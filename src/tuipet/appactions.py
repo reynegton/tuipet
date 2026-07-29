@@ -7,34 +7,36 @@ from __future__ import annotations
 
 import random  # noqa: F401
 
-from . import albumscreen  # noqa: F401
-from . import assistscreen  # noqa: F401
-from . import backgroundscreen  # noqa: F401
-from . import bugscreen  # noqa: F401
-from . import data  # noqa: F401
-from . import deathscreen  # noqa: F401
-from . import digicorescreen  # noqa: F401
-from . import dnascreen  # noqa: F401
-from . import egg as egg_mod  # noqa: F401
-from . import eggguidescreen  # noqa: F401
-from . import eggselectscreen  # noqa: F401
-from . import feedscreen  # noqa: F401
-from . import hallscreen  # noqa: F401
-from . import rival  # noqa: F401
-from . import helpscreen  # noqa: F401
-from . import lobbyscreen  # noqa: F401
-from . import net  # noqa: F401
-from . import persistence  # noqa: F401
-from . import shopscreen  # noqa: F401
-from . import statusbox  # noqa: F401
-from . import theme  # noqa: F401
-from . import titlescreen  # noqa: F401
-from . import tournament  # noqa: F401
-from . import tournamentscreen  # noqa: F401
-from . import training  # noqa: F401
-from . import optionsscreen  # noqa: F401
-from .appboot import _lobby_uri  # noqa: F401
-from .pet import Pet  # noqa: F401
+import tuipet.ui.screens.albumscreen as albumscreen    # noqa: F401
+import tuipet.ui.screens.assistscreen as assistscreen    # noqa: F401
+import tuipet.ui.screens.backgroundscreen as backgroundscreen    # noqa: F401
+import tuipet.ui.screens.bugscreen as bugscreen    # noqa: F401
+import tuipet.data.loaders.data as data    # noqa: F401
+import tuipet.ui.screens.deathscreen as deathscreen    # noqa: F401
+import tuipet.ui.screens.digicorescreen as digicorescreen    # noqa: F401
+import tuipet.ui.screens.dnascreen as dnascreen    # noqa: F401
+import tuipet.core.egg as egg_mod    # noqa: F401
+import tuipet.ui.screens.eggguidescreen as eggguidescreen    # noqa: F401
+import tuipet.ui.screens.eggselectscreen as eggselectscreen    # noqa: F401
+import tuipet.ui.screens.feedscreen as feedscreen    # noqa: F401
+import tuipet.ui.screens.hallscreen as hallscreen    # noqa: F401
+import tuipet.core.rival as rival    # noqa: F401
+import tuipet.ui.screens.helpscreen as helpscreen    # noqa: F401
+import tuipet.ui.screens.lobbyscreen as lobbyscreen    # noqa: F401
+import tuipet.network.net as net    # noqa: F401
+import tuipet.utils.persistence as persistence    # noqa: F401
+import tuipet.ui.screens.shopscreen as shopscreen    # noqa: F401
+import tuipet.ui.components.statusbox as statusbox    # noqa: F401
+import tuipet.utils.theme as theme    # noqa: F401
+import tuipet.ui.screens.titlescreen as titlescreen
+
+from tuipet.i18n.translator import t    # noqa: F401
+import tuipet.core.tournament as tournament    # noqa: F401
+import tuipet.ui.screens.tournamentscreen as tournamentscreen    # noqa: F401
+import tuipet.core.training as training    # noqa: F401
+import tuipet.ui.screens.optionsscreen as optionsscreen    # noqa: F401
+from tuipet.appboot import _lobby_uri    # noqa: F401
+from tuipet.core.pet import Pet    # noqa: F401
 
 
 class ActionsMixin:
@@ -91,10 +93,10 @@ class ActionsMixin:
     def action_lobby(self):
         if self.mode is not None:
             return
-        name, pw = persistence.get_account()
-        self._open_mode(lobbyscreen.LobbyPanel(self.pet, self._lobby_connect,
-                        name=name, pw=pw),
-                        self._after_lobby)
+        # TODO: Estudar a comunicação de rede do servidor gringo original e manter a compatibilidade
+        # dos envios/recebimentos para reativar o multiplayer futuramente.
+        self._hud(t("msg_multiplayer_disabled", "Multiplayer desativado"))
+        self.repaint()
 
     def _lobby_connect(self, name, pw, card):
         """Create + start the WebSocket client; the app owns its worker lifecycle."""
@@ -232,7 +234,7 @@ class ActionsMixin:
         # praise & scold, RESTORED (canon restoration B, 2026-07-23).
         # The asleep poke follows the care-key law: wake + refuse this
         # press; youth outranks sleep like every other gate.
-        from . import disciplinescreen
+        import tuipet.ui.screens.disciplinescreen as disciplinescreen
         p = self.pet
         if (g := p._guard(asleep_blocks=False)) is not None:
             self._do(g); return
@@ -270,7 +272,7 @@ class ActionsMixin:
         err = self.pet.can_battle()
         if err:
             self._do(err); return
-        from . import battlescreen
+        import tuipet.ui.screens.battlescreen as battlescreen
         # THE NAMED RIVAL answers every 3rd bout (Joel 2026-07-26): its
         # card rides the ordinary Battle engine — same bracket, ideal
         # condition, no purse — only the NAME changes.  A rival bout wears
@@ -415,7 +417,7 @@ class ActionsMixin:
         self.repaint()
 
     def action_adventure(self):
-        from . import adventurescreen
+        import tuipet.ui.screens.adventurescreen as adventurescreen
         reason = self.pet.can_adventure()   # single-source gate, like raid/train/cup
         if reason:
             self._do(reason); return
@@ -425,7 +427,7 @@ class ActionsMixin:
     def _after_zone_pick(self, zone):
         if not zone:
             self.repaint(); return          # backed out of Adventure
-        from . import adventurescreen
+        import tuipet.ui.screens.adventurescreen as adventurescreen
         self._open_mode(adventurescreen.AdventurePanel(self.pet, zone=zone),
                         self._after_adventure)
 
@@ -441,12 +443,8 @@ class ActionsMixin:
         self.repaint()
 
     def action_raid(self):
-        from . import raidscreen
-        reason = self.pet.can_raid()    # single-source gate, like feed/train/dna/cup
-        if reason:
-            self._do(reason); return
-        self._open_mode(raidscreen.RaidPanel(self.pet, self._lobby_connect),
-                        self._after_raid)
+        self._hud(t("msg_raid_disabled", "Raid desativada"))
+        self.repaint()
 
     def _after_raid(self, msg):
         if msg:

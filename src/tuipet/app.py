@@ -14,30 +14,31 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Static
 
-from . import statusbox
-from .appactions import ActionsMixin
-from .appboot import (  # noqa: F401  (re-export: tuipet.app.X keeps resolving)
+import tuipet.ui.components.statusbox as statusbox
+from tuipet.appactions import ActionsMixin
+from tuipet.appboot import (    # noqa: F401  (re-export: tuipet.app.X keeps resolving)
     MIN_COLS, MIN_ROWS, _load_sound, _lobby_uri, _preflight, _save_sound,
     _sound_path, host_platform)
-from . import data
-from . import menu
-from . import eggselectscreen
-from . import persistence
-from . import net
-from . import lobbyscreen
-from . import titlescreen
-from . import deathscreen
-from . import sound
-from . import update as update_check
-from . import cloudsync
-from . import shop
-from .pet import Pet
-from .petbase import POOPDANCE_AT
+import tuipet.data.loaders.data as data
+import tuipet.ui.components.menu as menu
+from tuipet.i18n.translator import t
+import tuipet.ui.screens.eggselectscreen as eggselectscreen
+import tuipet.utils.persistence as persistence
+import tuipet.network.net as net
+import tuipet.ui.screens.lobbyscreen as lobbyscreen
+import tuipet.ui.screens.titlescreen as titlescreen
+import tuipet.ui.screens.deathscreen as deathscreen
+import tuipet.utils.sound as sound
+import tuipet.utils.update as update_check
+import tuipet.network.cloudsync as cloudsync
+import tuipet.core.shop as shop
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import POOPDANCE_AT
 
-from . import theme
+import tuipet.utils.theme as theme
 # arena.py owns the LCD renderer; pull the names app.py and the tests still
 # reach through `tuipet.app.*` back into this namespace (modularization 2026-07-08).
-from .arena import (  # noqa: F401  (full re-export: preserve tuipet.app.* for callers/tests)
+from tuipet.core.arena import (    # noqa: F401  (full re-export: preserve tuipet.app.* for callers/tests)
     Screen, SCREEN_COLS, SCREEN_ROWS, SPRITE_W, PET_BASE_X, _FxCtx,
     hearts, bar, _FX, GRAVESTONE, POOP_W, POOP_PAD,
     _evol_strobe, _filth_right, _filth_pts, COND_W, COND_H, SICK_ZONE,
@@ -91,9 +92,9 @@ def keys_markup():
         # "(meat·pill)" left 2026-07-26 (Joel: "save rome by removing (meat
         # pill)") -- the old line sat at the 71-cell cap exactly, and its
         # room is what the H key rides in on
-        f"[{k}]f[/] feed  [{k}]h[/] heal  [{k}]c[/] clean  [{k}]o[/] lights  [{k}]v[/] assist  [{k}]p[/] discipline  [{k}]m[/] battle\n"
-        f"[{k}]a[/] adventure  [{k}]r[/] raid  [{k}]u[/] cup  [{k}]l[/] lobby [dim](pvp)[/]  [{k}]t[/] train  [{k}]x[/] DNA  [{k}]d[/] digicore\n"
-        f"[{k}]e[/] eggs  [{k}]s[/] shop  [{k}]b[/] bag  [{k}]n[/] scenes  [{k}]g[/] options  [{k}]i[/] bug  [{k}]?[/] help  [{k}]q[/] quit"
+        f"[{k}]f[/] {t('action_feed', 'feed')}  [{k}]h[/] {t('action_heal', 'heal')}  [{k}]c[/] {t('action_clean', 'clean')}  [{k}]o[/] {t('action_lights', 'lights')}  [{k}]v[/] {t('action_assist', 'assist')}  [{k}]p[/] {t('action_discipline', 'discipline')}  [{k}]m[/] {t('action_battle', 'battle')}\n"
+        f"[{k}]a[/] {t('action_adventure', 'adventure')}  [{k}]r[/] {t('action_raid', 'raid')}  [{k}]u[/] {t('action_cup', 'cup')}  [{k}]l[/] {t('action_lobby', 'lobby')} [dim](pvp)[/]  [{k}]t[/] {t('action_train', 'train')}  [{k}]x[/] {t('action_dna', 'DNA')}  [{k}]d[/] {t('action_digicore', 'digicore')}\n"
+        f"[{k}]e[/] {t('action_eggs', 'eggs')}  [{k}]s[/] {t('action_shop', 'shop')}  [{k}]b[/] {t('action_bag', 'bag')}  [{k}]n[/] {t('action_scenes', 'scenes')}  [{k}]g[/] {t('action_options', 'options')}  [{k}]i[/] {t('action_bug', 'bug')}  [{k}]?[/] {t('action_help', 'help')}  [{k}]q[/] {t('action_quit', 'quit')}"
     )
 
 
@@ -273,7 +274,7 @@ class TuiPetApp(ActionsMixin, App):
         build only (Joel 2026-07-07: release news belongs on the title
         screen).  The seen stamp lives in settings so it survives pets and
         rides the .bak rotation like every app-level pref."""
-        from . import update
+        import tuipet.utils.update as update
         cur = update.current_version()
         if not cur:
             return None
@@ -371,7 +372,6 @@ class TuiPetApp(ActionsMixin, App):
         playing the version they launched.  Python already imported that code,
         so a fresh install can only take effect on the NEXT launch -- the nudge
         says exactly that, and never claims a live swap.
-
         Honest about what it cannot do (the silent-failure law): where we cannot
         run pip for the player -- iOS sandboxes subprocesses, a source checkout
         has no release to install over -- we fall back to telling them the
@@ -1061,7 +1061,7 @@ class TuiPetApp(ActionsMixin, App):
                 self._dying_fx = False
                 hits = getattr(self, "_revive_hits", 0)
                 self._revive_hits = 0
-                from .pet import HITS_TO_SAVE
+                from tuipet.core.pet import HITS_TO_SAVE
                 if hits > HITS_TO_SAVE * (self.pet.saved_from_death + 1):
                     old_num = self.pet.save_from_death()
                     if old_num is not None:            # the dark rebirth
@@ -1401,7 +1401,7 @@ class TuiPetApp(ActionsMixin, App):
         """The strict-max Field whose charge has ARMED a divergence, or None
         -- the HUD's wrapper over evolution.divergence_target (cheap: the
         corpus tables behind it are all lru_cached loads)."""
-        from . import evolution
+        import tuipet.core.evolution as evolution
         return p.highest_dna() if evolution.divergence_target(p) is not None else None
 
     def _need_message(self, p):
@@ -1461,7 +1461,8 @@ class TuiPetApp(ActionsMixin, App):
             # pick with the SAME generation in hand.  (This sentinel was
             # only handled on the fresh-start path -- the retire/death path
             # crashed on it: Termux crash 2026-07-18, egg_type='guide'.)
-            from . import eggguidescreen, eggselectscreen
+            import tuipet.ui.screens.eggguidescreen as eggguidescreen
+            import tuipet.ui.screens.eggselectscreen as eggselectscreen
             self._open_mode(eggguidescreen.EggGuidePanel(self.pet),
                             lambda _=None: self._open_mode(
                                 eggselectscreen.EggSelectPanel(self.pet),
@@ -1518,6 +1519,8 @@ class TuiPetApp(ActionsMixin, App):
 
 
 def main():
+    from tuipet.i18n.translator import set_language
+    set_language("pt")
     _preflight()
     other = persistence.acquire_instance_lock()
     if other and not _os.environ.get("TUIPET_FORCE"):

@@ -7,8 +7,8 @@ import os
 import platform as _pf  # noqa: F401
 import sys  # noqa: F401
 
-from . import data  # noqa: F401
-from . import persistence
+import tuipet.data.loaders.data as data    # noqa: F401
+import tuipet.utils.persistence as persistence
 
 MIN_COLS, MIN_ROWS = 77, 24     # the fixed layout: #left 44 + #stats 30 + chrome
 
@@ -16,7 +16,7 @@ MIN_COLS, MIN_ROWS = 77, 24     # the fixed layout: #left 44 + #stats 30 + chrom
 def host_platform():
     """The platform name for bug reports (hostinfo owns the detection so the
     sound backend and the bug feed can never disagree about the host)."""
-    from . import hostinfo
+    import tuipet.utils.hostinfo as hostinfo
     return hostinfo.host_platform()
 
 

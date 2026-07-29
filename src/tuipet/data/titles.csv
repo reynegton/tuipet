@@ -1,8 +1,8 @@
-TitleID,Name,Price,Description
-0,Bit Collector,10000,a first fortune spent in style
-1,Bit Baron,25000,the shopkeeper knows your name
-2,Data Dynast,50000,wealth measured in terabytes
-3,Digital Monarch,100000,the net bows to your bankroll
-4,Legend of the Net,250000,they tell stories about your bits
-5,Sovereign of Bits,500000,half a million and still counting
-6,The Bottomless Wallet,1000000,a myth the shopkeepers whisper
+TitleID,Name,Name_pt,Name_es,Price,Description,Description_pt,Description_es
+0,Bit Collector,Bit Collector,Bit Collector,10000,a first fortune spent in style,a first fortune spent in style,a first fortune spent in style
+1,Bit Baron,Bit Baron,Bit Baron,25000,the shopkeeper knows your name,the shopkeeper knows your name,the shopkeeper knows your name
+2,Data Dynast,Data Dynast,Data Dynast,50000,wealth measured in terabytes,wealth measured in terabytes,wealth measured in terabytes
+3,Digital Monarch,Digital Monarch,Digital Monarch,100000,the net bows to your bankroll,the net bows to your bankroll,the net bows to your bankroll
+4,Legend of the Net,Legend of the Net,Legend of the Net,250000,they tell stories about your bits,they tell stories about your bits,they tell stories about your bits
+5,Sovereign of Bits,Sovereign of Bits,Sovereign of Bits,500000,half a million and still counting,half a million and still counting,half a million and still counting
+6,The Bottomless Wallet,The Bottomless Wallet,The Bottomless Wallet,1000000,a myth the shopkeepers whisper,a myth the shopkeepers whisper,a myth the shopkeepers whisper
