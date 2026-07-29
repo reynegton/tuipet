@@ -20,6 +20,7 @@ import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
 import tuipet.utils.persistence as persistence
 from tuipet.utils.theme import INK, INK_B, DIM, LCD_ON, LCD_BG    # noqa: F401  (theme.apply propagation)
+from tuipet.i18n.translator import t
 
 VIS = 9                      # list rows shown at once (the egg-guide window)
 IMG_W, IMG_H = 40, 16        # detail pixel area (8 character rows)
@@ -39,21 +40,21 @@ def route_hint(num):
             if num in line["members"]}
     if lids:
         for i in range(egg_mod.count()):
-            for t in egg_mod.hatch_targets(i):
-                _root, lid = lines.canonical_root(t)
+            for target in egg_mod.hatch_targets(i):
+                _root, lid = lines.canonical_root(target)
                 if lid in lids:
-                    return f"raised on the {egg_mod.hatch_name(i)} line"
-        return "raised on a line"          # a line holds it; no listed egg
+                    return t("album_raised_on_egg_line", "raised on the {name} line").format(name=egg_mod.hatch_name(i))
+        return t("album_raised_on_line", "raised on a line")          # a line holds it; no listed egg
     req = data.load_requirements().get(num, {})
     if req.get("evol_item", -1) != -1:
-        return "an armor jump reaches it"
+        return t("album_armor_jump", "an armor jump reaches it")
     if req.get("special", "None") != "None":
-        return "a jogress reaches it"
+        return t("album_jogress", "a jogress reaches it")
     _, by_num = data.load_sprites()
     field = (by_num.get(num) or {}).get("field", "") or ""
     if field and field != "None":
-        return f"a {data.pretty_field(field)} divergence reaches it"
-    return "keep raising"
+        return t("album_field_divergence", "a {field} divergence reaches it").format(field=data.pretty_field(field))
+    return t("album_keep_raising", "keep raising")
 
 
 class AlbumPanel:
@@ -73,9 +74,9 @@ class AlbumPanel:
 
     def strip(self):
         if self.detail:
-            return menu.hints(("←→", "browse"), ("ESC", "back"))
-        return menu.hints(("↑↓", "browse"), ("ENTER", "view"),
-                          ("ESC", "out"))
+            return menu.hints(("←→", t("album_key_browse", "browse")), ("ESC", t("album_key_back", "back")))
+        return menu.hints(("↑↓", t("album_key_browse", "browse")), ("ENTER", t("album_key_view", "view")),
+                          ("ESC", t("album_key_out", "out")))
 
     def key(self, k):
         if self.detail:
@@ -113,13 +114,13 @@ class AlbumPanel:
 
     def _note(self, num):
         if num not in self.seen:
-            return "not yet discovered"
+            return t("album_not_yet_disc", "not yet discovered")
         rec = self._rec(num)
         fld = data.pretty_field(rec.get("field", "") or "")
-        return f"No. #{num}" + (f" · {fld}" if fld else "")
+        return t("album_no", "No. #{num}").format(num=num) + (f" · {fld}" if fld else "")
 
     def _list_scene(self):
-        out = menu.header("ALBUM", f"{len(self.seen)}/{self.n}")
+        out = menu.header(t("album_hdr_album", "ALBUM"), f"{len(self.seen)}/{self.n}")
 
         def fmt(num, j):
             cur = j == self.i
@@ -147,7 +148,7 @@ class AlbumPanel:
         seen = num in self.seen
         rec = self._rec(num)
         name = rec.get("name", "?") if seen else "???"
-        out = menu.header(f"ALBUM  {name[:20].upper()}", f"#{num}")
+        out = menu.header(t("album_hdr_name", "ALBUM  {name}").format(name=name[:20].upper()), f"#{num}")
         rows = (data.bob_frame(num, self.frame_i) if seen
                 else silhouette(data.frames_for(num)[0])) or []
         buf = [[0] * IMG_W for _ in range(IMG_H)]
@@ -177,7 +178,7 @@ class AlbumPanel:
             self._routes = getattr(self, "_routes", {})
             if num not in self._routes:
                 self._routes[num] = route_hint(num)
-            info = f"not yet discovered — {self._routes[num]}"
+            info = t("album_not_yet_disc_route", "not yet discovered — {route}").format(route=self._routes[num])
         out.append_text(menu.note(info, tick=self.frame_i))
         out.right_crop(1)     # keys ride the strip (the egg-guide law)
         return out

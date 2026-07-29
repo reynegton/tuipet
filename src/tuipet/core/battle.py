@@ -14,7 +14,8 @@ set (ripped from multiple fan games).
 from __future__ import annotations
 import random
 
-import tuipet.data.loaders.data as data
+from tuipet.data.loaders import data
+from tuipet.i18n.translator import t
 
 HP = 5
 ROUNDS_LOCAL = 20
@@ -214,12 +215,12 @@ def coach_line(mine, theirs):
     them, so losses read as arbitrary.  '' when nothing notable dragged
     -- the volleys were just volleys."""
     return {
-        "weight": f"weight {mine.weight}g vs base {mine.base_weight}g dragged it",
-        "hunger": "it fought hungry",
-        "energy": "energy ran low",
-        "effort": "the effort gauge sat near empty",
-        "rank": f"outranked — {theirs.stage} over {mine.stage}",
-        "drills": "more drills raise the hit rate",
+        "weight": t("coach_weight", "weight {weight}g vs base {base}g dragged it").format(weight=mine.weight, base=mine.base_weight),
+        "hunger": t("coach_hunger", "it fought hungry"),
+        "energy": t("coach_energy", "energy ran low"),
+        "effort": t("coach_effort", "the effort gauge sat near empty"),
+        "rank": t("coach_rank", "outranked — {theirs} over {mine}").format(theirs=theirs.stage, mine=mine.stage),
+        "drills": t("coach_drills", "more drills raise the hit rate"),
         "": "",
     }[_drag_key(mine, theirs)]
 
@@ -230,13 +231,13 @@ def readiness_line(mine, theirs):
     what's deciding it, before it starts").  Present tense, card-width
     (<= 26 cells); "in top form" when nothing drags."""
     return {
-        "weight": f"weight {mine.weight}g vs {mine.base_weight}g base",
-        "hunger": "fighting hungry",
-        "energy": "energy is low",
-        "effort": "effort meter low",
-        "rank": f"outranked by {theirs.stage}"[:26],
-        "drills": "drills would sharpen it",
-        "": "in top form",
+        "weight": t("ready_weight", "weight {weight}g vs {base}g base").format(weight=mine.weight, base=mine.base_weight),
+        "hunger": t("ready_hunger", "fighting hungry"),
+        "energy": t("ready_energy", "energy is low"),
+        "effort": t("ready_effort", "effort meter low"),
+        "rank": t("ready_rank", "outranked by {theirs}").format(theirs=theirs.stage)[:26],
+        "drills": t("ready_drills", "drills would sharpen it"),
+        "": t("ready_top_form", "in top form"),
     }[_drag_key(mine, theirs)]
 
 

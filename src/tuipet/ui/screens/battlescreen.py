@@ -18,6 +18,7 @@ from tuipet.utils.theme import LCD_ON, LCD_BG, SIL_SCENE, SIL_LIGHTSOFF    # noq
 import tuipet.utils.grid as grid
 import tuipet.ui.components.menu as menu
 import tuipet.utils.strikefx as strikefx
+from tuipet.i18n.translator import t
 
 COLS, ROWS = 40, 12
 PXH = ROWS * 2                                   # 24 px tall
@@ -221,7 +222,7 @@ class BattlePanel:
         from tuipet.core.battle import RAID_PLAYER_HP
         self.hud_php = RAID_PLAYER_HP if raid else 5   # raids fight from 10
         self.hud_fhp = 5
-        self.hud_note = "Battle start!"
+        self.hud_note = t("bat_battle_start", "Battle start!")
         self.phase = "intro"
         self.sfx = "battle"          # the banner sting
         self._last_m = None          # timeline marker edges -> per-event sfx
@@ -474,10 +475,10 @@ class BattlePanel:
         fh = fr.get("fh", b.enemy_hp if b else self.hud_fhp)
         if m == "banner":
             scene = self._scene([], _full(BANNER[fr["f"]]))
-            note = "BATTLE!"
+            note = t("bat_battle_start", "BATTLE!")
         elif m == "hit":
             scene = self._scene([], _full(EXPLODE[fr["f"]]))
-            note = "HIT!"
+            note = t("bat_flinch", "HIT!")
         elif m == "bossdie":
             if fr["stage"] == "off":                     # lights-out beat: it blinks away
                 scene = self._scene([], [])
@@ -488,7 +489,7 @@ class BattlePanel:
                 xshift = (-1 if fr.get("jit") else 1) if fr["stage"] == "on" else 0
                 place, _ = self._place_one("foe", rows, xshift)
                 scene = self._scene(place, [])
-            note = f"{self.enemy['name'][:12]} falls!"
+            note = t("bat_falls", "{name} falls!").replace("{name}", self.enemy['name'][:12])
         else:
             view = fr.get("view", "pet")
             dt = round(fr.get("prog", 0) * DODGE_T) if m == "dodge" else 0   # dodge beat 1..DODGE_T
@@ -551,10 +552,10 @@ class BattlePanel:
             # no orb on "dodge": canon hides the attack sprite -- the unhurt hop IS the miss
             overlay = self._orb_overlay(fr, mouth) if m in ("fire_out", "fire_in") else []
             scene = self._scene(place, overlay)
-            note = {"faceoff": f"{self.pet.name[:8]} vs {self.enemy['name'][:8]}",
-                    "reveal": f"{self.enemy['name'][:12]} appears!",
-                    "windup": "...", "fire_out": "Fire!", "fire_in": "Incoming!",
-                    "dodge": "Dodge!", "flinch": "Hit!", "result": ""}.get(m, "")
+            note = {"faceoff": t("bat_faceoff", "{p_name} vs {e_name}").format(p_name=self.pet.name[:8], e_name=self.enemy['name'][:8]),
+                    "reveal": t("bat_appears", "{name} appears!").replace("{name}", self.enemy['name'][:12]),
+                    "windup": t("bat_windup", "..."), "fire_out": t("bat_fire_out", "Fire!"), "fire_in": t("bat_fire_in", "Incoming!"),
+                    "dodge": t("bat_dodge", "Dodge!"), "flinch": t("bat_flinch", "Hit!"), "result": ""}.get(m, "")
             if m == "result":
                 note = self._result_note()
         self.hud_php, self.hud_fhp, self.hud_note = ph, fh, note
@@ -566,16 +567,16 @@ class BattlePanel:
         loss carries battle.coach_line's biggest fixable drag.  A raid
         keeps the plain record — its boss never falls and the dealt tally
         rides the exit line."""
-        rec = f"record {self.pet.wins}W/{self.pet.battles}"
+        rec = t("bat_record", "record {w}W/{b}").format(w=self.pet.wins, b=self.pet.battles)
         b = self.battle
         if b is None or self.raid:
             return rec
         if getattr(b, "drawn", False):
-            return f"a draw — counts as a loss · {rec}"
+            return t("bat_draw", "a draw — counts as a loss · {rec}").format(rec=rec)
         if self.won:
-            edge = ("by a whisker" if b.pet_hp <= 1
-                    else f"{b.pet_hp} HP to spare")
-            return f"won {edge} · {rec}"
+            edge = (t("bat_whisker", "by a whisker") if b.pet_hp <= 1
+                    else t("bat_hp_spare", "{hp} HP to spare").format(hp=b.pet_hp))
+            return t("bat_won", "won {edge} · {rec}").format(edge=edge, rec=rec)
         import tuipet.core.battle as _b
         why = _b.coach_line(b.me, b.foe)
         return f"{why} · {rec}" if why else rec

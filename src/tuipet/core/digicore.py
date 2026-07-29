@@ -12,8 +12,9 @@ import tuipet.data.loaders.data as data
 import tuipet.core.petbase as _petbase
 import tuipet.utils.backgrounds as _bgs
 import tuipet.core.egg as _egg
-import tuipet.core.evolution as evolution
-import tuipet.core.lines as lines
+from tuipet.core import evolution
+from tuipet.core import lines
+from tuipet.i18n.translator import t
 
 
 DIGICORE_BASE_RATE = 14            # DigicoreBaseRate (config.csv col 1)
@@ -196,9 +197,9 @@ def divergence_report(pet):
     field = pet.highest_dna()
     need = evolution.DIVERGE_NEED.get(pet.stage, 0)
     have = pet.dna_applied.get(field, 0)
-    return [(True, f"{field} charge {have}/{need} — ARMED"),
-            (None, "the steer overrides the chart"),
-            (None, "charges clear at every evolution")]
+    return [(True, t("digicore_diverge_armed", "{field} charge {have}/{need} — ARMED").format(field=field, have=have, need=need)),
+            (None, t("digicore_steer_overrides", "the steer overrides the chart")),
+            (None, t("digicore_charges_clear", "charges clear at every evolution"))]
 
 
 def _evo_rows(pet):
@@ -220,7 +221,7 @@ def _evo_rows(pet):
         _, by = data.load_sprites()
         targets = egg_mod.hatch_targets(getattr(pet, "egg_type", 0))
         if not targets:
-            return "(final form)"
+            return t("digicore_final_form_paren", "(final form)")
         if len(targets) > 1:
             return [(targets[0], "???", False, 0)]
         return [(t, by.get(t, {}).get("name", "?"), False, 0) for t in targets]
@@ -233,7 +234,7 @@ def _evo_rows(pet):
             # the steer tops the chart; the line rows stay below -- they
             # come BACK if another Field catches up and breaks the strict max
             return [armed] + [r for r in (rows or []) if r[0] != armed[0]]
-        return rows or "(final form)"
+        return rows or t("digicore_final_form_paren", "(final form)")
     try:
         # ready first, then HIGHEST fulfilled -- ascending put the form the
         # engine is LEAST likely to pick in the top "closest" row, against
@@ -242,7 +243,7 @@ def _evo_rows(pet):
     except Exception:
         cands = []
     if not cands:
-        return [armed] if armed else "(final form)"
+        return [armed] if armed else t("digicore_final_form_paren", "(final form)")
     rows = []
     from tuipet import persistence as _p
     reqs = data.load_requirements()
@@ -267,12 +268,12 @@ def _trophy_rows(pet):
     from tuipet import persistence as _p
     # "This life" is exactly the 9-char label column -- it rendered flush
     # against its value ("This lifenone yet"; egg-stage audit 2026-07-05)
-    rows = [("This pet", "\u2605" * min(pet.trophies, 12) or "none yet")]
+    rows = [(t("digicore_lbl_this_pet", "This pet"), "\u2605" * min(pet.trophies, 12) or t("digicore_val_none_yet", "none yet"))]
     try:
         career = len(_p.get_progress().get("tourneys", ()) or ())
     except Exception:
         career = 0
-    rows.append(("Career", f"{career} cup(s), all generations"))
+    rows.append((t("digicore_lbl_career", "Career"), t("digicore_val_career_cups", "{career} cup(s), all generations").format(career=career)))
     # the collection long game ("ultimate v-pet" arc 2026-07-07): every raised
     # form lands in the cross-generation album; divergence/jogress/eggs are
     # the roads to the rest of the corpus
@@ -289,20 +290,20 @@ def _trophy_rows(pet):
     # mons??").  album_roster() = that canonical set, shared with the album
     # screen's pages (the book this count fronts for).
     total = len(data.album_roster())
-    rows.append(("Album", f"{seen}/{total} discovered"))
+    rows.append((t("digicore_lbl_album", "Album"), t("digicore_val_album_disc", "{seen}/{total} discovered").format(seen=seen, total=total)))
     # the Maps row became the Raids row (BASIC VPET 2026-07-16): adventure
     # left, and felled community bosses gate the old MapComplete eggs now
     try:
         felled = int(_p.get_progress().get("raids", 0) or 0)
     except Exception:
         felled = 0
-    rows.append(("Raids", f"{felled} raid bosses felled"))
+    rows.append((t("digicore_lbl_raids", "Raids"), t("digicore_val_raids_felled", "{felled} raid bosses felled").format(felled=felled)))
     won = sorted((getattr(pet, "trophies_won", None) or {}).items())
     for tid, season in won[:4]:                     # keep the page at 9 rows max
         # trophy_name speaks every id space -- town cups included
         rows.append((_t.trophy_name(tid)[:12], season))   # (was 5: Maps row joined)
     if len(won) > 4:
-        rows.append(("…", f"+{len(won) - 4} more"))
+        rows.append(("…", t("digicore_val_more", "+{count} more").format(count=len(won) - 4)))
     return rows
 
 
@@ -316,7 +317,7 @@ def _legacy_rows():
     except Exception:
         elders = []
     if not elders:
-        return [("—", "no elders yet — this pet"), ("", "is writing generation one")]
+        return [("—", t("digicore_no_elders_1", "no elders yet — this pet")), ("", t("digicore_no_elders_2", "is writing generation one"))]
     rows = []
     for r in reversed(elders[-8:]):                 # 8 headstones + the more row = 9
         # _mins: the book's own REAL-time formatter, same unit as the STATUS
@@ -329,25 +330,25 @@ def _legacy_rows():
         val = f"{str(r.get('name', '?'))[:12]} {r.get('stage', '?')} {age}{fate}"
         rows.append((f"gen {r.get('gen', '?')}", val[:30]))
     if len(elders) > 8:
-        rows.append(("…", f"+{len(elders) - 8} more remembered"))
+        rows.append(("…", t("digicore_more_remembered", "+{count} more remembered").format(count=len(elders) - 8)))
     return rows
 
 
 def build_pages(pet):
-    appetite = ["picky", "normal", "greedy"][pet._glutton() + 1]
-    temperament = ["mellow", "steady", "restless"][pet._restless() + 1]
-    disp = ["sour", "even", "sunny"][pet._disposition() + 1]
+    appetite = [t("digicore_glutton_picky", "picky"), t("digicore_glutton_normal", "normal"), t("digicore_glutton_greedy", "greedy")][pet._glutton() + 1]
+    temperament = [t("digicore_temp_mellow", "mellow"), t("digicore_temp_steady", "steady"), t("digicore_temp_restless", "restless")][pet._restless() + 1]
+    disp = [t("digicore_disp_sour", "sour"), t("digicore_disp_even", "even"), t("digicore_disp_sunny", "sunny")][pet._disposition() + 1]
     status = [
-        ("Name", pet.name or "—"),
+        (t("digicore_lbl_name", "Name"), pet.name or t("digicore_val_dash", "—")),
         # an egg has no dex number yet -- "#-1" leaked the internal sentinel
         # (egg-stage audit 2026-07-05)
-        ("No.", "—" if pet.num < 0 else f"#{pet.num}"), ("Stage", pet.stage),
-        ("Attrib", pet.attribute), ("Field", data.pretty_field(pet.field) or "—"),
-        ("Gen", str(pet.generation)),
+        (t("digicore_lbl_no", "No."), t("digicore_val_dash", "—") if pet.num < 0 else f"#{pet.num}"), (t("digicore_lbl_stage", "Stage"), pet.stage),
+        (t("digicore_lbl_attrib", "Attrib"), pet.attribute), (t("digicore_lbl_field", "Field"), data.pretty_field(pet.field) or t("digicore_val_dash", "—")),
+        (t("digicore_lbl_gen", "Gen"), str(pet.generation)),
         # (the "Life Xd left" row left with the lifespan clock -- DSprite
         # mortality 2026-07-22: nothing counts down anymore, Age counts up)
-        ("Age", _mins(pet.age_seconds)),
-        ("Battles", f"{pet.wins}W / {pet.battles} · {pet.bits}b"),
+        (t("digicore_lbl_age", "Age"), _mins(pet.age_seconds)),
+        (t("digicore_lbl_battles", "Battles"), f"{pet.wins}W / {pet.battles} · {pet.bits}b"),
     ]
     # the POWER page is the BATTLE ledger (framing fixed, gameplay polish
     # #17 2026-07-22): the Va/D/Vi attribute powers stopped gating growth
@@ -358,10 +359,10 @@ def build_pages(pet):
     # moved beside its kin (weight -> CONDITION; battles/bits -> STATUS;
     # trophies have their own page).
     power = [
-        ("Vaccine", str(pet.vaccine)), ("Data", str(pet.data_power)),
-        ("Virus", str(pet.virus)), ("Effort", f"{pet.strength}/4"),
-        ("Form", getattr(pet, "saved_hit_type", "normal")),
-        ("Level", f"{lines._pet_level(pet)} ({getattr(pet, 'exp', 0)} exp)"),
+        (t("digicore_lbl_vaccine", "Vaccine"), str(pet.vaccine)), (t("digicore_lbl_data", "Data"), str(pet.data_power)),
+        (t("digicore_lbl_virus", "Virus"), str(pet.virus)), (t("digicore_lbl_effort", "Effort"), f"{pet.strength}/4"),
+        (t("digicore_lbl_form", "Form"), getattr(pet, "saved_hit_type", t("digicore_val_normal", "normal"))),
+        (t("digicore_lbl_level", "Level"), f"{lines._pet_level(pet)} ({getattr(pet, 'exp', 0)} exp)"),
         # both training terms of the hit formula on one row (Joel
         # 2026-07-23 "is there a stat somewhere i can see that shows
         # this?"): lifetime (the +20% term, never resets) · this stage
@@ -370,61 +371,60 @@ def build_pages(pet):
         # Named TRAINING, not "Drills", since 2026-07-25: a bout feeds
         # both counters now (+2), so a row that says drills would be
         # naming one of its two sources (the liveness law).
-        ("Training", f"{getattr(pet, 'total_trainings', 0)}"
-                     f" · {getattr(pet, 'stage_trainings', 0)} this stage"),
-        ("KO6", f"{pet.mega_kills} Mega felled"),
+        (t("digicore_lbl_training", "Training"), t("digicore_val_this_stage", "{total} · {stage} this stage").format(total=getattr(pet, 'total_trainings', 0), stage=getattr(pet, 'stage_trainings', 0))),
+        (t("digicore_lbl_ko6", "KO6"), t("digicore_val_mega_felled", "{kills} Mega felled").format(kills=pet.mega_kills)),
     ]
     if pet.x_antibody != "None":
-        power.append(("X-Anti", pet.x_antibody))   # keep the page at its 9-row max
+        power.append((t("digicore_lbl_xanti", "X-Anti"), pet.x_antibody))   # keep the page at its 9-row max
     # (the Likes/Dislikes clock rows left with the timeRanks system --
     # BASIC VPET 2026-07-17)
     person = [
         # ("Spirit" was the dead spirit system's word -- the row shows the
         # DISPOSITION trait, which is alive; label polish 2026-07-17)
-        ("Type", pet.personality()), ("Nature", disp),
-        ("Appetite", appetite), ("Pace", temperament),
+        (t("digicore_lbl_type", "Type"), pet.personality()), (t("digicore_lbl_nature", "Nature"), disp),
+        (t("digicore_lbl_appetite", "Appetite"), appetite), (t("digicore_lbl_pace", "Pace"), temperament),
         # the manners gauge, LIVE again (canon restoration B, 2026-07-23)
-        ("Manners", f"{getattr(pet, 'obedience', 0)}/{_petbase.MAX_OBEDIENCE}"),
+        (t("digicore_lbl_manners", "Manners"), f"{getattr(pet, 'obedience', 0)}/{_petbase.MAX_OBEDIENCE}"),
     ]
     if getattr(pet, "rival_name", ""):
         # the named rival's head-to-head (Joel 2026-07-26) — appears once
         # the first challenge mints the tamer, dies with the generation
-        person.append(("Rival",
+        person.append((t("digicore_lbl_rival", "Rival"),
                        f"{pet.rival_name} · {pet.rival_wins}W-{pet.rival_losses}L"))
     core = data.load_digicore_icons().get(pet.num)
     if core:
-        person.append(("Core", f"{chr(0x25C6)} {core}"))   # DVPet digicore badge
+        person.append((t("digicore_lbl_core", "Core"), f"{chr(0x25C6)} {core}"))   # DVPet digicore badge
     return [
-        ("STATUS", status),
-        ("POWER", power),
-        ("CONDITION", [
-            ("Hunger", f"{pet.hunger}/4"), ("Energy", f"{int(pet.energy)}/{pet.max_energy}"),
-            ("Weight", f"{pet.weight}g"),
+        (t("digicore_pg_status", "STATUS"), status),
+        (t("digicore_pg_power", "POWER"), power),
+        (t("digicore_pg_condition", "CONDITION"), [
+            (t("digicore_lbl_hunger", "Hunger"), f"{pet.hunger}/4"), (t("digicore_lbl_energy", "Energy"), f"{int(pet.energy)}/{pet.max_energy}"),
+            (t("digicore_lbl_weight", "Weight"), f"{pet.weight}g"),
             # two ailments, two words: INJURY returned with the canon
             # restoration (2026-07-23) but this row kept the removal-era
             # sick-only read -- the data book could never say "hurt".
             # Sick outranks hurt, same as the feed cursor (audit 2026-07-25)
-            ("Ailing", "sick" if pet.sick else
-             ("hurt" if pet.is_injured() else "no")),
+            (t("digicore_lbl_ailing", "Ailing"), t("digicore_val_sick", "sick") if pet.sick else
+             (t("digicore_val_hurt", "hurt") if pet.is_injured() else t("digicore_val_no", "no"))),
             # (no nutrition row: the macro system was REMOVED 2026-07-16 --
             # its fields are frozen starter values; cards only show LIVE data)
-            ("Poop", str(pet.poop)),
-            ("Care", f"{pet.care_mistakes} this stage"),
-            ("Disturb", str(pet.disturb)),
+            (t("digicore_lbl_poop", "Poop"), str(pet.poop)),
+            (t("digicore_lbl_care", "Care"), t("digicore_val_care_stage", "{mistakes} this stage").format(mistakes=pet.care_mistakes)),
+            (t("digicore_lbl_disturb", "Disturb"), str(pet.disturb)),
         ]),
-        ("HOME", [
+        (t("digicore_pg_home", "HOME"), [
             # the household page (data-page polish 2026-07-17): the scene
             # honors the E pick.  (The staple-fixture stock rows left with
             # the props: strict-DSprite items, 2026-07-17.)
-            ("Scene", _bgs.name(getattr(pet, "bg_pick", "")
+            (t("digicore_lbl_scene", "Scene"), _bgs.name(getattr(pet, "bg_pick", "")
                                 or _bgs.scene_for_egg(getattr(pet, "egg_type", 0)))),
-            ("Egg", _egg.hatch_name(getattr(pet, "egg_type", 0))),
-            ("Helper", "hired" if getattr(pet, "auto_care", False) else "off"),
+            (t("digicore_lbl_egg", "Egg"), _egg.hatch_name(getattr(pet, "egg_type", 0))),
+            (t("digicore_lbl_helper", "Helper"), t("digicore_val_hired", "hired") if getattr(pet, "auto_care", False) else t("digicore_val_off", "off")),
         ]),
-        ("PERSON", person),
-        ("TROPHIES", _trophy_rows(pet)),
-        ("LEGACY", _legacy_rows()),
-        ("EVOLVES", _evo_rows(pet)),
+        (t("digicore_pg_person", "PERSON"), person),
+        (t("digicore_pg_trophies", "TROPHIES"), _trophy_rows(pet)),
+        (t("digicore_pg_legacy", "LEGACY"), _legacy_rows()),
+        (t("digicore_pg_evolves", "EVOLVES"), _evo_rows(pet)),
     ]
 
 

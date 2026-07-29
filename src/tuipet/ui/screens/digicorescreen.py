@@ -21,6 +21,7 @@ from tuipet.utils.render import render_scene
 
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, SIL_SCENE, SIL_LIGHTSOFF, VOID    # noqa: F401  (theme.apply propagation)
 import tuipet.ui.components.menu as menu
+from tuipet.i18n.translator import t
 
 SCENE_ROWS = 12                    # the core/teaser pages own the WHOLE arena now --
 #                                    Joel 2026-07-05: the 8-row band crammed a 16px mon
@@ -57,7 +58,7 @@ class DigiCorePanel:
         self.teaser_t = 0         # ticks into the digicoreExpand zoom
         self._back_t = 0          # evolSilhouetteBack dark-blink ticks left
         self.frame_i = 0
-        self.note = "the core stirs…"
+        self.note = t("digicore_stirs", "the core stirs…")
         self.evo_sel = 0          # EVOLVES page: the highlighted candidate
         self.detail = None        # (num, name): the open requirement checklist
         self.det_off = 0          # ...and its scroll offset
@@ -180,33 +181,33 @@ class DigiCorePanel:
         # age-count on a final form -- same glyph, opposite directions,
         # with only the Meter row to disambiguate
         if pending:
-            core_val = f"{chr(0x25C6)} {n} to evolve"
+            core_val = t("digicore_to_evolve", "{chr} {n} to evolve").format(chr=chr(0x25C6), n=n)
         elif p.is_geriatric:
-            core_val = f"{chr(0x25C6)} {n} — elder"
+            core_val = t("digicore_elder", "{chr} {n} — elder").format(chr=chr(0x25C6), n=n)
         else:
-            core_val = f"{chr(0x25C6)} {n} of {DIGICORE_BASE_RATE} to elder"
+            core_val = t("digicore_to_elder_full", "{chr} {n} of {base} to elder").format(chr=chr(0x25C6), n=n, base=DIGICORE_BASE_RATE)
         rows = [
-            ("Core", core_val),
-            ("Meter", "evolution nears at 1" if pending else "counts the days"),
-            ("Field", data.pretty_field(getattr(p, "field", "") or "None")),
-            ("X-State", "none" if x == "None" else x.lower()),
-            ("Mode", ("ready — press M" if p.can_mode_change() else chr(0x2014))),
+            (t("digicore_lbl_core", "Core"), core_val),
+            (t("digicore_lbl_meter", "Meter"), t("digicore_meter_near", "evolution nears at 1") if pending else t("digicore_meter_days", "counts the days")),
+            (t("digicore_lbl_field", "Field"), data.pretty_field(getattr(p, "field", "") or "None")),
+            (t("digicore_lbl_xstate", "X-State"), t("digicore_val_none_lower", "none") if x == "None" else x.lower()),
+            (t("digicore_lbl_mode", "Mode"), (t("digicore_mode_ready", "ready — press M") if p.can_mode_change() else chr(0x2014))),
         ]
-        out = menu.header("DIGICORE  CORE", self._dots())
+        out = menu.header(t("digicore_hdr_core", "DIGICORE  CORE"), self._dots())
         for label, val in rows:
             out.append(f" {label:<9}", style=DIM)
             out.append(f"{val}\n", style=INK_B)
         out.append_text(menu.blanks(9 - len(rows) - 3))
-        out.append(" gaze into the core to glimpse\n", style=DIM)
-        out.append(" what stirs within…\n", style=DIM)
+        out.append(t("digicore_hint_gaze_1", " gaze into the core to glimpse\n"), style=DIM)
+        out.append(t("digicore_hint_gaze_2", " what stirs within…\n"), style=DIM)
         # the door wears its key in BOLD (menu polish 2026-07-21: the gaze
         # was easy to look over in dim prose) -- the EVOLVES "ENTER: what it
         # takes" / TROPHIES "ENTER: the album" teaching line, gaze verdicts
         # still take the slot when one is pending
-        out.append_text(menu.note(self.note if self.note != "the core stirs…"
-                                  else "SPACE: gaze into the core",
+        out.append_text(menu.note(self.note if self.note != t("digicore_stirs", "the core stirs…")
+                                  else t("digicore_hint_space_gaze", "SPACE: gaze into the core"),
                                   tick=self.frame_i))
-        out.append_text(menu.footer("SPACE gaze  ←→ page  ESC out"))
+        out.append_text(menu.footer(t("digicore_hint_footer", "SPACE gaze  ←→ page  ESC out")))
         return out
 
     def _teaser_scene(self):
@@ -253,16 +254,16 @@ class DigiCorePanel:
         """Narration only -- the gaze speaks through the message box; every
         other digicore state leaves it alone."""
         if not self.teaser:
-            return menu.hints(("SPACE", "gaze"), ("\u2190\u2192", "page"),
-                              ("ESC", "out"))
-        t = self.teaser_t
-        if t < MON_T:
-            return "the core stirs…"
-        if t < MON_T + EXPAND_T:
-            return "the core opens…"
-        return ("Nothing stirs — this is its final form."
+            return menu.hints(("SPACE", t("digicore_key_gaze", "gaze")), ("\u2190\u2192", t("digicore_key_page", "page")),
+                              ("ESC", t("digicore_key_out", "out")))
+        t_val = self.teaser_t
+        if t_val < MON_T:
+            return t("digicore_stirs", "the core stirs…")
+        if t_val < MON_T + EXPAND_T:
+            return t("digicore_opens", "the core opens…")
+        return (t("digicore_final_form", "Nothing stirs — this is its final form.")
                 if next_evolution(self.pet) is None
-                else "A shape looms in the core…")
+                else t("digicore_shape_looms", "A shape looms in the core…"))
 
     def _detail_scene(self):
         """One candidate's requirement checklist (evolution.requirement_report):
@@ -278,7 +279,7 @@ class DigiCorePanel:
             report = (lines.requirement_report(self.pet, num) if lines.active(self.pet)
                       else evolution.requirement_report(self.pet, num))
         vis = DET_VIS
-        out = menu.header(f"DIGICORE  {name[:16].upper()}", "req")
+        out = menu.header(t("digicore_hdr_req", "DIGICORE  {name}").format(name=name[:16].upper()), t("digicore_req_tag", "req"))
 
         def fmt(r, i):
             met, txt = r
@@ -291,16 +292,16 @@ class DigiCorePanel:
 
         self.det_off = menu.scroll_window(out, report, self.det_off, vis, fmt)
         more = "" if len(report) <= vis else f"  ({self.det_off + 1}-{min(len(report), self.det_off + vis)}/{len(report)})"
-        out.append_text(menu.footer(f"↑↓ scroll{more}   ESC back"))
+        out.append_text(menu.footer(t("digicore_hint_scroll_back", "↑↓ scroll{more}   ESC back").format(more=more)))
         return out
 
     def _evolves_scene(self, rows, dots):
         from rich.text import Text
-        out = menu.header("DIGICORE  EVOLVES", dots)
+        out = menu.header(t("digicore_hdr_evolves", "DIGICORE  EVOLVES"), dots)
         if isinstance(rows, str):                      # "(final form)"
             out.append(f" {rows}\n", style=DIM)
             out.append_text(menu.blanks(8))
-            out.append_text(menu.footer("←→ page    ESC out"))
+            out.append_text(menu.footer(t("digicore_hint_page_out", "←→ page    ESC out")))
             return out
 
         div = evolution.divergence_target(self.pet)
@@ -310,16 +311,16 @@ class DigiCorePanel:
             cur = j == self.evo_sel
             # the armed DNA steer wears its own word: it isn't "gates met",
             # it's the charge overriding the chart (gameplay audit B3)
-            tag = (chr(0x2713) + " armed" if num == div
-                   else chr(0x2713) + " ready" if ready else f"{unmet} to go")
+            tag = (chr(0x2713) + t("digicore_armed", " armed") if num == div
+                   else chr(0x2713) + t("digicore_ready", " ready") if ready else t("digicore_to_go", "{unmet} to go").format(unmet=unmet))
             t = Text()
             t.append(("▸" if cur else " ") + f" {name[:20]:<21}", style=INK_B if cur else INK)
             t.append(f"{tag:>10}\n", style=INK_B if ready else DIM)
             return t
 
         self.evo_sel = menu.list_window(out, rows, self.evo_sel, 8, fmt)
-        out.append_text(menu.note("ENTER: what it takes"))
-        out.append_text(menu.footer("↑↓ pick  ENTER req  ←→ page  ESC out"))
+        out.append_text(menu.note(t("digicore_hint_what_it_takes", "ENTER: what it takes")))
+        out.append_text(menu.footer(t("digicore_hint_evolves", "↑↓ pick  ENTER req  ←→ page  ESC out")))
         return out
 
     def text(self):
@@ -335,7 +336,7 @@ class DigiCorePanel:
         dots = self._dots()
         if title == "EVOLVES":
             return self._evolves_scene(rows, dots)
-        out = menu.header(f"DIGICORE  {title}", dots)
+        out = menu.header(t("digicore_hdr_title", "DIGICORE  {title}").format(title=title), dots)
         for label, val in rows:
             out.append(f" {label:<9}", style=DIM)
             out.append(f"{val}\n", style=INK_B)
@@ -343,14 +344,14 @@ class DigiCorePanel:
             # the Album row fronts a browsable book (2026-07-21): teach the
             # door the way EVOLVES teaches its checklist
             out.append_text(menu.blanks(9 - len(rows) - 1))
-            out.append_text(menu.note("ENTER: the album"))
-            out.append_text(menu.footer("ENTER album  ←→ page  ESC out"))
+            out.append_text(menu.note(t("digicore_hint_enter_album", "ENTER: the album")))
+            out.append_text(menu.footer(t("digicore_hint_album", "ENTER album  ←→ page  ESC out")))
         elif title == "LEGACY":
             # the headstones front their room now too (2026-07-26)
             out.append_text(menu.blanks(9 - len(rows) - 1))
-            out.append_text(menu.note("ENTER: the hall of memory"))
-            out.append_text(menu.footer("ENTER hall  ←→ page  ESC out"))
+            out.append_text(menu.note(t("digicore_hint_hall_memory", "ENTER: the hall of memory")))
+            out.append_text(menu.footer(t("digicore_hint_hall", "ENTER hall  ←→ page  ESC out")))
         else:
             out.append_text(menu.blanks(9 - len(rows)))
-            out.append_text(menu.footer("←→ page    ESC out"))
+            out.append_text(menu.footer(t("digicore_hint_page_out", "←→ page    ESC out")))
         return out
