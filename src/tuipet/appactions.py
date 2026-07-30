@@ -166,7 +166,7 @@ class ActionsMixin:
             # (Joel 2026-07-05: "automatically selected an egg for me??")
             self._new_game = True
             self._open_mode(titlescreen.TitlePanel(), self._after_title)
-            self.flash("All data erased — a fresh start.")
+            self.flash("Todos os dados apagados — um novo começo.")
             return
         self.repaint()
 
@@ -239,7 +239,7 @@ class ActionsMixin:
         if (g := p._guard(asleep_blocks=False)) is not None:
             self._do(g); return
         if p.stage in ("Egg", "Fresh"):
-            self._do("Too young for lessons."); return
+            self._do("Muito novo para lições."); return
         if p.asleep:
             self._do(p._disturbed()); return
         self._open_mode(disciplinescreen.DisciplinePanel(p),
@@ -279,7 +279,7 @@ class ActionsMixin:
         # the arena backdrop (enemy != None flips it; presentation only).
         foe = rival.maybe_challenge(self.pet)
         if foe is not None:
-            self.flash(f"[b]{foe['tamer']}[/] challenges you — "
+            self.flash(f"[b]{foe['tamer']}[/] te desafia — "
                        f"{foe['name']} steps up!")
         self._open_mode(battlescreen.BattlePanel(self.pet, enemy=foe),
                         self._after_battle)
@@ -292,7 +292,7 @@ class ActionsMixin:
                 and self.screen_w.fx is None and not self.pet.dead):
             if (getattr(b, "enemy", None) or {}).get("rival"):
                 # the feud's running score lands with the verdict
-                self.flash(f"[b]{rival.record_line(self.pet)}[/] all-time")
+                self.flash(f"[b]{rival.record_line(self.pet)}[/] no total")
             self.screen_w.start_fx("cheer" if b.won else "losing")
         self.repaint()
 
@@ -328,7 +328,7 @@ class ActionsMixin:
             _, field, amount = result          # DVPet applyDNA -> DNA_Feeding -> main view
             self.screen_w.start_fx("dna_charge", icon=field, pet=self.pet)
             self.beep("compatible", bell=False)   # the DNA charge/absorb beep (no dedicated dna rip)
-            self.flash("%s absorbed %d %s DNA" % (self.pet.name, amount, data.pretty_field(field)))
+            self.flash("%s absorveu %d DNA de %s" % (self.pet.name, amount, data.pretty_field(field)))
         else:
             self.repaint()
 
@@ -381,7 +381,7 @@ class ActionsMixin:
             return
         if isinstance(msg, tuple) and msg and msg[0] == "evolve":
             # modeChange -> State.Evolving: the same strobe as any evolution
-            self.flash(f"[b]{msg[2] if len(msg) > 2 else 'MODE CHANGE!'}[/]")
+            self.flash(f"[b]{msg[2] if len(msg) > 2 else 'MUDANÇA DE MODO!'}[/]")
             self.screen_w.start_fx("evolve", old_num=msg[1])
         self.repaint()
 
@@ -463,7 +463,7 @@ class ActionsMixin:
             # the SURPRISE: hold the reveal until the present is opened at the
             # end of the amble (2026-07-24) -- a tease now, the contents then.
             self._pending_gift_reveal = msg
-            self._do("A present! Let's see what it is…")
+            self._do("Um presente! Vamos ver o que é…")
 
     def action_heal(self):
         """The H key: patch a battle injury -- a free care BUTTON like C

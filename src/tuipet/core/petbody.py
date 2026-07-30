@@ -842,7 +842,7 @@ class BodyMixin:
             if r == 0:
                 wake_anim = "sad"                    # BadMorning: wakeUp(9)
                 self.wake_note = f"{self.name} woke up on the wrong side…"
-            elif r == 1 and m == "Happy":
+            elif r == 1 and m == "Feliz":
                 wake_anim = "surprise"               # TerribleMorning: wakeUp(6)
                 self.wake_note = f"{self.name} had an awful night!"
             elif r == 2:
@@ -920,7 +920,7 @@ class BodyMixin:
         # Happy/Neutral/Unhappy only, and the sticky depressed STATE never
         # feeds the word -- so the old two-word check carried a dead arm
         # (audit 2026-07-25))
-        if m == "Unhappy":
+        if m == "Triste":
             # THE SULK COMES FIRST, UNGATED (pose audit 2026-07-25, Joel:
             # "ive yet to see an angry pose to this day on anything. see a
             # lot of happy poses").  It carried three gates a fuming pet
@@ -947,7 +947,7 @@ class BodyMixin:
             return
         if self.energy < self.max_energy / 3 or self.enthusiasm < 0:
             return
-        if m == "Happy":
+        if m == "Feliz":
             self._set_anim(random.choice(("play", "happy")), 2.0)
 
     def _check_discipline_call(self):
@@ -1032,12 +1032,12 @@ class BodyMixin:
         best = max(counts.values()) if counts else 0
         tops = [k for k, v in counts.items() if v == best and best > 0]
         major = tops[0] if len(tops) == 1 else None
-        if major == "Happy" and self.mistake_day <= MAX_MISTAKE_DAY_BONUS:
+        if major == "Feliz" and self.mistake_day <= MAX_MISTAKE_DAY_BONUS:
             self.evol_bonus += 1
             self.add_item("cupcake")            # a REAL bag treat (TUIPET catalog 2026-07-18)
             self._set_anim("happy", 2.0)                     # Birthday_Good
             self.birthday_note = f"A wonderful day! {self.name} earned a Cupcake!"
-        elif major == "Unhappy" and self.mistake_day >= MIN_MISTAKE_DAY_DEC:
+        elif major == "Triste" and self.mistake_day >= MIN_MISTAKE_DAY_DEC:
             # (the BonusLifeDec burn left with the lifespan clock --
             # DSprite mortality 2026-07-22; the bad day still costs bonus)
             if self.evol_bonus > 0:
@@ -1066,7 +1066,7 @@ class BodyMixin:
         # (BASIC VPET 2026-07-16): a WELL pet (not unwell) can find a present,
         # and obedience alone narrows the roll
         if (self.gift or self.asleep or self.stage in ("Egg", "Fresh", "InTraining")
-                or self.current_mood() == "Unhappy"
+                or self.current_mood() == "Triste"
                 or getattr(self, "away", False)):   # checkGiftCall gates on _isHome:
             return                                  # presents are found AT HOME
         # a FESTIVAL pet is more generous: the roll narrows by the multiplier

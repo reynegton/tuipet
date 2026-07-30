@@ -105,7 +105,7 @@ class TownPanel(menu.SubHost):
         elif kind == "item_use" and len(r) > 3 and r[3]:
             self.msg = str(r[3])
         elif kind == "evolve":
-            self.msg = t("town_msg_evolved", "...evolved into {name}!").format(name=self.pet.name)
+            self.msg = t("town_msg_evolved", "...evoluiu para {name}!").format(name=self.pet.name)
         elif kind == "inherit":
             self.msg = t("town_msg_inherit", "The memory settles in.")
         else:

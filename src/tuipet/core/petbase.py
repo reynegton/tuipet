@@ -620,8 +620,8 @@ HUNGER_MISTAKE_OBED_GLUTTON = -1        # ...ChangeGlutton
 LIGHTS_MISTAKE_SEC = 60.0               # MinutesToMistakeLights(60) as ~12% of the sleep,
 #                                         scaled to tuipet's ~6-min night -- one mistake/night
 MORNING_MOOD_CHANCE = 5                 # MorningMoodChance: 1/5 bad, 1/5 terrible-if-happy, 1/5 good
-BAD_MORNING_MOOD = {"Happy": -150, "Neutral": -100, "Unhappy": -10, "Depressed": -10}
-GOOD_MORNING_MOOD = {"Happy": 50, "Neutral": 100, "Unhappy": 150, "Depressed": 150}
+BAD_MORNING_MOOD = {"Feliz": -150, "Neutro": -100, "Triste": -10, "Depressed": -10}
+GOOD_MORNING_MOOD = {"Feliz": 50, "Neutro": 100, "Triste": 150, "Depressed": 150}
 WORST_MORNING_MOOD = -10                # WorstMorningMood (TerribleMorning sets mood TO this)
 NAP_WAKE_MOOD_DEC = 20                  # NapWakeMoodDec: a NAP wake swings +-20 on 2 of the 5 rolls
 # disturb (setAsleep(false) runs the wake roll after these; canon disturb())

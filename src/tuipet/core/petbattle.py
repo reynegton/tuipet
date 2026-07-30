@@ -131,7 +131,7 @@ class BattleMixin:
             return t("train_too_hurt", "Too hurt to train.")
         if self.poop:
             self._set_anim("refuse", 1.0)
-            return t("train_clean_first", "Clean up first!")
+            return t("train_clean_first", "Limpe primeiro!")
         if self.energy < TRAIN_ENERGY_COST:
             self._set_anim("refuse", 1.0)
             return t("train_too_tired", "Too tired to train.")
@@ -242,7 +242,7 @@ class BattleMixin:
 
     def can_battle(self):
         if self.dead:
-            return t("guard_dead", "It rests now — press N for a new egg.")
+            return t("guard_dead", "Descansando agora — aperte N para um novo ovo.")
         if self.stage in ("Egg", "Fresh"):
             return t("battle_too_young", "Too young to battle.")
         if self.asleep:
@@ -292,7 +292,7 @@ class BattleMixin:
             # 2026-07-23: a wounded device pet cannot battle)
             return t("battle_too_hurt", "Too hurt to fight.")
         if self.poop:
-            return t("train_clean_first", "Clean up first!")
+            return t("train_clean_first", "Limpe primeiro!")
         return None
 
     def record_battle(self, won, enemy=None, online=False,
@@ -409,7 +409,7 @@ class BattleMixin:
             dom = enemy.get("attribute")
             if dom in self._ATTR3:
                 inc = 1
-                if self.current_mood() == "Happy" and dom == self._power_bonus_attr():
+                if self.current_mood() == "Feliz" and dom == self._power_bonus_attr():
                     inc += BONUS_ATTRIBUTE_POWER
                 if dom == "Vaccine":
                     self.vaccine += inc

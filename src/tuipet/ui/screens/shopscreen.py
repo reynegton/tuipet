@@ -110,7 +110,7 @@ class ShopPanel:
         self.msg_t = 0
         self.sealed, self.wave_hint = shop.wave_status()
         self._answers = {}              # (num, key) -> crest_answer cache
-        self._flash(t("shop_welcome_bag", "Your bag.") if start_mode == "bag"
+        self._flash(t("shop_welcome_bag", "Sua mochila.") if start_mode == "bag"
                     else t("shop_welcome_shop", "Welcome! Spend your bits."))
 
     def anim(self):
@@ -264,11 +264,11 @@ class ShopPanel:
         if p.num != old:                        # a crest egg fired the armor jump
             return ("done", ("evolve", old))
         if out is None:
-            self._flash("You don't have that.")
+            self._flash("Você não tem isso.")
             self.sfx = "error"
             return None
         if out == "":
-            self._flash(f"{e['name']} does nothing here.")
+            self._flash(f"{e['name']} não faz nada aqui.")
             return None
         from tuipet.core.petbase import _Refused
         refused = isinstance(out, _Refused)      # kept the item: no show plays
@@ -334,7 +334,7 @@ class ShopPanel:
             self.mode = "bag" if self.mode == "shop" else "shop"
             self.tab, self.cursor = self._mode_pos.get(self.mode, (0, 0))
             self._normalize_cursor(self._rows())
-            self._flash("Your bag." if self.mode == "bag" else "Welcome back!")
+            self._flash("Sua mochila." if self.mode == "bag" else "Bem-vindo de volta!")
             return None
         if k in ("left", "h"):
             self._tab_pos[(self.mode, self.tab)] = self.cursor
@@ -368,7 +368,7 @@ class ShopPanel:
                     # still sells at FULL price -- say which before a
                     # mash spends four times the bits it meant to
                     self._deal_guard = None
-                    self._flash("deal's gone — ENTER again for %db"
+                    self._flash("a oferta sumiu — ENTER de novo por %db"
                                 % e["price"])
                     self.sfx = "cancel"
                     return None
@@ -394,7 +394,7 @@ class ShopPanel:
             else:
                 if self._retarget:
                     self._retarget = False
-                    self._flash(f"now on {e['name']} — press again")
+                    self._flash(f"agora em {e['name']} — aperte de novo")
                     self.sfx = "cancel"
                     return None
                 r = self._use(e)
@@ -408,7 +408,7 @@ class ShopPanel:
                 return None
             if self._retarget:
                 self._retarget = False
-                self._flash(f"now on {e['name']} — press again")
+                self._flash(f"agora em {e['name']} — aperte de novo")
                 self.sfx = "cancel"
                 return None
             msg, self.sfx = shop.sell(self.pet, e)

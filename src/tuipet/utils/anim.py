@@ -68,7 +68,7 @@ def mood_pose(pet):
     starving / filthy); bright = condition tier 3, the well-kept pet."""
     if pet.energy <= 0:
         return random.choice((10, 9, 2))      # weary / collapsed / droop
-    if pet.current_mood() == "Unhappy":
+    if pet.current_mood() == "Triste":
         return random.choice((4, 6))          # sour faces
     if pet.condition() >= 3:
         return 5                              # bright: earned, not frozen-on

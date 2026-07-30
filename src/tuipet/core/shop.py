@@ -910,10 +910,10 @@ def effect_line(e):
 def buy(pet, e):
     """-> (message, sfx)."""
     if pet.bits < e["price"]:
-        return (f"Need {e['price']}b — you have {pet.bits}b.", "error")
+        return (f"Precisa de {e['price']}b — você tem {pet.bits}b.", "error")
     pet.spend_bits(e["price"])
     pet.add_item(e["key"])
-    return (f"Bought {e['name']}!", "confirm")
+    return (f"Comprou {e['name']}!", "confirm")
 
 
 def resell_price(e):
@@ -926,10 +926,10 @@ def resell_price(e):
 
 def sell(pet, e):
     if pet.inventory.get(e["key"], 0) <= 0:
-        return ("You don't have that.", "error")
+        return ("Você não tem isso.", "error")
     pet.take_item(e["key"])                    # classic take_item returns None
     pet.bits += resell_price(e)
-    return (f"Sold {e['name']} for {resell_price(e)}b.", "confirm")
+    return (f"Vendeu {e['name']} por {resell_price(e)}b.", "confirm")
 
 
 # (the OLD town storefront chain -- home_shop_open / town_shop_open /
@@ -1385,14 +1385,14 @@ def town_egg_buy(pet, idx):
     if rule is not None and not rule["can_perm"]:
         # the single buy path guards what the shelf filter promises: a
         # lineage egg is never permanently ownable (egg audit 2026-07-25)
-        return ("A lineage egg — it hatches for those who earn it.", "error")
+        return ("Um ovo de linhagem — choca para quem o conquista.", "error")
     if idx in egg_mod.owned_now():       # same read as the shelf: never sell
-        return ("You already own that egg.", "error")   # what's already earned
+        return ("Você já possui esse ovo.", "error")   # what's already earned
     price = egg_price(idx)
     if not pet.spend_bits(price):
-        return (f"{price}b — not enough bits.", "error")
+        return (f"{price}b — bits insuficientes.", "error")
     persistence.egg_own(idx)
-    return (f"Bought the {egg_mod.hatch_name(idx)} egg — "
+    return (f"Comprou o ovo de {egg_mod.hatch_name(idx)} — "
             "it's on your carousel!", "reward")
 
 
@@ -1414,7 +1414,7 @@ def town_buy(pet, e, today=None):
     live = next((r for r in rows if r.get("key") == e.get("key")
                  and r.get("left") is not None), None)
     if live is None or live.get("left", 0) <= 0:
-        return ("Sold out today — come back tomorrow.", "error")
+        return ("Esgotado hoje — volte amanhã.", "error")
     e = live
     msg, sfx = buy(pet, e)
     if sfx == "confirm":

@@ -132,10 +132,10 @@ class CareMixin:
             return _g
         if self.sick and not assisted:
             self._set_anim("refuse", 1.0)
-            return f"{self.name} is too sick to eat — try the pill."
+            return f"{self.name} está muito doente para comer — tente a pílula."
         if self.poop:
             self._set_anim("refuse", 1.0)
-            return "Clean up first!"
+            return "Limpe primeiro!"
         if self.hunger >= FULL_HUNGER:
             # THE OVERFEED PENALTY (D2, 2026-07-23): canon overeatPenalty
             # bills a stuffed pet -- weight piles on and it counts as a
@@ -149,12 +149,12 @@ class CareMixin:
             self._set_weight(self.weight + 1)
             self.care_mistakes += 1
             self._set_anim("refuse", 1.0)
-            return f"{self.name} is too full! (✗ overfed)"
+            return f"{self.name} está muito cheio! (✗ hiperalimentado)"
         # (a HIRED assistant is never blown off -- you paid for that
         # visit; today the empty-belly exemption already covers it,
         # since auto-care only serves at hunger 0)
         if not assisted and self.manners_refusal("feed"):
-            return f"{self.name} turns its nose up!"
+            return f"{self.name} torce o nariz!"
         if self.asleep:
             self._disturbed()
         self._last_meal_starving = self.hunger == 0          # eat(): wolfed down
@@ -167,7 +167,7 @@ class CareMixin:
         # (checkDirtyEating's filth-meal sickness risk left with the
         # sickness system (BASIC VPET 2026-07-17))
         self._set_anim("eat", 1.4)
-        return "Fed Meat."
+        return "Alimentado com carne."
 
     def feed_pill(self):
         """The pill (clone rules): cures the sickness, strength +1, energy
@@ -182,7 +182,7 @@ class CareMixin:
             # the source refuses the pill beside filth too (canon gates
             # 2026-07-18, decompile L11677)
             self._set_anim("refuse", 1.0)
-            return "Clean up first!"
+            return "Limpe primeiro!"
         if not self.sick \
                 and self.strength >= 4 and self.energy >= self.max_energy:
             self._set_anim("refuse", 1.0)
@@ -195,7 +195,7 @@ class CareMixin:
         self._set_weight(self.weight + PILL_WEIGHT_GAIN)
         self._last_meal_starving = False     # a tonic is never wolfed down
         self._set_anim("eat", 1.4)
-        return "Took the pill."
+        return "Tomou a pílula."
 
     # ---- discipline: praise / scold, RESTORED (canon restoration B,
     # 2026-07-23, Joel: "it was wrongfully stripped... whatever is canon
@@ -231,9 +231,9 @@ class CareMixin:
             self.praise_window = 0.0
             self._set_obedience(self.obedience + 10)
             self._set_anim("happy", 1.8)
-            return f"{self.name} beams with pride!"
+            return f"{self.name} sorri de orgulho!"
         self._set_anim("happy", 1.0)
-        return f"{self.name} looks pleased — but unsure why."
+        return f"{self.name} parece satisfeito — mas não sabe por quê."
 
     def scold(self):
         """SCOLD: answering an open tantrum pays obedience +25 and the
@@ -245,9 +245,9 @@ class CareMixin:
             self.scold_window = 0.0
             self._set_obedience(self.obedience + 25)
             self._set_anim("sad", 1.8)
-            return "Scolded — lesson learned."
+            return "Repreendido — lição aprendida."
         self._set_anim("sad", 1.4)
-        return f"{self.name} sulks — it did nothing wrong."
+        return f"{self.name} faz beicinho — ele não fez nada de errado."
 
     def clean(self):
         """PhysicalState.clean: wash the filth off the floor.  (The mood and
@@ -257,12 +257,12 @@ class CareMixin:
         if (_g := self._guard()) is not None:
             return _g
         if not self.poop:
-            return "Nothing to clean."
+            return "Nada para limpar."
         n, self.poop = self.poop, 0
         self.poop_sizes = []                        # clearFilth()
         self._set_obedience(self.obedience + CLEAN_OBED_INC[self._disposition()])
         self._set_anim("wash", 1.2)
-        return f"Cleaned {n} poop."
+        return f"Limpou {n} cocôs."
 
     def heal(self):
         """The pill (BASIC VPET 2026-07-16): the med/bandage staples left
@@ -275,15 +275,15 @@ class CareMixin:
         the assistant also rolls WHICH Digimon answers, from the digimon.csv
         CanAssist pool (Evolution.getRandomAssistDigimon)."""
         if self.dead:
-            return "It rests now — press N for a new egg."
+            return "Descansando agora — aperte N para um novo ovo."
         self.auto_care = bool(on)
         if self.auto_care:
             pool = data.assist_pool()
             self.assistant_num = random.choice(pool) if pool else -1
             _, by_num = data.load_sprites()
             name = (by_num.get(self.assistant_num) or {}).get("name", "The assistant")
-            return f"{name} is on duty."
-        return "The assistant was dismissed."
+            return f"{name} está de serviço."
+        return "O assistente foi dispensado."
 
     def toggle_lights(self):
         """The lights button (DVPet setLights): toggles the room light ONLY. The pet
@@ -297,12 +297,12 @@ class CareMixin:
             # (canon !isFuton()'s nap shield left with the Futon: strict-DSprite
             # items, 2026-07-17)
             self._wake()                         # a nap wake rolls +-NapWakeMoodDec
-            return "Lights on — up from its nap."
+            return "Luzes acesas — acordou da soneca."
         if not self.lights and not self.asleep and self.energy <= 0:
             # the exhausted nag said "S — rest"; a flat "Lights off." read
             # as a no-op while the doze timer ran (QOL 2026-07-23)
-            return f"Lights off — {self.name} settles down to rest…"
-        return "Lights off." if not self.lights else "Lights on."
+            return f"Luzes apagadas — {self.name} se deita para descansar…"
+        return "Luzes apagadas." if not self.lights else "Luzes acesas."
 
     # ---- shop / items --------------------------------------------------------
     # (buy_slot -- the town-counter purchase -- cut with the town chain
@@ -420,7 +420,7 @@ class CareMixin:
         _Refused message keeps the item ('consume on refusal' burned
         Rev.Floppies on live pets; clone audit 2026-07-15)."""
         if self.inventory.get(key, 0) <= 0:
-            return "None left."
+            return "Nenhum sobrando."
         # the crest eggs (Armor-Spirit): the ONE clone item family that maps
         # onto a classic system -- each virtue joins its Digimental's
         # EvolItemID, so the armor evolutions stay reachable (the dub swap is
@@ -561,7 +561,7 @@ class CareMixin:
         if self.energy >= self.max_energy:
             return _Refused("Energy is already full.")
         self._set_energy(self.max_energy)
-        return "Energy restored!"
+        return "Energia restaurada!"
 
     def _snack(self, hunger=0, energy=0, weight=0, obedience=0, powers=None,
                strength=0):
@@ -587,7 +587,7 @@ class CareMixin:
             self.vaccine += v
             self.data_power += d
             self.virus += vi
-        return "Munch."
+        return "Nham nham."
 
     def _giga_meal(self):
         if self.hunger >= FULL_HUNGER:
@@ -595,7 +595,7 @@ class CareMixin:
         self.hunger = FULL_HUNGER
         self._set_energy(self.energy + 4)
         self._set_weight(self.weight + 6)
-        return "A FEAST."
+        return "UM BANQUETE."
 
     def _vitamin(self):
         # the canon second job (restoration 2026-07-23): a live vitamin
@@ -608,7 +608,7 @@ class CareMixin:
         # 1440 game-min == ONE GAME DAY (~24 real minutes of play).  Burns
         # down by dt in petbody._tick_life -- see THE UNIT LAW there.
         self.vitamin_lapse = 1440.0
-        return "Effort brims — and it guards!"
+        return "Cheio de energia — e ele protege!"
 
     def _bandage(self):
         """The SECOND med, restored (canon restoration 2026-07-23, Joel:
@@ -620,7 +620,7 @@ class CareMixin:
         self.injured = False
         self.inj_length = 0.0        # the wait is what the Bandage buys off
         self._set_anim("happy", 1.4)
-        return "All patched up!"
+        return "Totalmente curado!"
 
     def _caffeine(self):
         """Tonight's bedtime pushed later: a quarter of the night off the
@@ -648,7 +648,7 @@ class CareMixin:
             if self.sleep_lapse <= 0:
                 return _Refused("It's nowhere near bedtime.")      # noqa: F405
             self.sleep_lapse = max(0.0, self.sleep_lapse - self.sleep_limit * 0.25)
-        return "Wide awake for a while yet."
+        return "Bem acordado por um tempo ainda."
 
     def _miracle_drink(self):
         """THE ERASER, rehoused and nerfed (Joel 2026-07-23: "one at a
@@ -671,7 +671,7 @@ class CareMixin:
         self.care_mistakes -= 1
         self._set_energy(self.energy + MIRACLE_ENERGY_GAIN)   # noqa: F405
         left = self.care_mistakes
-        return ("One slip, forgiven." if not left
+        return ("Um erro, perdoado." if not left
                 else f"One slip forgiven — {left} still on the slate.")
 
     def _cold_compress(self):
@@ -690,7 +690,7 @@ class CareMixin:
         self.care_mistakes -= 1
         self._set_energy(self.energy - COMPRESS_ENERGY_COST)    # noqa: F405
         left = self.care_mistakes
-        return ("One slip scrubbed off — and it stings." if not left
+        return ("Um erro apagado — e isso dói." if not left
                 else f"One slip scrubbed off — {left} still on the slate.")
 
     def _textbook(self):
@@ -786,7 +786,7 @@ class CareMixin:
         # tick-edge detector never saw a between-ticks death at all
         # (gameplay audit 2026-07-19; the app's state check pairs with this)
         self._die("a poison mushroom")
-        return "...it was DELICIOUS. And fatal."
+        return "...estava DELICIOSO. E foi fatal."
 
     def _junk(self):
         self.hunger = FULL_HUNGER
@@ -795,7 +795,7 @@ class CareMixin:
         # without the mood sting or mistake_day, so the burger slip was
         # invisible to the birthday judgment
         self._inc_mistake()
-        return "Delicious. Regrettable."
+        return "Delicioso. Lamentável."
 
     def _premium_meat(self):
         self.hunger = FULL_HUNGER
@@ -803,12 +803,12 @@ class CareMixin:
         # the old 12*60 ticks delivered 12 real MINUTES while the text and
         # this message promised hours -- the eat card's countdown exposed it
         self.full_until = self.world_seconds + 12 * 3600.0
-        return "Satiated for 12 hours."
+        return "Satisfeito por 12 horas."
 
     def _smart_potty(self):
         self.clean()
         self.auto_clean_until = self.world_seconds + 24 * 3600.0  # 24 REAL hours (same ruling)
-        return "Auto-clean for 24 hours."
+        return "Limpeza automática por 24 horas."
 
     def _sleep_pill(self):
         """Sleep NOW, no argument.  A line pet's real sleep outside its
@@ -858,7 +858,7 @@ class CareMixin:
         self.awake_lapse = 0.0
         if self._in_sleep_window() is not None and not was_nap:
             self._bed_postpone_t = float(random.randint(*DISTURB_POSTPONE))
-        return "Rise and shine!"
+        return "Hora de acordar!"
 
     def _time_gear(self):
         """The Grow Capsule: a QUARTER of this stage off the growth clock
@@ -898,7 +898,7 @@ class CareMixin:
 
     def _anti_evo(self):
         self.evo_blocked = not getattr(self, "evo_blocked", False)
-        return "Evolution " + ("BLOCKED." if self.evo_blocked else "unblocked.")
+        return "Evolução " + ("BLOQUEADA." if self.evo_blocked else "desbloqueada.")
 
     def _x_item(self):
         """The X-Antibody chip: raises the X state (the classic X system).
@@ -916,19 +916,19 @@ class CareMixin:
         self._set_xantibody("Permanent")
         import tuipet.utils.persistence as _persist
         _persist.note_xanti()
-        return "The X-Antibody takes hold!"
+        return "O Anticorpo-X faz efeito!"
 
     def _training_pack(self):
         """The Dumbbell: +10 stage trainings, capped 999 (the source's canon
         value -- the +5 was unexplained drift; TUIPET catalog 2026-07-18)."""
         self.stage_trainings = min(999, self.stage_trainings + 10)
-        return "Training +10."
+        return "Treino +10."
 
     def _revive_item(self):
         if not self.dead:
             return _Refused("No one needs reviving.")
         self.save_from_death()
-        return "It LIVES."
+        return "VIVO."
 
     def stash_wild_memory(self):
         """A FOUND digimemory carries a random payload (2026-07-24, Joel:
@@ -979,7 +979,7 @@ class CareMixin:
         if self.weight <= 1:
             return _Refused("Nothing left to trim.")
         self._set_weight(max(1, self.weight - 10))
-        return "Feather-light!"
+        return "Leve como uma pena!"
 
     # ======================= THE EXPANSION (2026-07-26) =====================
     # Joel: "bring in all 99 unused items ... your call".  Every handler
@@ -1035,7 +1035,7 @@ class CareMixin:
             return _Refused("No sickness to treat.")  # noqa: F405
         self.sick = False
         self._set_anim("eat", 1.4)
-        return "The sickness passes."
+        return "A doença passa."
 
     def _elixir(self):
         """The premium combo (2000b): cures sickness AND fills the tank.
@@ -1045,7 +1045,7 @@ class CareMixin:
         self.sick = False
         self._set_energy(self.max_energy)
         self._set_anim("eat", 1.4)
-        return "Illness swept away — brimming with life!"
+        return "Doença curada — cheio de vida!"
 
     def _vitamin_g(self):
         """The golden mend (2000b): heals the injury AND the vitamin's
@@ -1059,14 +1059,14 @@ class CareMixin:
         self.strength = 4
         self.vitamin_lapse = 1440.0
         self._set_anim("happy", 1.4)
-        return "Golden! Mended, guarded, brimming."
+        return "Dourado! Curado, protegido, cheio de energia."
 
     def _gold_pill(self):
         """Canon Energy +12 (the miracle drink's dose, no eraser)."""
         if self.energy >= self.max_energy:
             return _Refused("Energy is already full.")  # noqa: F405
         self._set_energy(self.energy + 12)
-        return "Vitality, gilded!"
+        return "Vitalidade dourada!"
 
     def _supplement(self):
         """Effort to FULL + the obedience leg (authored +5) + its weight."""
@@ -1075,7 +1075,7 @@ class CareMixin:
         self.strength = 4
         self._set_obedience(self.obedience + 5)
         self._set_weight(self.weight + 1)
-        return "Effort brims!"
+        return "Transbordando esforço!"
 
     def _board_game(self):
         """The attribute RESHAPER (items.csv 5): Vaccine -15 -> Data +15,
@@ -1086,7 +1086,7 @@ class CareMixin:
         self.vaccine -= 15
         self.data_power += 15
         self._set_obedience(self.obedience + 5)
-        return "A long game — order yields to logic. (Va-15 → D+15)"
+        return "Um jogo longo — a ordem cede à lógica. (Va-15 → D+15)"
 
     def _computer_game(self):
         """Virus -15 -> Data +15 (items.csv 8)."""
@@ -1094,14 +1094,14 @@ class CareMixin:
             return _Refused("Not enough Virus power to trade.")  # noqa: F405
         self.virus -= 15
         self.data_power += 15
-        return "High score — chaos compiles. (Vi-15 → D+15)"
+        return "Recorde — o caos compila. (Vi-15 → D+15)"
 
     def _toy_oven(self):
         """'+Appetite': makes room for a meal (hunger -1)."""
         if self.hunger <= 0:
             return _Refused("The belly is already empty.")  # noqa: F405
         self.hunger = max(0, self.hunger - 1)
-        return "Something smells wonderful — suddenly peckish."
+        return "Um cheiro maravilhoso — de repente com fome."
 
     def _futon(self):
         """The deep daytime bed: lie down NOW (the sleeping pill's flow)
@@ -1113,14 +1113,14 @@ class CareMixin:
             if getattr(self, "futon_doze", False):
                 return _Refused("Already tucked in deep.")  # noqa: F405
             self.futon_doze = True
-            return "The futon slides underneath — deeper sleep."
+            return "O futon desliza por baixo — sono mais profundo."
         self._fall_asleep()
         self.lights = False
         self._bed_postpone_t = 0.0
         if self._in_sleep_window() is False:
             self.nap = True
         self.futon_doze = True
-        return "Tucked in deep. Zzz..."
+        return "Bem agasalhado. Zzz..."
 
     def _x_program(self):
         """The RISKY X (items.csv 14, a 100%-authored elite drop): the
@@ -1136,7 +1136,7 @@ class CareMixin:
         self._set_xantibody("Permanent")
         import tuipet.utils.persistence as _persist
         _persist.note_xanti()
-        return "It convulses... and TRANSCENDS. The X takes hold!"
+        return "Ele convulsiona... e TRANSCENDE. O X faz efeito!"
 
     def _textbook_lite(self):
         """The Book (items.csv 2): the textbook's little brother -- the
@@ -1152,7 +1152,7 @@ class CareMixin:
         A trap with a warning label -- the poison mushroom's precedent:
         a trap always goes down, never refuses."""
         self._set_obedience(self.obedience - 80)
-        return "It reads the WHOLE thing. Manners: obliterated."
+        return "Ele lê a coisa TODA. Modos: obliterados."
 
     # the evolution KEYS (Joel: "wire fully").  item_select forms answer to
     # their care gates (the item is an extra gate, not a bypass);
@@ -1200,7 +1200,7 @@ class CareMixin:
             beast = key.replace("human_", "beast_", 1)
             if beast in self._ITEM_EVO_IDS:
                 self.add_item(beast)
-                return (f"{self.name} evolves — and the BEAST half of the "
+                return (f"{self.name} evolui — e a metade FERA do "
                         "spirit answers!")
         return f"{self.name} evolves!"
 

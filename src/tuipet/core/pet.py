@@ -146,7 +146,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     item_interest: int = 0          # _itemInterest: toy boredom 0..5 (decays over time)
     # missed-day / birthday (PhysicalState _mistakeDay / _dailyMoodRecord / _bonus)
     mistake_day: int = 0            # today's care slips (resets each birthday)
-    daily_mood: dict = _dcf(default_factory=lambda: {"Happy": 0, "Neutral": 0, "Unhappy": 0, "Depressed": 0})
+    daily_mood: dict = _dcf(default_factory=lambda: {"Feliz": 0, "Neutro": 0, "Triste": 0, "Depressed": 0})
     last_birthday: int = 0          # last celebrated age-day
     evol_bonus: int = 0             # _bonus: birthday/win-rate credit fed into evolution odds
     digimemory: dict = _dcf(default_factory=dict)   # held inheritance data (item 32 payload)
@@ -469,7 +469,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         """The E picker's commit: '' returns the scene to the egg's own."""
         self.bg_pick = key
         if not key:
-            return "Back to the egg's own scene."
+            return "De volta à cena do próprio ovo."
         return f"{backgrounds.name(key)} it is."
 
     def _disposition(self):
@@ -484,7 +484,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
 
     def personality(self):
         if self.num == -1 or self.stage == "Egg":
-            return "Unhatched"
+            return "Não chocado"
         trio = _PERSONALITY[(self._disposition(), self._glutton())]
         rst = self._restless()
         return trio[0 if rst == 0 else (1 if rst == 1 else 2)]
@@ -595,7 +595,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         """The shared action gate: dead / still-an-egg / asleep (a sleeping pet
         is DISTURBED, not served).  Returns the refusal string or None."""
         if self.dead:
-            return t("guard_dead", "It rests now — press N for a new egg.")
+            return t("guard_dead", "Descansando agora — aperte N para um novo ovo.")
         if self.stage == "Egg":
             return t("guard_egg", "It is still an egg.")
         if asleep_blocks and self.asleep:
@@ -735,8 +735,8 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             best = max(counts.values()) if counts else 0
             tops = [k for k, v in counts.items() if v == best and best > 0]
             major = tops[0] if len(tops) == 1 else None
-            self._set_obedience(ROOKIE_OBED_GOOD if major == "Happy"
-                                else ROOKIE_OBED_DEFAULT if major == "Neutral"
+            self._set_obedience(ROOKIE_OBED_GOOD if major == "Feliz"
+                                else ROOKIE_OBED_DEFAULT if major == "Neutro"
                                 else ROOKIE_OBED_BAD)
         if was_young and self.stage == "Champion":
             # randOnChampion (taste/rank audit 2026-07-06): the childhood-care
@@ -796,7 +796,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         ModeChangeEnergyChange and plays State.Evolving.
         Returns (old_num_or_None, message)."""
         if self.dead:
-            return None, "It rests now — press N for a new egg."
+            return None, "Descansando agora — aperte N para um novo ovo."
         if self.asleep:
             return None, self._disturbed()
         refused = self.check_refused(energy_change=MODE_CHANGE_ENERGY)
@@ -911,10 +911,10 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         +1) was unreachable for the life of the app (MED audit 2026-07-19)."""
         w = self.status_word()
         if w in ("sick", "starving", "needs cleaning"):
-            return "Unhappy"
+            return "Triste"
         if w == "ok" and self.condition() == 3:
-            return "Happy"
-        return "Neutral"
+            return "Feliz"
+        return "Neutro"
 
     def _set_enthusiasm(self, value):
         """A NO-OP: the spirit meter left with the enthusiasm system (BASIC
@@ -1026,9 +1026,9 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         b = self.evol_bonus
         b = b - self.care_mistakes if self.care_mistakes > 0 else b + 1
         m = self.current_mood()
-        if m == "Happy":
+        if m == "Feliz":
             b += 1
-        elif m != "Neutral":
+        elif m != "Neutro":
             b -= 1
         # (the obedience legs left with the discipline system: the meter is
         # pinned at 0, so `< BONUS_DEC_OBEDIENCE` docked EVERY graded life

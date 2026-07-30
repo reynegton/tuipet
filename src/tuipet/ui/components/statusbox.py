@@ -80,7 +80,7 @@ def care_deco(pet, word=None):
     if pet.poop: deco.append(f"[{T.COIN}]{t('deco_poop', '~poop x{count}').format(count=pet.poop)}[/]")
     # +rude (badge audit 2026-07-24): manners drives feed/train/battle
     # refusals below DISOBEY_BELOW, but the gauge lives only on DigiCore --
-    # a pet "turns its nose up!" with no on-card reason.  This is the ONLY
+    # a pet "torce o nariz!" with no on-card reason.  This is the ONLY
     # signal that a refusal is EARNED disobedience, not a bug.  Below the
     # ailments/needs in priority: a hungry, defiant pet shows the hunger
     # first.  Discipline (praise/scold/p) or a Textbook lifts it back.
@@ -358,7 +358,7 @@ def scenes(app):
     state = "picked" if row == app.pet.bg_pick else \
         ("the default" if not row and not app.pet.bg_pick else "a preview")
     # word-wrap the picker message (card audit 2026-07-24): "pick a scene —
-    # it hangs behind the mon" (38) and "Back to the egg's own scene." (28)
+    # it hangs behind the mon" (38) and "De volta à cena do próprio ovo." (28)
     # were sliced at [:26], losing the tail.
     sc_lines = [f"[dim]{m.cursor + 1} of {len(m.rows)}[/]", "",
                 "On the wall", f"  [b]{name[:24]}[/]",

@@ -206,7 +206,7 @@ class TuiPetApp(ActionsMixin, App):
         if pet is None:
             loaded, msg = persistence.load()
             if loaded is not None:
-                pet, self._welcome = loaded, (msg or t("app_msg_welcome_back", "Welcome back!"))
+                pet, self._welcome = loaded, (msg or t("app_msg_welcome_back", "Bem-vindo de volta!"))
             else:
                 self._new_game = True
                 if msg:          # a QUARANTINED corrupt save -- never play it
@@ -391,18 +391,18 @@ class TuiPetApp(ActionsMixin, App):
         if not latest:
             return
         if not persistence.get_auto_update():          # the player opted out
-            self._update_msg = f"⬆ tuipet {latest} out — {update_check.manual_command()}"
+            self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"
             return
         if update_check.upgrade_argv() is None:        # iOS / source: cannot self-install
-            self._update_msg = f"⬆ tuipet {latest} out — {update_check.manual_command()}"
+            self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"
             return
-        self._update_msg = f"⬆ installing tuipet {latest}…"
+        self._update_msg = f"⬆ instalando tuipet {latest}…"
         ok, _msg = await asyncio.to_thread(update_check.run_upgrade)
         if ok:
             self._updated_to = latest
-            self._update_msg = f"✔ tuipet {latest} installed — restart to play it"
+            self._update_msg = f"✔ tuipet {latest} instalado — reinicie para jogar"
         else:
-            self._update_msg = f"⬆ tuipet {latest} out — {update_check.manual_command()}"
+            self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"
 
 
     def _post_title(self):
@@ -490,16 +490,16 @@ class TuiPetApp(ActionsMixin, App):
         if sync is None:
             return
         if getattr(sync, "cloud_dropped", False):
-            msg = ("⚠ Cloud sync off — tuipet is open in a newer session. "
+            msg = ("⚠ Sincronização desligada — tuipet aberto em outra sessão. "
                    "This device saves locally only.")
         elif getattr(sync, "save_invalid", False):
-            msg = ("⚠ Cloud sync off — the server rejected this save's "
+            msg = ("⚠ Sincronização desligada — servidor rejeitou este save "
                    "format. This device saves locally only.")
         elif getattr(sync, "save_too_big", False):
-            msg = ("⚠ Cloud sync off — this pet's save is too large to "
+            msg = ("⚠ Sincronização desligada — save muito grande "
                    "sync. This device saves locally only.")
         elif getattr(sync, "last_error", ""):
-            msg = f"⚠ Cloud sync trouble — {sync.last_error}"
+            msg = f"⚠ Problema de sincronização — {sync.last_error}"
         else:
             return
         if getattr(self, "_cloud_warned", None) == msg:
@@ -515,7 +515,7 @@ class TuiPetApp(ActionsMixin, App):
             return
         self._save_warned = True
         self.beep("alarm")
-        self.flash(f"[{theme.NEG}]⚠ CAN'T SAVE — your pet will not persist! "
+        self.flash(f"[{theme.NEG}]⚠ NÃO É POSSÍVEL SALVAR — seu pet não persistirá! "
                    f"Set TUIPET_SAVE_DIR to a writable folder.[/]")
 
     def _note_progress(self):
@@ -1073,10 +1073,10 @@ class TuiPetApp(ActionsMixin, App):
                 if hits > HITS_TO_SAVE * (self.pet.saved_from_death + 1):
                     old_num = self.pet.save_from_death()
                     if old_num is not None:            # the dark rebirth
-                        self.flash(f"[b]{self.pet.name}![/] It came back... changed.")
+                        self.flash(f"[b]{self.pet.name}![/] Voltou... diferente.")
                         self.screen_w.start_fx("evolve", old_num=old_num)
                     else:
-                        self.flash(f"[b]{self.pet.name}[/] clings to life!")
+                        self.flash(f"[b]{self.pet.name}[/] se apega à vida!")
                         self.screen_w.start_fx("cheer")
                     persistence.save(self.pet)
                 else:
@@ -1094,7 +1094,7 @@ class TuiPetApp(ActionsMixin, App):
                     self.beep("hatch")
                 if done:
                     p = self.pet
-                    self.flash(f"[b]{p.name}[/] hatched!")
+                    self.flash(f"[b]{p.name}[/] chocou!")
             # (the HeavyRain thunder roll -- the FLASH + the disposition-keyed
             # startle -- left with the weather system; BASIC VPET 2026-07-16)
             p = self.pet
@@ -1161,7 +1161,7 @@ class TuiPetApp(ActionsMixin, App):
                 self.beep("hatch")
                 star = ("  [b]★ a NEW species for the album![/]"
                         if not persistence.album_has(p.num) else "")
-                self.flash(f"[b]{p.name}[/] hatched!{star}")
+                self.flash(f"[b]{p.name}[/] chocou!{star}")
                 # hatch has NO evolve dither -- the egg already shook; the Fresh just appears
             else:
                 # _evolve sounds INSIDE the strobe (fx snds beat 5), like DVPet evolveAnim.
@@ -1383,13 +1383,13 @@ class TuiPetApp(ActionsMixin, App):
         self._flash_t = self.FLASH_HOLD
 
     def _evolve_msg(self, old_num):
-        """'Koromon evolved into Agumon (Rookie)!' -- old name -> NEW NAME, stage
+        """'Koromon evoluiu para Agumon (Rookie)!' -- old name -> NEW NAME, stage
         in parentheses.  The old form ('X! evolved to InTraining!') read as if
         the stage were the pet's NAME (Joel, 2026-07-04: 'the babys name is
         intraining????'), because the species name never appeared."""
         _, by = data.load_sprites()
         old = by.get(old_num, {}).get("name") or "It"
-        msg = f"[b]{old}[/] evolved into [b]{self.pet.name}[/] ({self.pet.stage})!"
+        msg = f"[b]{old}[/] evoluiu para [b]{self.pet.name}[/] ({self.pet.stage})!"
         # genuine FIRSTS get named (sweep 2026-07-14): a first-ever Mega and a
         # first-ever species read no bigger than a baby's first bump before.
         # Both checks race nothing: the progress stamps trail on autosave and
@@ -1416,33 +1416,33 @@ class TuiPetApp(ActionsMixin, App):
         """HUD announcement for the pet's most urgent unmet care need (or '')."""
         name = p.name or "Your pet"
         if p.asleep and p.lights:               # lightsCall: the one asleep call
-            msg = f"{name} is trying to sleep — lights off! ([b]O[/])"
+            msg = f"{name} está tentando dormir — apague as luzes! ([b]O[/])"
         # every call names its key (gameplay polish #19, 2026-07-22): lights
         # always said (S) while hungry/sick/cleaning -- the three commonest
         # calls -- left a new player hunting the 19-key bar mid-alarm
         # the pill is the FEED menu's second row -- free and infinite (the
         # canon meat/pill picker), NOT a bag item; the v0.5.169 hint sent a
         # panicked player to the bag (Joel caught it 2026-07-22)
-        elif p.sick:          msg = f"{name} is sick! ([b]F[/] — feed it the pill)"
+        elif p.sick:          msg = f"{name} está doente! ([b]F[/] — dê a pílula)"
         # ...and the injury cure is the H KEY (2026-07-26 final ruling:
         # "remove bandage as an item alltogether and just add an h heal
         # hotkey") -- name the door that actually cures, the v0.5.169/178
         # lesson these lines keep re-learning.
-        elif p.is_injured():  msg = f"{name} is hurt! ([b]H[/] — patch it up)"
-        elif p.hunger == 0:   msg = f"{name} is hungry! ([b]F[/])"
-        elif p.strength == 0: msg = f"{name}'s effort gauge is empty — train it! ([b]T[/])"
-        elif p.poop >= 3:     msg = f"{name} needs cleaning! ([b]C[/])"
+        elif p.is_injured():  msg = f"{name} está machucado! ([b]H[/] — cure-o)"
+        elif p.hunger == 0:   msg = f"{name} está com fome! ([b]F[/])"
+        elif p.strength == 0: msg = f"{name} está sem energia — treine-o! ([b]T[/])"
+        elif p.poop >= 3:     msg = f"{name} precisa ser limpo! ([b]C[/])"
         # ...and never nag a SLEEPER to rest (bug report 2026-07-26,
         # v0.5.280: "still getting exhausted! (S — rest) even when mon is
         # sleeping after exhaustion") -- this is the one call whose cure
         # IS the state the pet is already in; the doze is the rest
         elif p.energy <= 0 and not p.asleep:
-            msg = f"{name} is exhausted! ([b]O[/] — rest)"
+            msg = f"{name} está exausto! ([b]O[/] — descanse)"
         elif p.discipline_call:
-            msg = f"{name} is acting up! ([b]P[/] — scold it)"
+            msg = f"{name} está desobediente! ([b]P[/] — repreenda-o)"
         elif p.is_frail():
             left = max(0, 5 - p.care_mistakes)
-            msg = (f"{name} is getting frail — "
+            msg = (f"{name} está ficando frágil — "
                    + (f"{left} more slip{'s' if left != 1 else ''} could be fatal!"
                       if left else "handle with perfect care!"))
         else:                 return ""
@@ -1462,7 +1462,7 @@ class TuiPetApp(ActionsMixin, App):
 
     def _hatch_new(self, egg_type, gen):
         if egg_type is None:                        # cancelled -> keep the current pet
-            self._do("Kept your current partner.")
+            self._do("Manteve seu parceiro atual.")
             return
         if egg_type == "guide":
             # E on the carousel: consult the guide, then come back to the
@@ -1521,7 +1521,7 @@ class TuiPetApp(ActionsMixin, App):
                 if self.pet.inventory.get("digimemory", 0) <= 0:
                     self.pet.add_item("digimemory")
         persistence.save(self.pet)
-        self._do(f"A new egg appeared! (generation {gen})")
+        self._do(f"Um novo ovo apareceu! (geração {gen})")
 
 
 
