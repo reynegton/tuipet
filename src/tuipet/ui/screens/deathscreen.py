@@ -5,6 +5,7 @@ import tuipet.ui.components.menu as menu
 import tuipet.utils.grid as grid
 import tuipet.utils.persistence as persistence
 from tuipet.utils.theme import LCD_ON, LCD_BG, DIM, SIL_SCENE    # noqa: F401  (palette names bound for theme.apply propagation)
+from tuipet.i18n.translator import t
 
 COLS, ROWS = 40, 12   # the ONE locked arena: the grave rests in the home scenery
 GRAVE = (data.load_effects().get("grave") or [None])[0]
@@ -17,10 +18,10 @@ def _age_str(secs):
     h, rem = divmod(rem, 3600)
     m = rem // 60
     if d:
-        return f"{d}d {h}h"
+        return t("death_msg_d_h", "{d}d {h}h").format(d=d, h=h)
     if h:
-        return f"{h}h {m}m"
-    return f"{m}m"
+        return t("death_msg_h_m", "{h}h {m}m").format(h=h, m=m)
+    return t("death_msg_m", "{m}m").format(m=m)
 
 
 class DeathPanel:
@@ -110,28 +111,28 @@ class DeathPanel:
         mq = getattr(self, "_mq", 0) // 2
         if self.ask_etch:
             # DigiMemory_Validation: etch the data, or carry the care bonus
-            return (f"[b]E[/] etch {marquee(p.name, 10, mq)}'s data · "
-                    f"[b]B[/] bonus +{self.grade_kept}")
+            return t("death_msg_etch", "[b]E[/] etch {name}'s data · [b]B[/] bonus +{bonus}").format(name=marquee(p.name, 10, mq), bonus=self.grade_kept)
         if self.asking:
             # setNewDigimemory validation: only one Digimemory may exist
-            return (f"Only one: [b]E[/] {marquee(p.name, 10, mq)} · "
-                    f"[b]K[/] {marquee(self.old_mem.get('name', '?'), 10, mq)}")
-        rip = f"R.I.P. {p.name} · gen {p.generation} · lived {_age_str(p.age_seconds)}"
+            return t("death_msg_only_one", "Only one: [b]E[/] {new_name} · [b]K[/] {old_name}").format(
+                new_name=marquee(p.name, 10, mq), old_name=marquee(self.old_mem.get('name', '?'), 10, mq))
+        rip = t("death_msg_rip_base", "R.I.P. {name} · gen {gen} · lived {age}").format(
+            name=p.name, gen=p.generation, age=_age_str(p.age_seconds))
         if getattr(p, "death_cause", ""):
-            rip += f" · of {p.death_cause}"        # what took it (audit 2026-07-05)
+            rip += t("death_msg_of_cause", " · of {cause}").format(cause=p.death_cause)        # what took it (audit 2026-07-05)
         if self.new_mem:
             m = self.new_mem
-            rip += f" · etched Va+{m['vaccine']} D+{m['data']} Vi+{m['virus']}"
+            rip += t("death_msg_etched", " · etched Va+{va} D+{da} Vi+{vi}").format(va=m['vaccine'], da=m['data'], vi=m['virus'])
         # field 18 + chrome 22 = 40: ESC wears its word (the bare "· ESC"
         # read as a clipped run-off -- menu audit 2026-07-21); "out" is the
         # app's leave-to-home word
-        return f"[b]{marquee(rip, 18, mq)}[/] [dim]· N new egg · ESC out[/]"
+        return t("death_msg_footer", "[b]{rip}[/] [dim]· N new egg · ESC out[/]").format(rip=marquee(rip, 18, mq))
 
     def text(self):
         p = self.pet
         if not GRAVE:
-            out = menu.bar("MEMORIAL", "")
-            out.append_text(menu.note(f"R.I.P.  {p.name}"))
+            out = menu.bar(t("death_hdr_memorial", "MEMORIAL"), "")
+            out.append_text(menu.note(t("death_msg_rip", "R.I.P.  {name}").format(name=p.name)))
             return out
         # the memorial is a PLACE (audit 2026-07-04): the grave stands grounded
         # in the pet's home scenery, filling the LCD; words ride the strip

@@ -9,6 +9,7 @@ import tuipet.utils.grid as grid
 
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, SIL_SCENE, SIL_LIGHTSOFF    # noqa: F401  (palette names bound for theme.apply propagation)
 import tuipet.ui.components.menu as menu
+from tuipet.i18n.translator import t
 COLS, ROWS = 40, 7
 # the bracket/result scenes only carry ONE info line + note + footer below the bar,
 # so they afford an 8-row (16px) box -> a 14px band: most creatures render at
@@ -45,8 +46,8 @@ class TournamentPanel(menu.SubHost):
         self.sched = tournament.schedule(pet)      # today's 24 hourly cups
         self.cursor = tournament._hour(pet)        # start the list on NOW
         fest = tournament.holiday()
-        self.msg = (f"{fest} — every cup runs today!" if fest
-                    else "One cup per hour — F fights today's featured.")
+        self.msg = (t("cup_runs_today", "{fest} — every cup runs today!").replace("{fest}", fest) if fest
+                    else t("cup_one_per_hour", "One cup per hour — F fights today's featured."))
         self.phase = "select"
         self.tree_view = False       # the bracket page (B toggles; shown between rounds)
         self._advance = None         # the field-advances parade: {"t","nums"}
@@ -95,16 +96,16 @@ class TournamentPanel(menu.SubHost):
         if self.sub is not None:
             return ""                          # the bout's own panel owns the box
         if self._ceremony is not None:
-            return "[b]%s[/]" % (self._say or "★ CHAMPION!")
+            return "[b]%s[/]" % (self._say or t("cup_champion", "★ CHAMPION!"))
         if self._advance is not None:
-            return "[dim]%s[/]" % (self._say or "the field advances…")
+            return "[dim]%s[/]" % (self._say or t("cup_field_advances", "the field advances…"))
         if self._intro is not None:
-            return "[b]%s[/]" % (self._say or "introductions…")
+            return "[b]%s[/]" % (self._say or t("cup_introductions", "introductions…"))
         if self.phase == "select":
-            return menu.hints(("↑↓", "pick"), ("ENTER", "go"),
-                              ("F", "feat."), ("A", "alarm"))
-        return menu.hints(("SPACE", "fight on"), ("B", "bracket"),
-                          ("ESC", "leave"))
+            return menu.hints(("↑↓", t("cup_hint_pick", "pick")), ("ENTER", t("cup_hint_go", "go")),
+                              ("F", t("cup_hint_feat", "feat.")), ("A", t("cup_hint_alarm", "alarm")))
+        return menu.hints(("SPACE", t("cup_hint_fight_on", "fight on")), ("B", t("cup_hint_bracket", "bracket")),
+                          ("ESC", t("cup_hint_leave", "leave")))
 
     def key(self, k):
         if self.sub is not None:
@@ -119,7 +120,7 @@ class TournamentPanel(menu.SubHost):
                     # forfeit (gameplay audit 2026-07-19); walking out of
                     # the CUP stays the labeled forfeit on the bracket ESC.
                     self.tree_view = True
-                    self.tourney.last = "You back out — the match still waits."
+                    self.tourney.last = t("cup_back_out", "You back out — the match still waits.")
                     self.sfx = "refuse"
                     return None
                 won = bool(r[1].won)
@@ -128,8 +129,7 @@ class TournamentPanel(menu.SubHost):
                 if won and isinstance(opp, dict) and opp.get("rival"):
                     # REVENGE: the grudge is settled, the slate wiped
                     self.pet.rival_num, self.pet.rival_name = -1, ""
-                    self.tourney.last = ("REVENGE on %s! The grudge is settled."
-                                         % opp["name"])
+                    self.tourney.last = t("cup_revenge", "REVENGE on {name}! The grudge is settled.").replace("{name}", opp["name"])
                     self.sfx = "happy"
                 if self.tourney.over:                   # cup finished this match
                     self.sfx = "champion" if self.tourney.champion else "lose"
@@ -163,7 +163,7 @@ class TournamentPanel(menu.SubHost):
                 tid = self.sched[self.cursor] if 0 <= self.cursor < n else -1
                 tr = tournament.trophy_by_id(tid) if tid >= 0 else None
                 if tr is None:
-                    self.msg = "No cup in that slot."
+                    self.msg = t("cup_no_slot", "No cup in that slot.")
                     self.sfx = "error"
                     return None
                 err = tournament.eligibility_at(self.pet, tr, self.cursor)
@@ -179,7 +179,7 @@ class TournamentPanel(menu.SubHost):
                 # today's FEATURED cup: any hour, once per real day
                 tr = tournament.featured_now(self.pet)
                 if tr is None:
-                    self.msg = "No featured cup today."
+                    self.msg = t("cup_no_featured", "No featured cup today.")
                     self.sfx = "error"
                     return None
                 err = tournament.eligibility_featured(self.pet, tr)
@@ -197,10 +197,10 @@ class TournamentPanel(menu.SubHost):
                 if tid >= 0:
                     if self.pet.tourney_alarm == tid:
                         self.pet.tourney_alarm = -1
-                        self.msg = "Alarm off."
+                        self.msg = t("cup_alarm_off", "Alarm off.")
                     else:
                         self.pet.tourney_alarm = tid
-                        self.msg = "Alarm set — it will call you at %02d:00." % self.cursor
+                        self.msg = t("cup_alarm_set", "Alarm set — it will call you at {hour:02d}:00.").format(hour=self.cursor)
                     self.sfx = "confirm"
             elif k in ("escape", "u"):          # u (the opening key) also closes
                 return ("done", None)
@@ -253,7 +253,7 @@ class TournamentPanel(menu.SubHost):
                 s = ("!" if e.get("rival") else "") + e["name"]
             return s[:w]
 
-        out = menu.bar(t.name, "BRACKET")
+        out = menu.bar(t.name, t("cup_bracket_title", "BRACKET"))
         champ = tree[3][0] if len(tree) > 3 else None
         for i in range(8):
             c1 = nm(tree[0][i], 10)
@@ -271,12 +271,12 @@ class TournamentPanel(menu.SubHost):
                        style=style if you else (INK if c1 else DIM))
         out.append_text(menu.note(t.last, tick=self.frame_i))
         if t.over:
-            out.append_text(menu.footer("SPACE result   ESC leave"))
+            out.append_text(menu.footer(t("cup_hint_result", "SPACE result   ESC leave")))
         else:
             # two-space gap: "quarterfinal" runs the line to exactly 38 --
             # three spaces clipped "ESC forfeit" to "ESC forfei" (menu audit
             # 2026-07-21; menu.footer hard-cuts at W)
-            out.append_text(menu.footer("SPACE to the %s  ESC forfeit" % t.round_name.lower()))
+            out.append_text(menu.footer(t("cup_hint_next", "SPACE to the {round}  ESC forfeit").format(round=t.round_name.lower())))
         return out
 
     def _frames(self, num, role="idle"):
@@ -298,7 +298,7 @@ class TournamentPanel(menu.SubHost):
         on = menu.scene_ink(bgimg)
         # pure scene (cup audit 2026-07-25): the crown, the trophy count and
         # the purse are all on the CARD; the roar rides the strip
-        self._say = "★ CHAMPION — the trophy is yours!"
+        self._say = t("cup_champion_full", "★ CHAMPION — the trophy is yours!")
         return render_scene([grid.center(self._frames(self.pet.num, "happy"),
                                          ph=FIGHT_ROWS * 2)],
                             COLS, FIGHT_ROWS, on, LCD_BG, bgimg=bgimg)
@@ -329,7 +329,7 @@ class TournamentPanel(menu.SubHost):
         nm = (self.tourney.results[i]
               if i < len(self.tourney.results) else "")
         # pure scene; who advanced rides the STRIP (cup audit 2026-07-25)
-        self._say = ("%s advances" % nm) if nm else "the field advances"
+        self._say = (t("cup_advances_name", "{name} advances").replace("{name}", nm)) if nm else t("cup_advances_field", "the field advances")
         return scene
 
     def _intro_frame(self):
@@ -350,18 +350,18 @@ class TournamentPanel(menu.SubHost):
         if t < INTRO_OPP_T:                    # the challenger walks in
             p = t / max(1, INTRO_OPP_T - 1)
             placements = [(rrows, round(grid.X1 + (rx - grid.X1) * p), rm)]
-            note = ("%s — your RIVAL!" % opp["name"] if opp.get("rival") else
-                    "%s [%s] enters!" % (opp["name"], opp["attribute"][:2]))
+            note = (t("cup_rival_enters", "{name} — your RIVAL!").replace("{name}", opp["name"]) if opp.get("rival") else
+                    t("cup_foe_enters", "{name} [{attr}] enters!").replace("{name}", opp["name"]).replace("{attr}", opp["attribute"][:2]))
         elif t < INTRO_OPP_T + INTRO_PET_T:    # your mon answers
             p = (t - INTRO_OPP_T) / max(1, INTRO_PET_T - 1)
             lw = grid.width(lrows)
             placements = [(lrows, round((grid.X0 - lw) + (lx - (grid.X0 - lw)) * p), lm),
                           (rrows, rx, rm)]
-            note = ("%s answers!" % self.pet.name if self.pet.name
-                    else "You answer!")           # unnamed: "YOU answers!" was bad grammar
+            note = (t("cup_pet_answers", "{name} answers!").replace("{name}", self.pet.name) if self.pet.name
+                    else t("cup_you_answer", "You answer!"))           # unnamed: "YOU answers!" was bad grammar
         else:                                  # the held stare-down
             placements = [(lrows, lx, lm), (rrows, rx, rm)]
-            note = "%s — FIGHT!" % self.tourney.round_name
+            note = t("cup_round_fight", "{round} — FIGHT!").replace("{round}", self.tourney.round_name)
         bgimg = self.pet.background(file="tourneyBack")
         scene = render_scene(placements, COLS, FIGHT_ROWS,
                              menu.scene_ink(bgimg), LCD_BG, bgimg=bgimg,
@@ -398,11 +398,11 @@ class TournamentPanel(menu.SubHost):
                 # open cup IS the alarm's fulfilment); alarm beats +item
                 # (the itemed prize shows on every other hour + in the cup)
                 if i == hour:
-                    tag = "\u00bb OPEN"
+                    tag = t("cup_open", "\u00bb OPEN")
                 elif tr and self.pet.tourney_alarm == tr["id"]:
-                    tag = "\u2666alarm"
+                    tag = t("cup_alarm_tag", "\u2666alarm")
                 elif tr and tr["item"] >= 0:
-                    tag = "+item"
+                    tag = t("cup_plus_item", "+item")
                 else:
                     tag = ""
                 return ("%02dh %-22s %s" % (i, name, tag)).rstrip()
@@ -412,8 +412,8 @@ class TournamentPanel(menu.SubHost):
             wg = _lines.win_gate_progress(self.pet)
             if wg:
                 now, need, window = wg
-                mark = " \u2713 ready" if now >= need else ""
-                out.append("  evolution: %d/%d wins (last %d)%s\n" % (now, need, window, mark),
+                mark = t("cup_ready", " \u2713 ready") if now >= need else ""
+                out.append(t("cup_evolution_wins", "  evolution: {now}/{need} wins (last {window}){mark}\n").format(now=now, need=need, window=window, mark=mark),
                            style=INK_B if now >= need else DIM)
             # the stake/purse line describes the cup you'd ACTUALLY enter:
             # on a festival that's the slot under the cursor, not the hour's
@@ -427,8 +427,8 @@ class TournamentPanel(menu.SubHost):
                 from tuipet.core.pet import weekend_bonus
                 fee = tournament.entry_fee(self.pet, tr_line)
                 purse = int(fee * tournament.ENTRY_FEE_DIV * weekend_bonus())
-                wk = " \u00b7 wknd x1.5" if weekend_bonus() > 1 else ""
-                out.append("  stake %db \u00b7 purse ~%db%s\n" % (fee, purse, wk),
+                wk = t("cup_wknd", " \u00b7 wknd x1.5") if weekend_bonus() > 1 else ""
+                out.append(t("cup_stake_purse", "  stake {fee}b \u00b7 purse ~{purse}b{wk}\n").format(fee=fee, purse=purse, wk=wk),
                            style=DIM)
             ftr = tournament.featured_now(self.pet)
             if ftr is not None:
@@ -436,19 +436,18 @@ class TournamentPanel(menu.SubHost):
                 # tag <= 12: "  \u2605 " + 20-char label + " \u00b7 " + tag must fit
                 # the 40-col box (cup audit 2026-07-21: the old 21-char tag
                 # ran the row to 44 and clipped)
-                tag = "run today" if done else "F \u00b7 any hour"
+                tag = t("cup_run_today", "run today") if done else t("cup_f_any_hour", "F \u00b7 any hour")
                 out.append("  \u2605 %s \u00b7 %s\n"
                            % (tournament.trophy_label(ftr)[:20], tag),
                            style=DIM if done else INK_B)
             nw = tournament.next_winnable(self.pet)
             if nw and nw[0] == hour:
-                out.append("  \u2713 %s is open NOW\n" % tournament.trophy_label(nw[1])[:24],
+                out.append(t("cup_open_now", "  \u2713 {name} is open NOW\n").format(name=tournament.trophy_label(nw[1])[:24]),
                            style=INK_B)
             elif nw:
-                out.append("  next winnable %02d:00 %s\n"
-                           % (nw[0], tournament.trophy_label(nw[1])[:16]), style=DIM)
+                out.append(t("cup_next_winnable", "  next winnable {hour:02d}:00 {name}\n").format(hour=nw[0], name=tournament.trophy_label(nw[1])[:16]), style=DIM)
             else:
-                out.append("  no cup left you can enter today\n", style=DIM)
+                out.append(t("cup_no_cups_today", "  no cup left you can enter today\n"), style=DIM)
             out.append_text(menu.note(self.msg, tick=self.frame_i))
             # (the in-LCD key footer went 2026-07-25, cup audit: it repeated
             # the strip word for word -- the FOOTER PURGE the QOL sweep ran

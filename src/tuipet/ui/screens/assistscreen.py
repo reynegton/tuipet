@@ -10,19 +10,20 @@ import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, SEL, POS, NEG    # noqa: F401  (palette names bound for theme.apply propagation)
 from tuipet.core.pet import AUTO_CARE_VISIT_PRICE, AUTO_CARE_HOUR_PRICE
+from tuipet.i18n.translator import t
 
 
 class AssistPanel:
     def __init__(self, pet):
         self.pet = pet
-        self.msg = "A helper minds the pet, for a fee."
+        self.msg = t("ast_msg_intro", "A helper minds the pet, for a fee.")
         self._fresh = False       # a toggle happened THIS visit: its verdict
         #                           rides home on ESC (round 32)
 
     def strip(self):
         on = getattr(self.pet, "auto_care", False)
-        return menu.hints(("ENTER", "dismiss helper" if on else "hire helper"),
-                          ("ESC", "out"))
+        return menu.hints(("ENTER", t("ast_hint_dismiss", "dismiss helper") if on else t("ast_hint_hire", "hire helper")),
+                          ("ESC", t("ast_hint_out", "out")))
 
     def anim(self):
         # a frame heartbeat so the app repaints at 10 Hz and an
@@ -42,26 +43,26 @@ class AssistPanel:
 
     def text(self):
         p = self.pet
-        out = menu.header("AI ASSISTANT", f"{p.bits}b")
+        out = menu.header(t("ast_hdr_ast", "AI ASSISTANT"), f"{p.bits}b")
         hour = AUTO_CARE_HOUR_PRICE.get(p.stage, 0)
         care = AUTO_CARE_VISIT_PRICE.get(p.stage, 0)
         if hour > 0:
-            out.append(f"  {hour}b/hour\n", style=INK)
-        out.append(f"  {care}b/care\n", style=INK)
+            out.append(t("ast_msg_hour_fee", "  {h}b/hour\n").format(h=hour), style=INK)
+        out.append(t("ast_msg_care_fee", "  {c}b/care\n").format(c=care), style=INK)
         if p.auto_care:
             _, by_num = data.load_sprites()
-            name = (by_num.get(p.assistant_num) or {}).get("name", "A helper")
-            out.append(f"  ON — {name} is on duty\n", style=INK_B)
+            name = (by_num.get(p.assistant_num) or {}).get("name", t("ast_msg_a_helper", "A helper"))
+            out.append(t("ast_msg_on", "  ON — {name} is on duty\n").format(name=name), style=INK_B)
         else:
-            out.append("  OFF\n", style=DIM)
+            out.append(t("ast_msg_off", "  OFF\n"), style=DIM)
         # the whole contract, quit clause included (round 32: the helper
         # walks off duty the moment it can't cover the retainer or the
         # next visit -- the card must say so up front, not just the
         # after-the-fact quit note)
-        out.append("\n  Cleans, feeds a starving or\n"
+        out.append(t("ast_msg_contract", "  Cleans, feeds a starving or\n"
                    "  drained pet, dims the lights.\n"
                    "  Each visit costs bits — the\n"
-                   "  helper quits if they run dry.\n", style=DIM)
+                   "  helper quits if they run dry.\n"), style=DIM)
         out.append_text(menu.note(self.msg))
         # keys ride the strip (round 32: the footer doubled them)
         return out

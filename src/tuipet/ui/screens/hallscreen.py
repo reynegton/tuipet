@@ -24,6 +24,7 @@ import tuipet.ui.components.menu as menu
 import tuipet.utils.persistence as persistence
 from tuipet.core.digicore import _mins
 from tuipet.utils.theme import INK, INK_B, DIM, LCD_ON, LCD_BG    # noqa: F401  (theme.apply propagation)
+from tuipet.i18n.translator import t
 
 VIS = 9                      # list rows shown at once (the album's window)
 IMG_W, IMG_H = 40, 16        # detail pixel area (8 character rows)
@@ -55,9 +56,9 @@ class HallPanel:
 
     def strip(self):
         if self.detail:
-            return menu.hints(("←→", "browse"), ("ESC", "back"))
-        return menu.hints(("↑↓", "browse"), ("ENTER", "view"),
-                          ("ESC", "out"))
+            return menu.hints(("←→", t("hall_hint_browse_lr", "browse")), ("ESC", t("hall_hint_back", "back")))
+        return menu.hints(("↑↓", t("hall_hint_browse_ud", "browse")), ("ENTER", t("hall_hint_view", "view")),
+                          ("ESC", t("hall_hint_out", "out")))
 
     def key(self, k):
         if not self.n:
@@ -97,19 +98,19 @@ class HallPanel:
         age = _mins(float(r.get("age", 0.0)))
         if r.get("dead"):
             cause = str(r.get("cause", "") or "")
-            fate = f"fell of {cause}" if cause else "fell"
+            fate = t("hall_msg_fell_cause", "fell of {c}").format(c=cause) if cause else t("hall_msg_fell", "fell")
         else:
-            fate = "walked to the next egg"
+            fate = t("hall_msg_walked", "walked to the next egg")
         extra = ""
         cups, wins = int(r.get("cups", 0)), int(r.get("wins", -1))
         if cups:
-            extra += f" · {cups} cup{'s' if cups != 1 else ''}"
+            extra += " · " + t("hall_msg_cups", "{n} cup{s}").format(n=cups, s="s" if cups != 1 else "")
         if wins > 0:
-            extra += f" · {wins} wins"
-        return f"lived {age} · {fate}{extra}"
+            extra += " · " + t("hall_msg_wins", "{n} wins").format(n=wins)
+        return t("hall_msg_lived", "lived {age} · {fate}{extra}").format(age=age, fate=fate, extra=extra)
 
     def _list_scene(self):
-        out = menu.header("HALL OF MEMORY", f"{self.n} elders" if self.n else "")
+        out = menu.header(t("hall_hdr_memory", "HALL OF MEMORY"), t("hall_msg_elders_count", "{n} elders").format(n=self.n) if self.n else "")
 
         def fmt(r, j):
             cur = j == self.i
@@ -123,9 +124,9 @@ class HallPanel:
             return t
 
         self.i = menu.list_window(out, self.elders, self.i, VIS, fmt,
-                                  empty="no elders rest here yet")
+                                  empty=t("hall_msg_empty", "no elders rest here yet"))
         note = (self._epitaph(self.elders[self.i]) if self.n
-                else "this pet is writing generation one")
+                else t("hall_msg_gen1", "this pet is writing generation one"))
         out.append_text(menu.note(note, tick=self.frame_i))
         out.right_crop(1)     # keys ride the strip (the egg-guide law)
         return out
@@ -142,7 +143,7 @@ class HallPanel:
     def _detail_scene(self):
         r = self.elders[self.i]
         name = str(r.get("name", "?"))
-        out = menu.header(f"MEMORY  {name[:20].upper()}",
+        out = menu.header(t("hall_hdr_memory_name", "MEMORY  {name}").format(name=name[:20].upper()),
                           f"g{r.get('gen', '?')}")
         rows = self._portrait_rows(r)
         buf = [[0] * IMG_W for _ in range(IMG_H)]

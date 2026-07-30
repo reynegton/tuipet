@@ -13,10 +13,11 @@ from __future__ import annotations
 import tuipet.ui.components.menu as menu
 from tuipet.core.petbase import MAX_OBEDIENCE
 from tuipet.utils.theme import INK, INK_B, DIM, SEL    # noqa: F401  (theme.apply propagation)
+from tuipet.i18n.translator import t
 
 _ROWS = (
-    ("Praise", "warmth for a proud moment"),
-    ("Scold", "answer the tantrum call"),
+    ("disc_lbl_praise", "Praise", "disc_desc_praise", "warmth for a proud moment"),
+    ("disc_lbl_scold", "Scold", "disc_desc_scold", "answer the tantrum call"),
 )
 
 
@@ -31,7 +32,7 @@ class DisciplinePanel:
         self.frame_i += 1
 
     def strip(self):
-        return menu.hints(("ENTER", "apply"), ("ESC", "back"))
+        return menu.hints(("ENTER", t("disc_hint_apply", "apply")), ("ESC", t("disc_hint_back", "back")))
 
     def key(self, k):
         if k in ("up", "down", "j", "k"):
@@ -59,19 +60,21 @@ class DisciplinePanel:
     def _state_line(self):
         p = self.pet
         if p.discipline_call:
-            return "it is ACTING UP — a scold lands"
+            return t("disc_msg_acting_up", "it is ACTING UP — a scold lands")
         if p.world_seconds <= getattr(p, "praise_window", 0.0):
-            return "a PROUD moment — praise lands"
-        return "all calm — neither will land"
+            return t("disc_msg_proud", "a PROUD moment — praise lands")
+        return t("disc_msg_calm", "all calm — neither will land")
 
     def text(self):
-        out = menu.header("DISCIPLINE", f"manners {self.pet.obedience}/{MAX_OBEDIENCE}")
-        for i, (label, desc) in enumerate(_ROWS):
+        out = menu.header(t("disc_hdr_disc", "DISCIPLINE"), t("disc_hdr_manners", "manners {ob}/{max}").format(ob=self.pet.obedience, max=MAX_OBEDIENCE))
+        for i, (lbl_key, lbl_def, desc_key, desc_def) in enumerate(_ROWS):
             sel = i == self.cursor
+            label = t(lbl_key, lbl_def)
+            desc = t(desc_key, desc_def)
             out.append(f" {'▸' if sel else ' '} {label:<8}", style=SEL if sel else INK_B)
             out.append(f"{desc}\n", style=DIM)
         out.append("\n")
         out.append(f" {self._state_line()}\n", style=INK)
         out.append_text(menu.blanks(9 - 4))
-        out.append_text(menu.footer("ENTER apply  ↑↓ pick  ESC out"))
+        out.append_text(menu.footer(t("disc_footer_strip", "ENTER apply  ↑↓ pick  ESC out")))
         return out

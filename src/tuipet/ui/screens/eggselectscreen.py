@@ -12,6 +12,7 @@ import tuipet.ui.components.menu as menu
 import tuipet.utils.persistence as persistence
 from tuipet.utils.render import render_scene
 from tuipet.utils.theme import LCD_ON, LCD_BG    # noqa: F401  (theme.apply propagation)
+from tuipet.i18n.translator import t
 
 COLS, ROWS = 40, 10           # scene area, 20px: the egg gets headroom --
 #                               the in-LCD text block left (Joel bug report
@@ -78,8 +79,8 @@ class EggSelectPanel:
             return self.msg
         if (self.locked > 0 and self.hint
                 and self.frame_i % (2 * TEASE_BEAT) >= TEASE_BEAT):
-            return f"{self.locked} more out there · {self.hint}"
-        return menu.hints(("←→", "browse"), ("ENTER", "pick"), ("E", "guide"))
+            return t("eggsel_msg_more", "{locked} more out there · {hint}").format(locked=self.locked, hint=self.hint)
+        return menu.hints(("←→", t("eggsel_hint_browse", "browse")), ("ENTER", t("eggsel_hint_pick", "pick")), ("E", t("eggsel_hint_guide", "guide")))
 
     def key(self, k):
         if k in ("right", "l", "down", "j"):
@@ -122,13 +123,13 @@ class EggSelectPanel:
         state = self.states.get(idx, "owned")
         targets = egg_mod.hatch_targets(idx)
         if len(targets) > 1:
-            name, new = "???  (two fates stir)", False
+            name, new = t("eggsel_lbl_two_fates", "???  (two fates stir)"), False
         else:
             name = egg_mod.destined_name(idx)  # the BABY, not the egg's title
             album = persistence.get_album()
             new = bool(targets) and data.canonical_num(targets[0]) not in album
-        tail = "  (this gen only)" if state == "temp" else ""
-        return "hatches: %s%s%s" % (name, "  ★new" if new else "", tail)
+        tail = t("eggsel_msg_this_gen", "  (this gen only)") if state == "temp" else ""
+        return t("eggsel_msg_hatches", "hatches: {name}{new}{tail}").format(name=name, new=t("eggsel_lbl_new", "  ★new") if new else "", tail=tail)
 
     def _scene_bg(self, idx):
         """The browsed egg's OWN backdrop behind the carousel -- the egg
@@ -139,10 +140,10 @@ class EggSelectPanel:
 
     def text(self):
         if not self.n:                                 # defensive: starters keep this non-empty
-            out = menu.header("CHOOSE YOUR EGG", "0/0")
+            out = menu.header(t("eggsel_hdr_choose", "CHOOSE YOUR EGG"), "0/0")
             out.append_text(menu.blanks(ROWS // 2))
-            out.append_text(menu.note("no eggs ready — earn them out in the world"))
-            out.append_text(menu.footer("ESC back"))
+            out.append_text(menu.note(t("eggsel_msg_no_eggs", "no eggs ready — earn them out in the world")))
+            out.append_text(menu.footer(t("eggsel_hint_back", "ESC back")))
             return out
         placements = []
         base = round(self.scroll)
@@ -160,6 +161,6 @@ class EggSelectPanel:
         # the LCD is PURE SCENE (carousel redo 2026-07-19): the dossier
         # rides the STATUS card, the words ride the message strip -- the
         # boxes that exist for them (Joel's bug report, verbatim)
-        out = menu.header("CHOOSE YOUR EGG", f"{self.i + 1}/{self.n}")
+        out = menu.header(t("eggsel_hdr_choose", "CHOOSE YOUR EGG"), f"{self.i + 1}/{self.n}")
         out.append_text(scene)
         return out

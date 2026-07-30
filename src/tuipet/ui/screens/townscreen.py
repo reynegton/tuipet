@@ -13,9 +13,10 @@ from __future__ import annotations
 import tuipet.ui.components.menu as menu
 import tuipet.core.tournament as tournament
 from tuipet.utils.theme import INK, INK_B, DIM, POS    # noqa: F401  (theme.apply propagation)
+from tuipet.i18n.translator import t
 
-_MENU = (("shop", "Shop"), ("eggs", "Eggs"), ("sell", "Sell"),
-         ("cup", "Town Cup"), ("leave", "Leave"))
+_MENU = (("shop", t("town_menu_shop", "Shop")), ("eggs", t("town_menu_eggs", "Eggs")), ("sell", t("town_menu_sell", "Sell")),
+         ("cup", t("town_menu_cup", "Town Cup")), ("leave", t("town_menu_leave", "Leave")))
 
 
 # the session's last hub pick: a multi-town run re-entered every hub on
@@ -38,7 +39,7 @@ class TownPanel(menu.SubHost):
         self.sfx = None
         # <= 38 cols: the hub body clips hard, no marquee (sheet audit
         # 2026-07-21 caught the old line dying mid-word at "resupply, o")
-        self.msg = "A town on the road — rest up, shop."
+        self.msg = t("town_msg_intro", "A town on the road — rest up, shop.")
 
     def anim(self):
         if self.sub_anim():            # the shop / cup match owns the clock
@@ -104,17 +105,17 @@ class TownPanel(menu.SubHost):
         elif kind == "item_use" and len(r) > 3 and r[3]:
             self.msg = str(r[3])
         elif kind == "evolve":
-            self.msg = f"...evolved into {self.pet.name}!"
+            self.msg = t("town_msg_evolved", "...evolved into {name}!").format(name=self.pet.name)
         elif kind == "inherit":
-            self.msg = "The memory settles in."
+            self.msg = t("town_msg_inherit", "The memory settles in.")
         else:
-            self.msg = "Anything else?"          # a plain browse -> back to the menu
+            self.msg = t("town_msg_anything_else", "Anything else?")          # a plain browse -> back to the menu
 
     # -- the town cup ---------------------------------------------------------
     def _start_cup(self):
         """Enter the distinct town championship (one per visit)."""
         if self._cup_done:
-            self.msg = "The Town Cup has run — come back next visit."
+            self.msg = t("town_msg_cup_run", "The Town Cup has run — come back next visit.")
             return
         # the SAME pet gates the home board runs (cup audit 2026-07-21: the
         # town cup skipped them -- the exact gap the 2026-07-19 audit closed
@@ -139,7 +140,7 @@ class TownPanel(menu.SubHost):
         # door shut until the player happened to open the home cup screen
         tournament.schedule(self.pet)
         if tournament._hour(self.pet) in (getattr(self.pet, "fought_hours", None) or []):
-            self.msg = "The cup hour is spent — the next starts on the hour."
+            self.msg = t("town_msg_hour_spent", "The cup hour is spent — the next starts on the hour.")
             return
         cup = tournament.town_cup(self.pet, self.town_id)
         if (stake := tournament._stake_check(self.pet, cup)):
@@ -172,23 +173,23 @@ class TownPanel(menu.SubHost):
         if isinstance(result, tuple):
             last, champ = result
             self.sfx = "champion" if champ else "lose"
-            self.msg = last or ("Town champion!" if champ
-                                else "Knocked out of the Town Cup.")
+            self.msg = last or (t("town_msg_champ", "Town champion!") if champ
+                                else t("town_msg_ko", "Knocked out of the Town Cup."))
         else:
-            self.msg = "You forfeit the Town Cup."
+            self.msg = t("town_msg_forfeit", "You forfeit the Town Cup.")
 
     # -- render ---------------------------------------------------------------
     def strip(self):
         if self.sub is not None:
             return self.sub.strip()
-        return menu.hints(("↑↓", "pick"), ("ENTER", "go"), ("ESC", "leave"))
+        return menu.hints(("↑↓", t("town_hint_pick", "pick")), ("ENTER", t("town_hint_go", "go")), ("ESC", t("town_hint_leave", "leave")))
 
     def text(self):
         if self.sub is not None:
             return self.sub.text()
-        out = menu.header("TOWN", "")
+        out = menu.header(t("town_hdr_town", "TOWN"), "")
         menu.list_window(out, list(_MENU), self.cursor, 6, lambda row, _i: row[1])
         out.append_text(menu.blanks(1))
         out.append_text(menu.note(self.msg, tick=self.frame_i))
-        out.append_text(menu.footer("↑↓ pick   ENTER go   ESC leave"))
+        out.append_text(menu.footer(t("town_footer_strip", "↑↓ pick   ENTER go   ESC leave")))
         return out

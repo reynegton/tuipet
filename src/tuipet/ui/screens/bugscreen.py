@@ -4,6 +4,7 @@ login; if the network's down the app stashes it and retries next launch."""
 from __future__ import annotations
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import INK, INK_B, DIM    # noqa: F401  (palette names bound for theme.apply propagation)
+from tuipet.i18n.translator import t
 
 MAXLEN = 1000          # a bug report is a sentence or two, not an essay
 BODY_W = 38            # the LCD box's writable width
@@ -32,7 +33,7 @@ class BugReportPanel(menu.SubHost):
         self.buf = ""
         self.frame_i = 0
         self.captures_text = True         # typing wins over the global q-quit
-        self.msg = "What went wrong? It goes to the dev."
+        self.msg = t("bug_msg_intro", "What went wrong? It goes to the dev.")
         self.sub = None
 
     def anim(self):
@@ -41,8 +42,8 @@ class BugReportPanel(menu.SubHost):
         self.frame_i += 1
 
     def strip(self):
-        return "[dim]to the dev —[/] " + \
-            menu.hints(("ENTER", "send"), ("ESC", "cancel"))
+        return t("bug_msg_strip_prefix", "[dim]to the dev —[/] ") + \
+            menu.hints(("ENTER", t("bug_hint_send", "send")), ("ESC", t("bug_hint_cancel", "cancel")))
 
     def key(self, k):
         if k == "escape":
@@ -50,7 +51,7 @@ class BugReportPanel(menu.SubHost):
         if k == "enter":
             text = self.buf.strip()
             if not text:
-                self.msg = "Type the bug first — or ESC to cancel."
+                self.msg = t("bug_msg_empty_error", "Type the bug first — or ESC to cancel.")
                 self.sfx = "error"
                 return None
             return ("done", ("bug", text))
@@ -64,7 +65,7 @@ class BugReportPanel(menu.SubHost):
         return None
 
     def text(self):
-        out = menu.header("REPORT A BUG", "%d/%d" % (len(self.buf), MAXLEN))
+        out = menu.header(t("bug_hdr_report", "REPORT A BUG"), "%d/%d" % (len(self.buf), MAXLEN))
         lines = wrap(self.buf, BODY_W) if self.buf else [""]
         caret = "_" if (self.frame_i // 5) % 2 == 0 else " "
         lines[-1] = (lines[-1] + caret)[:BODY_W]
@@ -73,5 +74,5 @@ class BugReportPanel(menu.SubHost):
         for ln in view:
             out.append(ln + "\n", style=INK if self.buf else DIM)
         out.append_text(menu.note(self.msg, tick=self.frame_i))
-        out.append_text(menu.footer("type  ENTER send  ESC cancel"))
+        out.append_text(menu.footer(t("bug_hint_footer", "type  ENTER send  ESC cancel")))
         return out

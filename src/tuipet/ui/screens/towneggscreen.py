@@ -12,6 +12,7 @@ import tuipet.ui.components.menu as menu
 import tuipet.core.shop as shop
 from tuipet.utils.render import downsample
 from tuipet.utils.theme import LCD_ON, LCD_BG    # noqa: F401  (theme.apply propagation)
+from tuipet.i18n.translator import t
 
 GW, GH = 40, 16              # grid pixel area (8 character rows)
 PER_ROW, SHOWN = 4, 8        # 2 rows of 4 thumbnails
@@ -27,7 +28,7 @@ class TownEggPanel:
         self.i = 0
         self.frame_i = 0
         self.sfx = None
-        self.msg = "The town egg vendor — pick one up for the road."
+        self.msg = t("tegg_msg_intro", "The town egg vendor — pick one up for the road.")
         self.msg_t = 0
 
     def anim(self):
@@ -39,7 +40,7 @@ class TownEggPanel:
         self.msg, self.msg_t = text, 26
 
     def strip(self):
-        return menu.hints(("←→↑↓", "browse"), ("ENTER", "buy"), ("ESC", "leave"))
+        return menu.hints(("←→↑↓", t("tegg_hint_browse", "browse")), ("ENTER", t("tegg_hint_buy", "buy")), ("ESC", t("tegg_hint_leave", "leave")))
 
     # -- input -----------------------------------------------------------------
     def key(self, k):
@@ -98,12 +99,12 @@ class TownEggPanel:
 
     def text(self):
         if not self.n:
-            out = menu.header("EGG MARKET", "0/0")
+            out = menu.header(t("tegg_hdr_market", "EGG MARKET"), "0/0")
             out.append_text(menu.blanks(4))
-            out.append_text(menu.note("This town's vendor is out of eggs."))
-            out.append_text(menu.footer("ESC leave"))
+            out.append_text(menu.note(t("tegg_msg_out", "This town's vendor is out of eggs.")))
+            out.append_text(menu.footer(t("tegg_footer_leave", "ESC leave")))
             return out
-        out = menu.header("EGG MARKET", f"{self.i + 1}/{self.n}")
+        out = menu.header(t("tegg_hdr_market", "EGG MARKET"), f"{self.i + 1}/{self.n}")
         buf = self._grid()
         bt = Text()
         for cy in range(GH // 2):
@@ -115,8 +116,8 @@ class TownEggPanel:
             bt.append("\n")
         out.append_text(bt)
         idx = self.stock[self.i]
-        tag = "owned" if idx in self.owned else f"{shop.egg_price(idx)}b"
+        tag = t("tegg_lbl_owned", "owned") if idx in self.owned else f"{shop.egg_price(idx)}b"
         line = self.msg if self.msg_t > 0 else f"{egg_mod.hatch_name(idx)} — {tag}"
         out.append_text(menu.note(line, tick=self.frame_i))
-        out.append_text(menu.footer("←→ ↑↓ browse   ENTER buy   ESC leave"))
+        out.append_text(menu.footer(t("tegg_footer_strip", "←→ ↑↓ browse   ENTER buy   ESC leave")))
         return out

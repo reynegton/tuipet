@@ -12,6 +12,7 @@ import tuipet.utils.grid as grid
 
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, SEL    # noqa: F401  (theme.apply propagation)
 import tuipet.ui.components.menu as menu
+from tuipet.i18n.translator import t
 
 COLS, ROWS = 40, 12
 
@@ -23,7 +24,7 @@ class BackgroundPanel:
         self.cursor = next((i for i, k in enumerate(self.rows)
                             if k == pet.bg_pick), 0)
         self.frame_i = 0
-        self.msg = "pick a scene — it hangs behind the mon"
+        self.msg = t("bg_msg_intro", "pick a scene — it hangs behind the mon")
         self.sfx = None
 
     def anim(self):
@@ -47,7 +48,7 @@ class BackgroundPanel:
         elif k in ("enter", "space"):
             key = self.rows[self.cursor]
             if key == self.pet.bg_pick:
-                self.msg = "Already up."
+                self.msg = t("bg_msg_already_up", "Already up.")
             else:
                 self.msg = self.pet.pick_background(key)
                 self.sfx = "confirm"
@@ -57,11 +58,11 @@ class BackgroundPanel:
 
     def _name(self, row):
         if not row:
-            return "%s (egg's own)" % bgs.name(bgs.scene_for_egg(self.pet.egg_type))
+            return t("bg_msg_eggs_own", "{name} (egg's own)").format(name=bgs.name(bgs.scene_for_egg(self.pet.egg_type)))
         return bgs.name(row)
 
     def _tag(self, row):
-        return "● here" if row == self.pet.bg_pick else ""
+        return t("bg_msg_here", "● here") if row == self.pet.bg_pick else ""
 
     def strip(self):
         # budgeted to HUD_W 40 (menu-bounds law): the name field scrolls,
@@ -69,7 +70,7 @@ class BackgroundPanel:
         from tuipet.utils.render import marquee
         return (f"[b]▸{marquee(self._name(self.rows[self.cursor]), 14, self.frame_i // 2)}[/]"
                 f" {self.cursor + 1}/{len(self.rows)}"
-                f" [dim]←→ ENTER ESC[/]")
+                f" {t('bg_hint_footer', '[dim]←→ ENTER ESC[/]')}")
 
     def text(self):
         """The browsed backdrop AS A SCENE: the pet stands in it --

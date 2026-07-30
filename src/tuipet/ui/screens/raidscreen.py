@@ -23,6 +23,7 @@ from tuipet.utils.render import render_scene
 
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, NEG, POS, COIN    # noqa: F401  (theme.apply propagation)
 import tuipet.ui.components.menu as menu
+from tuipet.i18n.translator import t
 
 COLS, ROWS = 40, 12
 
@@ -45,7 +46,7 @@ class RaidPanel(menu.SubHost):
         self.sub = None
         self.frame_i = 0
         self.sfx = None
-        self.msg = "Calling the raid gate…"
+        self.msg = t("raid_msg_calling", "Calling the raid gate…")
         self._pool_seen = None        # (start, hp, end, name) of the last-seen boss
         self._dealt = 0
         self._credited = 0            # the gate's acked board damage this session
@@ -89,23 +90,24 @@ class RaidPanel(menu.SubHost):
             # swallowed login_failed/error and held this line for good)
             st = getattr(self.client, "state", None)
             if self._no_account:
-                self.msg = "No account — log into the LOBBY first."
+                self.msg = t("raid_msg_no_acc", "No account — log into the LOBBY first.")
             elif st is not None and st.login_failed:
-                self.msg = f"The gate turned us away: {st.login_failed}"
+                self.msg = t("raid_msg_turned_away", "The gate turned us away: {reason}").format(reason=st.login_failed)
             elif st is not None and st.error:
-                self.msg = f"Gate error: {st.error}"
+                self.msg = t("raid_msg_gate_err", "Gate error: {err}").format(err=st.error)
             elif self.view:
                 if self._standing():
                     # PRE-WARN what the volley key will refuse (Joel
                     # 2026-07-25 "do i get any kind of warning?"): the same
                     # gate the press runs, read-only -- NEVER _disturbed()
                     # here, a warning must not wake or bill anyone
-                    cond = ("Fast asleep — raiding would wake it."
+                    # here, a warning must not wake or bill anyone
+                    cond = (t("raid_msg_fast_asleep", "Fast asleep — raiding would wake it.")
                             if self.pet.asleep else self.pet.battle_condition())
-                    self.msg = ("The boss stands. SPACE to raid!"
-                                if cond is None else f"The boss stands — {cond}")
+                    self.msg = (t("raid_msg_boss_stands", "The boss stands. SPACE to raid!")
+                                if cond is None else t("raid_msg_boss_stands_cond", "The boss stands — {cond}").format(cond=cond))
                 else:
-                    self.msg = "The next boss is incoming…"
+                    self.msg = t("raid_msg_next_inc", "The next boss is incoming…")
         hit = getattr(self.client, "last_hit", None)
         if hit is not None:
             # the gate's authoritative credit (raw x5000 x num-mult) -- the
@@ -115,7 +117,7 @@ class RaidPanel(menu.SubHost):
             dealt = int(hit.get("dealt", 0) or 0)
             if dealt > 0:
                 self._credited += dealt
-                self.msg = f"Gate credits {dealt:,} damage!"
+                self.msg = t("raid_msg_credits", "Gate credits {dealt:,} damage!").format(dealt=dealt)
                 self.sfx = "attackHit"
             else:
                 # the gate REFUSED the report -- speak ITS reason (the ack
@@ -124,7 +126,7 @@ class RaidPanel(menu.SubHost):
                 # attempt races, raid round 2026-07-19).  No refetch here:
                 # the gate re-sends the view with every hit ack now, like
                 # the claim flow.
-                self.msg = hit.get("why") or "The gate refused the report."
+                self.msg = hit.get("why") or t("raid_msg_refused", "The gate refused the report.")
                 self.sfx = "error"
         reward = getattr(self.client, "raid_reward", None)
         if reward is not None:
@@ -142,14 +144,14 @@ class RaidPanel(menu.SubHost):
             now = (self.view or {}).get("now", 0)
             if (prev is not None and b.get("start") != prev[0]
                     and prev[1] > 0 and now <= prev[2]):
-                self.msg = f"{prev[3]} falls — the pool is broken!"
+                self.msg = t("raid_msg_falls", "{name} falls — the pool is broken!").format(name=prev[3])
                 self.sfx = "win"
             self._pool_seen = (b.get("start"), b.get("hp", 0),
-                               b.get("end", 0), b.get("name", "The boss"))
+                               b.get("end", 0), b.get("name", t("raid_msg_the_boss", "The boss")))
 
     def _apply_reward(self, reward):
         if not reward.get("ok"):
-            self.msg = "Nothing to claim."
+            self.msg = t("raid_msg_nothing", "Nothing to claim.")
             self.sfx = "error"
             return
         bits = int(reward.get("bits", 0))
@@ -172,18 +174,19 @@ class RaidPanel(menu.SubHost):
             # vitamin, dna_crystal".
             names = ", ".join((shop.entry(k) or {}).get("name", k)
                               for k in got) if got else ""
-            self.msg = f"{reward.get('boss', 'The boss')} fell! " \
-                       f"Rank {reward.get('rank', '?')}: {bits}b" \
-                       + (f" + {names}" if names else "")
+            boss_name = reward.get('boss', t("raid_msg_the_boss", "The boss"))
+            rank = reward.get('rank', '?')
+            base_msg = t("raid_msg_fell_full", "{boss} fell! Rank {rank}: {bits}b").format(boss=boss_name, rank=rank, bits=bits)
+            self.msg = base_msg + (f" + {names}" if names else "")
             self.sfx = "champion"
         else:
-            self.msg = f"The boss escaped… {bits}b consolation."
+            self.msg = t("raid_msg_escaped", "The boss escaped… {bits}b consolation.").format(bits=bits)
             self.sfx = "confirm"
 
     def strip(self):
         if self.sub is not None:
             return ""
-        return menu.hints(("SPACE", "raid!"), ("C", "claim"), ("ESC", "out"))
+        return menu.hints(("SPACE", t("raid_hint_raid", "raid!")), ("C", t("raid_hint_claim", "claim")), ("ESC", t("raid_hint_out", "out")))
 
     # ---- the attempt ----
     def _boss_enemy(self):
@@ -203,7 +206,7 @@ class RaidPanel(menu.SubHost):
             # ESC before the bell: no volley rolled, no report, no attempt
             # spent -- the old "Not a scratch" called the walk-away a whiff
             # (raid round 2026-07-19)
-            self.msg = "You back off. The attempt keeps."
+            self.msg = t("raid_msg_back_off", "You back off. The attempt keeps.")
             return
         # THE VOLLEY BILLS THE BODY (Joel 2026-07-28: "bill the body only").
         # A raid was the ONE fight door that spent nothing -- RaidBout writes
@@ -222,9 +225,9 @@ class RaidPanel(menu.SubHost):
             # NEUTRAL until the ack lands: "reported!" used to stand even
             # when the gate rejected it or the socket was down (raid review
             # 2026-07-18); the ack path speaks the credit or the refusal
-            self.msg = f"Landed {dealt} — reporting to the gate…"
+            self.msg = t("raid_msg_landed", "Landed {dealt} — reporting to the gate…").format(dealt=dealt)
         else:
-            self.msg = "Not a scratch. Rest and try again."
+            self.msg = t("raid_msg_scratch", "Not a scratch. Rest and try again.")
 
     def key(self, k):
         if self.sub is not None:
@@ -236,15 +239,15 @@ class RaidPanel(menu.SubHost):
         if k in ("space", "enter"):
             v = self.view
             if not v:
-                self.msg = "The gate hasn't answered yet…"
+                self.msg = t("raid_msg_gate_no_ans", "The gate hasn't answered yet…")
                 self.client.raid_get()
                 return None
             if not self._standing():
-                self.msg = "The boss is not standing."
+                self.msg = t("raid_msg_not_stand", "The boss is not standing.")
                 self.sfx = "error"
                 return None
             if int(v.get("attempts", 0)) <= 0:
-                self.msg = "No attempts left today."
+                self.msg = t("raid_msg_no_att", "No attempts left today.")
                 self.sfx = "error"
                 return None
             # THE SLEEPER ANSWERS FIRST (sleep audit 2026-07-25, S1).  The
@@ -281,18 +284,18 @@ class RaidPanel(menu.SubHost):
             award = (self.view or {}).get("award")
             if award:
                 self.client.raid_claim(award["id"])
-                self.msg = "Claim sent…"
+                self.msg = t("raid_msg_claim_sent", "Claim sent…")
             else:
-                self.msg = "Nothing to claim yet."
+                self.msg = t("raid_msg_nothing_yet", "Nothing to claim yet.")
             return None
         if k in ("escape", "r"):
             # the exit line speaks the GATE's number (board damage), not the
             # raw accumulator -- three magnitudes described one session
             # (raid review 2026-07-18)
             if self._credited:
-                done = f"Raid: the gate credited {self._credited:,} damage."
+                done = t("raid_msg_credited_done", "Raid: the gate credited {dmg:,} damage.").format(dmg=self._credited)
             elif self._dealt:
-                done = f"Raid: {self._dealt} raw landed — no gate credit yet."
+                done = t("raid_msg_landed_done", "Raid: {dmg} raw landed — no gate credit yet.").format(dmg=self._dealt)
             else:
                 done = None
             return ("done", done)
@@ -306,7 +309,7 @@ class RaidPanel(menu.SubHost):
         them when over-wide)."""
         award = v.get("award")
         if award:
-            alt = f"purse waiting: {award.get('boss', '?')[:12]} — press C"
+            alt = t("raid_msg_purse", "purse waiting: {name} — press C").format(name=award.get('boss', '?')[:12])
         elif not self._standing():
             alt = ""
         else:
@@ -325,9 +328,9 @@ class RaidPanel(menu.SubHost):
             # (cup audit 2026-07-19).  Cups stay local: their purse pays
             # client-side, so the player's own weekend IS their truth.
             srv_wknd = _time.gmtime(v.get("now", _time.time())).tm_wday >= 5
-            alt = (f"weekly boss · {days}d {hrs}h left"
+            alt = (t("raid_msg_weekly", "weekly boss · {d}d {h}h left").format(d=days, h=hrs)
                    + (f" · {fest}" if fest
-                      else " · weekend claims pay 1.5x" if srv_wknd else ""))
+                      else t("raid_msg_weekend", " · weekend claims pay 1.5x") if srv_wknd else ""))
         if self.msg and (not alt or (self.frame_i // 40) % 2 == 0):
             return self.msg
         return alt or self.msg
@@ -338,7 +341,7 @@ class RaidPanel(menu.SubHost):
         v = self.view
         b = self._boss()
         if not v or not b:
-            out = menu.header("RAID", "…")
+            out = menu.header(t("raid_hdr_raid", "RAID"), "…")
             out.append_text(menu.blanks(5))
             out.append_text(menu.note(self.msg, tick=self.frame_i))
             # keys ride the STRIP here like every other state of this
@@ -366,14 +369,14 @@ class RaidPanel(menu.SubHost):
         if bgimg and len(bgimg) > sc_rows * 2:
             bgimg = bgimg[-sc_rows * 2:]
         scene = render_scene(placements, COLS, sc_rows, menu.scene_ink(bgimg),
-                             LCD_BG, bgimg=bgimg)
+                              LCD_BG, bgimg=bgimg)
         stage = data.record_for(num).get("stage", "Mega")
-        out = menu.bar(f"RAID · {b.get('name', '?')[:14]}", stage[:8])
+        out = menu.bar(t("raid_hdr_raid_name", "RAID · {name}").format(name=b.get('name', '?')[:14]), stage[:8])
         out.append_text(scene)
         out.append("\n")               # terminate the scene's last row
         if not self._standing():
             left = max(0, int(b.get("start", 0) - v.get("now", 0)))
-            note = f"INCOMING BOSS — {left // 3600}h {left % 3600 // 60}m"
+            note = t("raid_msg_inc_boss", "INCOMING BOSS — {h}h {m}m").format(h=left // 3600, m=left % 3600 // 60)
         else:
             # priority msg > waiting purse > the weekly cadence; every
             # number (pool, standing, tries, top) lives on the CARD
