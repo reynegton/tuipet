@@ -182,7 +182,7 @@ def _divergence_row(pet):
         return None
     _, by = data.load_sprites()
     name = by.get(div, {}).get("name", "?")
-    from tuipet import persistence as _p
+    import tuipet.utils.persistence as _p
     if data.load_requirements().get(div, {}).get("hidden_evo") \
             and not _p.album_seen(div):
         name = "???"
