@@ -1289,7 +1289,7 @@ class TuiPetApp(ActionsMixin, App):
             # overwrite.  The egg has no needs, so the idle slot is free to
             # hold the pointer for the whole wait.
             if not self._showing_eggwait:
-                self._hud("the egg hatches on its own — [b]?[/] help · [b]E[/] egg guide")
+                self._hud("o ovo choca sozinho — [b]?[/] ajuda · [b]E[/] guia de ovos")
                 self._showing_eggwait = True
             self._showing_update = False
         elif self._showing_eggwait:
@@ -1303,7 +1303,7 @@ class TuiPetApp(ActionsMixin, App):
             # yes, and C clears it.  No beep -- the 3-pile alarm keeps its
             # escalation role.
             if not self._showing_tidy:
-                self._hud("a mess on the floor — [b]C[/] to clean")
+                self._hud("sujeira no chão — [b]C[/] para limpar")
                 self._showing_tidy = True
             self._showing_update = False
         elif self._showing_tidy:
@@ -1316,8 +1316,8 @@ class TuiPetApp(ActionsMixin, App):
             # DNA screen (gameplay polish #14, 2026-07-22).  Idle-only:
             # every need, alert and gift outranks it.
             if not self._showing_armed:
-                self._hud(f"◆ DNA armed — next evolution rides the "
-                          f"{data.pretty_field(self._armed_field(p))} road ([b]X[/])")
+                self._hud(f"◆ DNA armado — a próxima evolução segue o "
+                          f"caminho {data.pretty_field(self._armed_field(p))} ([b]X[/])")
                 self._showing_armed = True
             self._showing_update = False
         elif self._showing_armed:
