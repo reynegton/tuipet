@@ -219,7 +219,6 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     # from a cup bracket -- it re-seeds into future brackets its tier fits,
     # until revenge settles the grudge.  Real losses only, never forfeits.
     rival_num: int = -1
-    rival_name: str = ""
     egg_type: int = 0
     bg_pick: str = ""               # picked home scene ("" = follow the egg; E picker 2026-07-17)
     generation: int = 1

@@ -23,7 +23,7 @@ from tuipet.ui.screens.themescreen import ThemePanel
 from tuipet.i18n.translator import t
 from tuipet import SERVIDOR_ONLINE
 
-_ROWS = ("theme", "sound", "account", "cloud", "update", "keys", "new", "erase")
+_ROWS: tuple[str, ...] = ("theme", "sound", "account", "cloud", "update", "keys", "new", "erase")
 if not SERVIDOR_ONLINE:
     _ROWS = tuple(r for r in _ROWS if r not in ("account", "cloud", "update"))
 def _get_label():

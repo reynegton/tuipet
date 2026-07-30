@@ -216,7 +216,7 @@ class TuiPetApp(ActionsMixin, App):
 
     from tuipet import SERVIDOR_ONLINE
     if not SERVIDOR_ONLINE:
-        BINDINGS = [b for b in BINDINGS if b[1] not in ('raid', 'lobby', 'bug')]
+        BINDINGS = [b for b in BINDINGS if (b[1] if isinstance(b, tuple) else getattr(b, 'action', '')) not in ('raid', 'lobby', 'bug')]
 
     def __init__(self, pet: Pet | None = None):
         super().__init__()

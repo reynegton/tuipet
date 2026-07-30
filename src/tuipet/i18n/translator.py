@@ -47,7 +47,7 @@ def _load_language(lang_code: str) -> None:
         # If the file doesn't exist yet, we just create an empty dictionary
         _translations[lang_code] = {}
 
-def t(key: str, fallback: str = None, **kwargs: Any) -> str:
+def t(key: str, fallback: str | None = None, **kwargs: Any) -> str:
     """
     Translates a key into the current language.
     If the key is not found in the current language, falls back to English.
@@ -55,7 +55,7 @@ def t(key: str, fallback: str = None, **kwargs: Any) -> str:
     """
     lang_dict: Dict[str, str] = _translations.get(_current_language, {})
     
-    text: str = lang_dict.get(key)
+    text: str | None = lang_dict.get(key)
     
     if text is None:
         fallback_dict: Dict[str, str] = _translations.get(_fallback_language, {})
