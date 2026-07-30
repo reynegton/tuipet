@@ -8,17 +8,18 @@ from rich.text import Text
 import tuipet.utils.theme as theme
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import INK, SEL
+from tuipet.i18n.translator import t
 
 # one line of personality per palette (picker polish 2026-07-18)
 _NOTES = {
-    "grey": "the quiet default",
-    "mono": "pure 1-bit terminal",
-    "amber": "vintage phosphor glow",
-    "midnight": "deep blue after-hours",
-    "gameboy": "the 4-shade DMG green",
-    "paper": "dark ink on warm paper",
-    "sakura": "petals on dusk",
-    "ocean": "abyssal teal",
+    "grey": t("theme_note_grey", "the quiet default"),
+    "mono": t("theme_note_mono", "pure 1-bit terminal"),
+    "amber": t("theme_note_amber", "vintage phosphor glow"),
+    "midnight": t("theme_note_midnight", "deep blue after-hours"),
+    "gameboy": t("theme_note_gameboy", "the 4-shade DMG green"),
+    "paper": t("theme_note_paper", "dark ink on warm paper"),
+    "sakura": t("theme_note_sakura", "petals on dusk"),
+    "ocean": t("theme_note_ocean", "abyssal teal"),
 }
 
 
@@ -42,8 +43,8 @@ class ThemePanel:
             self.on_change()
 
     def strip(self):
-        return menu.hints(("↑↓", "preview"), ("ENTER", "keep"),
-                          ("ESC", "revert"))
+        return menu.hints(("↑↓", t("theme_hint_preview", "preview")), ("ENTER", t("theme_hint_keep", "keep")),
+                          ("ESC", t("theme_hint_revert", "revert")))
 
     def anim(self):
         # a frame heartbeat so the app repaints at 10 Hz and an
@@ -69,20 +70,20 @@ class ThemePanel:
         return None
 
     def text(self):
-        out = menu.header("THEMES", f"{self.cursor + 1}/{len(self.names)}")
+        out = menu.header(t("theme_hdr_themes", "THEMES"), f"{self.cursor + 1}/{len(self.names)}")
         for i, name in enumerate(self.names):
-            t = theme.THEMES[name]
+            t_obj = theme.THEMES[name]
             sel = i == self.cursor
             mark = "▸ " if sel else "  "
             worn = " ●" if name == self.original else "  "
             out.append(mark + f"{name:<10}", style=SEL if sel else INK)
             sw = "".join(f"[{c}]██[/]" for c in
-                         (t["on"], t["heart"], t["energy"], t["care"], t["coin"]))
+                         (t_obj["on"], t_obj["heart"], t_obj["energy"], t_obj["care"], t_obj["coin"]))
             out.append_text(Text.from_markup(sw))
             out.append(worn + "\n", style=INK)
         out.append_text(menu.blanks(max(0, 8 - len(self.names))))
         out.append_text(menu.note(
-            _NOTES.get(self.names[self.cursor], "live preview as you move")))
+            _NOTES.get(self.names[self.cursor], t("theme_note_preview", "live preview as you move"))))
         out.right_crop(1)              # the strip owns the keys -- this footer
         #                                duplicated it word for word (QOL 2026-07-23)
         return out

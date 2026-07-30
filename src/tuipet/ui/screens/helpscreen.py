@@ -4,164 +4,130 @@ with ? from anywhere on the home screen."""
 from __future__ import annotations
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import INK, INK_B, DIM    # noqa: F401  (palette names bound for theme.apply propagation)
+from tuipet.i18n.translator import t
 
 VIS = 8                                   # lines shown at once in the box
 
 # (text, kind): 2 = section head (bold), 1 = a control line, 0 = prose (dim)
-HELP = [
-    ("CARE", 2),
-    # claims audit 2026-07-25; re-truthed 2026-07-26 with the bandage's
-    # final door, the H key ("bits/hour" was half the assistant's bill)
-    ("f feed - meat fills; the pill", 1),
-    ("  cures sickness, free and infinite", 0),
-    ("h heal - bandage a battle injury,", 1),
-    ("  free (a wound also mends with time)", 0),
-    ("c clean poop", 1),
-    ("o lights   v assistant - paid help:", 1),
-    ("  a fee per visit + an hourly wage", 0),
-    ("  once it's Rookie or older", 0),
-    ("ENTER accepts a found gift", 1),
-    # the ✗ counter finally explained (gameplay polish #18, 2026-07-22):
-    # it steers every line's CM gates and 20 is lethal -- the single most
-    # important growth driver was an unexplained glyph on the status card
-    ("Ignored calls add ✗ care mistakes", 0),
-    ("(status card): they pick which form", 0),
-    ("comes next and reset each stage.", 0),
-    # ("elder" was the wrong axis here -- the 5-mistake death is 2 game-days
-    # INTO an Ultimate/Mega stage, never the age-15 elder; audit 2026-07-25)
-    ("20 is fatal - and 2 days into an", 0),
-    ("Ultimate/Mega stage just 5 can be.", 0),
-    # the energy dial explained (gameplay polish #6, 2026-07-22): no
-    # passive decay BY DESIGN -- it is the ACTION meter, so the gauge only
-    # reads "broken" to a player nobody told what spends it
-    ("Energy fuels drills, fights and the", 0),
-    ("road; sleep refills it each night.", 0),
-    # the two ailments, two meds (canon restoration 2026-07-23; the
-    # bandage's final door, the H key -- 2026-07-26)
-    ("Two ailments: SICKNESS (filth or", 0),
-    ("fat) takes the pill, free on F.", 0),
-    ("Battle INJURY takes H - free; a", 0),
-    ("wound also closes with time. Both", 0),
-    ("block fights and whisper to death.", 0),
-    ("p discipline - praise & scold:", 1),
-    ("  scold a tantrum (+manners), praise", 0),
-    ("  a proud win; ignored tantrums", 0),
-    ("  cost a care mistake", 0),
-    # the alarm legend (#8): the ring count is the message
-    ("Alarms count the urgency: one beep", 0),
-    ("routine, two a mess, three urgent.", 0),
-    ("", 0),
-    ("EXPLORE", 2),
-    ("m battle - fight a matched rival:", 1),
-    ("  a real bout (wins, exp, training)", 0),
-    # "costs 5" alone implied a bout could start at 5-9 energy; the entry
-    # gate is BATTLE_MIN_ENERGY = 10 (audit 2026-07-25)
-    ("  but no purse; costs 5 energy (10", 0),
-    ("  in the tank to start)", 0),
-    # the named rival (Joel 2026-07-26: "build the named rival too")
-    ("  every 3rd bout your named RIVAL", 0),
-    ("  answers - the feud's score lives", 0),
-    ("  on the digicore PERSON page", 0),
-    ("a adventure - head out on the road", 1),
-    # eggs were never a road FIND -- they are bought at town vendors or
-    # unlocked by clearing a map (audit 2026-07-25)
-    ("  cross a zone, fell its boss, then", 0),
-    ("  rest in towns, find loot; towns", 0),
-    ("  sell eggs, map clears unlock them", 0),
-    # the item expansion (2026-07-26): the authored drop tables are live
-    ("  beaten foes can DROP their goods -", 0),
-    ("  bosses guard the rarest relics", 0),
-    ("r raid - the community boss: fight", 1),
-    ("  10-round volleys, break the shared", 0),
-    ("  pool together, claim the purse", 0),
-    ("u cup - hourly tournaments; win", 1),
-    ("  trophies to unlock new eggs; a", 0),
-    ("  champion banks the cup's own prize", 0),
-    ("l lobby - go online: chat, and", 1),
-    ("  battle / jogress other players", 0),
-    ("", 0),
-    ("GROW", 2),
-    ("Eggs hatch, then evolve by HOW you", 0),
-    ("raise them - care, train, battles.", 0),
-    ("Each egg has its own line to a Mega.", 0),
-    # "a clean hit saves your battle form" read backwards: EVERY grade
-    # saves, only MEGA is worth anything, and home fights lock their own
-    # bar -- the saved form is what LOBBY rivals face (audit 2026-07-25)
-    ("t train - time the strike: PERFECT", 1),
-    ("  locks the power form your lobby", 0),
-    ("  rivals will face", 0),
-    # the DNA arc told as ONE story (Joel 2026-07-22: "what does dna even
-    # do lol" -- the pages teach the pieces, the guide tells the loop)
-    ("x DNA - steer the next evolution:", 1),
-    ("  wager bits, mash to bank a Field,", 0),
-    ("  charge ONE Field to its threshold;", 0),
-    ("  the next evolution takes that road", 0),
-    ("d digicore - the pet's data book", 1),
-    ("  ENTER on its trophy page opens the", 0),
-    ("  ALBUM - every species, in dex order", 0),
-    # the lineage's own book (Joel 2026-07-26: "build the hall of memory")
-    ("  on its LEGACY page, the HALL OF", 0),
-    ("  MEMORY - every elder, remembered", 0),
-    ("e egg guide - every digitama + what", 1),
-    ("  earns it, with live progress", 0),
-    ("", 0),
-    ("MANAGE", 2),
-    ("s shop   b bag   n scenes", 1),
-    ("  the shop's last tab sells HONORS -", 0),
-    ("  titles that ride your status card", 0),
-    # the expansion (2026-07-26): the one line the capsules need
-    ("  a CAPSULE opens into a surprise,", 0),
-    ("  finer on festival days", 0),
-    ("g options   i report a bug   q quit", 1),
-    ("  themes, sound, cloud sync, your", 0),
-    ("  account, updates, every key", 0),
-    # honest reach (help audit 2026-07-22): with a screen open every key
-    # belongs to that screen -- ? answers from home.  SPACE=ENTER holds on
-    # MOST screens, not all (digicore pages on SPACE; the road prompts
-    # split the pair -- ENTER enters/digs, SPACE walks on; the erase
-    # confirm types) -- hence "most" below (claims audit 2026-07-25)
-    ("? this guide, any time you're home", 1),
-    ("SPACE doubles ENTER on most screens;", 0),
-    ("PgUp/PgDn leap through long lists.", 0),
-    ("", 0),
-    ("LEGACY", 2),
-    ("Neglect, hunger, sickness or age", 0),
-    ("take it in the end. The grave asks", 0),
-    ("what carries to the next one:", 0),
-    ("E etch its data for your heir", 1),
-    ("B keep the care bonus instead", 1),
-    ("Only one etch may stand: if data is", 0),
-    ("already banked, E takes the new one,", 0),
-    ("K keeps the elder's.", 0),
-    ("n starts the next egg.", 1),
-    ("", 0),
-    ("TIPS", 2),
-    ("Feed when hungry, clean the poop,", 0),
-    ("and let it sleep at night. Win cups,", 0),
-    ("fell raids, link with tamers, play a", 0),
-    ("festival - every egg is earned.", 0),
-]
-# (the full item catalog was tried in the guide 2026-07-24 and REVERTED:
-# it doubled the guide's length and only mirrored what the shop dossier
-# already shows live -- name, price and effect -- at the point of purchase.
-# The shop is the item reference; the guide teaches the systems.)
-
+def get_help():
+    return [
+        (t("help_txt_care", "CARE"), 2),
+        (t("help_txt_feed", "f feed - meat fills; the pill"), 1),
+        (t("help_txt_feed_2", "  cures sickness, free and infinite"), 0),
+        (t("help_txt_heal", "h heal - bandage a battle injury,"), 1),
+        (t("help_txt_heal_2", "  free (a wound also mends with time)"), 0),
+        (t("help_txt_clean", "c clean poop"), 1),
+        (t("help_txt_lights", "o lights   v assistant - paid help:"), 1),
+        (t("help_txt_lights_2", "  a fee per visit + an hourly wage"), 0),
+        (t("help_txt_lights_3", "  once it's Rookie or older"), 0),
+        (t("help_txt_gift", "ENTER accepts a found gift"), 1),
+        (t("help_txt_mistakes", "Ignored calls add ✗ care mistakes"), 0),
+        (t("help_txt_mistakes_2", "(status card): they pick which form"), 0),
+        (t("help_txt_mistakes_3", "comes next and reset each stage."), 0),
+        (t("help_txt_fatal", "20 is fatal - and 2 days into an"), 0),
+        (t("help_txt_fatal_2", "Ultimate/Mega stage just 5 can be."), 0),
+        (t("help_txt_energy", "Energy fuels drills, fights and the"), 0),
+        (t("help_txt_energy_2", "road; sleep refills it each night."), 0),
+        (t("help_txt_ailments", "Two ailments: SICKNESS (filth or"), 0),
+        (t("help_txt_ailments_2", "fat) takes the pill, free on F."), 0),
+        (t("help_txt_ailments_3", "Battle INJURY takes H - free; a"), 0),
+        (t("help_txt_ailments_4", "wound also closes with time. Both"), 0),
+        (t("help_txt_ailments_5", "block fights and whisper to death."), 0),
+        (t("help_txt_discipline", "p discipline - praise & scold:"), 1),
+        (t("help_txt_discipline_2", "  scold a tantrum (+manners), praise"), 0),
+        (t("help_txt_discipline_3", "  a proud win; ignored tantrums"), 0),
+        (t("help_txt_discipline_4", "  cost a care mistake"), 0),
+        (t("help_txt_alarms", "Alarms count the urgency: one beep"), 0),
+        (t("help_txt_alarms_2", "routine, two a mess, three urgent."), 0),
+        ("", 0),
+        (t("help_txt_explore", "EXPLORE"), 2),
+        (t("help_txt_battle", "m battle - fight a matched rival:"), 1),
+        (t("help_txt_battle_2", "  a real bout (wins, exp, training)"), 0),
+        (t("help_txt_battle_3", "  but no purse; costs 5 energy (10"), 0),
+        (t("help_txt_battle_4", "  in the tank to start)"), 0),
+        (t("help_txt_rival", "  every 3rd bout your named RIVAL"), 0),
+        (t("help_txt_rival_2", "  answers - the feud's score lives"), 0),
+        (t("help_txt_rival_3", "  on the digicore PERSON page"), 0),
+        (t("help_txt_adv", "a adventure - head out on the road"), 1),
+        (t("help_txt_adv_2", "  cross a zone, fell its boss, then"), 0),
+        (t("help_txt_adv_3", "  rest in towns, find loot; towns"), 0),
+        (t("help_txt_adv_4", "  sell eggs, map clears unlock them"), 0),
+        (t("help_txt_drop", "  beaten foes can DROP their goods -"), 0),
+        (t("help_txt_drop_2", "  bosses guard the rarest relics"), 0),
+        (t("help_txt_raid", "r raid - the community boss: fight"), 1),
+        (t("help_txt_raid_2", "  10-round volleys, break the shared"), 0),
+        (t("help_txt_raid_3", "  pool together, claim the purse"), 0),
+        (t("help_txt_cup", "u cup - hourly tournaments; win"), 1),
+        (t("help_txt_cup_2", "  trophies to unlock new eggs; a"), 0),
+        (t("help_txt_cup_3", "  champion banks the cup's own prize"), 0),
+        (t("help_txt_lobby", "l lobby - go online: chat, and"), 1),
+        (t("help_txt_lobby_2", "  battle / jogress other players"), 0),
+        ("", 0),
+        (t("help_txt_grow", "GROW"), 2),
+        (t("help_txt_grow_1", "Eggs hatch, then evolve by HOW you"), 0),
+        (t("help_txt_grow_2", "raise them - care, train, battles."), 0),
+        (t("help_txt_grow_3", "Each egg has its own line to a Mega."), 0),
+        (t("help_txt_train", "t train - time the strike: PERFECT"), 1),
+        (t("help_txt_train_2", "  locks the power form your lobby"), 0),
+        (t("help_txt_train_3", "  rivals will face"), 0),
+        (t("help_txt_dna", "x DNA - steer the next evolution:"), 1),
+        (t("help_txt_dna_2", "  wager bits, mash to bank a Field,"), 0),
+        (t("help_txt_dna_3", "  charge ONE Field to its threshold;"), 0),
+        (t("help_txt_dna_4", "  the next evolution takes that road"), 0),
+        (t("help_txt_digicore", "d digicore - the pet's data book"), 1),
+        (t("help_txt_digicore_2", "  ENTER on its trophy page opens the"), 0),
+        (t("help_txt_digicore_3", "  ALBUM - every species, in dex order"), 0),
+        (t("help_txt_legacy", "  on its LEGACY page, the HALL OF"), 0),
+        (t("help_txt_legacy_2", "  MEMORY - every elder, remembered"), 0),
+        (t("help_txt_egg_guide", "e egg guide - every digitama + what"), 1),
+        (t("help_txt_egg_guide_2", "  earns it, with live progress"), 0),
+        ("", 0),
+        (t("help_txt_manage", "MANAGE"), 2),
+        (t("help_txt_shop", "s shop   b bag   n scenes"), 1),
+        (t("help_txt_shop_2", "  the shop's last tab sells HONORS -"), 0),
+        (t("help_txt_shop_3", "  titles that ride your status card"), 0),
+        (t("help_txt_capsule", "  a CAPSULE opens into a surprise,"), 0),
+        (t("help_txt_capsule_2", "  finer on festival days"), 0),
+        (t("help_txt_opts", "g options   i report a bug   q quit"), 1),
+        (t("help_txt_opts_2", "  themes, sound, cloud sync, your"), 0),
+        (t("help_txt_opts_3", "  account, updates, every key"), 0),
+        (t("help_txt_guide", "? this guide, any time you're home"), 1),
+        (t("help_txt_guide_2", "SPACE doubles ENTER on most screens;"), 0),
+        (t("help_txt_guide_3", "PgUp/PgDn leap through long lists."), 0),
+        ("", 0),
+        (t("help_txt_grave", "LEGACY"), 2),
+        (t("help_txt_grave_1", "Neglect, hunger, sickness or age"), 0),
+        (t("help_txt_grave_2", "take it in the end. The grave asks"), 0),
+        (t("help_txt_grave_3", "what carries to the next one:"), 0),
+        (t("help_txt_grave_4", "E etch its data for your heir"), 1),
+        (t("help_txt_grave_5", "B keep the care bonus instead"), 1),
+        (t("help_txt_grave_6", "Only one etch may stand: if data is"), 0),
+        (t("help_txt_grave_7", "already banked, E takes the new one,"), 0),
+        (t("help_txt_grave_8", "K keeps the elder's."), 0),
+        (t("help_txt_grave_9", "n starts the next egg."), 1),
+        ("", 0),
+        (t("help_txt_tips", "TIPS"), 2),
+        (t("help_txt_tips_1", "Feed when hungry, clean the poop,"), 0),
+        (t("help_txt_tips_2", "and let it sleep at night. Win cups,"), 0),
+        (t("help_txt_tips_3", "fell raids, link with tamers, play a"), 0),
+        (t("help_txt_tips_4", "festival - every egg is earned."), 0),
+    ]
 
 class HelpPanel:
     def __init__(self, pet):
         self.pet = pet
         self.top = 0
         self.frame_i = 0
-        self.msg = "How to play tuipet."
+        self.msg = t("help_msg_intro", "How to play tuipet.")
 
     def anim(self):
         self.frame_i += 1
 
     def strip(self):
-        return menu.hints(("↑↓", "scroll"), ("ESC", "out"))
+        return menu.hints(("↑↓", t("help_hint_scroll", "scroll")), ("ESC", t("help_hint_out", "out")))
 
     def _max_top(self):
-        return max(0, len(HELP) - VIS)
+        return max(0, len(get_help()) - VIS)
 
     def key(self, k):
         if k in ("up", "k"):
@@ -184,17 +150,18 @@ class HelpPanel:
         message strip already says HOW to move), so the two never echo."""
         up, dn = self.top > 0, self.top < self._max_top()
         if up and dn:
-            return "▲▼ more"
+            return t("help_more_both", "▲▼ more")
         if dn:
-            return "▼ more below"
+            return t("help_more_below", "▼ more below")
         if up:
-            return "▲ more above"
+            return t("help_more_above", "▲ more above")
         return ""
 
     def text(self):
+        HELP = get_help()
         self.top = max(0, min(self.top, self._max_top()))
         pos = "%d-%d/%d" % (self.top + 1, min(self.top + VIS, len(HELP)), len(HELP))
-        out = menu.header("HELP", pos)
+        out = menu.header(t("help_hdr_help", "HELP"), pos)
         for text, kind in HELP[self.top:self.top + VIS]:
             style = INK_B if kind == 2 else (INK if kind == 1 else DIM)
             out.append((text or " ") + "\n", style=style)

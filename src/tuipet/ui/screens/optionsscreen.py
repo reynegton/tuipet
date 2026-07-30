@@ -20,23 +20,27 @@ import tuipet.utils.sound as sound
 import tuipet.utils.theme as theme
 import tuipet.utils.update as update_check
 from tuipet.ui.screens.themescreen import ThemePanel
+from tuipet.i18n.translator import t
 
 _ROWS = ("theme", "sound", "account", "cloud", "update", "keys", "new", "erase")
-_LABEL = {"theme": "Theme", "sound": "Sound", "account": "Account",
-          "cloud": "Cloud sync", "update": "Update", "keys": "Keys",
-          "new": "New egg", "erase": "Erase all data"}
+def _get_label():
+    return {"theme": t("opt_lbl_theme", "Theme"), "sound": t("opt_lbl_sound", "Sound"), "account": t("opt_lbl_account", "Account"),
+            "cloud": t("opt_lbl_cloud", "Cloud sync"), "update": t("opt_lbl_update", "Update"), "keys": t("opt_lbl_keys", "Keys"),
+            "new": t("opt_lbl_new", "New egg"), "erase": t("opt_lbl_erase", "Erase all data")}
 # the note line under the list describes the SELECTED row and follows the
 # cursor (Joel's live review 2026-07-07: it sat frozen on the flavour line);
 # action feedback (sound toggled, update verdict...) overrides it until the
+# action feedback (sound toggled, update verdict...) overrides it until the
 # cursor moves again.  Over-wide lines marquee via menu.note(tick).
-_DESC = {"theme": "recolor the whole game — live preview",
-         "sound": "the DVPet chirps — switch + volume",
-         "account": "switch login — the pet parks in the cloud",
-         "cloud": "cloud saves + offline mail — on or off",
-         "update": "ENTER checks + installs · A flips launch auto-install",
-         "keys": "every binding on one page",
-         "new": "retire the pet, hatch the heir",
-         "erase": "wipe save, progress and login — for keeps"}
+def _get_desc():
+    return {"theme": t("opt_desc_theme", "recolor the whole game — live preview"),
+            "sound": t("opt_desc_sound", "the DVPet chirps — switch + volume"),
+            "account": t("opt_desc_account", "switch login — the pet parks in the cloud"),
+            "cloud": t("opt_desc_cloud", "cloud saves + offline mail — on or off"),
+            "update": t("opt_desc_update", "ENTER checks + installs · A flips launch auto-install"),
+            "keys": t("opt_desc_keys", "every binding on one page"),
+            "new": t("opt_desc_new", "retire the pet, hatch the heir"),
+            "erase": t("opt_desc_erase", "wipe save, progress and login — for keeps")}
 
 
 def _sound_value(on, with_volume=False):
@@ -45,13 +49,13 @@ def _sound_value(on, with_volume=False):
     so nothing clips mid-word in the 18-char value column; the volume rides
     along on the OPTIONS row when a real player exists (the bell has none)."""
     if not on:
-        return "off"
+        return t("opt_snd_off", "off")
     b = sound.backend()
     if b:
         name = b.split("-")[0][:13]
-        return f"on · {name[:6]} · {sound.volume()}%" if with_volume else f"on · {name}"
+        return t("opt_snd_on_vol", "on · {name} · {vol}%").format(name=name[:6], vol=sound.volume()) if with_volume else t("opt_snd_on", "on · {name}").format(name=name)
     import tuipet.utils.hostinfo as hostinfo
-    return "on · bell (iOS)" if hostinfo.is_ios() else "on · bell only"
+    return t("opt_snd_on_bell_ios", "on · bell (iOS)") if hostinfo.is_ios() else t("opt_snd_on_bell_only", "on · bell only")
 
 
 class SoundPanel:
@@ -62,8 +66,9 @@ class SoundPanel:
     volume, so the bar never pretends to slide it."""
 
     _ROWS = ("sound", "volume")
-    _DESC = {"sound": "the DVPet chirps — on or off",
-             "volume": "←→ set it — every step chirps"}
+    def _get_snd_desc(self):
+        return {"sound": t("opt_snd_desc_sound", "the DVPet chirps — on or off"),
+                "volume": t("opt_snd_desc_volume", "←→ set it — every step chirps")}
 
     def __init__(self, sound_get, sound_toggle):
         self.sound_get = sound_get
@@ -78,9 +83,9 @@ class SoundPanel:
 
     def strip(self):
         if self._ROWS[self.cursor] == "volume" and sound.available():
-            return menu.hints(("←→", "volume"), ("ENTER", "hear it"),
-                              ("ESC", "back"))
-        return menu.hints(("↑↓", "pick"), ("ENTER", "toggle"), ("ESC", "back"))
+            return menu.hints(("←→", t("opt_snd_hint_vol", "volume")), ("ENTER", t("opt_snd_hint_hear", "hear it")),
+                              ("ESC", t("opt_snd_hint_back", "back")))
+        return menu.hints(("↑↓", t("opt_snd_hint_pick", "pick")), ("ENTER", t("opt_snd_hint_toggle", "toggle")), ("ESC", t("opt_snd_hint_back", "back")))
 
     def key(self, k):
         row = self._ROWS[self.cursor]
@@ -92,41 +97,41 @@ class SoundPanel:
             self.msg = ""
         elif row == "volume" and k in ("left", "right", "h", "l"):
             if not sound.available():
-                self.msg = "the terminal bell has no volume"
+                self.msg = t("opt_snd_bell_no_vol", "the terminal bell has no volume")
                 return None
             v = sound.set_volume(sound.volume()
                                  + (10 if k in ("right", "l") else -10))
-            self.msg = f"volume: {v}%"
+            self.msg = t("opt_snd_vol", "volume: {v}%").format(v=v)
             if self.sound_get():
                 self.sfx = "confirm"   # hear the NEW level right away
         elif k in ("enter", "space"):
             if row == "sound":
                 self.sound_toggle()
-                self.msg = f"sound: {_sound_value(self.sound_get())}"
+                self.msg = t("opt_snd_res", "sound: {val}").format(val=_sound_value(self.sound_get()))
                 self.sfx = "confirm" if self.sound_get() else None
             elif not sound.available():
-                self.msg = "the terminal bell has no volume"
+                self.msg = t("opt_snd_bell_no_vol", "the terminal bell has no volume")
             elif not self.sound_get():
-                self.msg = "sound is off — nothing to hear"
+                self.msg = t("opt_snd_off_msg", "sound is off — nothing to hear")
             else:
-                self.msg = f"volume: {sound.volume()}%"
+                self.msg = t("opt_snd_vol", "volume: {v}%").format(v=sound.volume())
                 self.sfx = "confirm"
         elif k in ("escape", "g"):
             return ("done", None)
         return None
 
     def text(self):
-        out = menu.header("SOUND", sound.backend() or "bell")
+        out = menu.header(t("opt_snd_hdr", "SOUND"), sound.backend() or "bell")
         vol = sound.volume()
         if sound.available():
             vbar = "█" * (vol // 10) + "░" * (10 - vol // 10) + f" {vol}%"
         else:
-            vbar = "bell — n/a"        # no player: nothing a slider could touch
-        rows = (("Sound", _sound_value(self.sound_get())), ("Volume", vbar))
+            vbar = t("opt_snd_bell_na", "bell — n/a")        # no player: nothing a slider could touch
+        rows = ((t("opt_snd_lbl_sound", "Sound"), _sound_value(self.sound_get())), (t("opt_snd_lbl_volume", "Volume"), vbar))
         for i, (label, val) in enumerate(rows):
             out.append_text(menu.row(f"{label:<16} {val[:18]}", i == self.cursor))
         out.append_text(menu.blanks(5))
-        out.append_text(menu.note(self.msg or self._DESC[self._ROWS[self.cursor]],
+        out.append_text(menu.note(self.msg or self._get_snd_desc()[self._ROWS[self.cursor]],
                                   tick=self.frame_i))
         # no in-LCD key footer: the strip owns the keys, and this one was
         # STATIC -- it contradicted the strip on the volume row ("↑↓ pick
@@ -155,7 +160,7 @@ class KeysPanel:
         self.top = 0
 
     def strip(self):
-        return menu.hints(("↑↓", "scroll"), ("ESC", "back"))
+        return menu.hints(("↑↓", t("opt_key_hint_scroll", "scroll")), ("ESC", t("opt_snd_hint_back", "back")))
 
     def key(self, k):
         last = max(0, len(self.rows) - self.VISIBLE)
@@ -174,12 +179,12 @@ class KeysPanel:
     def text(self):
         n = len(self.rows)
         lo, hi = self.top + 1, min(self.top + self.VISIBLE, n)
-        out = menu.header("KEYS", f"{lo}-{hi}/{n}")
+        out = menu.header(t("opt_key_hdr", "KEYS"), f"{lo}-{hi}/{n}")
         shown = self.rows[self.top:self.top + self.VISIBLE]
         for r in shown:
             out.append_text(menu.row(r))
         out.append_text(menu.blanks(self.VISIBLE - len(shown) + 1))
-        out.append_text(menu.footer("↑↓ scroll  ESC back"))
+        out.append_text(menu.footer(t("opt_key_footer", "↑↓ scroll  ESC back")))
         return out
 
 
@@ -227,25 +232,25 @@ class OptionsPanel(menu.SubHost):
         if self.sub is not None:
             return ""                  # the hosted panel owns the box (strip walker)
         if self.confirm:
-            return menu.hints(("ENTER", "erase it all"), ("ESC", "keep"))
+            return menu.hints(("ENTER", t("opt_hint_erase_all", "erase it all")), ("ESC", t("opt_hint_keep", "keep")))
         if self.confirm_restart:
-            return menu.hints(("ENTER", "restart now"), ("ESC", "later"))
+            return menu.hints(("ENTER", t("opt_hint_restart_now", "restart now")), ("ESC", t("opt_hint_later", "later")))
         if self.confirm_new:
-            return menu.hints(("ENTER", "retire"), ("ESC", "keep"))
-        return menu.hints(("↑↓", "pick"), ("ENTER", "go"), ("ESC", "out"))
+            return menu.hints(("ENTER", t("opt_hint_retire", "retire")), ("ESC", t("opt_hint_keep", "keep")))
+        return menu.hints(("↑↓", t("opt_snd_hint_pick", "pick")), ("ENTER", t("opt_hint_go", "go")), ("ESC", t("opt_hint_out", "out")))
 
     # ---- the update check (threaded: latest_if_newer blocks up to 4s) ----
     def _check_updates(self):
         if self._upd == "…":
             return                      # one probe at a time
         self._upd = "…"
-        self.msg = "checking PyPI…"
+        self.msg = t("opt_msg_chk_pypi", "checking PyPI…")
 
         def run():
             latest = update_check.latest_if_newer()
             self._upd = latest or ""
-            self.msg = (f"tuipet {latest} is out — ENTER installs it"
-                        if latest else "no newer release found.")
+            self.msg = (t("opt_msg_chk_found", "tuipet {latest} is out — ENTER installs it").format(latest=latest)
+                        if latest else t("opt_msg_chk_not_found", "no newer release found."))
         threading.Thread(target=run, daemon=True).start()
 
     def _install_update(self):
@@ -258,7 +263,7 @@ class OptionsPanel(menu.SubHost):
         if self._installing:
             return
         self._installing = True
-        self.msg = "updating… (this takes a moment)"
+        self.msg = t("opt_msg_updating", "updating… (this takes a moment)")
 
         def run():
             ok, msg = update_check.run_upgrade()
@@ -270,28 +275,28 @@ class OptionsPanel(menu.SubHost):
                 # the restart OFFER (Joel 2026-07-18: "make it so the update
                 # option asks to restart after update"): ENTER relaunches
                 self.confirm_restart = True
-                self.msg = "Updated! Restart now?  ENTER restarts · ESC later"
+                self.msg = t("opt_msg_updated_restart", "Updated! Restart now?  ENTER restarts · ESC later")
             # the completion ALSO rides the app's verdict channel (options
             # audit 2026-07-19, swallow class #4): pip takes seconds -- if
             # the player closed options meanwhile, the offer above lands on
             # a dead panel and they learn nothing.  The parked verdict
             # flashes wherever they are next home; a redundant note beside
             # the live offer is honest, a swallowed one is not.
-            self.verdict("tuipet updated — restart to play the new version."
-                         if ok else f"update: {msg}")
+            self.verdict(t("opt_msg_verdict_ok", "tuipet updated — restart to play the new version.")
+                         if ok else t("opt_msg_verdict_err", "update: {msg}").format(msg=msg))
         threading.Thread(target=run, daemon=True).start()
 
     def _sub_done(self, r):
         row, self._sub_row = self._sub_row, None
         if row == "theme":
-            self.msg = f"theme: {theme.current()}"
+            self.msg = t("opt_msg_theme_res", "theme: {theme}").format(theme=theme.current())
         elif row == "sound":
-            self.msg = f"sound: {self._value('sound')}"
+            self.msg = t("opt_snd_res", "sound: {val}").format(val=self._value('sound'))
         elif row == "account":
             if r:
                 self._done = ("account",) + tuple(r)   # app does the heavy lifting
             else:
-                self.msg = "kept your account."
+                self.msg = t("opt_msg_kept_account", "kept your account.")
 
     def key(self, k):
         if self.sub_key(k, self._sub_done):
@@ -304,24 +309,24 @@ class OptionsPanel(menu.SubHost):
                 return ("done", ("restart",))
             if k == "escape":
                 self.confirm_restart = False
-                self.msg = "later — the update applies on your next launch"
+                self.msg = t("opt_msg_restart_later", "later — the update applies on your next launch")
             return None
         if self.confirm_new:
             if k in ("enter", "space"):    # SPACE = ENTER like the restart
                 return ("done", ("new",))  # confirm right above (parity 07-18)
             if k == "escape":
                 self.confirm_new = False
-                self.msg = f"kept {self.pet.name}."
+                self.msg = t("opt_msg_kept_pet", "{name} mantido.").format(name=self.pet.name)
             return None
         if self.confirm:
             if k == "escape":
                 self.confirm, self.buf = False, ""
-                self.msg = "kept everything."
+                self.msg = t("opt_msg_kept_everything", "tudo mantido.")
             elif k == "enter":
                 if self.buf.strip().upper() == "YES":
                     return ("done", ("erase",))
                 self.confirm, self.buf = False, ""
-                self.msg = "that wasn't YES — kept everything."
+                self.msg = t("opt_msg_not_yes", "isso não foi SIM — tudo mantido.")
                 self.sfx = "error"
             elif k == "backspace":
                 self.buf = self.buf[:-1]
@@ -338,8 +343,8 @@ class OptionsPanel(menu.SubHost):
             # opt out of the launch auto-install (Joel 2026-07-14: it is ON by
             # default, but nobody should be forced to have pip run for them)
             on = persistence.set_auto_update(not persistence.get_auto_update())
-            self.msg = ("auto-update on — new releases install at launch"
-                        if on else "auto-update off — you'll be told, not updated")
+            self.msg = (t("opt_msg_auto_upd_on", "auto-update on — new releases install at launch")
+                        if on else t("opt_msg_auto_upd_off", "auto-update off — you'll be told, not updated"))
             self.sfx = "confirm"
         elif k in ("enter", "space"):
             row = _ROWS[self.cursor]
@@ -353,11 +358,11 @@ class OptionsPanel(menu.SubHost):
                 from tuipet.ui.screens.accountscreen import AccountPanel
                 self._sub_row = row
                 self.sub = AccountPanel(
-                    note="Switch: the pet parks with this login.")
+                    note=t("opt_msg_switch_login", "Switch: the pet parks with this login."))
             elif row == "cloud":
                 on = persistence.set_cloud_sync(not persistence.get_cloud_sync())
-                self.msg = ("cloud sync on — saves follow your account"
-                            if on else "cloud sync off — this device saves locally only")
+                self.msg = (t("opt_msg_cloud_on", "cloud sync on — saves follow your account")
+                            if on else t("opt_msg_cloud_off", "cloud sync off — this device saves locally only"))
                 self.sfx = "confirm"
             elif row == "update":
                 # first ENTER checks; with a newer release known, the second
@@ -390,10 +395,10 @@ class OptionsPanel(menu.SubHost):
                 if getattr(self.pet, "dead", False) or self.pet.stage == "Egg":
                     return ("done", ("new",))
                 self.confirm_new = True
-                self.msg = f"retire {self.pet.name} (gen {self.pet.generation}) for a new egg?"
+                self.msg = t("opt_msg_retire_prompt", "retire {name} (gen {gen}) for a new egg?").format(name=self.pet.name, gen=self.pet.generation)
             elif row == "erase":
                 self.confirm, self.buf = True, ""
-                self.msg = "erase EVERYTHING? type YES + ENTER"
+                self.msg = t("opt_msg_erase_prompt", "erase EVERYTHING? type YES + ENTER")
         elif k in ("escape", "g"):     # g opened it; g also closes (nav-quit rule)
             return ("done", None)
         return None
@@ -404,68 +409,68 @@ class OptionsPanel(menu.SubHost):
         if row == "sound":
             return _sound_value(self.sound_get(), with_volume=True)
         if row == "account":
-            return persistence.get_account()[0] or "not signed in"
+            return persistence.get_account()[0] or t("opt_val_not_signed_in", "not signed in")
         if row == "cloud":
             import os as _o
             if _o.environ.get("TUIPET_NO_SYNC"):
-                return "off (TUIPET_NO_SYNC)"   # the env override outranks the toggle
-            return "on" if persistence.get_cloud_sync() else "off"
+                return t("opt_val_off_nosync", "off (TUIPET_NO_SYNC)")   # the env override outranks the toggle
+            return t("opt_val_on", "on") if persistence.get_cloud_sync() else t("opt_val_off", "off")
         if row == "update":
             if self._installing:
-                return "updating…"
+                return t("opt_val_updating", "updating…")
             if self.confirm_restart:
-                return "restart now? ENTER"
+                return t("opt_val_restart_now", "restart now? ENTER")
             hint = self.update_hint() if self.update_hint is not None else ""
             if self._updated or "installed" in (hint or ""):
                 # (was getattr(self.pet, "_updated_to") -- a DEAD read: the
                 # launch installer sets the flag on the APP, never the pet;
                 # the update_hint lambda carries the app's message.  Bug-
                 # report sweep 2026-07-19.)
-                return "restart to apply"
+                return t("opt_val_restart_apply", "restart to apply")
             if not persistence.get_auto_update():
-                return f"v{update_check.current_version() or 'dev'} · auto off"
+                return t("opt_val_v_auto_off", "v{ver} · auto off").format(ver=update_check.current_version() or 'dev')
             if self._upd == "…":
-                return "checking…"
+                return t("opt_val_checking", "checking…")
             if self._upd:
-                return f"{self._upd} · ENTER installs"
+                return t("opt_val_install", "{upd} · ENTER installs").format(upd=self._upd)
             if self._upd == "":
-                return "up to date"
+                return t("opt_val_uptodate", "up to date")
             if self.update_hint is not None and self.update_hint():
-                return "new version out!"   # the boot check already knows
-            return f"v{update_check.current_version() or 'dev'}"
+                return t("opt_val_new_ver", "new version out!")   # the boot check already knows
+            return t("opt_val_v", "v{ver}").format(ver=update_check.current_version() or 'dev')
         if row == "keys":
-            return f"{len(self.bindings)} bindings"
+            return t("opt_val_bindings", "{len} bindings").format(len=len(self.bindings))
         if row == "new":
-            return f"gen {self.pet.generation + 1} next"
-        return "everything"          # the confirm page spells out what that means
+            return t("opt_val_gen_next", "gen {gen} next").format(gen=self.pet.generation + 1)
+        return t("opt_val_everything", "everything")          # the confirm page spells out what that means
 
     def text(self):
         if self.sub is not None:
             return self.sub.text()
-        out = menu.header("OPTIONS", persistence.get_account()[0] or "")
+        out = menu.header(t("opt_hdr_options", "OPTIONS"), persistence.get_account()[0] or "")
         if self.confirm_restart:
             out.append_text(menu.blanks(1))
-            out.append_text(menu.note("Update installed."))
-            out.append_text(menu.note("Restart into the new version now?"))
+            out.append_text(menu.note(t("opt_conf_upd_1", "Update installed.")))
+            out.append_text(menu.note(t("opt_conf_upd_2", "Restart into the new version now?")))
             out.append_text(menu.blanks(1))
-            out.append_text(menu.note("Your save is already written."))
+            out.append_text(menu.note(t("opt_conf_upd_3", "Your save is already written.")))
             out.append_text(menu.blanks(2))
             out.right_crop(1)          # the strip owns the keys (QOL 2026-07-23)
             return out
         if self.confirm:
             out.append_text(menu.blanks(1))
-            out.append_text(menu.note("This erases the pet, progress,"))
-            out.append_text(menu.note("eggs and your login — for keeps."))
+            out.append_text(menu.note(t("opt_conf_erase_1", "This erases the pet, progress,")))
+            out.append_text(menu.note(t("opt_conf_erase_2", "eggs and your login — for keeps.")))
             out.append_text(menu.blanks(1))
-            out.append_text(menu.row(f"type YES:  {self.buf}_", True))
+            out.append_text(menu.row(t("opt_conf_erase_prompt", "type YES:  {buf}_").format(buf=self.buf), True))
             out.append_text(menu.blanks(2))
             out.right_crop(1)          # the strip owns the keys (QOL 2026-07-23)
             return out
         for i, row in enumerate(_ROWS):
-            out.append_text(menu.row(f"{_LABEL[row]:<16} {self._value(row)[:18]}",
+            out.append_text(menu.row(f"{_get_label()[row]:<16} {self._value(row)[:18]}",
                                      i == self.cursor))
         out.append_text(menu.blanks(7 - len(_ROWS)))
-        out.append_text(menu.note(self.msg or _DESC[_ROWS[self.cursor]],
+        out.append_text(menu.note(self.msg or _get_desc()[_ROWS[self.cursor]],
                                   tick=self.frame_i))
         out.right_crop(1)              # the strip owns the keys (QOL 2026-07-23)
         return out
