@@ -222,7 +222,7 @@ class BattlePanel:
         from tuipet.core.battle import RAID_PLAYER_HP
         self.hud_php = RAID_PLAYER_HP if raid else 5   # raids fight from 10
         self.hud_fhp = 5
-        self.hud_note = t("bat_battle_start", "Battle start!")
+        self.hud_note = t("bat_battle_start", "Batalha iniciada!")
         self.phase = "intro"
         self.sfx = "battle"          # the banner sting
         self._last_m = None          # timeline marker edges -> per-event sfx
@@ -554,8 +554,8 @@ class BattlePanel:
             scene = self._scene(place, overlay)
             note = {"faceoff": t("bat_faceoff", "{p_name} vs {e_name}").format(p_name=self.pet.name[:8], e_name=self.enemy['name'][:8]),
                     "reveal": t("bat_appears", "{name} appears!").replace("{name}", self.enemy['name'][:12]),
-                    "windup": t("bat_windup", "..."), "fire_out": t("bat_fire_out", "Fire!"), "fire_in": t("bat_fire_in", "Incoming!"),
-                    "dodge": t("bat_dodge", "Dodge!"), "flinch": t("bat_flinch", "Hit!"), "result": ""}.get(m, "")
+                    "windup": t("bat_windup", "..."), "fire_out": t("bat_fire_out", "Fire!"), "fire_in": t("bat_fire_in", "Atenção!"),
+                    "dodge": t("bat_dodge", "Esquiva!"), "flinch": t("bat_flinch", "Hit!"), "result": ""}.get(m, "")
             if m == "result":
                 note = self._result_note()
         self.hud_php, self.hud_fhp, self.hud_note = ph, fh, note

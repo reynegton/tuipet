@@ -257,7 +257,7 @@ BONUS_AFTER_SAVED = -1              # BonusChangeAfterSavedFromDeath
 BATTLE_FREE_OBED_INC = 1            # BattleFreeObedienceInc (fighting under orders)
 ORDERS_WON_MOOD_INC = 10            # OrdersWonMoodInc
 BATTLE_DISPO_MOOD_FACTOR = -5       # BattleDispositionMoodFactor (x -disposition)
-OBED_HEALTH_COEF = 5                # ObedienceChanceHealthCoefficient (hp >= full/5 = "healthy")
+OBED_HEALTH_COEF = 5                # ObedienceChanceHealthCoefficient (hp >= full/5 = "saudável")
 HI_DISPO_OBED_HIGH_HP = 0           # HighDispositionObedienceChanceHighHealthFactor
 HI_DISPO_OBED_LOW_HP = -10          # ...LowHealthFactor (a hurt pet obeys less)
 HI_DISPO_REFUSE_COEF = 10           # HighDispositionRefuseChanceDispositionCoefficient
@@ -620,8 +620,8 @@ HUNGER_MISTAKE_OBED_GLUTTON = -1        # ...ChangeGlutton
 LIGHTS_MISTAKE_SEC = 60.0               # MinutesToMistakeLights(60) as ~12% of the sleep,
 #                                         scaled to tuipet's ~6-min night -- one mistake/night
 MORNING_MOOD_CHANCE = 5                 # MorningMoodChance: 1/5 bad, 1/5 terrible-if-happy, 1/5 good
-BAD_MORNING_MOOD = {"Feliz": -150, "Neutro": -100, "Triste": -10, "Depressed": -10}
-GOOD_MORNING_MOOD = {"Feliz": 50, "Neutro": 100, "Triste": 150, "Depressed": 150}
+BAD_MORNING_MOOD = {"Feliz": -150, "Neutro": -100, "Triste": -10, "Deprimido": -10}
+GOOD_MORNING_MOOD = {"Feliz": 50, "Neutro": 100, "Triste": 150, "Deprimido": 150}
 WORST_MORNING_MOOD = -10                # WorstMorningMood (TerribleMorning sets mood TO this)
 NAP_WAKE_MOOD_DEC = 20                  # NapWakeMoodDec: a NAP wake swings +-20 on 2 of the 5 rolls
 # disturb (setAsleep(false) runs the wake roll after these; canon disturb())
@@ -926,15 +926,15 @@ BANDAGE_HOURS = 60                       # BandageHours (game-min the bandage in
 # Personality: DVPet's 3x3x3 table over (disposition, glutton, restless), each in
 # {-1 low, 0 neutral, +1 high}.  Ported verbatim from PhysicalState.checkPersonality.
 _PERSONALITY = {
-    (0, 0): ("Docile", "Restless", "Calm"),
-    (0, 1): ("Gluttonous", "Hasty", "Lazy"),
-    (0, -1): ("Content", "Fidgety", "Stoic"),
-    (1, 0): ("Cheerful", "Hyper", "Carefree"),
-    (1, 1): ("Eager", "Playful", "Loafing"),
-    (1, -1): ("Generous", "Antsy", "Mellow"),
-    (-1, 0): ("Serious", "Anxious", "Apathetic"),
-    (-1, 1): ("Selfish", "Impish", "Lethargic"),
-    (-1, -1): ("Tolerant", "Unruly", "Callous"),
+    (0, 0): ("Dócil", "Agitado", "Calm"),
+    (0, 1): ("Glutão", "Hasty", "Lazy"),
+    (0, -1): ("Contente", "Inquieto", "Stoic"),
+    (1, 0): ("Alegre", "Hyper", "Despreocupado"),
+    (1, 1): ("Eager", "Brincalhão", "Preguiçoso"),
+    (1, -1): ("Generoso", "Antsy", "Tranquilo"),
+    (-1, 0): ("Sério", "Ansioso", "Apático"),
+    (-1, 1): ("Egoísta", "Travesso", "Letárgico"),
+    (-1, -1): ("Tolerante", "Indômito", "Insensível"),
 }
 
 # Day/night: the world runs on an accelerated clock. One full DAY_LENGTH-second

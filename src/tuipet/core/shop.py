@@ -71,19 +71,19 @@ class Item(NamedTuple):
 # gets named fields.  Keep the alignment: this table is meant to be read.
 _AUTHORED = {
     # ---- FOOD (eaten on the LCD through their own 4-frame strips) ----------
-    "fish":            ("Fish",            "f:1",  50,   "Feed", "hunger +1", "the everyday catch"),
-    "vegetable":       ("Vegetable",       "f:3",  150,  "Feed", "hunger +1 · weight -1", "crunchy diet fare"),
-    "tuna":            ("Tuna",            "f:14", 400,  "Feed", "hunger +2 · energy +1", "a hearty catch"),
-    "cake":            ("Cake",            "f:6",  300,  "Feed", "hunger +1 · energy +2 · weight +2", "a celebration slice"),
-    "cheese_burger":   ("Cheese burger",   "f:57", 50,   "Feed", "fills belly · weight +4 · a care mistake", "greasy, regrettable"),
+    "fish":            ("Fish",            "f:1",  50,   "Feed", "hunger +1", "a captura do dia a dia"),
+    "vegetable":       ("Vegetal",       "f:3",  150,  "Feed", "hunger +1 · weight -1", "alimento crocante de dieta"),
+    "tuna":            ("Tuna",            "f:14", 400,  "Feed", "hunger +2 · energy +1", "uma captura substancial"),
+    "cake":            ("Cake",            "f:6",  300,  "Feed", "hunger +1 · energy +2 · weight +2", "uma fatia de celebração"),
+    "cheese_burger":   ("Hamburguer de queijo",   "f:57", 50,   "Feed", "fills belly · weight +4 · a care mistake", "greasy, regrettable"),
     "giga_meal":       ("Giga Meal",       "f:28", 800,  "Feed", "fills belly · energy +4 · weight +6", "a feast fit for a Mega"),
-    "steak":           ("Steak",           "f:8",  2000, "Feed", "fills belly · 12h satiety", "the premium table"),
-    "poison_mushroom": ("Poison Mushroom", "f:13", 200,  "Feed", "DO NOT FEED", "it does look delicious"),
+    "steak":           ("Steak",           "f:8",  2000, "Feed", "fills belly · 12h satiety", "a mesa premium"),
+    "poison_mushroom": ("Poison Mushroom", "f:13", 200,  "Feed", "DO NOT FEED", "parece mesmo delicioso"),
     "cupcake":         ("Cupcake",         "f:55", None, "Feed", "hunger +1 · energy +1", "a birthday's reward"),
     "cookie":          ("Cookie",          "f:54", None, "Feed", "hunger +1 · energy +1", "a birthday's treat"),
-    "candy":           ("Candy",           "f:7",  None, "Feed", "hunger +1 · energy +1", "a consolation sweet"),
+    "candy":           ("Candy",           "f:7",  None, "Feed", "hunger +1 · energy +1", "um docinho de consolação"),
     # ---- MEDICINE (the two ailments: sick and injured) ----------------------
-    "vitamin":         ("Vitamin",         "f:5",  500,  "Cure", "effort FULL · injury guard", "effort in a capsule"),
+    "vitamin":         ("Vitamin",         "f:5",  500,  "Cure", "effort FULL · injury guard", "esforço em uma cápsula"),
     # (the BANDAGE's FINAL door, 2026-07-26: after one era as the F menu's
     #  third row (R3) and one afternoon as a 300b shelf item (v0.5.277,
     #  tag-only, never published), Joel settled it -- "remove bandage as an
@@ -91,21 +91,21 @@ _AUTHORED = {
     #  the H key: a free care BUTTON with the i:80 rip and the Bandaging
     #  show; the canon time-heal (injLapse) stays underneath.  No shelf
     #  entry may ever sell either ailment cure again.)
-    "miracle_drink":   ("Miracle Drink",   "f:18", 7777, "Cure", "ONE care slip erased · energy +12", "the expensive absolution"),
+    "miracle_drink":   ("Miracle Drink",   "f:18", 7777, "Cure", "ONE care slip erased · energy +12", "a absolvição cara"),
     # ---- CARE (upkeep: sleep, lights, filth, the mistake slate) -------------
-    "sleeping_pill":   ("Sleep Pill",      "f:34", 300,  "Rest", "sleep now", "lights out, no argument"),
-    "caffeine_pill":   ("Caffeine Pill",   "f:38", 300,  "Rest", "bedtime pushed later", "tonight runs long"),
-    "music_player":    ("Music Player",    "i:9",  300,  "Rest", "wake now, no grudge", "a gentle waking song"),
-    "textbook":        ("Textbook",        "i:0",  1500, "Manners", "obedience +20", "study makes a good pupil"),
-    "port_potty":      ("Port. Potty",     "i:83", 2000, "Rest", "clean + auto-clean 24h", "it cleans itself"),
+    "sleeping_pill":   ("Sleep Pill",      "f:34", 300,  "Rest", "durma agora", "lights out, no argument"),
+    "caffeine_pill":   ("Caffeine Pill",   "f:38", 300,  "Rest", "hora de dormir adiada", "a noite é longa"),
+    "music_player":    ("Music Player",    "i:9",  300,  "Rest", "wake now, no grudge", "uma canção suave de despertar"),
+    "textbook":        ("Livro Didático",        "i:0",  1500, "Modos", "obedience +20", "estudo faz um bom aluno"),
+    "port_potty":      ("Port. Potty",     "i:83", 2000, "Rest", "clean + auto-clean 24h", "ele se limpa sozinho"),
     # ---- TRAINING (the body: effort, weight, drills) ------------------------
-    "energy_drink":    ("Energy Drink",    "f:17", 200,  "Rest", "energy to FULL", "instant pep"),
-    "slim_drink":      ("Slim Drink",      "f:23", 100,  "Drill", "weight -10", "the crash diet"),
-    "dumbbell":        ("Dumbbell",        "i:7",  300,  "Drill", "training +10", "reps in a box"),
+    "energy_drink":    ("Energy Drink",    "f:17", 200,  "Rest", "energy to FULL", "energia instantânea"),
+    "slim_drink":      ("Slim Drink",      "f:23", 100,  "Drill", "weight -10", "a dieta relâmpago"),
+    "dumbbell":        ("Halter",        "i:7",  300,  "Drill", "training +10", "repetições numa caixa"),
     # ---- EVOLUTION (the gates: growth, locks, X, DNA) -----------------------
-    "grow_capsule":    ("Grow Capsule",    "i:78", 500,  "Evolve", "growth: a quarter of this stage", "time in a bottle"),
-    "anti_evo_chip":   ("Anti-Evo Chip",   "f:32", 1000, "Evolve", "toggle evolution lock", "holds this form"),
-    "x_antibody":      ("X-Antibody",      "i:79", 2000, "Evolve", "the X-Antibody takes hold", "the X factor"),
+    "grow_capsule":    ("Grow Capsule",    "i:78", 500,  "Evoluir", "growth: a quarter of this stage", "tempo numa garrafa"),
+    "anti_evo_chip":   ("Anti-Evo Chip",   "f:32", 1000, "Evoluir", "alternar bloqueio de evolução", "mantém esta forma"),
+    "x_antibody":      ("X-Antibody",      "i:79", 2000, "Evoluir", "the X-Antibody takes hold", "the X factor"),
     "dna_crystal":     ("DNA Crystal",     "i:35", 1500, "Power", "+10 own-Field DNA banked", "a Field's worth of code"),
     # ---- THE ATTRIBUTE CHIPS (items refactor P6, 2026-07-23) ---------------
     # The one LIVE lever with no purchasable support: Va/D/Vi powers gate
@@ -113,31 +113,31 @@ _AUTHORED = {
     # move them were winning battles (+1 each) and the inheritance-only
     # Digimemory.  Canon rows, canon prices, canon +15/+30 -- a chip is worth
     # about fifteen wins.  Uncapped, exactly like the win path they shortcut.
-    "vaccine_chip":    ("Vaccine Chip",    "f:10", 1500, "Power", "Vaccine power +15", "a shot of order"),
-    "data_chip":       ("Data Chip",       "f:11", 1500, "Power", "Data power +15", "a shot of logic"),
-    "virus_chip":      ("Virus Chip",      "f:12", 1500, "Power", "Virus power +15", "a shot of chaos"),
-    "vaccine_chip_g":  ("Vaccine Chip G",  "f:20", 3000, "Power", "Vaccine power +30", "the golden dose"),
-    "data_chip_g":     ("Data Chip G",     "f:21", 3000, "Power", "Data power +30", "the golden dose"),
-    "virus_chip_g":    ("Virus Chip G",    "f:22", 3000, "Power", "Virus power +30", "the golden dose"),
-    "omni_chip_g":     ("Omni Chip G",     "f:33", 8000, "Power", "all three powers +30", "every colour at once"),
+    "vaccine_chip":    ("Vaccine Chip",    "f:10", 1500, "Power", "Vaccine power +15", "uma dose de ordem"),
+    "data_chip":       ("Data Chip",       "f:11", 1500, "Power", "Data power +15", "uma dose de lógica"),
+    "virus_chip":      ("Virus Chip",      "f:12", 1500, "Power", "Virus power +15", "uma dose de caos"),
+    "vaccine_chip_g":  ("Vaccine Chip G",  "f:20", 3000, "Power", "Vaccine power +30", "a dose dourada"),
+    "data_chip_g":     ("Data Chip G",     "f:21", 3000, "Power", "Data power +30", "a dose dourada"),
+    "virus_chip_g":    ("Virus Chip G",    "f:22", 3000, "Power", "Virus power +30", "a dose dourada"),
+    "omni_chip_g":     ("Omni Chip G",     "f:33", 8000, "Power", "all three powers +30", "todas as cores de uma vez"),
     # ---- LEGACY (death and inheritance -- NOT medicine, which is why the
     # old "Medical" name had to go: it never held a med) ---------------------
     # i:64 (the notched-square disk glyph): i:32 is DVPet's own Digimemory
     # sprite, and two catalog entries sharing an icon broke key_for_icon
     # (consistency audit 2026-07-21) -- the floppy wears its own rip now
-    "revive_floppy":   ("Rev. Floppy",     "i:64", 2500, "Cure", "raise the dead", "one more chance"),
-    "digimemory":      ("Digimemory",      "i:32", None, "Evolve", "the ancestor's Va·D·Vi", "its data lives on"),
+    "revive_floppy":   ("Rev. Floppy",     "i:64", 2500, "Cure", "ressuscitar os mortos", "mais uma chance"),
+    "digimemory":      ("Digimemória",      "i:32", None, "Evoluir", "the ancestor's Va·D·Vi", "seus dados vivem"),
     # ---- PLAY (the shows the engine already ships; small LIVE stat dials:
     # exercise sheds weight, couch time buys energy at a weight price) --------
-    "ball":            ("Ball",            "i:3",  100,  "Drill", "play! weight -1", "a grand kickabout"),
-    "skateboard":      ("Skateboard",      "i:6",  500,  "Drill", "ride! weight -2 · energy -1", "shred the living room"),
-    "xylophone":       ("Xylophone",       "i:63", 800,  "Rest", "a recital · energy +2", "music hath charms"),
+    "ball":            ("Ball",            "i:3",  100,  "Drill", "play! weight -1", "um chutinho incrível"),
+    "skateboard":      ("Skate",      "i:6",  500,  "Drill", "ride! weight -2 · energy -1", "arrasar a sala"),
+    "xylophone":       ("Xilofone",       "i:63", 800,  "Rest", "a recital · energy +2", "a música tem encantos"),
     "video_game":      ("Video Game",      "i:65", 600,  "Rest", "couch time · energy +2 · weight +1", "one more level…"),
-    "television":      ("Television",      "i:10", 1000, "Rest", "deep couch · energy +3 · weight +1", "glued to the screen"),
+    "television":      ("Televisão",      "i:10", 1000, "Rest", "deep couch · energy +3 · weight +1", "colado na tela"),
     # ---- ADVENTURE (the road's own shelf -- cleared maps open it) -----------
     "town_transport":     ("Town Transport",   "i:29", 500,  "Road", "on the road: T-warp to a town + rest", "a Birdramon ride"),
     "disaster_transport": ("Disaster Transp.", "i:30", 250,  "Road", "on the road: T-dash to the boss + ambush", "a Garudamon ride"),
-    "life_recovery":      ("Life Recovery",    "i:27", 1000, "Road", "restore adventure lives on the road", "a second wind"),
+    "life_recovery":      ("Life Recovery",    "i:27", 1000, "Road", "restaura vidas na aventura", "um fôlego extra"),
     # ======================= THE EXPANSION (2026-07-26) =====================
     # Joel: "bring in all 99 unused items ... spread out ... your call".
     # Every row below is an authored source row (foods.csv / items.csv):
@@ -150,19 +150,19 @@ _AUTHORED = {
     # Board file: ITEM_EXPANSION_2026_07_26.md.
     "meat":            ("Meat",                "f:0",  None,  "Feed", "hunger +1 · weight +2", "the classic slab, to go"),
     "fruit":           ("Fruit",               "f:2",  None,  "Feed", "hunger +1 · obedience -1", "sweet, and a little spoiling"),
-    "bread":           ("Bread",               "f:24", 100,   "Feed", "hunger +1 · weight +1", "a warm honest loaf"),
-    "cheese":          ("Cheese",              "f:49", 200,   "Feed", "hunger +1 · weight +2", "aged to please"),
-    "broccoli":        ("Broccoli",            "f:51", 100,   "Feed", "hunger +1 · obedience +2", "eat it. no arguments."),
-    "orange":          ("Orange",              "f:42", 300,   "Feed", "hunger +1 · obedience -1", "zest for the road"),
-    "honey":           ("Honey",               "f:31", 500,   "Feed", "hunger +1 · energy +1 · obedience -5 · weight +1", "spoils them rotten"),
-    "chocolate_egg":   ("Chocolate Egg",       "f:58", 300,   "Feed", "hunger +1 · weight +1 · a TOY inside", "a toy hides inside"),
+    "bread":           ("Bread",               "f:24", 100,   "Feed", "hunger +1 · weight +1", "um pão honesto e quentinho"),
+    "cheese":          ("Queijo",              "f:49", 200,   "Feed", "hunger +1 · weight +2", "envelhecido para agradar"),
+    "broccoli":        ("Brócolis",            "f:51", 100,   "Feed", "hunger +1 · obedience +2", "eat it. no arguments."),
+    "orange":          ("Laranja",              "f:42", 300,   "Feed", "hunger +1 · obedience -1", "energia para a estrada"),
+    "honey":           ("Honey",               "f:31", 500,   "Feed", "hunger +1 · energy +1 · obedience -5 · weight +1", "estraga completamente"),
+    "chocolate_egg":   ("Chocolate Egg",       "f:58", 300,   "Feed", "hunger +1 · weight +1 · a TOY inside", "um brinquedo escondido dentro"),
     "burnt_food":      ("Burnt Food",          "f:56", None,  "Feed", "hunger +1 · saps effort · obedience +5", "somebody wasn't watching"),
-    "yellow_pepper":   ("Yellow Pepper",       "f:35", 100,   "Feed", "hunger +1 · Virus power +1 · obedience +1", "a spark of chaos"),
-    "green_pepper":    ("Green Pepper",        "f:36", 100,   "Feed", "hunger +1 · Data power +1 · obedience +1", "a spark of logic"),
-    "red_pepper":      ("Red Pepper",          "f:37", 100,   "Feed", "hunger +1 · Vaccine power +1 · obedience +1", "a spark of order"),
-    "med":             ("Med",                 "f:4",  None,  "Cure", "cures sickness", "the field pill"),
+    "yellow_pepper":   ("Yellow Pepper",       "f:35", 100,   "Feed", "hunger +1 · Virus power +1 · obedience +1", "uma centelha de caos"),
+    "green_pepper":    ("Green Pepper",        "f:36", 100,   "Feed", "hunger +1 · Data power +1 · obedience +1", "uma centelha de lógica"),
+    "red_pepper":      ("Red Pepper",          "f:37", 100,   "Feed", "hunger +1 · Vaccine power +1 · obedience +1", "uma centelha de ordem"),
+    "med":             ("Med",                 "f:4",  None,  "Cure", "cura doenças", "a pílula do campo"),
     "elixir":          ("Elixir",              "f:15", 2000,  "Cure", "cures sickness · energy to FULL", "the pill, perfected"),
-    "vitamin_g":       ("Vitamin G",           "f:16", 2000,  "Cure", "heals injury · effort FULL · injury guard", "the golden mend"),
+    "vitamin_g":       ("Vitamin G",           "f:16", 2000,  "Cure", "heals injury · effort FULL · injury guard", "o reparo dourado"),
     # THE CURE LADDER (2026-07-27, Joel: "fill the cure hole").  care_mistakes
     # is the deadliest meter in the game -- 21 reads, it gates evolutions and
     # it KILLS -- and until now exactly one item touched it, at 7777b.  These
@@ -170,61 +170,61 @@ _AUTHORED = {
     # freed by the same day's cuts: nothing is drawn, ever.
     "cold_compress":   ("Cold Compress",       "i:67", 2000,  "Cure", "ONE care slip erased · costs energy", "relief, the hard way"),
     "gold_pill":       ("Gold Pill",           "f:19", 10000, "Cure", "energy +12", "vitality, gilded"),
-    "supplement":      ("Supplement",          "f:25", 100,   "Drill", "effort FULL · obedience +5 · weight +1", "discipline in a dose"),
+    "supplement":      ("Suplemento",          "f:25", 100,   "Drill", "effort FULL · obedience +5 · weight +1", "disciplina em uma dose"),
     "food_pill":       ("Food Pill",           "f:41", 100,   "Feed", "fills belly · obedience +5 · weight +3", "a meal, compressed"),
     "ai_supplement":   ("AI Supplement",       "f:43", None,  "Drill", "effort +1", "the assistant's own blend"),
     "ai_food_pill":    ("AI Food Pill",        "f:44", None,  "Cure", "hunger +1", "the assistant's ration"),
-    "hp_chip":         ("HP Chip",             "f:26", 1500,  "Power", "all three powers +5", "vitality etched in silicon"),
-    "hp_chip_g":       ("HP Chip G",           "f:27", 3000,  "Power", "all three powers +10", "the golden constitution"),
-    "hedonism_101":    ("Hedonism 101",        "i:1",  2000,  "Manners", "manners OBLITERATED · DO NOT STUDY", "the forbidden syllabus"),
-    "book":            ("Book",                "i:2",  1000,  "Manners", "obedience +5", "a well-thumbed guide"),
-    "board_game":      ("Board Game",          "i:5",  2000,  "Power", "Vaccine power -15 · Data power +15 · obedience +5", "logic beats order"),
-    "computer_game":   ("Computer Game",       "i:8",  2000,  "Power", "Virus power -15 · Data power +15", "logic tames chaos"),
-    "trampoline":      ("Trampoline",          "i:13", 2500,  "Drill", "bounce! effort +1 · weight -1", "gravity, negotiable"),
-    "x_program":       ("X-Program Sample",    "i:14", None,  "Evolve", "belly + effort emptied · the X takes hold", "survive it, transcend"),
+    "hp_chip":         ("HP Chip",             "f:26", 1500,  "Power", "all three powers +5", "vitalidade gravada em silício"),
+    "hp_chip_g":       ("HP Chip G",           "f:27", 3000,  "Power", "all three powers +10", "a constituição dourada"),
+    "hedonism_101":    ("Hedonism 101",        "i:1",  2000,  "Modos", "manners OBLITERATED · DO NOT STUDY", "o currículo proibido"),
+    "book":            ("Book",                "i:2",  1000,  "Modos", "obedience +5", "a well-thumbed guide"),
+    "board_game":      ("Board Game",          "i:5",  2000,  "Power", "Vaccine power -15 · Data power +15 · obedience +5", "lógica supera ordem"),
+    "computer_game":   ("Computer Game",       "i:8",  2000,  "Power", "Virus power -15 · Data power +15", "lógica doma o caos"),
+    "trampoline":      ("Trampolim",          "i:13", 2500,  "Drill", "bounce! effort +1 · weight -1", "gravity, negotiable"),
+    "x_program":       ("X-Program Sample",    "i:14", None,  "Evoluir", "belly + effort emptied · the X takes hold", "survive it, transcend"),
     "zone_transport":  ("Zone Transport",      "i:28", 750,   "Road", "on the road: a safe T-lift up the road", "a Birdramon lift"),
     "continent_transport":("Continent Transport", "i:31", 1000,  "Road", "on the road: rest to half tank, anywhere", "a Whamon camp"),
-    "digitron":        ("Digitron",            "i:33", 6000,  "Evolve", "a dark evolution, if one answers", "a mysterious dark fluid"),
-    "horn_helmet":     ("Horn Helmet",         "i:34", 3000,  "Evolve", "evolve: Kabuterimon, if the body is ready", "the beetle's crown"),
-    "grey_claws":      ("Grey Claws",          "i:36", 3000,  "Evolve", "evolve: Greymon, if the body is ready", "the tyrant's grip"),
-    "water_bottle":    ("Water Bottle",        "i:37", 3000,  "Evolve", "evolve: Seadramon, if the body is ready", "the serpent's sea"),
-    "torn_tatter":     ("Torn Tatter",         "i:38", 3000,  "Evolve", "evolve: Bakemon, if the body is ready", "the ghost's shroud"),
-    "white_wings":     ("White Wings",         "i:39", 3000,  "Evolve", "evolve: Angemon, if the body is ready", "the angel's lift"),
-    "black_wings":     ("Black Wings",         "i:40", 3000,  "Evolve", "evolve: Devimon, if the body is ready", "the fallen's lift"),
-    "metal_armor":     ("Metal Armor",         "i:41", 3000,  "Evolve", "evolve: MetalMamemon, if the body is ready", "the mercenary's shell"),
-    "flaming_wings":   ("Flaming Wings",       "i:42", 3000,  "Evolve", "evolve: Birdramon, if the body is ready", "the firebird's pinions"),
-    "toy_oven":        ("Toy Oven",            "i:66", 500,   "Feed", "fresh-baked! hunger -1 (makes room)", "smells like seconds"),
-    "capsule_a":       ("Capsule",             "i:68", 100,   "Treasure", "open: a surprise item (finer on festivals)", "the corner-shop gacha"),
-    "capsule_b":       ("Blue Capsule",             "i:69", None,  "Treasure", "open: an uncommon surprise", "a cut above the counter"),
-    "capsule_c":       ("Green Capsule",             "i:70", None,  "Treasure", "open: an uncommon surprise", "road-found, road-worthy"),
-    "capsule_d":       ("Red Capsule",             "i:72", None,  "Treasure", "open: a rare surprise", "warm to the touch"),
-    "capsule_e":       ("Silver Capsule",             "i:73", None,  "Treasure", "open: a rare surprise", "heavier than it looks"),
-    "capsule_f":       ("Gold Capsule",             "i:74", None,  "Treasure", "open: a fine surprise", "it practically hums"),
-    "capsule_g":       ("Prism Capsule",             "i:75", None,  "Treasure", "open: a fine surprise", "light bends around it"),
-    "capsule_h":       ("Royal Capsule",             "i:76", None,  "Treasure", "open: the finest surprise", "festival stock, the good shelf"),
-    "prank_capsule_a": ("Rattling Capsule",             "i:71", None,  "Treasure", "open: a surprise. probably fine.", "something inside is ALIVE"),
-    "prank_capsule_b": ("Hissing Capsule",             "i:77", None,  "Treasure", "open: a surprise. definitely fine.", "do you smell smoke?"),
-    "futon":           ("Futon",               "i:81", 1000,  "Rest", "the next daytime doze rests to FULL", "deepest daytime sleep"),
-    "human_fire_spirit":("Human Fire Spirit",   "i:43", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_light_spirit":("Human Light Spirit",  "i:44", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_ice_spirit":("Human Ice Spirit",    "i:45", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_wind_spirit":("Human Wind Spirit",   "i:46", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_thunder_spirit":("Human Thndr. Spirit", "i:47", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_earth_spirit":("Human Earth Spirit",  "i:48", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_water_spirit":("Human Water Spirit",  "i:49", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_wood_spirit":("Human Wood Spirit",   "i:50", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_metal_spirit":("Human Metal Spirit",  "i:51", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "human_dark_spirit":("Human Dark Spirit",   "i:52", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_fire_spirit":("Beast Fire Spirit",   "i:53", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_light_spirit":("Beast Light Spirit",  "i:54", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_ice_spirit":("Beast Ice Spirit",    "i:55", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_wind_spirit":("Beast Wind Spirit",   "i:56", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_thunder_spirit":("Beast Thndr. Spirit", "i:57", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_earth_spirit":("Beast Earth Spirit",  "i:58", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_water_spirit":("Beast Water Spirit",  "i:59", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_wood_spirit":("Beast Wood Spirit",   "i:60", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_metal_spirit":("Beast Metal Spirit",  "i:61", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
-    "beast_dark_spirit":("Beast Dark Spirit",   "i:62", None,  "Evolve", "a spirit evolution, if one answers", "an elemental inheritance"),
+    "digitron":        ("Digitron",            "i:33", 6000,  "Evoluir", "a dark evolution, if one answers", "um fluido escuro misterioso"),
+    "horn_helmet":     ("Horn Helmet",         "i:34", 3000,  "Evoluir", "evolve: Kabuterimon, if the body is ready", "the beetle's crown"),
+    "grey_claws":      ("Grey Claws",          "i:36", 3000,  "Evoluir", "evolve: Greymon, if the body is ready", "the tyrant's grip"),
+    "water_bottle":    ("Water Bottle",        "i:37", 3000,  "Evoluir", "evolve: Seadramon, if the body is ready", "the serpent's sea"),
+    "torn_tatter":     ("Torn Tatter",         "i:38", 3000,  "Evoluir", "evolve: Bakemon, if the body is ready", "the ghost's shroud"),
+    "white_wings":     ("White Wings",         "i:39", 3000,  "Evoluir", "evolve: Angemon, if the body is ready", "the angel's lift"),
+    "black_wings":     ("Black Wings",         "i:40", 3000,  "Evoluir", "evolve: Devimon, if the body is ready", "the fallen's lift"),
+    "metal_armor":     ("Metal Armor",         "i:41", 3000,  "Evoluir", "evolve: MetalMamemon, if the body is ready", "the mercenary's shell"),
+    "flaming_wings":   ("Flaming Wings",       "i:42", 3000,  "Evoluir", "evolve: Birdramon, if the body is ready", "the firebird's pinions"),
+    "toy_oven":        ("Toy Oven",            "i:66", 500,   "Feed", "fresh-baked! hunger -1 (makes room)", "cheira a mais"),
+    "capsule_a":       ("Cápsula",             "i:68", 100,   "Tesouro", "open: a surprise item (finer on festivals)", "the corner-shop gacha"),
+    "capsule_b":       ("Blue Capsule",             "i:69", None,  "Tesouro", "open: an uncommon surprise", "acima do balcão"),
+    "capsule_c":       ("Green Capsule",             "i:70", None,  "Tesouro", "open: an uncommon surprise", "road-found, road-worthy"),
+    "capsule_d":       ("Red Capsule",             "i:72", None,  "Tesouro", "open: a rare surprise", "quente ao toque"),
+    "capsule_e":       ("Silver Capsule",             "i:73", None,  "Tesouro", "open: a rare surprise", "mais pesado do que parece"),
+    "capsule_f":       ("Gold Capsule",             "i:74", None,  "Tesouro", "open: a fine surprise", "quase zumbe"),
+    "capsule_g":       ("Prism Capsule",             "i:75", None,  "Tesouro", "open: a fine surprise", "a luz se curva ao redor"),
+    "capsule_h":       ("Royal Capsule",             "i:76", None,  "Tesouro", "open: the finest surprise", "festival stock, the good shelf"),
+    "prank_capsule_a": ("Rattling Capsule",             "i:71", None,  "Tesouro", "open: a surprise. probably fine.", "something inside is ALIVE"),
+    "prank_capsule_b": ("Hissing Capsule",             "i:77", None,  "Tesouro", "open: a surprise. definitely fine.", "você está sentindo cheiro de fumaça?"),
+    "futon":           ("Futon",               "i:81", 1000,  "Rest", "the next daytime doze rests to FULL", "o sono diurno mais profundo"),
+    "human_fire_spirit":("Human Fire Spirit",   "i:43", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_light_spirit":("Human Light Spirit",  "i:44", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_ice_spirit":("Human Ice Spirit",    "i:45", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_wind_spirit":("Human Wind Spirit",   "i:46", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_thunder_spirit":("Human Thndr. Spirit", "i:47", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_earth_spirit":("Human Earth Spirit",  "i:48", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_water_spirit":("Human Water Spirit",  "i:49", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_wood_spirit":("Human Wood Spirit",   "i:50", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_metal_spirit":("Human Metal Spirit",  "i:51", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "human_dark_spirit":("Human Dark Spirit",   "i:52", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_fire_spirit":("Beast Fire Spirit",   "i:53", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_light_spirit":("Beast Light Spirit",  "i:54", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_ice_spirit":("Beast Ice Spirit",    "i:55", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_wind_spirit":("Beast Wind Spirit",   "i:56", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_thunder_spirit":("Beast Thndr. Spirit", "i:57", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_earth_spirit":("Beast Earth Spirit",  "i:58", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_water_spirit":("Beast Water Spirit",  "i:59", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_wood_spirit":("Beast Wood Spirit",   "i:60", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_metal_spirit":("Beast Metal Spirit",  "i:61", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
+    "beast_dark_spirit":("Beast Dark Spirit",   "i:62", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
 }
 
 # ---------------------------------------------------------------------------
@@ -826,8 +826,8 @@ def shelf(cat):
 # EIGHT TABS BY ACT (item refactor 2026-07-27, Joel: "all items need to be
 # completely refactored and catagorized"): each tab names the thing the
 # player wants to HAPPEN, in play order -- feed first, the doors late.
-CATEGORY_ORDER = ("Feed", "Rest", "Cure", "Drill", "Manners", "Power",
-                  "Treasure", "Evolve", "Road", ARMOR_CATEGORY)
+CATEGORY_ORDER = ("Feed", "Rest", "Cure", "Drill", "Modos", "Power",
+                  "Tesouro", "Evoluir", "Road", ARMOR_CATEGORY)
 
 
 def crest_answer(pet, key):
@@ -886,7 +886,7 @@ def wave_status(prog=None):
     # more useful tease: "your 1st armor evo" over "wins 0/25".
     sig, need = max(sorted(set(sealed)), key=lambda g: (ratio(g), -g[1]))
     have = min(int(prog.get(sig, 0)), need)
-    tease = _WAVE_TEASE.get((sig, need), "more relics stir out there")
+    tease = _WAVE_TEASE.get((sig, need), "mais relíquias surgem por aí")
     return len(sealed), tease.format(have=have, need=need)
 
 
@@ -894,7 +894,7 @@ def effect_line(e):
     if e.get("category") == ARMOR_CATEGORY:
         return "an armor evolution (the right Child)"
     k = e["key"]
-    eff = EFFECTS.get(k, "a curiosity")
+    eff = EFFECTS.get(k, "uma curiosidade")
     fl = FLAVORS.get(k)
     # the dossier speaks effect AND character ("polish up the shop
     # descriptions" 2026-07-18) -- but the info block holds exactly two

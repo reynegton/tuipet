@@ -41,10 +41,10 @@ def _today():
     return _dt.date.today()
 
 
-SEASON_OF_MONTH = {3: "Spring", 4: "Spring", 5: "Spring",
-                   6: "Summer", 7: "Summer", 8: "Summer",
+SEASON_OF_MONTH = {3: "Primavera", 4: "Primavera", 5: "Primavera",
+                   6: "Verão", 7: "Verão", 8: "Verão",
                    9: "Fall", 10: "Fall", 11: "Fall",
-                   12: "Winter", 1: "Winter", 2: "Winter"}
+                   12: "Inverno", 1: "Inverno", 2: "Inverno"}
 
 # festival days: the whole day's board is enterable at any hour (each slot
 # still runs once -- no purse farming).  Aug 1 is Odaiba Memorial Day, the
@@ -100,7 +100,7 @@ TOURNEY_AGES = {"Rookie": 3, "Champion": 6, "Ultimate": 9, "Mega": 12}   # Tourn
 # (the TourneyRandom*Power / *Health stat bands left with the classic
 # battle -- 0.5 entrants are plain species cards at ideal condition)
 HOME_LIMIT = 24                 # HomeTournamentLimit: one cup per game hour
-ROUNDS = ["Quarterfinal", "Semifinal", "Final"]
+ROUNDS = ["Quartas de final", "Semifinal", "Final"]
 _TIERS = ("Rookie", "Champion", "Ultimate", "Mega")
 
 
@@ -291,7 +291,7 @@ def eligibility_at(pet, t, slot):
     can't be farmed."""
     run = getattr(pet, "fought_hours", None) or []
     if slot in run:
-        return "That cup has run."
+        return "Essa copa já terminou."
     if slot != _hour(pet) and not holiday():
         return "That cup is closed — only the %02d:00 one runs now." % _hour(pet)
     return (_eligibility_rest(pet, t) or _stake_check(pet, t)
@@ -334,7 +334,7 @@ def next_winnable(pet):
 def _eligibility_rest(pet, t):
     """Eligibility WITHOUT the cup-hour gate -- for judging a FUTURE slot."""
     if t["id"] in (pet.fought_today or []) and not t["same_day_retry"]:
-        return "Already fought that cup today."
+        return "Já lutou nessa copa hoje."
     if t["age_limit"] and _pet_tier_rank(pet) > _TIER_RANK.get(t["age_limit"], 3):
         return "Too old for the %s bracket." % t["age_limit"]
     if t["field_req"] and t["field_req"] != getattr(pet, "field", ""):
@@ -345,7 +345,7 @@ def _eligibility_rest(pet, t):
         won = getattr(pet, "trophies_won", {}) or {}
         if t["prelim"] not in won:
             q = trophy_by_id(t["prelim"])
-            label = trophy_label(q) if q else "qualifier"
+            label = trophy_label(q) if q else "classificatória"
             # the grand chain crosses REAL seasons -- name the missing
             # link's season so the year-long arc reads as a journey, not a
             # mystery wall (cup ruling 2026-07-18)
@@ -362,11 +362,11 @@ def can_enter(pet):
     if (g := pet._guard(asleep_blocks=False)) is not None:
         return g
     if pet.stage in ("Fresh", "InTraining"):
-        return "Too young for the cup."
+        return "Muito jovem para a copa."
     if pet.asleep:
         return pet._disturbed()   # a player poke wakes the sleeper, like every care key
     if not data.load_tournies():
-        return "No cups exist."
+        return "Nenhuma copa existe."
     return None
 
 
@@ -662,7 +662,7 @@ class Tournament:
                 key = _prize_key("i", self.trophy["item"])
                 self.pet.add_item(key)
                 e = shop.entry(key) or {}
-                extras.append(e.get("name", "a prize"))
+                extras.append(e.get("name", "um prêmio"))
             if self.trophy["food_id"] >= 0 and self.trophy["food_amt"] > 0:
                 key = _prize_key("f", self.trophy["food_id"])
                 amt = self.trophy["food_amt"]
@@ -677,5 +677,5 @@ class Tournament:
             self._resolve_npc_round()
             self.tree.append(list(self.bracket))          # the field after this round
             beat = " / ".join(self.results[:2])
-            self.last = "Won! %s advance too. Now: the %s." % (beat or "The rest", self.round_name)
+            self.last = "Won! %s advance too. Now: the %s." % (beat or "O restante", self.round_name)
         return self.last

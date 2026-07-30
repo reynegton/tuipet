@@ -470,14 +470,14 @@ class CareMixin:
             "revive_floppy": self._revive_item,
             "digimemory": self._inherit_memory,
             # ---- PLAY (small LIVE dials; the SHOW is fired by the bag panel)
-            "ball": lambda: self._toy(weight=-1, msg="A grand kickabout!"),
+            "ball": lambda: self._toy(weight=-1, msg="Um chutinho incrível!"),
             "skateboard": lambda: self._toy(weight=-2, energy=-1,
-                                            msg="It shreds!"),
-            "xylophone": lambda: self._toy(energy=2, msg="A lovely recital."),
+                                            msg="Ele arraса!"),
+            "xylophone": lambda: self._toy(energy=2, msg="Um recital encantador."),
             "video_game": lambda: self._toy(energy=2, weight=1,
                                             msg="One more level…"),
             "television": lambda: self._toy(energy=3, weight=1,
-                                            msg="Glued to the screen."),
+                                            msg="Colado na tela."),
             # ---- ADVENTURE (spent ON THE ROAD, not from the home bag) -------
             "town_transport": lambda: _Refused("Save it for the road (press T)."),
             "disaster_transport": lambda: _Refused("Save it for the road (press T)."),
@@ -559,7 +559,7 @@ class CareMixin:
         old += max_energy left a drained pet short of full), and refuse at
         full like every care sibling instead of vanishing for nothing."""
         if self.energy >= self.max_energy:
-            return _Refused("Energy is already full.")
+            return _Refused("Energia já está cheia.")
         self._set_energy(self.max_energy)
         return "Energia restaurada!"
 
@@ -603,7 +603,7 @@ class CareMixin:
         # column) for a game-day -- so a full-effort pet still has a
         # reason to take one before a hard fight
         if self.strength >= 4 and getattr(self, "vitamin_lapse", 0.0) > 0:
-            return _Refused("Effort is full and the vitamin is working.")
+            return _Refused("Esforço cheio e a vitamina está agindo.")
         self.strength = 4
         # 1440 game-min == ONE GAME DAY (~24 real minutes of play).  Burns
         # down by dt in petbody._tick_life -- see THE UNIT LAW there.
@@ -616,7 +616,7 @@ class CareMixin:
         the pill's own grammar; the pill stays sick-only.  Two ailments,
         two meds, the device pair."""
         if not self.injured:
-            return _Refused("Nothing to bandage.")  # noqa: F405
+            return _Refused("Nada para curativo.")  # noqa: F405
         self.injured = False
         self.inj_length = 0.0        # the wait is what the Bandage buys off
         self._set_anim("happy", 1.4)
@@ -667,7 +667,7 @@ class CareMixin:
         dropped: mood is a verified no-op meter and the lifespan clock
         left with DSprite mortality (2026-07-22)."""
         if self.care_mistakes <= 0:
-            return _Refused("Nothing on the slate to erase.")   # noqa: F405
+            return _Refused("Nada no histórico para apagar.")   # noqa: F405
         self.care_mistakes -= 1
         self._set_energy(self.energy + MIRACLE_ENERGY_GAIN)   # noqa: F405
         left = self.care_mistakes
@@ -684,9 +684,9 @@ class CareMixin:
         energy instead of giving it: relief you have to sleep off.
         """
         if self.care_mistakes <= 0:
-            return _Refused("Nothing on the slate to erase.")   # noqa: F405
+            return _Refused("Nada no histórico para apagar.")   # noqa: F405
         if self.energy <= COMPRESS_ENERGY_COST:                 # noqa: F405
-            return _Refused("Too drained to take the shock.")   # noqa: F405
+            return _Refused("Sem energia para o choque.")   # noqa: F405
         self.care_mistakes -= 1
         self._set_energy(self.energy - COMPRESS_ENERGY_COST)    # noqa: F405
         left = self.care_mistakes
@@ -721,7 +721,7 @@ class CareMixin:
         if (_g := self._guard(asleep_blocks=False)) is not None:
             return _g
         if not self.injured:
-            return _Refused("Nothing to bandage.")            # noqa: F405
+            return _Refused("Nada para curativo.")            # noqa: F405
         if self.asleep:
             self._disturbed()
         return self._bandage()
@@ -891,7 +891,7 @@ class CareMixin:
         target = min(self.stage_seconds + dur * GROW_CAPSULE_FRACTION,  # noqa: F405
                      ceiling)
         if target <= self.stage_seconds:
-            return _Refused("The growth clock is already full.")  # noqa: F405
+            return _Refused("O relógio de crescimento já está cheio.")  # noqa: F405
         moved = target - self.stage_seconds
         self.stage_seconds = target
         return f"Time lurches forward. (+{int(moved)}min)"
@@ -906,7 +906,7 @@ class CareMixin:
         from None (PhysicalState L3361) -- the X-Program's price in LIFE.  That
         burn was dead; the antibody was a free ride (Joel 2026-07-22)."""
         if self.x_antibody != "None":
-            return _Refused("The antibody already runs in it.")
+            return _Refused("O anticorpo já está ativo.")
         # (calcXAntibodyLifeDec left with the lifespan clock -- DSprite
         # mortality 2026-07-22.  NOTE: the unmarked-pet death roulette was
         # never THIS item's -- it belonged to the separate X-PROGRAM item,
@@ -926,7 +926,7 @@ class CareMixin:
 
     def _revive_item(self):
         if not self.dead:
-            return _Refused("No one needs reviving.")
+            return _Refused("Ninguém precisa ser revivido.")
         self.save_from_death()
         return "VIVO."
 
@@ -965,7 +965,7 @@ class CareMixin:
         mem = self.digimemory or (self.wild_memories[0]
                                   if self.wild_memories else None)
         if not mem:
-            return _Refused("The chip is silent.")  # noqa: F405
+            return _Refused("O chip está silencioso.")  # noqa: F405
         self.vaccine += int(mem.get("vaccine", 0) or 0)
         self.data_power += int(mem.get("data", 0) or 0)
         self.virus += int(mem.get("virus", 0) or 0)
@@ -977,7 +977,7 @@ class CareMixin:
 
     def _super_carrot(self):
         if self.weight <= 1:
-            return _Refused("Nothing left to trim.")
+            return _Refused("Nada mais para aparar.")
         self._set_weight(max(1, self.weight - 10))
         return "Leve como uma pena!"
 
@@ -1032,7 +1032,7 @@ class CareMixin:
         free pill's one job in pocket form -- never sold, so the free-cure
         law holds."""
         if not self.sick:
-            return _Refused("No sickness to treat.")  # noqa: F405
+            return _Refused("Nenhuma doença para tratar.")  # noqa: F405
         self.sick = False
         self._set_anim("eat", 1.4)
         return "A doença passa."
@@ -1053,7 +1053,7 @@ class CareMixin:
         free cure -- this is the vitamin's big sibling."""
         if not self.injured and self.strength >= 4 \
                 and getattr(self, "vitamin_lapse", 0.0) > 0:
-            return _Refused("Nothing to mend and the guard is running.")  # noqa: F405
+            return _Refused("Nada para remendar e a proteção está ativa.")  # noqa: F405
         self.injured = False
         self.inj_length = 0.0
         self.strength = 4
@@ -1064,14 +1064,14 @@ class CareMixin:
     def _gold_pill(self):
         """Canon Energy +12 (the miracle drink's dose, no eraser)."""
         if self.energy >= self.max_energy:
-            return _Refused("Energy is already full.")  # noqa: F405
+            return _Refused("Energia já está cheia.")  # noqa: F405
         self._set_energy(self.energy + 12)
         return "Vitalidade dourada!"
 
     def _supplement(self):
         """Effort to FULL + the obedience leg (authored +5) + its weight."""
         if self.strength >= 4 and self.obedience >= MAX_OBEDIENCE:  # noqa: F405
-            return _Refused("Nothing left to firm up.")  # noqa: F405
+            return _Refused("Nada mais para fortalecer.")  # noqa: F405
         self.strength = 4
         self._set_obedience(self.obedience + 5)
         self._set_weight(self.weight + 1)
@@ -1099,7 +1099,7 @@ class CareMixin:
     def _toy_oven(self):
         """'+Appetite': makes room for a meal (hunger -1)."""
         if self.hunger <= 0:
-            return _Refused("The belly is already empty.")  # noqa: F405
+            return _Refused("A barriga já está vazia.")  # noqa: F405
         self.hunger = max(0, self.hunger - 1)
         return "Um cheiro maravilhoso — de repente com fome."
 
@@ -1111,7 +1111,7 @@ class CareMixin:
             return _Refused("Not on the road — no bed out here.")  # noqa: F405
         if self.asleep:
             if getattr(self, "futon_doze", False):
-                return _Refused("Already tucked in deep.")  # noqa: F405
+                return _Refused("Já bem agasalhado.")  # noqa: F405
             self.futon_doze = True
             return "O futon desliza por baixo — sono mais profundo."
         self._fall_asleep()
@@ -1129,7 +1129,7 @@ class CareMixin:
         death roll; the aftermath (hunger calls, red-energy stings) is
         the gamble."""
         if self.x_antibody != "None":
-            return _Refused("The antibody already runs in it.")  # noqa: F405
+            return _Refused("O anticorpo já está ativo.")  # noqa: F405
         self.hunger = 0
         self.strength = 0
         self._set_energy(self.energy - int(self.max_energy * 0.8))

@@ -107,9 +107,9 @@ class TownPanel(menu.SubHost):
         elif kind == "evolve":
             self.msg = t("town_msg_evolved", "...evoluiu para {name}!").format(name=self.pet.name)
         elif kind == "inherit":
-            self.msg = t("town_msg_inherit", "The memory settles in.")
+            self.msg = t("town_msg_inherit", "A memória se consolida.")
         else:
-            self.msg = t("town_msg_anything_else", "Anything else?")          # a plain browse -> back to the menu
+            self.msg = t("town_msg_anything_else", "Mais alguma coisa?")          # a plain browse -> back to the menu
 
     # -- the town cup ---------------------------------------------------------
     def _start_cup(self):
@@ -173,7 +173,7 @@ class TownPanel(menu.SubHost):
         if isinstance(result, tuple):
             last, champ = result
             self.sfx = "champion" if champ else "lose"
-            self.msg = last or (t("town_msg_champ", "Town champion!") if champ
+            self.msg = last or (t("town_msg_champ", "Campeão da cidade!") if champ
                                 else t("town_msg_ko", "Knocked out of the Town Cup."))
         else:
             self.msg = t("town_msg_forfeit", "You forfeit the Town Cup.")

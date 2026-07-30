@@ -99,8 +99,8 @@ def get_help():
         (t("help_txt_grave_1", "Neglect, hunger, sickness or age"), 0),
         (t("help_txt_grave_2", "take it in the end. The grave asks"), 0),
         (t("help_txt_grave_3", "what carries to the next one:"), 0),
-        (t("help_txt_grave_4", "E etch its data for your heir"), 1),
-        (t("help_txt_grave_5", "B keep the care bonus instead"), 1),
+        (t("help_txt_grave_4", "E grave os dados para o herdeiro"), 1),
+        (t("help_txt_grave_5", "B guarde o bônus de cuidados"), 1),
         (t("help_txt_grave_6", "Only one etch may stand: if data is"), 0),
         (t("help_txt_grave_7", "already banked, E takes the new one,"), 0),
         (t("help_txt_grave_8", "K keeps the elder's."), 0),
@@ -118,7 +118,7 @@ class HelpPanel:
         self.pet = pet
         self.top = 0
         self.frame_i = 0
-        self.msg = t("help_msg_intro", "How to play tuipet.")
+        self.msg = t("help_msg_intro", "Como jogar tuipet.")
 
     def anim(self):
         self.frame_i += 1

@@ -126,7 +126,7 @@ class RaidPanel(menu.SubHost):
                 # attempt races, raid round 2026-07-19).  No refetch here:
                 # the gate re-sends the view with every hit ack now, like
                 # the claim flow.
-                self.msg = hit.get("why") or t("raid_msg_refused", "The gate refused the report.")
+                self.msg = hit.get("why") or t("raid_msg_refused", "O portal recusou o relatório.")
                 self.sfx = "error"
         reward = getattr(self.client, "raid_reward", None)
         if reward is not None:
@@ -151,7 +151,7 @@ class RaidPanel(menu.SubHost):
 
     def _apply_reward(self, reward):
         if not reward.get("ok"):
-            self.msg = t("raid_msg_nothing", "Nothing to claim.")
+            self.msg = t("raid_msg_nothing", "Nada a coletar.")
             self.sfx = "error"
             return
         bits = int(reward.get("bits", 0))
@@ -243,11 +243,11 @@ class RaidPanel(menu.SubHost):
                 self.client.raid_get()
                 return None
             if not self._standing():
-                self.msg = t("raid_msg_not_stand", "The boss is not standing.")
+                self.msg = t("raid_msg_not_stand", "O chefe não está ativo.")
                 self.sfx = "error"
                 return None
             if int(v.get("attempts", 0)) <= 0:
-                self.msg = t("raid_msg_no_att", "No attempts left today.")
+                self.msg = t("raid_msg_no_att", "Nenhuma tentativa restante hoje.")
                 self.sfx = "error"
                 return None
             # THE SLEEPER ANSWERS FIRST (sleep audit 2026-07-25, S1).  The
@@ -286,7 +286,7 @@ class RaidPanel(menu.SubHost):
                 self.client.raid_claim(award["id"])
                 self.msg = t("raid_msg_claim_sent", "Claim sent…")
             else:
-                self.msg = t("raid_msg_nothing_yet", "Nothing to claim yet.")
+                self.msg = t("raid_msg_nothing_yet", "Nada a coletar ainda.")
             return None
         if k in ("escape", "r"):
             # the exit line speaks the GATE's number (board damage), not the

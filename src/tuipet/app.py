@@ -1398,9 +1398,9 @@ class TuiPetApp(ActionsMixin, App):
         if self.pet.stage in data.STAGE_ORDER:
             if data.STAGE_ORDER.index(self.pet.stage) > \
                     persistence.get_progress().get("max_stage", 0):
-                extra.append(f"your first {self.pet.stage} ever")
+                extra.append(f"seu primeiro {self.pet.stage} da história")
         if not persistence.album_has(self.pet.num):
-            extra.append("a NEW species for the album")
+            extra.append("uma espécie NOVA para o álbum")
         if extra:
             msg += f"  [b]★ {' · '.join(extra)}![/]"
         return msg
@@ -1443,8 +1443,8 @@ class TuiPetApp(ActionsMixin, App):
         elif p.is_frail():
             left = max(0, 5 - p.care_mistakes)
             msg = (f"{name} está ficando frágil — "
-                   + (f"{left} more slip{'s' if left != 1 else ''} could be fatal!"
-                      if left else "handle with perfect care!"))
+                   + (f"mais {left} erro{'s' if left != 1 else ''} pode{'m' if left != 1 else ''} ser fatal!"
+                      if left else "trate com perfeição!"))
         else:                 return ""
         return f"[{theme.NEG}]\u26a0 {msg}[/]"
 

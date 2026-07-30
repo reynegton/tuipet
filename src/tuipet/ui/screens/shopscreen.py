@@ -54,10 +54,10 @@ from tuipet.i18n.translator import t
 # same P4 width law), and the acts ride the Items tab as its sub-headers:
 # the sub-header line finally answers "what do I want to happen?"
 GROUPS = (("Food", ("Feed",)),
-          ("Items", ("Rest", "Cure", "Drill", "Manners", "Power",
-                     "Treasure", "Evolve", "Road")),
+          ("Items", ("Rest", "Cure", "Drill", "Modos", "Power",
+                     "Tesouro", "Evoluir", "Road")),
           ("Eggs", (shop.ARMOR_CATEGORY,)),
-          ("Honors", None))
+          ("Honras", None))
 
 # the tab whose rows carry sub-headers (the only one holding >1 category)
 _GROUPED_TAB = "Items"
@@ -134,7 +134,7 @@ class ShopPanel:
             return self.wave_hint
         if self.mode == "shop":
             tabs = self._tabs()
-            act = t("shop_hint_wear", "wear") if tabs[self.tab % len(tabs)] == "Honors" else t("shop_hint_buy", "buy")
+            act = t("shop_hint_wear", "wear") if tabs[self.tab % len(tabs)] == "Honras" else t("shop_hint_buy", "buy")
             return menu.hints(("←→", t("shop_hint_tab", "tab")), ("ENTER", act),
                               ("TAB", t("shop_hint_bag", "bag")), ("ESC", t("shop_hint_out", "out")))
         if self.bag_only:
@@ -240,7 +240,7 @@ class ShopPanel:
         """Buy an honor once, then ENTER toggles wearing it.  Purely cosmetic:
         the worn title rides the STATUS panel border and the lobby card.
         Returns (msg, sfx) like shop.buy -- the old flat confirm played the
-        happy chirp on "Not enough bits." too (round 31)."""
+        happy chirp on "Bits insuficientes." too (round 31)."""
         tid, price = e["title_id"], e["price"]
         if tid in persistence.get_titles_owned():
             if persistence.get_title_worn() == tid:
@@ -249,7 +249,7 @@ class ShopPanel:
             persistence.set_title_worn(tid)
             return "Wearing: %s." % e["name"], "confirm"
         if not self.pet.spend_bits(price):
-            return "Not enough bits.", "error"
+            return "Bits insuficientes.", "error"
         persistence.title_own(tid)
         persistence.set_title_worn(tid)
         return "Earned the honor: %s!" % e["name"], "confirm"

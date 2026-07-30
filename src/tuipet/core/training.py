@@ -108,7 +108,7 @@ class TrainingPanel:
         self.pet.saved_hit_type = g
         self.pet.train_result(self.success, g)   # the GRADE picks the verdict pose
         self.result = {"mega": t("train_result_mega", "A PERFECT strike!"),
-                       "normal": t("train_result_normal", "A solid hit."),
+                       "normal": t("train_result_normal", "Acerto sólido!"),
                        "miss": t("train_result_miss", "Whiffed it...")}[g]
         self.sfx = "confirm" if self.success else "refuse"
         # the strike is the battle's own volley: windup -> fire -> the

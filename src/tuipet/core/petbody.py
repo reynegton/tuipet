@@ -569,13 +569,13 @@ class BodyMixin:
         sleep tick and _tick_mortality and had to be edited in lockstep
         (refactor 2026-07-05).  True when the pet died."""
         if self.care_mistakes >= 20:                           # MaxCareMistakes
-            self._die("neglect")
+            self._die("negligência")
             return True
         # Pen20 (LINES_SPEC §5): at the last stages, 5 slips once the evolution
         # window is open = death -- an elder Perfect/Ultimate demands real care
         if (self.stage in ("Ultimate", "Mega") and self.care_mistakes >= 5
                 and self.stage_seconds >= self.LATE_STAGE_WINDOW):
-            self._die("frailty")
+            self._die("fragilidade")
             return True
         return False
 
@@ -606,7 +606,7 @@ class BodyMixin:
             # real-min -> /60 game scale"): hunger decays on this clock, so
             # what starving costs is counted on it too.
             if self._starve_t >= STARVE_DEATH_MIN:            # noqa: F405
-                self._die("starvation"); return True
+                self._die("inanição"); return True
         elif self.hunger > 0:
             self._starve_t = 0.0
         # ⭐ THE UNIT LAW (audit 2026-07-23): dt is world-SECONDS and one
@@ -698,7 +698,7 @@ class BodyMixin:
                 break
         if d > 0 and random.random() < d * dt:
             self._die("old age" if self.age_days >= GERIATRIC_AGE_DAYS  # noqa: F405
-                      else "neglect" if self.care_mistakes >= 5 else "sickness")
+                      else "negligência" if self.care_mistakes >= 5 else "doença")
             return True
         return False
 
@@ -898,9 +898,9 @@ class BodyMixin:
         self.wake_note = ""                         # a disturbed wake reports the
         #                                             DISTURBANCE, not the morning tier
         if nap:
-            return t("guard_stirs", "It stirs from its doze.")
+            return t("guard_stirs", "Mexeu e saiu da soneca.")
         if not postponed:
-            return t("guard_grumbles", "It grumbles awake.")
+            return t("guard_grumbles", "Acordou resmungando.")
         self._set_anim("angry", 1.8)                # Sad_Jeering: woken too soon
         return t("guard_mind_sleep", "zzz… mind its sleep!")
 

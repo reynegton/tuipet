@@ -529,7 +529,7 @@ class AdventurePanel(menu.SubHost):
         anything else is extra").  `battle_condition` is the device's own
         battle button asking whether this body can fight at all -- the home
         key, both cups and the lobby have always asked it, and the road
-        never did, so an injured pet was told "Too hurt to fight" at home
+        never did, so an injured pet was told "Muito machucado para lutar" at home
         and then marched into a BOSS.  A wayside ambush keeps the carve-out
         (you cannot decline a pounce; that beat is tuipet's own extra), but
         the gate is a stop you choose to walk into, so it asks.  Refused,
@@ -674,10 +674,10 @@ class AdventurePanel(menu.SubHost):
 
     def _outcome_word(self):
         if self.adv.done:
-            return t("msg_adv_conquered_short", "Conquered!")
+            return t("msg_adv_conquered_short", "Conquistado!")
         if self.adv.failed:
-            return t("msg_adv_defeated_short", "Defeated")
-        return t("msg_adv_turned_back", "Turned back")
+            return t("msg_adv_defeated_short", "Derrotado")
+        return t("msg_adv_turned_back", "Recuado")
 
     def key(self, k):
         if self.sub is not None:              # a fight or the town hub owns input
@@ -828,7 +828,7 @@ class AdventurePanel(menu.SubHost):
             if self._transport is not None:
                 import tuipet.core.shop as shop
                 key = self._transport[self._transport_cursor]
-                name = (shop.entry(key) or {}).get("name", "Transport")
+                name = (shop.entry(key) or {}).get("name", "Transporte")
                 nav = " ↑↓" if len(self._transport) > 1 else ""
                 return f"[b]{t('msg_adv_transport', '⟿ {name}').replace('{name}', name)}[/]  [dim]{t('msg_adv_transport_hint', 'ENTER use{nav} · ESC').replace('{nav}', nav)}[/]"
             if self._town_prompt:
@@ -1294,7 +1294,7 @@ class AdventurePanel(menu.SubHost):
         out = menu.header("ADVENTURE", "results")
         out.append(a.name[:26] + "\n", style=INK_B)
         word = self._outcome_word()
-        out.append(word + "\n", style={"Conquered!": POS, "Defeated": NEG}.get(word, DIM))
+        out.append(word + "\n", style={"Conquistado!": POS, "Derrotado": NEG}.get(word, DIM))
         out.append(f"Bits    +{a.bits_earned}\n", style=INK)
         out.append(f"Fights  {a.wins}W/{a.fights}\n", style=INK)
         out.append(f"Loot    {a.finds}\n", style=INK)

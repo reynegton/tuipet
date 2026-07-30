@@ -16,7 +16,7 @@ from tuipet.utils.theme import INK, INK_B, DIM, SEL    # noqa: F401  (theme.appl
 from tuipet.i18n.translator import t
 
 _ROWS = (
-    ("disc_lbl_praise", "Praise", "disc_desc_praise", "warmth for a proud moment"),
+    ("disc_lbl_praise", "Elogiar", "disc_desc_praise", "warmth for a proud moment"),
     ("disc_lbl_scold", "Scold", "disc_desc_scold", "answer the tantrum call"),
 )
 

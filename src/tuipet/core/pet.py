@@ -146,7 +146,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     item_interest: int = 0          # _itemInterest: toy boredom 0..5 (decays over time)
     # missed-day / birthday (PhysicalState _mistakeDay / _dailyMoodRecord / _bonus)
     mistake_day: int = 0            # today's care slips (resets each birthday)
-    daily_mood: dict = _dcf(default_factory=lambda: {"Feliz": 0, "Neutro": 0, "Triste": 0, "Depressed": 0})
+    daily_mood: dict = _dcf(default_factory=lambda: {"Feliz": 0, "Neutro": 0, "Triste": 0, "Deprimido": 0})
     last_birthday: int = 0          # last celebrated age-day
     evol_bonus: int = 0             # _bonus: birthday/win-rate credit fed into evolution odds
     digimemory: dict = _dcf(default_factory=dict)   # held inheritance data (item 32 payload)
@@ -499,7 +499,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     def _set_xantibody(self, state):
         """BINARY (the X slim): any raise lands Permanent; never downgrades."""
         if state != "None":
-            self.x_antibody = "Permanent"
+            self.x_antibody = "Permanente"
 
     # (buy_habitat/move_to -- the habitat buy/move economy -- left with the
     # habitat system: the home scene is wired to the egg now.  BASIC VPET
@@ -597,7 +597,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         if self.dead:
             return t("guard_dead", "Descansando agora — aperte N para um novo ovo.")
         if self.stage == "Egg":
-            return t("guard_egg", "It is still an egg.")
+            return t("guard_egg", "Ainda é um ovo.")
         if asleep_blocks and self.asleep:
             return self._disturbed()
         return None
@@ -702,7 +702,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         self._sleep_energy_gain = _req.get("sleep_energy_gain", 3)
         self.energy = min(self.energy, self.max_energy)   # DVPet clamps to new max (no auto-refill)
         if _req.get("xantibody", "None") in ("Induced", "Natural"):
-            self._set_xantibody("Permanent")          # the X-Antibody locks in
+            self._set_xantibody("Permanente")          # the X-Antibody locks in
         return _req
 
     def evolve_to(self, num):
@@ -768,7 +768,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             self.add_item(f"i:{_req['give_item']}")
         if _req.get("xantibody", "None") in ("Induced", "Natural"):
             # Evolution.digivolve: becoming an X form makes the X state PERMANENT
-            self._set_xantibody("Permanent")
+            self._set_xantibody("Permanente")
         self._set_anim("happy", 2.5)
 
     def _swap_form(self, num, subtract_current=False):
@@ -818,7 +818,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             targets = evolution.mode_targets(self)
             if not targets:
                 self._set_anim("refuse", 1.0)             # Jeering
-                return None, "The mode is out of reach."
+                return None, "O modo está fora de alcance."
             self._swap_form(targets[0])
         self._set_energy(self.energy + MODE_CHANGE_ENERGY)
         self._set_anim("happy", 2.5)                      # State.Evolving
@@ -1017,7 +1017,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     def _is_failed_form(self):
         """isFilthyEvol: the current form is a SpecialEvolution=Failed one."""
         r = data.load_requirements().get(self.num, {})
-        return (r.get("special") or "None") == "Failed"
+        return (r.get("special") or "None") == "Falhou"
 
     def final_care_grade(self):
         """careBonusOnReset: grade the ending life.  Runs at death AFTER the

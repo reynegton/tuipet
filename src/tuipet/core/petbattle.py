@@ -115,10 +115,10 @@ class BattleMixin:
             return _g
         if self.hunger <= 0:
             self._set_anim("refuse", 1.0)
-            return t("train_too_hungry", "Too hungry to train.")
+            return t("train_too_hungry", "Com muita fome para treinar.")
         if self.sick:
             self._set_anim("refuse", 1.0)
-            return t("train_too_sick", "Too sick to train.")
+            return t("train_too_sick", "Muito doente para treinar.")
         if self.injured:
             # THE SECOND AILMENT GATES THE DRILL TOO (training audit
             # 2026-07-25).  Injury was restored 2026-07-23 and wired into
@@ -128,13 +128,13 @@ class BattleMixin:
             # strike drills instead.  One ailment, one grammar; the cure is
             # free on the F menu, so this costs a tamer nothing but a key.
             self._set_anim("refuse", 1.0)
-            return t("train_too_hurt", "Too hurt to train.")
+            return t("train_too_hurt", "Muito machucado para treinar.")
         if self.poop:
             self._set_anim("refuse", 1.0)
             return t("train_clean_first", "Limpe primeiro!")
         if self.energy < TRAIN_ENERGY_COST:
             self._set_anim("refuse", 1.0)
-            return t("train_too_tired", "Too tired to train.")
+            return t("train_too_tired", "Muito cansado para treinar.")
         if self.manners_refusal("train"):     # D3: earned disobedience
             return t("train_refuses", "{name} refuses to train!").replace("{name}", self.name)
         return None
@@ -147,7 +147,7 @@ class BattleMixin:
         if (g := self._guard(asleep_blocks=False)) is not None:
             return g
         if self.stage == "Fresh":
-            return t("raid_too_young", "Too young for a raid.")
+            return t("raid_too_young", "Muito jovem para um raid.")
         if self.asleep:
             return self._disturbed()
         return None
@@ -165,13 +165,13 @@ class BattleMixin:
         if (g := self._guard(asleep_blocks=False)) is not None:
             return g
         if self.stage == "Fresh":
-            return t("adv_too_young", "Too young for the road.")
+            return t("adv_too_young", "Muito jovem para a aventura.")
         if self.asleep:
             return self._disturbed()
         if self.hunger <= 0:
             return t("adv_too_hungry", "Too hungry for the road — eat first.")
         if self.poop:
-            return t("adv_clean_first", "Clean up before you go!")
+            return t("adv_clean_first", "Limpe antes de sair!")
         return None
 
     def max_health(self):
@@ -244,7 +244,7 @@ class BattleMixin:
         if self.dead:
             return t("guard_dead", "Descansando agora — aperte N para um novo ovo.")
         if self.stage in ("Egg", "Fresh"):
-            return t("battle_too_young", "Too young to battle.")
+            return t("battle_too_young", "Muito jovem para lutar.")
         if self.asleep:
             return self._disturbed()
         self._calm_discipline_call()                         # canBattle placates the tantrum
@@ -282,15 +282,15 @@ class BattleMixin:
         became unreachable.  The BODY states (starving / sick / hurt /
         filthy) still hold everywhere, because those are the device's."""
         if self.hunger <= 0:
-            return t("battle_too_hungry", "Too hungry to fight.")
+            return t("battle_too_hungry", "Com muita fome para lutar.")
         if check_energy and self.energy < BATTLE_MIN_ENERGY:
-            return t("battle_too_drained", "Too drained to fight.")
+            return t("battle_too_drained", "Sem energia para lutar.")
         if self.sick:
-            return t("battle_too_sick", "Too sick to fight.")
+            return t("battle_too_sick", "Muito doente para lutar.")
         if self.injured:
             # the second ailment gates like the first (canon restoration
             # 2026-07-23: a wounded device pet cannot battle)
-            return t("battle_too_hurt", "Too hurt to fight.")
+            return t("battle_too_hurt", "Muito machucado para lutar.")
         if self.poop:
             return t("train_clean_first", "Limpe primeiro!")
         return None
@@ -396,7 +396,7 @@ class BattleMixin:
         if total in egg_mod.wins_thresholds():
             # a lifetime-wins egg gate just crossed (Zuba 75 / Hack 40 / V 25 /
             # Sakumon 50 / Chibickmon 10...): flash the nursery note
-            self.egg_unlock_note = "A new egg appeared in the nursery!"
+            self.egg_unlock_note = "Um novo ovo apareceu no ninho!"
         if enemy:
             self.levels_fought.append(_enemy_level(enemy))
             # KO6: Stage VI is Mega, full stop (online never reaches here

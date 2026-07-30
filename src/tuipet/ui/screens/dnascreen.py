@@ -34,13 +34,13 @@ _METER_W = 12               # the strip meter: was 22 -> the whole line ran 62 c
 #                             MARQUEED mid-minigame (a live meter must hold still --
 #                             the training-audit rule; DNA audit 2026-07-05)
 
-_HOME = (("charge", "Charge"), ("generate", "Generate"),
-         ("stats", "Stats"), ("roads", "Divergence"))
+_HOME = (("charge", "Carregar"), ("generate", "Gerar"),
+         ("stats", "Stats"), ("roads", "Divergência"))
 
 
 def _field_word(f, w):
     """pretty_field fitted to `w` at a WORD boundary: a column too narrow for
-    the full name shows whole words only -- "Nightmare", never the mid-word
+    the full name shows whole words only -- "Pesadelo", never the mid-word
     run-off "Nightmare Sold" the old char-slices printed (menu audit
     2026-07-21).  Every field's first word is unique, so a one-word tag
     still names it."""
@@ -203,7 +203,7 @@ class DNAPanel:
                 self.phase, self.hits, self.mash_f = "mash", 0, 0
                 self.sfx = "select"
             else:
-                self.last = t("dna_msg_no_bits", "Not enough bits to wager.")
+                self.last = t("dna_msg_no_bits", "Bits insuficientes para apostar.")
                 self.sfx = "error"
                 self.phase = "home"
         elif k == "escape":
@@ -302,7 +302,7 @@ class DNAPanel:
                        t("dna_msg_need", "need {n}c").format(n=need) if need is not None else t("dna_msg_top_stage", "top stage"))
         if not self._roads or need is None:
             out.append_text(menu.blanks(1))
-            out.append_text(menu.note(t("dna_msg_no_wild_roads", "No wild roads from this form.")))
+            out.append_text(menu.note(t("dna_msg_no_wild_roads", "Nenhum caminho selvagem desta forma.")))
             out.append_text(menu.blanks(1))
             out.append_text(menu.row(t("dna_msg_charge_field", "Charge a Field to its threshold"), False))
             out.append_text(menu.row(t("dna_msg_to_steer", "to steer the next evolution."), False))

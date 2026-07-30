@@ -146,7 +146,7 @@ class EggGuidePanel:
         desc = (rule["desc"] if rule else "") or t("egg_guide_mystery", "a mystery egg")
         first = True
         for ln in _wrap(desc):
-            rows.append((t("egg_guide_unlock_label", "Unlock") if first else "", ln))
+            rows.append((t("egg_guide_unlock_label", "Desbloquear") if first else "", ln))
             first = False
         live = egg_mod.unlock_progress(idx, self.prog)
         if state == "locked" and live and live != desc:
