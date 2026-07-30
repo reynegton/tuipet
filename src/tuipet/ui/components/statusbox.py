@@ -324,15 +324,15 @@ def eggselect(app):
     state = m.states.get(idx, "owned")
     targets = egg_mod.hatch_targets(idx)
     if state == "locked":
-        shown, badge = "???", "[dim]sealed[/]"
+        shown, badge = "???", "[dim]selado[/]"
     elif len(targets) > 1:
-        shown, badge = "???", "[dim]two fates stir[/]"
+        shown, badge = "???", "[dim]dois destinos se agitam[/]"
     else:
         shown = egg_mod.destined_name(idx)     # the BABY, not the egg's title
         fresh = bool(targets) and \
             data.canonical_num(targets[0]) not in persistence.get_album()
-        badge = ("[b]★ never raised[/]" if fresh
-                 else {"temp": "[dim]this gen only[/]"}.get(state, "[dim]ready[/]"))
+        badge = ("[b]★ nunca criado[/]" if fresh
+                 else {"temp": "[dim]só essa ger.[/]"}.get(state, "[dim]pronto[/]"))
     # the egg wears its NAME (Joel 2026-07-22: "shouldnt the egg carousel
     # screen show the name of the egg?") -- the browsed digitama had no
     # label anywhere, so matching it to its egg-guide entry meant matching
@@ -343,9 +343,9 @@ def eggselect(app):
     scene = backgrounds.name(backgrounds.scene_for_egg(idx))
     card(app, "New Egg", [f"[dim]{m.i + 1} of {m.n} · {m.locked} locked[/]",
                           f"[b]{ename[:22]}[/]", "",
-                          "Destined to hatch", f"  [b]{shown}[/]",
+                          "Destinado a chocar", f"  [b]{shown}[/]",
                           f"  {badge}", "",
-                          f"Home   {scene[:18]}", "",
+                          f"Casa   {scene[:18]}", "",
                           "[dim]←→ browse  ENTER pick[/]"])
 
 
@@ -361,7 +361,7 @@ def scenes(app):
     # it hangs behind the mon" (38) and "De volta à cena do próprio ovo." (28)
     # were sliced at [:26], losing the tail.
     sc_lines = [f"[dim]{m.cursor + 1} of {len(m.rows)}[/]", "",
-                "On the wall", f"  [b]{name[:24]}[/]",
+                "Na parede", f"  [b]{name[:24]}[/]",
                 f"  [dim]{state}[/]", ""]
     sc_lines += wrap(m.msg or "", 2)
     sc_lines.append("[dim]↑↓ browse  ENTER hang[/]")
@@ -431,7 +431,7 @@ def shop(app):
     rows = m._rows()
     if not rows:
         card(app, "Shop" if m.mode == "shop" else "Bag",
-             ["", "[dim]nothing here[/]", "",
+             ["", "[dim]nada aqui[/]", "",
               f"Bits   [b]{p.bits}b[/]"])
         return
     e = rows[min(m.cursor, len(rows) - 1)]
@@ -439,10 +439,10 @@ def shop(app):
     if e.get("title_id") is not None:
         state = ("worn" if e.get("worn")
                  else "owned" if e.get("owned") else f"{e['price']}b")
-        lines = [f"[b]{e['name'][:24]}[/]", "[dim]a tamer honor[/]",
+        lines = [f"[b]{e['name'][:24]}[/]", "[dim]honra de domador[/]",
                  f"Status  {state}", "",
                  f"Bits    [b]{p.bits}b[/]", "",
-                 "[dim]ENTER buys, then wears[/]"]
+                 "[dim]ENTER compra, depois usa[/]"]
     else:
         have = p.inventory.get(e["key"], 0)
         # word-wrap the effect blurb (card audit 2026-07-24): an effect_line
@@ -453,21 +453,21 @@ def shop(app):
             # item runs; shop polish 2026-07-17)
             names = shop_mod.crest_answer(p, e["key"])
             eff = ([f"[{T.POS}]{ln}[/]" for ln in wrap("answers: " + " / ".join(names), 2)]
-                   if names else ["[dim]nothing answers it yet[/]"])
+                   if names else ["[dim]nada responde ainda[/]"])
         else:
             eff = [f"[dim]{ln}[/]" for ln in wrap(shop_mod.effect_line(e), 3)]
         if m.mode == "shop":
             short = e["price"] - p.bits
-            price = (f"Price   [{T.NEG}]{e['price']}b · short {short}[/]"
-                     if short > 0 else f"Price   {e['price']}b")
+            price = (f"Preço   [{T.NEG}]{e['price']}b · falta {short}[/]"
+                     if short > 0 else f"Preço   {e['price']}b")
         else:
             price = f"Sells   {shop_mod.resell_price(e)}b"
         lines = [f"[b]{e['name'][:24]}[/]", *eff, "",
                  price,
                  f"Owned   x{have}",
                  f"Bits    [b]{p.bits}b[/]", "",
-                 ("[dim]ENTER buy[/]" if m.mode == "shop"
-                  else "[dim]ENTER use  R sell[/]")]
+                 ("[dim]ENTER comprar[/]" if m.mode == "shop"
+                  else "[dim]ENTER usar  R vender[/]")]
     card(app, ttl, lines, subtitle=gen_subtitle(p))
 
 
@@ -482,18 +482,18 @@ def eggguide(app):
     name = egg_mod.hatch_name(m.i)
     live = egg_mod.unlock_progress(m.i, m.prog)
     rule = m.rules.get(m.i)
-    keeps = ("this gen only" if rule is not None and not rule["can_perm"]
-             else "forever")
-    hints = ("←→ next egg  ESC back" if m.detail
-             else "ENTER story  ↑↓ browse")     # phase-true (round 34)
+    keeps = ("só essa ger." if rule is not None and not rule["can_perm"]
+             else "para sempre")
+    hints = ("←→ próx. ovo  ESC voltar" if m.detail
+             else "ENTER história  ↑↓ navegar")     # phase-true (round 34)
     # the goal WRAPS to two card lines -- the one-slice clip froze the dual
     # map gate mid-word ("clear adventure map 1 (or", Joel 2026-07-28)
     goal = wrap(live, 2) if live and state == "locked" else [""]
     card(app, "Digitama", [
         f"[dim]{m.i + 1} of {m.n}[/]", "",
-        f"Hatches  [b]{name[:16]}[/]",
-        f"State    {state}",
-        f"Keeps    {keeps}", ""]
+        f"Choca    [b]{name[:16]}[/]",
+        f"Estado   {state}",
+        f"Guarda   {keeps}", ""]
         + [f"[b]{g}[/]" if g else "" for g in goal]
         + [f"[dim]{hints}[/]"])
 
@@ -505,10 +505,10 @@ def digicore(app):
     dc_lines = [
         f"[b]{p.name[:16]}[/]",
         f"[dim]{p.stage} · {p.attribute}[/]", "",
-        f"Page   [b]{page[:18]}[/]",
+        f"Página [b]{page[:18]}[/]",
         f"[dim]{m.i + 1} of {len(m.pages)}[/]", ""]
     dc_lines += wrap(m.note or "", 2)          # note carries mode-change lines
-    dc_lines.append("[dim]←→ pages  SPACE core[/]")
+    dc_lines.append("[dim]←→ páginas  SPACE núcleo[/]")
     card(app, "DigiCore", dc_lines, subtitle=gen_subtitle(p))
 
 
@@ -521,7 +521,7 @@ def raid(app):
     v = m.view or {}
     b = m._boss()
     if not b:
-        card(app, "Raid", ["", "[dim]calling the gate…[/]"])
+        card(app, "Raid", ["", "[dim]chamando o portal…[/]"])
         return
     pool, mx = int(b.get("hp", 0)), max(1, int(b.get("max_hp", 1)))
     pct = max(0, min(100, pool * 100 // mx))
@@ -535,15 +535,15 @@ def raid(app):
     card(app, "Raid", [
         f"[b]{b.get('name', '?')[:18]}[/]",
         (f"Pool   {bar(pct, 11, theme.NEG)} {pct}%" if standing
-         else "[dim]incoming boss[/]"),
-        (f"[dim]{when} left[/]" if standing else f"[dim]in {when}[/]"),
+         else "[dim]chefe a caminho[/]"),
+        (f"[dim]{when} left[/]" if standing else f"[dim]em {when}[/]"),
         "",
         (f"You    #{rank} · {_fmt_dmg(mine)}" if rank
-         else "You    [dim]— not on the board[/]"),
+         else "Você   [dim]— não classificado[/]"),
         f"Top    {lead}",
         f"Tries  {v.get('attempts', 0)} today",
-        ("[b]purse waiting — C[/]" if v.get("award") else ""),
-        "[dim]SPACE raid  C claim[/]"],
+        ("[b]recompensa pronta — C[/]" if v.get("award") else ""),
+        "[dim]SPACE raid  C coletar[/]"],
         subtitle=gen_subtitle(app.pet))
 
 
@@ -552,7 +552,7 @@ def lobby(app):
     m = app.mode
     st = m.state
     if st is None or getattr(st, "me_id", None) is None:
-        card(app, "Lobby", ["", "[dim]connecting…[/]"])
+        card(app, "Lobby", ["", "[dim]conectando…[/]"])
         return
     roster = list(getattr(st, "roster", []) or [])
     links = persistence.get_progress().get("connections", 0)
@@ -561,8 +561,8 @@ def lobby(app):
         f"[dim]{app.pet.name[:14]} rides along[/]", "",
         f"Here   {len(roster)} tamer" + ("s" if len(roster) != 1 else ""),
         f"Links  {links} lifetime", "",
-        "[dim]type to chat · ENTER[/]",
-        "[dim]↑↓ pick a tamer[/]"])
+        "[dim]digite p/ chat · ENTER[/]",
+        "[dim]↑↓ escolha um domador[/]"])
 
 
 def help_(app):
@@ -575,10 +575,10 @@ def help_(app):
     card(app, "Help", [
         f"tuipet [b]v{ver}[/]", "",
         f"Sound  {snd}",
-        f"Gen    {app.pet.generation}", "",
-        "[dim]the guide scrolls[/]",
-        "[dim]on the display[/]", "",
-        "[dim]↑↓ scroll  ESC out[/]"])
+        f"Ger    {app.pet.generation}", "",
+        "[dim]o guia rola[/]",
+        "[dim]no display[/]", "",
+        "[dim]↑↓ rolar  ESC sair[/]"])
 
 
 def options(app):
@@ -596,7 +596,7 @@ def options(app):
     if m.msg:
         lines += wrap(m.msg, 4)
         lines.append("")
-    lines.append("[dim]ENTER toggles[/]")
+    lines.append("[dim]ENTER alterna[/]")
     card(app, "Options", lines)
 
 
@@ -604,11 +604,11 @@ def bug(app):
     m = app.mode
     n = len(getattr(m, "buf", ""))
     card(app, "Bug Report", [
-        "[dim]straight to the dev[/]", "",
-        f"Typed  {n} chars", "",
-        "[dim]say what you did and[/]",
-        "[dim]what went wrong[/]", "",
-        "[dim]ENTER send  ESC out[/]"])
+        "[dim]direto pro dev[/]", "",
+        f"Digitou {n} caracs", "",
+        "[dim]diga o que você fez e[/]",
+        "[dim]o que deu errado[/]", "",
+        "[dim]ENTER enviar  ESC sair[/]"])
 
 
 def death(app):
@@ -619,9 +619,9 @@ def death(app):
         f"[b]{p.name[:18]}[/]",
         f"[dim]{p.stage} · gen {p.generation}[/]", "",
         f"Lived  {days} day" + ("s" if days != 1 else ""),
-        f"Of     {cause[:20]}", "",
-        "[dim]its data can live on[/]",
-        "[dim]in the next egg[/]"])
+        f"De     {cause[:20]}", "",
+        "[dim]seus dados podem viver[/]",
+        "[dim]no próximo ovo[/]"])
 
 
 def assist(app):
@@ -630,12 +630,12 @@ def assist(app):
     on = getattr(p, "auto_care", False)
     fee = AUTO_CARE_VISIT_PRICE.get(p.stage, 200)
     card(app, "Assistant", [
-        f"Helper  [b]{'hired' if on else 'off'}[/]", "",
-        f"Visit   ~{fee}b",
+        f"Ajuda   [b]{'ativa' if on else 'inativa'}[/]", "",
+        f"Visita  ~{fee}b",
         f"Bits    [b]{p.bits}b[/]", "",
-        "[dim]cleans and feeds while[/]",
-        "[dim]you are away[/]", "",
-        "[dim]ENTER hire/dismiss[/]"])
+        "[dim]limpa e alimenta[/]",
+        "[dim]enquanto você está fora[/]", "",
+        "[dim]ENTER contratar/dispensar[/]"])
 
 
 class _SubView:
@@ -658,23 +658,23 @@ def tournament(app):
     p, t, T = app.pet, app.mode.tourney, theme
     app.stats_w.border_subtitle = gen_subtitle(p)
     if t is None:                      # cup-select phase (no bout yet)
-        card(app, "Cup", ["", "Pick a cup", "to enter."],
+        card(app, "Cup", ["", "Escolha uma", "copa p/ entrar."],
              subtitle=gen_subtitle(p))
         return
     if t.over and t.champion:
         lines = [f"[b]{p.name[:14]}[/] [dim]· cup[/]", DIV,
                  f"[b]{t.name[:24]}[/]", "",
                  f"[{T.POS}]★ CHAMPION ★[/]", "",
-                 f"Trophy   [{T.COIN}]★{p.trophies}[/]",
-                 f"Reward   [{T.COIN}]+{t.reward_bits}b[/]", DIV,
-                 "[dim]you took the cup![/]"]
+                 f"Troféu   [{T.COIN}]★{p.trophies}[/]",
+                 f"Prêmio   [{T.COIN}]+{t.reward_bits}b[/]", DIV,
+                 "[dim]você venceu a copa![/]"]
     elif t.over:
         lines = [f"[b]{p.name[:14]}[/] [dim]· cup[/]", DIV,
                  f"[b]{t.name[:24]}[/]", "",
-                 f"[{T.NEG}]eliminated[/]",
-                 f"[dim]in the {t.round_name}[/]", "",
-                 f"Trophy   [{T.COIN}]★{p.trophies}[/]", DIV,
-                 "[dim]train up, try again[/]"]
+                 f"[{T.NEG}]eliminado[/]",
+                 f"[dim]no(a) {t.round_name}[/]", "",
+                 f"Troféu   [{T.COIN}]★{p.trophies}[/]", DIV,
+                 "[dim]treine e tente de novo[/]"]
     else:
         # WHO YOU FACE (cup audit 2026-07-25): the faceoff and the
         # introductions used to name the challenger in a caption row UNDER
@@ -690,13 +690,13 @@ def tournament(app):
             f"[b]{t.name[:24]}[/]",
             f"Match    {t.round + 1} / 3",
             foe,
-            f"Trophy   [{T.COIN}]★{p.trophies}[/]",
+            f"Troféu   [{T.COIN}]★{p.trophies}[/]",
             DIV,
             f"Effort   {hearts(p.strength)}",
             f"Energy   {bar(p.energy_pct(), 11, T.ENERGY)}",
             f"Form     {getattr(p, 'saved_hit_type', 'normal')}",
             DIV,
-            "[dim]fight for the cup[/]",
+            "[dim]lute pela copa[/]",
         ]
     app.stats_w.update("\n".join(lines))
 
@@ -708,20 +708,20 @@ def discipline(app):
     p, T = app.pet, theme
     app.stats_w.border_subtitle = gen_subtitle(p)
     if p.discipline_call:
-        moment = f"[{T.NEG}]acting up![/]"
+        moment = f"[{T.NEG}]dando chilique![/]"
     elif p.world_seconds <= getattr(p, "praise_window", 0.0):
-        moment = f"[{T.POS}]a proud moment[/]"
+        moment = f"[{T.POS}]um momento de orgulho[/]"
     else:
-        moment = "[dim]calm[/]"
+        moment = "[dim]calmo[/]"
     lines = [f"[b]{p.name[:14]}[/] [dim]· lessons[/]", DIV,
              # bar() takes a PERCENT -- the gauge is 0..MAX_OBEDIENCE (150,
              # canon), so scale it or a 100/150 pet reads as full
              f"Manners  {bar(p.obedience * 100 // _MAXOBED, 11, T.POS)}"
              f" {p.obedience}",
              f"Moment   {moment}", DIV,
-             "[dim]scold a tantrum: +25[/]",
-             "[dim]praise a proud win: +10[/]",
-             "[dim]ignored tantrums cost ✗[/]"]
+             "[dim]repreenda chilique: +25[/]",
+             "[dim]elogie vitória: +10[/]",
+             "[dim]chiliques ignorados custam ✗[/]"]
     app.stats_w.update("\n".join(lines))
 
 
@@ -736,14 +736,14 @@ def training(app):
     form = getattr(p, "saved_hit_type", "normal")
     if tp.phase == "bar":
         lines = [f"[b]{p.name[:14]}[/] [dim]· train[/]", DIV,
-                 "[b]time the strike[/]", "",
+                 "[b]acerte o tempo[/]", "",
                  f"Window   {window}px",
                  f"Form     {form}",
                  f"Effort   {eff}", f"Energy   {energy}",
-                 DIV, "[dim]SPACE locks the bar[/]"]
+                 DIV, "[dim]SPACE trava a barra[/]"]
     else:
         lines = [f"[b]{p.name[:14]}[/] [dim]· train[/]", DIV,
-                 "[b]the strike[/]", "",
+                 "[b]o ataque[/]", "",
                  f"Grade    {tp.grade or ''}",
                  f"Energy   {energy}", DIV, ""]
     app.stats_w.update("\n".join(lines))
@@ -774,11 +774,11 @@ def battle(app):
             pct = max(0, min(100, phv * 100 // pmx))
             foe_line = f"Pool {bar(pct, 11, T.NEG)} {pct}%"
         else:
-            foe_line = "Pool [dim]shared — held by the gate[/]"
+            foe_line = "Pool [dim]compartilhado pelo portal[/]"
     else:
         foe_line = f"Foe  {bar(fp, 11, T.NEG)} {fhp}/{foe_max}"
     lines = [
-        f"[b]{p.name[:14]}[/] [dim]· {'raid' if raid else 'battle'}[/]", DIV,
+        f"[b]{p.name[:14]}[/] [dim]· {'raid' if raid else 'batalha'}[/]", DIV,
         f"vs [b]{enemy.get('name', '?')[:14]}[/]{tag}", "",
         f"You  {bar(pp, 11, T.POS)} {php}/{pet_max}",
         foe_line,
@@ -791,25 +791,25 @@ def battle(app):
     if getattr(m, "locked", None):
         g = m.locked
         gsty = T.POS if g == "mega" else (T.NEG if g == "miss" else "")
-        lines.append(f"Lock [{gsty}]{g}[/]" if gsty else f"Lock {g}")
+        lines.append(f"Trava [{gsty}]{g}[/]" if gsty else f"Trava {g}")
     if m.done_anim and raid:
-        res = (f"[{T.POS}]STOOD YOUR GROUND[/]" if m.won
-               else f"[{T.NEG}]KNOCKED OUT[/]")
-        lines += [res, f"[b]dealt {getattr(b, 'dealt', 0)}[/] [dim]→ the gate[/]",
-                  "", "[dim]SPACE  continue[/]"]
+        res = (f"[{T.POS}]RESISTIU[/]" if m.won
+               else f"[{T.NEG}]NOCAUTEADO[/]")
+        lines += [res, f"[b]causou {getattr(b, 'dealt', 0)}[/] [dim]→ ao portal[/]",
+                  "", "[dim]SPACE  continuar[/]"]
     elif m.done_anim:
-        res = f"[{T.POS}]VICTORY![/]" if m.won else f"[{T.NEG}]DEFEAT[/]"
+        res = f"[{T.POS}]VITÓRIA![/]" if m.won else f"[{T.NEG}]DERROTA[/]"
         lines += [res, f"[dim]{(b.reward if b else '') or ''}"[:30] + "[/]",
-                  "", "[dim]SPACE  continue[/]"]
+                  "", "[dim]SPACE  continuar[/]"]
     elif getattr(m, "phase", "") == "ready":
         # readiness_line is <=26, but the result-anim note ("a draw — counts
         # as a loss · record 12W/30", ~40) also rides hud_note -- wrap so it
         # is not sliced (card audit 2026-07-24).
         lines += [f"[dim]{ln}[/]" for ln in wrap(m.hud_note or "", 2)]
-        lines += ["", "[dim]SPACE  lock the bar[/]"]
+        lines += ["", "[dim]SPACE  travar barra[/]"]
     else:
         lines += [f"[dim]{ln}[/]" for ln in wrap(m.hud_note or "", 2)]
-        lines += ["", "[dim]SPACE skip · ESC end it[/]"]
+        lines += ["", "[dim]SPACE pular · ESC terminar[/]"]
     app.stats_w.update("\n".join(lines))
 
 
@@ -848,8 +848,8 @@ def dna(app):
         DIV,
         f"[dim]{cost}[/]",
         *last_rows,
-        "[dim]own Field charges cheap[/]",
-        "[dim]ESC steps back out[/]",
+        "[dim]cargas do próprio Field são baratas[/]",
+        "[dim]ESC volta[/]",
     ]
     app.stats_w.update("\n".join(lines))
 
