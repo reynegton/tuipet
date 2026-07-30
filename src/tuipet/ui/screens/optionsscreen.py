@@ -21,8 +21,11 @@ import tuipet.utils.theme as theme
 import tuipet.utils.update as update_check
 from tuipet.ui.screens.themescreen import ThemePanel
 from tuipet.i18n.translator import t
+from tuipet.app import TuipetApp
 
 _ROWS = ("theme", "sound", "account", "cloud", "update", "keys", "new", "erase")
+if not getattr(TuipetApp, "SERVIDOR_ONLINE", True):
+    _ROWS = tuple(r for r in _ROWS if r not in ("account", "cloud", "update"))
 def _get_label():
     return {"theme": t("opt_lbl_theme", "Theme"), "sound": t("opt_lbl_sound", "Sound"), "account": t("opt_lbl_account", "Account"),
             "cloud": t("opt_lbl_cloud", "Cloud sync"), "update": t("opt_lbl_update", "Update"), "keys": t("opt_lbl_keys", "Keys"),
