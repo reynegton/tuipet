@@ -245,7 +245,7 @@ def _evo_rows(pet):
     if not cands:
         return [armed] if armed else t("digicore_final_form_paren", "(final form)")
     rows = []
-    from tuipet import persistence as _p
+    import tuipet.utils.persistence as _p
     reqs = data.load_requirements()
     for num, name, ready, dev in cands[:8]:
         unmet = sum(1 for met, _ in evolution.requirement_report(pet, num) if met is False)
@@ -264,8 +264,8 @@ def _evo_rows(pet):
 def _trophy_rows(pet):
     """The trophy room: this life's cups (label + the day they fell) topped
     by the career totals -- lifetime cups persist across generations."""
-    from tuipet import tournament as _t
-    from tuipet import persistence as _p
+    import tuipet.core.tournament as _t
+    import tuipet.utils.persistence as _p
     # "This life" is exactly the 9-char label column -- it rendered flush
     # against its value ("This lifenone yet"; egg-stage audit 2026-07-05)
     rows = [(t("digicore_lbl_this_pet", "This pet"), "\u2605" * min(pet.trophies, 12) or t("digicore_val_none_yet", "none yet"))]
@@ -311,7 +311,7 @@ def _legacy_rows():
     """The LEGACY page: every retired generation's headstone, newest first --
     they were banked by snapshot_prev_gen and never shown (sweep 2026-07-14).
     Value budget is 30 cols (40 - the 9-char label gutter)."""
-    from tuipet import persistence as _p
+    import tuipet.utils.persistence as _p
     try:
         elders = list(_p.load_settings().get("progress", {}).get("legacy", []))
     except Exception:
