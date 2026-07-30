@@ -159,7 +159,6 @@ class TuiPetApp(ActionsMixin, App):
                  "N still starts the next egg — that promise is older "
                  "than the remap.)")
 
-    SERVIDOR_ONLINE = False
     BINDINGS = [
         # jogress is LOBBY-ONLY (fusion needs a real partner from the
         # roster).  m is the HOME PvE bout vs a stage-matched rival --
@@ -191,6 +190,7 @@ class TuiPetApp(ActionsMixin, App):
         ("enter,space", "gift", t("app_menu_gift", "Accept gift")),
     ]
 
+    from tuipet import SERVIDOR_ONLINE
     if not SERVIDOR_ONLINE:
         BINDINGS = [b for b in BINDINGS if b[1] not in ('raid', 'lobby', 'bug')]
 
@@ -269,7 +269,8 @@ class TuiPetApp(ActionsMixin, App):
         self.set_interval(0.1, self.on_frame)    # single DVPet interval clock: 1 tick == 0.1s (main view AND sub-screens)
         self.set_interval(1.0, self.on_tick)
         self.set_interval(10.0, self.autosave)
-        if self.SERVIDOR_ONLINE:
+        from tuipet import SERVIDOR_ONLINE
+        if SERVIDOR_ONLINE:
             self.run_worker(self._check_update(), name="update", exclusive=False)
             self.run_worker(self._flush_bugs(), name="bugflush", exclusive=False)
             self._start_sync()
@@ -339,7 +340,8 @@ class TuiPetApp(ActionsMixin, App):
     def _start_sync(self):
         """Spin up the background cloud-save push client once an account exists
         (idempotent). The startup pull already ran in main(); this handles pushes."""
-        if not self.SERVIDOR_ONLINE or self._sync is not None:
+        from tuipet import SERVIDOR_ONLINE
+        if not SERVIDOR_ONLINE or self._sync is not None:
             return
         if not persistence.sync_enabled():
             return                       # opted out (TUIPET_NO_SYNC or the options toggle)
@@ -365,7 +367,8 @@ class TuiPetApp(ActionsMixin, App):
 
     def _push_cloud(self):
         """Queue the current pet's save for upload (no-op until the account/sync exists)."""
-        if self.SERVIDOR_ONLINE and self._sync is not None and self.pet is not None and persistence.sync_enabled():
+        from tuipet import SERVIDOR_ONLINE
+        if SERVIDOR_ONLINE and self._sync is not None and self.pet is not None and persistence.sync_enabled():
             self._sync.push_save(persistence.to_save_dict(self.pet))
 
     async def _check_update(self):

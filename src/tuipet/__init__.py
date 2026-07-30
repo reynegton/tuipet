@@ -1,0 +1,2 @@
+
+SERVIDOR_ONLINE = False
