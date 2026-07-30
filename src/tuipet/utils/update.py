@@ -36,13 +36,13 @@ def _key(v):
     """Loose version tuple: numeric lead of each dotted part ('0.2.0' -> (0,2,0))."""
     out = []
     for part in v.split("."):
-        digits = ""
+        datats = ""
         for c in part:
             if c.isdigit():
-                digits += c
+                datats += c
             else:
                 break
-        out.append(int(digits) if digits else 0)
+        out.append(int(datats) if datats else 0)
     return tuple(out)
 
 

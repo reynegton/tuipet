@@ -27,10 +27,10 @@ def _age_str(secs):
 class DeathPanel:
     def __init__(self, pet, new_mem=None, old_mem=None, hold=0, grade_kept=0,
                  banked_new=False):
-        """new_mem: inheritance data the departed CAN etch (make_digimemory);
+        """new_mem: inheritance data the departed CAN etch (make_memory);
         old_mem: data already banked from an earlier generation.
 
-        Canon's DigiMemory_Validation is a real Yes/No (digimemory audit
+        Canon's memory_Validation is a real Yes/No (memory audit
         2026-07-06): declining the etch keeps the care bonus for the heir --
         grade_kept is that path's seed (the app pre-banked the etch default;
         B re-banks the kept grade and, when banked_new, un-banks the memory).
@@ -47,7 +47,7 @@ class DeathPanel:
         self.old_mem = old_mem
         self.grade_kept = int(grade_kept)
         self.banked_new = bool(banked_new)
-        self.ask_etch = bool(new_mem)           # DigiMemory_Validation: etch or carry?
+        self.ask_etch = bool(new_mem)           # memory_Validation: etch or carry?
         self.asking = False                     # the only-one prompt, after an etch
         self._hold = int(hold)
         self.sfx = "error" if hold else None    # soundConfig dieLoop -> error
@@ -70,7 +70,7 @@ class DeathPanel:
             elif k in ("b", "escape"):                    # No: the bonus carries instead
                 persistence.bank_bonus_seed(self.grade_kept)
                 if self.banked_new:                       # un-bank the etch default
-                    persistence.take_digimemory()
+                    persistence.take_memory()
                 self.new_mem = None
                 self.ask_etch = False
             return None
@@ -79,7 +79,7 @@ class DeathPanel:
             # these two prompts were the only non-text panel that broke it
             # (help audit 2026-07-21)
             if k in ("e", "enter", "space"):              # etch the new data over the old
-                persistence.bank_digimemory(self.new_mem)
+                persistence.bank_memory(self.new_mem)
                 self.asking = False
             elif k in ("k", "escape"):                    # keep the elder's memory
                 # the etch has nowhere to live, so the bonus CARRIES instead,
@@ -110,10 +110,10 @@ class DeathPanel:
         from tuipet.utils.render import marquee
         mq = getattr(self, "_mq", 0) // 2
         if self.ask_etch:
-            # DigiMemory_Validation: etch the data, or carry the care bonus
+            # memory_Validation: etch the data, or carry the care bonus
             return t("death_msg_etch", "[b]E[/] etch {name}'s data · [b]B[/] bonus +{bonus}").format(name=marquee(p.name, 10, mq), bonus=self.grade_kept)
         if self.asking:
-            # setNewDigimemory validation: only one Digimemory may exist
+            # setNewMemory validation: only one Memory may exist
             return t("death_msg_only_one", "Only one: [b]E[/] {new_name} · [b]K[/] {old_name}").format(
                 new_name=marquee(p.name, 10, mq), old_name=marquee(self.old_mem.get('name', '?'), 10, mq))
         rip = t("death_msg_rip_base", "R.I.P. {name} · gen {gen} · lived {age}").format(

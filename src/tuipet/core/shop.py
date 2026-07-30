@@ -6,9 +6,9 @@ category column; buying moves it into the bag at face value; the bag can
 sell it back for half.  Effects live in Pet.use_item — the token text here
 mirrors those exact effects so the shelf, the bag and the belly can never
 disagree.  The DVPet rolled-slot/town-hours shop machine is retired; the
-town counters serve the same catalog.  The digitama-licence shelf was cut
+town counters serve the same catalog.  The egg-licence shelf was cut
 2026-07-17 ("i never wanted egg licenses"): eggs unlock by condition only,
-like the real devices -- the shop sells goods, never digitama.
+like the real devices -- the shop sells goods, never egg.
 """
 from __future__ import annotations
 import random
@@ -64,7 +64,7 @@ class Item(NamedTuple):
 # GRAMMAR, DVPet is the ART -- every entry wears a real DVPet atlas strip
 # (all 59 foods + 84 items carry 4-frame rips; zero placeholders), and
 # every effect lands on a meter that is LIVE today.  vitems.json stays a
-# pristine rip: it now feeds only the 11 Digimentals; the consumable shelf
+# pristine rip: it now feeds only the 11 Relics; the consumable shelf
 # is THIS table.  price None = never sold (birthday-only treats).
 # key: (name, icon, price, category, effect-text mirroring use_item, tagline)
 # -- authored positionally, then wrapped into `Item` (P1) so every reader
@@ -111,7 +111,7 @@ _AUTHORED = {
     # The one LIVE lever with no purchasable support: Va/D/Vi powers gate
     # hundreds of evolution rows (>10 / >20 / >25 / >50) and the only ways to
     # move them were winning battles (+1 each) and the inheritance-only
-    # Digimemory.  Canon rows, canon prices, canon +15/+30 -- a chip is worth
+    # Memory.  Canon rows, canon prices, canon +15/+30 -- a chip is worth
     # about fifteen wins.  Uncapped, exactly like the win path they shortcut.
     "vaccine_chip":    ("Vaccine Chip",    "f:10", 1500, "Power", "Vaccine power +15", "uma dose de ordem"),
     "data_chip":       ("Data Chip",       "f:11", 1500, "Power", "Data power +15", "uma dose de lógica"),
@@ -122,11 +122,11 @@ _AUTHORED = {
     "omni_chip_g":     ("Omni Chip G",     "f:33", 8000, "Power", "all three powers +30", "todas as cores de uma vez"),
     # ---- LEGACY (death and inheritance -- NOT medicine, which is why the
     # old "Medical" name had to go: it never held a med) ---------------------
-    # i:64 (the notched-square disk glyph): i:32 is DVPet's own Digimemory
+    # i:64 (the notched-square disk glyph): i:32 is DVPet's own Memory
     # sprite, and two catalog entries sharing an icon broke key_for_icon
     # (consistency audit 2026-07-21) -- the floppy wears its own rip now
     "revive_floppy":   ("Rev. Floppy",     "i:64", 2500, "Cure", "ressuscitar os mortos", "mais uma chance"),
-    "digimemory":      ("Digimemória",      "i:32", None, "Evoluir", "the ancestor's Va·D·Vi", "seus dados vivem"),
+    "memory":      ("Datamemória",      "i:32", None, "Evoluir", "the ancestor's Va·D·Vi", "seus dados vivem"),
     # ---- PLAY (the shows the engine already ships; small LIVE stat dials:
     # exercise sheds weight, couch time buys energy at a weight price) --------
     "ball":            ("Ball",            "i:3",  100,  "Drill", "play! weight -1", "um chutinho incrível"),
@@ -144,7 +144,7 @@ _AUTHORED = {
     # real rip, real name, real DefaultPrice, stats off the authored columns
     # (weight = Calories // 2 for new rows; Mood/Enthusiasm/Stress stay
     # dormant).  price None = never sold (source price 0): those rows are
-    # EARNED -- drops, digs, gifts, capsules, cup prizes.  The 11 Digimentals
+    # EARNED -- drops, digs, gifts, capsules, cup prizes.  The 11 Relics
     # (i:15-25) are NOT here: they live on the crest shelf (one door), and
     # i:35 "Blue Crystal" stays out (its rip is the shipped dna_crystal's).
     # Board file: ITEM_EXPANSION_2026_07_26.md.
@@ -184,7 +184,7 @@ _AUTHORED = {
     "x_program":       ("X-Program Sample",    "i:14", None,  "Evoluir", "belly + effort emptied · the X takes hold", "survive it, transcend"),
     "zone_transport":  ("Zone Transport",      "i:28", 750,   "Road", "on the road: a safe T-lift up the road", "a Birdramon lift"),
     "continent_transport":("Continent Transport", "i:31", 1000,  "Road", "on the road: rest to half tank, anywhere", "a Whamon camp"),
-    "digitron":        ("Digitron",            "i:33", 6000,  "Evoluir", "a dark evolution, if one answers", "um fluido escuro misterioso"),
+    "datatron":        ("Datatron",            "i:33", 6000,  "Evoluir", "a dark evolution, if one answers", "um fluido escuro misterioso"),
     "horn_helmet":     ("Horn Helmet",         "i:34", 3000,  "Evoluir", "evolve: Kabuterimon, if the body is ready", "the beetle's crown"),
     "grey_claws":      ("Grey Claws",          "i:36", 3000,  "Evoluir", "evolve: Greymon, if the body is ready", "the tyrant's grip"),
     "water_bottle":    ("Water Bottle",        "i:37", 3000,  "Evoluir", "evolve: Seadramon, if the body is ready", "the serpent's sea"),
@@ -282,7 +282,7 @@ _TOUCHES = {
     "virus_chip_g": ("virus",),
     "omni_chip_g": ("vaccine", "data_power", "virus"),
     "revive_floppy": ("dead",),
-    "digimemory": ("vaccine", "data_power", "virus", "digimemory"),
+    "memory": ("vaccine", "data_power", "virus", "memory"),
     # ---- TOYS ----
     "ball": ("weight",),
     "skateboard": ("weight", "energy"),
@@ -329,7 +329,7 @@ _TOUCHES = {
     "x_program": ('hunger', 'strength', 'energy', 'x_antibody'),
     "zone_transport": (),
     "continent_transport": (),
-    "digitron": ('num',),
+    "datatron": ('num',),
     "horn_helmet": ('num',),
     "grey_claws": ('num',),
     "water_bottle": ('num',),
@@ -547,13 +547,13 @@ FLAVORS = {k: v.flavor for k, v in CATALOG.items()}   # the dossier taglines
 # the Revive Floppy -- its canon type is Play, but it is used on a DEAD
 # pet and the bag is unreachable at the grave, so that show could only
 # ever be wrong or unplayable (item-show audit 2026-07-23).
-_OWN_FLOW = frozenset({"digimemory", "town_transport", "disaster_transport",
+_OWN_FLOW = frozenset({"memory", "town_transport", "disaster_transport",
                        "life_recovery", "revive_floppy",
                        # the expansion (2026-07-26): evolution keys play the
                        # evolution itself; the road tools and the futon run
                        # their own doors
                        "zone_transport", "continent_transport", "futon",
-                       "digitron", "horn_helmet", "grey_claws",
+                       "datatron", "horn_helmet", "grey_claws",
                        "water_bottle", "torn_tatter", "white_wings",
                        "black_wings", "metal_armor", "flaming_wings",
                        "human_fire_spirit", "human_light_spirit",
@@ -659,20 +659,20 @@ LEGACY_KEYS = {
     "poop_clean_pill": "port_potty",
     # the inheritance chip circulated under its raw icon key -- a key the
     # bag could neither show nor use (gameplay audit 2026-07-19)
-    "i:32": "digimemory",
+    "i:32": "memory",
 }
 
 # the crest eggs: used from the bag, they trigger the classic ARMOR evolution
-# (Pet._crest_egg -> evolution.item_select via the Digimental ids)
+# (Pet._crest_egg -> evolution.item_select via the Relic ids)
 ARMOR_CATEGORY = "Armor-Spirit"
 
-# the Digimental waves (Joel 2026-07-17: "wire the gates") -- the canon
+# the Relic waves (Joel 2026-07-17: "wire the gates") -- the canon
 # discovery order, on the same earned-access rule as the egg carousel:
 # sealed ones simply don't appear.  Courage & Hope open armor evolution
 # from day one; the crest seven follow the FIRST armor evolution; the 02
 # pair rides lifetime wins; Miracles is golden (raids); Destiny is the
 # movie one (generation 5).  Gate signals are persistence.get_progress().
-DIGIMENTAL_GATES = {
+RELIC_GATES = {
     "egg_of_courage": None,
     "egg_of_hope": None,
     "egg_of_friendship": ("armor_evos", 1),
@@ -687,9 +687,9 @@ DIGIMENTAL_GATES = {
 }
 
 
-def digimental_open(key, prog=None):
-    """Is this Digimental's wave reached?  (Non-digimental keys are open.)"""
-    gate = DIGIMENTAL_GATES.get(key)
+def relic_open(key, prog=None):
+    """Is this Relic's wave reached?  (Non-relic keys are open.)"""
+    gate = RELIC_GATES.get(key)
     if gate is None:
         return True
     if prog is None:
@@ -701,14 +701,14 @@ def digimental_open(key, prog=None):
 
 # --- per-town egg market (Joel 2026-07-21: "different towns sell different
 # eggs -- all shops feel unique").  Each town stocks a DISTINCT band of the
-# earnable digitama, shown as the real 8x8 egg thumbnails; buying one owns it
+# earnable egg, shown as the real 8x8 egg thumbnails; buying one owns it
 # outright (bits -> persistence.egg_own).  Eggs still unlock FREE by condition
 # elsewhere -- a town is the road shortcut, priced.
 EGG_STOCK_PER_TOWN = 6
 
 
 def _sellable_eggs():
-    """The digitama a town may stock: every egg that ISN'T a free starter
+    """The egg a town may stock: every egg that ISN'T a free starter
     (the five START babies you already own) and CAN be owned.  A can_perm
     FALSE row is a lineage egg -- hatchable only the generation its
     condition holds, never permanently ownable (eggmigrate._sane_owned
@@ -725,7 +725,7 @@ def _sellable_eggs():
 
 def town_egg_stock(town_id, count=EGG_STOCK_PER_TOWN):
     """The DISTINCT set of eggs THIS town sells -- a stable band over the
-    earnable digitama, rotated by town so no two town shops feel the same."""
+    earnable egg, rotated by town so no two town shops feel the same."""
     pool = _sellable_eggs()
     if not pool:
         return []
@@ -765,7 +765,7 @@ def _price(v):
 def _usable(key, category):
     """Only goods Pet.use_item can actually APPLY are sold.  Since the
     TUIPET catalog (2026-07-18) the consumables are authored in CATALOG;
-    vitems contributes only the Digimentals (its theme_* skins,
+    vitems contributes only the Relics (its theme_* skins,
     storage_drive and retired consumables never reach the shelf)."""
     return category == ARMOR_CATEGORY or key in CATALOG
 
@@ -773,7 +773,7 @@ def _usable(key, category):
 def catalog():
     """Every buyable entry: [{key, name, price, category}], price order.
     The consumable shelf is the authored CATALOG (price None = unsold);
-    the 11 Digimentals still come from vitems.json.  A Digimental whose
+    the 11 Relics still come from vitems.json.  A Relic whose
     wave isn't reached is SEALED: it stays off the shelf entirely (the
     egg-carousel rule), though entry() still resolves it so an
     already-owned one renders in the bag."""
@@ -786,7 +786,7 @@ def catalog():
                         "category": v.category})
     for k, v in data.load_vitems().items():
         if isinstance(v, dict) and v.get("category") == ARMOR_CATEGORY \
-                and digimental_open(k, prog):
+                and relic_open(k, prog):
             out.append({"key": k, "name": v.get("name", k),
                         "price": _price(v),
                         "category": ARMOR_CATEGORY})
@@ -796,7 +796,7 @@ def catalog():
 
 def entry(key):
     """Resolve any key: the authored CATALOG first (an unsold treat still
-    renders in the bag at a nominal resale), then vitems (Digimentals)."""
+    renders in the bag at a nominal resale), then vitems (Relics)."""
     c = CATALOG.get(key)
     if c is not None:
         return {"key": key, "name": c.name,
@@ -860,13 +860,13 @@ _WAVE_TEASE = {
 
 
 def wave_status(prog=None):
-    """(sealed_count, closest-wave tease) from live DIGIMENTAL_GATES
+    """(sealed_count, closest-wave tease) from live RELIC_GATES
     progress -- (0, '') once every relic is on the shelf."""
     if prog is None:
         import tuipet.utils.persistence as persistence
         prog = persistence.get_progress()
-    sealed = [g for k, g in DIGIMENTAL_GATES.items()
-              if g is not None and not digimental_open(k, prog)]
+    sealed = [g for k, g in RELIC_GATES.items()
+              if g is not None and not relic_open(k, prog)]
     if not sealed:
         return 0, ""
 
@@ -991,7 +991,7 @@ def _town_maps():
 # premium-tier slots (the old map-4 Revive Floppy rule): map 4 deals the
 # dark fluid, map 5 the gilded pill.
 _MAP_SPECIALTY = {1: "chocolate_egg", 2: "futon", 3: "board_game",
-                  4: "digitron", 5: "gold_pill"}
+                  4: "datatron", 5: "gold_pill"}
 
 
 def _econ_stub(key):
@@ -1289,7 +1289,7 @@ def home_stock(today=None, pet=None):
                 and e["category"] not in (ARMOR_CATEGORY, "Road")):
             # not on today's shelf -- come back tomorrow.  TWO shelves
             # bypass the band, because both are DOORS, not stock: the
-            # Digimental shelf (the crest system's single door) and the
+            # Relic shelf (the crest system's single door) and the
             # ROAD shelf (map-clear gated -- a tamer who just earned the
             # warp must not wait three days to buy it; the gate IS its
             # scarcity).  Everything else rotates.
@@ -1361,7 +1361,7 @@ def town_stock(town_id, today=None, pet=None):
 
 
 def town_egg_rows(town_id):
-    """The town's digitama band as SHOP ROWS (shops-look-the-same,
+    """The town's egg band as SHOP ROWS (shops-look-the-same,
     2026-07-22: Joel — "the egg tabs in town shops are different than the
     normal shops, why arent these things modulized").  Same entry shape
     the shelf renders everywhere; `egg_idx` rides the existing menu icon
@@ -1369,13 +1369,13 @@ def town_egg_rows(town_id):
     import tuipet.core.egg as egg_mod
     owned = egg_mod.owned_now()          # earned-but-unbanked counts as owned
     return [{"key": f"egg:{i}", "name": egg_mod.hatch_name(i)[:18],
-             "price": egg_price(i), "category": "Digitama",
+             "price": egg_price(i), "category": "Egg",
              "egg_idx": i, "owned": i in owned, "town_id": town_id}
             for i in town_egg_stock(town_id)]
 
 
 def town_egg_buy(pet, idx):
-    """Buy a digitama outright (bits -> persistence.egg_own) -> (msg, sfx).
+    """Buy a egg outright (bits -> persistence.egg_own) -> (msg, sfx).
     THE single buy path — the town egg panel and the shop's Eggs tab both
     call here (single-source law)."""
     import tuipet.data.loaders.data as data

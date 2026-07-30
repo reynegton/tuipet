@@ -90,7 +90,7 @@ ver4,Champion,135,44,"CM 3+, TR 16+, OF 3+",24:00,Mojyamon
 ver4,Champion,118,46;44,CM 3+,21:00,Nanimon
 ver4,Ultimate,210,125;104;88,WIN 12/15,23:00,Megadramon
 ver4,Ultimate,196,123;120;135,WIN 12/15,22:00,Piximon (Piccolomon) (canon dead end)
-ver4,Ultimate,198,118,WIN 12/15,24:00,Digitamamon
+ver4,Ultimate,198,118,WIN 12/15,24:00,Eggmon
 ver4,Mega,396,210,CM 0-2,24:00,Aegisdramon
 ver4,Mega,395,198,CM 0-2,24:00,Titamon
 ver4,Mega,393,396,JOGRESS 276,24:00,RustTyrannomon (jogress with Machinedramon; canon Tag Battle capstone)
@@ -488,7 +488,7 @@ ver6,Champion,142,49,CM 4+,22:00,"Gekomon (Otamamon road; catch-all, SD folded)"
 ver6,Ultimate,225,140;113;125,WIN 12/15,23:00,MegaKabuterimon (AtlurKabuterimon; canon dead end)
 ver6,Ultimate,200,142,WIN 12/15,23:00,ShogunGekomon (TonosamaGekomon; canon dead end)
 ver6,Ultimate,251,141;120;159,WIN 12/15,23:00,Tekkamon (canon dead end)
-nsp,Fresh,1601,egg,TIME,20:00,Bubbmon (pen20 digitama_nsp)
+nsp,Fresh,1601,egg,TIME,20:00,Bubbmon (pen20 egg_nsp)
 nsp,InTraining,19,1601,TIME,21:00,Motimon
 nsp,Rookie,48,19,CM 0,21:00,Tentomon
 nsp,Rookie,28,19,CM 1-2,21:00,Gotsumon
@@ -528,7 +528,7 @@ nsp,Mega,302,223,"CM 0-1, WIN 12/15",00:00,Seraphimon
 nsp,Mega,279,213,JOGRESS Data,00:00,MetalGarurumon
 nsp,Mega,281,200;228,JOGRESS Virus,00:00,MetalEtemon
 nsp,Mega,294,279,JOGRESS 280,00:00,Omnimon
-dsv,Fresh,1602,egg,TIME,20:00,Pichimon (pen20 digitama_dsa)
+dsv,Fresh,1602,egg,TIME,20:00,Pichimon (pen20 egg_dsa)
 dsv,InTraining,20,1602,TIME,21:00,Bukamon
 dsv,Rookie,50,20,CM 0,21:00,Gomamon
 dsv,Rookie,51,20,CM 1-2,21:00,Ganimon
@@ -563,7 +563,7 @@ dsv,Mega,283,193,JOGRESS Vaccine,00:00,Plesiomon
 dsv,Mega,275,202;204,JOGRESS Data,00:00,MetalSeadramon
 dsv,Mega,283,207,JOGRESS Data,00:00,Plesiomon
 dsv,Mega,289,205;206,JOGRESS Virus,00:00,Pukumon
-nso,Fresh,1603,egg,TIME,20:00,Mokumon (pen20 digitama_nso)
+nso,Fresh,1603,egg,TIME,20:00,Mokumon (pen20 egg_nso)
 nso,InTraining,21,1603,TIME,21:00,DemiMeramon
 nso,Rookie,27,21,CM 0,21:00,Bakumon
 nso,Rookie,30,21,CM 1-2,21:00,Candlemon
@@ -606,7 +606,7 @@ nso,Mega,284,215,JOGRESS Virus,00:00,Demon
 nso,Mega,381,215,JOGRESS 224,00:00,Mastemon
 nso,Mega,294,279,JOGRESS 280,00:00,Omnimon
 nso,Mega,511,278,JOGRESS 203,00:00,Boltboutamon
-wgu,Fresh,1604,egg,TIME,20:00,Nyokimon (pen20 digitama_wgu)
+wgu,Fresh,1604,egg,TIME,20:00,Nyokimon (pen20 egg_wgu)
 wgu,InTraining,22,1604,TIME,21:00,Yokomon
 wgu,Rookie,46,22,CM 0,21:00,Biyomon
 wgu,Rookie,53,22,CM 1,21:00,Floramon
@@ -643,7 +643,7 @@ wgu,Mega,292,236,"CM 0-1, WIN 12/15",00:00,Phoenixmon
 wgu,Mega,285,218,"CM 0-1, WIN 12/15",00:00,Rosemon
 wgu,Mega,277,209,JOGRESS Virus,00:00,Puppetmon
 wgu,Mega,508,285,JOGRESS 374,00:00,Rafflesimon
-mem,Fresh,1605,egg,TIME,20:00,Choromon (pen20 digitama_mem)
+mem,Fresh,1605,egg,TIME,20:00,Choromon (pen20 egg_mem)
 mem,InTraining,23,1605,TIME,21:00,Kapurimon
 mem,Rookie,38,23,CM 0,21:00,ToyAgumon
 mem,Rookie,55,23,CM 1,21:00,Kokuwamon
@@ -683,7 +683,7 @@ mem,Mega,349,210,JOGRESS Virus,00:00,Darkdramon
 mem,Mega,294,280,JOGRESS 279,00:00,Omnimon
 mem,Mega,294,279,JOGRESS 280,00:00,Omnimon
 mem,Mega,348,349,JOGRESS 350,00:00,Chaosmon
-vbu,Fresh,1606,egg,TIME,20:00,YukimiBotamon (pen20 digitama_vbu)
+vbu,Fresh,1606,egg,TIME,20:00,YukimiBotamon (pen20 egg_vbu)
 vbu,InTraining,15,1606,TIME,21:00,Nyaromon
 vbu,Rookie,29,15,CM 0,21:00,Agumon
 vbu,Rookie,34,15,CM 1,21:00,Gabumon
@@ -731,59 +731,59 @@ vbu,Mega,282,226,JOGRESS Vaccine,00:00,Magnadramon
 vbu,Mega,287,196,JOGRESS Data,00:00,SaberLeomon
 vbu,Mega,294,280,JOGRESS 279,00:00,Omnimon
 vbu,Mega,294,279,JOGRESS 280,00:00,Omnimon
-corona,Fresh,1607,egg,TIME,20:00,Pichimon (dm20 digitama_corona)
+corona,Fresh,1607,egg,TIME,20:00,Pichimon (dm20 egg_corona)
 corona,InTraining,20,1607,TIME,21:00,Bukamon
 corona,Rookie,384,20,TIME,22:00,Coronamon
 corona,Champion,387,384,TIME,23:00,Firamon
 corona,Ultimate,390,387,WIN 12/15,23:00,Flaremon
 corona,Mega,394,390,CM 0-2,24:00,Apollomon
 corona,Mega,400,394,JOGRESS 377,24:00,GraceNovamon; Tag Battle gate -> jogress door (capstone convention)
-luna,Fresh,1608,egg,TIME,20:00,Pichimon (dm20 digitama_luna)
+luna,Fresh,1608,egg,TIME,20:00,Pichimon (dm20 egg_luna)
 luna,InTraining,20,1608,TIME,21:00,Bukamon
 luna,Rookie,385,20,TIME,22:00,Lunamon
 luna,Champion,388,385,TIME,23:00,Lekismon
 luna,Ultimate,391,388,WIN 12/15,23:00,Crescemon
 luna,Mega,377,391,CM 0-2,24:00,Dianamon
 luna,Mega,400,377,JOGRESS 394,24:00,GraceNovamon; Tag Battle gate -> jogress door (capstone convention)
-zuba,Fresh,1609,egg,TIME,20:00,Sakumon (dm20 digitama_zuba)
+zuba,Fresh,1609,egg,TIME,20:00,Sakumon (dm20 egg_zuba)
 zuba,InTraining,969,1609,TIME,21:00,Sakuttomon
 zuba,Rookie,67,969,TIME,22:00,Zubamon
 zuba,Champion,161,67,TIME,23:00,Zubaeagermon
 zuba,Ultimate,369,161,WIN 12/15,23:00,Duramon
 zuba,Mega,370,369,CM 0-2,24:00,Durandamon
-hack,Fresh,1610,egg,TIME,20:00,Sakumon (dm20 digitama_hack)
+hack,Fresh,1610,egg,TIME,20:00,Sakumon (dm20 egg_hack)
 hack,InTraining,969,1610,TIME,21:00,Sakuttomon
 hack,Rookie,66,969,TIME,22:00,Hackmon
 hack,Champion,160,66,TIME,23:00,BaoHackmon
 hack,Ultimate,371,160,WIN 12/15,23:00,SaviorHackmon
 hack,Mega,372,371,CM 0-2,24:00,Jesmon
-doru20,Fresh,1611,egg,TIME,20:00,Dodomon (dm20 digitama_doru)
+doru20,Fresh,1611,egg,TIME,20:00,Dodomon (dm20 egg_doru)
 doru20,InTraining,929,1611,TIME,21:00,Dorimon
 doru20,Rookie,41,929,TIME,22:00,Dorumon
 doru20,Champion,86,41,TIME,23:00,Dorugamon
 doru20,Ultimate,258,86,WIN 12/15,23:00,DoruGreymon
 doru20,Mega,330,258,CM 0-2,24:00,Alphamon
-slayerdra,Fresh,1612,egg,TIME,20:00,Petitmon (dm20 digitama_slayerdra)
+slayerdra,Fresh,1612,egg,TIME,20:00,Petitmon (dm20 egg_slayerdra)
 slayerdra,InTraining,955,1612,TIME,21:00,Babydmon
 slayerdra,Rookie,57,955,TIME,22:00,Dracomon
 slayerdra,Champion,150,57,TIME,23:00,Coredramon
 slayerdra,Ultimate,242,150,WIN 12/15,23:00,Wingdramon
 slayerdra,Mega,315,242,CM 0-2,24:00,Slayerdramon
 slayerdra,Mega,317,315,JOGRESS 316,24:00,Examon; Tag Battle gate -> jogress door (capstone convention)
-breakdra,Fresh,1613,egg,TIME,20:00,Petitmon (dm20 digitama_breakdra)
+breakdra,Fresh,1613,egg,TIME,20:00,Petitmon (dm20 egg_breakdra)
 breakdra,InTraining,955,1613,TIME,21:00,Babydmon
 breakdra,Rookie,57,955,TIME,22:00,Dracomon
 breakdra,Champion,150,57,TIME,23:00,Coredramon
 breakdra,Ultimate,250,150,WIN 12/15,23:00,Groundramon
 breakdra,Mega,316,250,CM 0-2,24:00,Breakdramon
 breakdra,Mega,317,316,JOGRESS 315,24:00,Examon; Tag Battle gate -> jogress door (capstone convention)
-ryuda,Fresh,1614,egg,TIME,20:00,Fufumon (pen20 digitama_ryuda)
+ryuda,Fresh,1614,egg,TIME,20:00,Fufumon (pen20 egg_ryuda)
 ryuda,InTraining,945,1614,TIME,21:00,Kyokyomon
 ryuda,Rookie,406,945,TIME,21:00,Ryudamon
 ryuda,Champion,415,406,TIME,22:00,Ginryumon
 ryuda,Ultimate,426,415,"CM 0-2, WIN 12/15",23:00,Hisyaryumon
 ryuda,Mega,437,426,"CM 0-2, WIN 12/15",00:00,Ouryumon
-draco,Fresh,1615,egg,TIME,20:00,Petitmon (pen20 digitama_draco)
+draco,Fresh,1615,egg,TIME,20:00,Petitmon (pen20 egg_draco)
 draco,InTraining,955,1615,TIME,21:00,Babydmon
 draco,Rookie,57,955,CM 0-1,21:00,Dracomon
 draco,Rookie,1061,955,CM 2+,21:00,AgumonHakase
@@ -804,19 +804,19 @@ draco,Mega,349,210,JOGRESS Virus,00:00,Darkdramon
 draco,Mega,317,315,JOGRESS 316,00:00,Examon
 draco,Mega,317,316,JOGRESS 315,00:00,Examon
 draco,Mega,348,349,JOGRESS 350,00:00,Chaosmon
-terrier,Fresh,1616,egg,TIME,20:00,Zerimon (pen20 digitama_twins)
+terrier,Fresh,1616,egg,TIME,20:00,Zerimon (pen20 egg_twins)
 terrier,InTraining,971,1616,TIME,21:00,Gummymon
 terrier,Rookie,60,971,TIME,21:00,Terriermon
 terrier,Champion,154,60,TIME,22:00,Gargomon
 terrier,Ultimate,249,154,"CM 0-2, WIN 12/15",23:00,Rapidmon
 terrier,Mega,309,249,"CM 0-2, WIN 12/15",00:00,MegaGargomon
-lop,Fresh,1617,egg,TIME,20:00,Cocomon (pen20 digitama_twins)
+lop,Fresh,1617,egg,TIME,20:00,Cocomon (pen20 egg_twins)
 lop,InTraining,973,1617,TIME,21:00,Chocomon
 lop,Rookie,61,973,TIME,21:00,Lopmon
 lop,Champion,163,61,TIME,22:00,Turuiemon
 lop,Ultimate,243,163,"CM 0-2, WIN 12/15",23:00,Andiramon
 lop,Mega,305,243,"CM 0-2, WIN 12/15",00:00,Cherubimon
-vegg,Fresh,1618,egg,TIME,20:00,Chibomon (pen20 digitama_v)
+vegg,Fresh,1618,egg,TIME,20:00,Chibomon (pen20 egg_v)
 vegg,InTraining,939,1618,TIME,21:00,DemiVeemon
 vegg,Rookie,62,939,TIME,21:00,Veemon
 vegg,Champion,144,62,CM 2+,22:00,Veedramon
@@ -829,7 +829,7 @@ vegg,Mega,292,234,"CM 0-2, WIN 12/15",00:00,Phoenixmon
 vegg,Mega,293,236,JOGRESS Data,00:00,Griffomon
 vegg,Mega,292,236,"CM 0-1, WIN 12/15",00:00,Phoenixmon
 vegg,Champion,144,62,TIME,22:00,Veedramon; catch-all road (device roads lost to roster prune fold here)
-vb20,Fresh,1619,egg,TIME,20:00,Botamon (pen20 digitama_vbu20)
+vb20,Fresh,1619,egg,TIME,20:00,Botamon (pen20 egg_vbu20)
 vb20,InTraining,12,1619,TIME,21:00,Koromon
 vb20,Rookie,40,12,CM 0-1,21:00,Guilmon
 vb20,Rookie,1063,12,CM 2+,21:00,BushiAgumon
@@ -843,7 +843,7 @@ vb20,Ultimate,254,494;495,"CM 0-2, WIN 12/15",23:00,RizeGreymon
 vb20,Ultimate,254,172,JOGRESS Vaccine/Data,23:00,RizeGreymon
 vb20,Mega,298,254,"CM 0, WIN 12/15",00:00,Gallantmon
 vb20,Mega,334,254,"CM 1-3, WIN 12/15",00:00,Duftmon
-x3a,Fresh,1620,egg,TIME,20:00,Zerimon (dmx digitama_x3)
+x3a,Fresh,1620,egg,TIME,20:00,Zerimon (dmx egg_x3)
 x3a,InTraining,971,1620,TIME,21:00,Gummymon
 x3a,Rookie,41,971,"CM 0, TR 16+ | CM 1, TR 16+",21:00,Dorumon; folded device-area term: 'Area 45 not cleared'
 x3a,Rookie,1064,971,"CM 0, TR 0-15 | CM 1, TR 0-15",21:00,Terriermon X; folded device-area term: 'Area 45 not cleared'
@@ -971,7 +971,7 @@ x3a,Mega,330,863,"CM 0-2, LV 10",00:00,Alphamon
 x3a,Mega,867,855,"CM 0-2, LV 8-10",00:00,Minervamon X; UNPARSED req term dropped: 'Special Random Encounter cleared'
 x3a,Mega,1239,1237,JOGRESS 863,00:00,Jesmon GX; Connection Battle gate -> jogress door
 x3a,Rookie,41,971,TIME,21:00,Dorumon; catch-all road (device roads lost to roster prune fold here)
-x3b,Fresh,1621,egg,TIME,20:00,Cocomon (dmx digitama_x3)
+x3b,Fresh,1621,egg,TIME,20:00,Cocomon (dmx egg_x3)
 x3b,InTraining,973,1621,TIME,21:00,Chocomon
 x3b,Rookie,406,973,"CM 0, TR 16+ | CM 1, TR 16+",21:00,Ryudamon; folded device-area term: 'Area 45 not cleared'
 x3b,Rookie,1065,973,"CM 0, TR 0-15 | CM 1, TR 0-15",21:00,Lopmon X; folded device-area term: 'Area 45 not cleared'
@@ -1049,7 +1049,7 @@ x3b,Mega,1239,1237,JOGRESS 863,00:00,Jesmon GX; Connection Battle gate -> jogres
 x3b,Rookie,406,973,TIME,21:00,Ryudamon; catch-all road (device roads lost to roster prune fold here)
 x3b,Champion,415,406,TIME,22:00,Ginryumon; catch-all road (device roads lost to roster prune fold here)
 x3b,Champion,1027,1065,TIME,22:00,Gatomon X; catch-all road (device roads lost to roster prune fold here)
-kera,Fresh,1622,egg,TIME,20:00,Kuramon (dmx digitama_kera)
+kera,Fresh,1622,egg,TIME,20:00,Kuramon (dmx egg_kera)
 kera,InTraining,383,1622,TIME,00:00,Tsumemon
 kera,Rookie,1029,383,TIME,00:00,Keramon X
 kera,Mega,865,1029,TIME,00:00,Diaboromon X

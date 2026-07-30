@@ -13,7 +13,7 @@
 },
 "normal_fruit": {
 "id": "normal_fruit",
-"name": "DigiFruit",
+"name": "DataFruit",
 "price": 1000.0,
 "category": "Fruit"
 },
@@ -101,15 +101,15 @@
 "price": 2000.0,
 "category": "Food"
 },
-"theme_digilab": {
-"id": "theme_digilab",
-"name": "Digilab Theme",
+"theme_lab": {
+"id": "theme_lab",
+"name": "Lab Theme",
 "price": 100000.0,
 "category": "Themes"
 },
-"theme_digistreet": {
-"id": "theme_digistreet",
-"name": "DigiStreet Theme",
+"theme_street": {
+"id": "theme_street",
+"name": "street Theme",
 "price": 100000.0,
 "category": "Themes"
 },
@@ -193,19 +193,19 @@
 },
 "theme_bubble17": {
 "id": "theme_bubble17",
-"name": "DigiLab Purple Theme",
+"name": "lab Purple Theme",
 "price": 100000.0,
 "category": "Themes"
 },
 "theme_bubble18": {
 "id": "theme_bubble18",
-"name": "Digital future Theme",
+"name": "Datatal future Theme",
 "price": 100000.0,
 "category": "Themes"
 },
 "theme_bubble19": {
 "id": "theme_bubble19",
-"name": "Digital Purple Theme",
+"name": "Datatal Purple Theme",
 "price": 100000.0,
 "category": "Themes"
 },

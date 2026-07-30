@@ -1,10 +1,10 @@
-"""DigiCore — DVPet's EvolutionState page + tuipet's paged data book.
+"""datacore — DVPet's EvolutionState page + tuipet's paged data book.
 
-The CORE page is the canon Digicore (SpriteAnim setupDigicore): the field-
-flavoured core backdrop (ViewUtil.getDigicoreBackground picks it by the pet's
+The CORE page is the canon Datacore (SpriteAnim setupDatacore): the field-
+flavoured core backdrop (ViewUtil.getDatacoreBackground picks it by the pet's
 HIGHEST DNA field, falling back to its own), the core badge (a special core
-from digicoreMenuConfig.csv, else the X-antibody state badge), and the core
-NUMBER — with a pending evolution it counts DOWN from DigicoreBaseRate 14 as
+from datacoreMenuConfig.csv, else the X-antibody state badge), and the core
+NUMBER — with a pending evolution it counts DOWN from DatacoreBaseRate 14 as
 the growth period elapses; past growth (or a final form) it counts UP through
 the days toward the elder line (age-based since the DSprite mortality port
 2026-07-22).  Pressing the core plays the silhouette teaser
@@ -13,7 +13,7 @@ The data-book pages after it are tuipet's own readout (kept adaptation).
 """
 from __future__ import annotations
 import tuipet.data.loaders.data as data
-import tuipet.core.digicore as core
+import tuipet.core.datacore as core
 import tuipet.utils.grid as grid
 import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines
@@ -26,14 +26,14 @@ from tuipet.i18n.translator import t
 SCENE_ROWS = 12                    # the core/teaser pages own the WHOLE arena now --
 #                                    Joel 2026-07-05: the 8-row band crammed a 16px mon
 #                                    against the chrome; scene-only + strip() instead
-EXPAND_T = 8                       # digicoreExpand: the badge zooms in (canon beats 6-14)
+EXPAND_T = 8                       # datacoreExpand: the badge zooms in (canon beats 6-14)
 MON_T = 10                         # the gaze opens ON the current mon before the core turns
 BACK_T = 6                         # evolSilhouetteBack: the dark blink on the way out
 DET_VIS = 8                        # requirement-checklist rows shown at once
 
-# the data model lives in digicore.py (modularized 2026-07-17); the old
+# the data model lives in datacore.py (modularized 2026-07-17); the old
 # names stay importable for callers and the test suite
-DIGICORE_BASE_RATE = core.DIGICORE_BASE_RATE
+DATACORE_BASE_RATE = core.DATACORE_BASE_RATE
 core_number = core.core_number
 core_badge_key = core.core_badge_key
 core_background = core.core_background
@@ -47,7 +47,7 @@ _legacy_rows = core._legacy_rows
 build_pages = core.build_pages
 
 
-class DigiCorePanel:
+class datacorePanel:
     def __init__(self, pet, start="CORE"):
         self.pet = pet
         self.pages = [("CORE", None)] + build_pages(pet)
@@ -55,10 +55,10 @@ class DigiCorePanel:
         # book on TROPHIES, not the cover); unknown titles fall to the cover
         self.i = next((j for j, (t, _) in enumerate(self.pages) if t == start), 0)
         self.teaser = False       # EvolSilhouette view (SPACE on the core)
-        self.teaser_t = 0         # ticks into the digicoreExpand zoom
+        self.teaser_t = 0         # ticks into the datacoreExpand zoom
         self._back_t = 0          # evolSilhouetteBack dark-blink ticks left
         self.frame_i = 0
-        self.note = t("digicore_stirs", "the core stirs…")
+        self.note = t("datacore_stirs", "the core stirs…")
         self.evo_sel = 0          # EVOLVES page: the highlighted candidate
         self.detail = None        # (num, name): the open requirement checklist
         self.det_off = 0          # ...and its scroll offset
@@ -78,10 +78,10 @@ class DigiCorePanel:
                 self.sfx = "wash"             # _silhouetteFade has no rip; wash substitutes
             return None
         if k in ("space", "enter") and self.i == 0:
-            # onDigicore -> EvolSilhouetteTransition (the fade sound has no rip;
+            # onDatacore -> EvolSilhouetteTransition (the fade sound has no rip;
             # the dna-wash sweep substitutes, like heal's click/confirm cues)
             self.teaser = True
-            self.teaser_t = 0                 # the badge zooms in first (digicoreExpand)
+            self.teaser_t = 0                 # the badge zooms in first (datacoreExpand)
             self.sfx = "wash"
             return None
         if k == "m" and self.i == 0:
@@ -164,14 +164,14 @@ class DigiCorePanel:
                         for j in range(len(self.pages)))
 
     def _core_scene(self):
-        """The CORE landing page -- a data-menu page like every other digicore
+        """The CORE landing page -- a data-menu page like every other datacore
         page (Joel 2026-07-05: one layout language for the whole data book;
         the scene experiment read as inconsistent).  SPACE opens the core
         gaze, where the visuals live."""
         p = self.pet
         n = core_number(p)
         growth = p.STAGE_DURATION.get(p.stage)
-        # ONE predicate for the whole page (digicore audit 2026-07-18):
+        # ONE predicate for the whole page (datacore audit 2026-07-18):
         # the Meter row and core_number must never disagree again
         pending = (growth is not None and p.stage_seconds < growth
                    and core.has_next(p))
@@ -181,37 +181,37 @@ class DigiCorePanel:
         # age-count on a final form -- same glyph, opposite directions,
         # with only the Meter row to disambiguate
         if pending:
-            core_val = t("digicore_to_evolve", "{chr} {n} to evolve").format(chr=chr(0x25C6), n=n)
+            core_val = t("datacore_to_evolve", "{chr} {n} to evolve").format(chr=chr(0x25C6), n=n)
         elif p.is_geriatric:
-            core_val = t("digicore_elder", "{chr} {n} — elder").format(chr=chr(0x25C6), n=n)
+            core_val = t("datacore_elder", "{chr} {n} — elder").format(chr=chr(0x25C6), n=n)
         else:
-            core_val = t("digicore_to_elder_full", "{chr} {n} of {base} to elder").format(chr=chr(0x25C6), n=n, base=DIGICORE_BASE_RATE)
+            core_val = t("datacore_to_elder_full", "{chr} {n} of {base} to elder").format(chr=chr(0x25C6), n=n, base=DATACORE_BASE_RATE)
         rows = [
-            (t("digicore_lbl_core", "Core"), core_val),
-            (t("digicore_lbl_meter", "Meter"), t("digicore_meter_near", "evolution nears at 1") if pending else t("digicore_meter_days", "counts the days")),
-            (t("digicore_lbl_field", "Field"), data.pretty_field(getattr(p, "field", "") or "None")),
-            (t("digicore_lbl_xstate", "X-State"), t("digicore_val_none_lower", "none") if x == "None" else x.lower()),
-            (t("digicore_lbl_mode", "Mode"), (t("digicore_mode_ready", "ready — press M") if p.can_mode_change() else chr(0x2014))),
+            (t("datacore_lbl_core", "Core"), core_val),
+            (t("datacore_lbl_meter", "Meter"), t("datacore_meter_near", "evolution nears at 1") if pending else t("datacore_meter_days", "counts the days")),
+            (t("datacore_lbl_field", "Field"), data.pretty_field(getattr(p, "field", "") or "None")),
+            (t("datacore_lbl_xstate", "X-State"), t("datacore_val_none_lower", "none") if x == "None" else x.lower()),
+            (t("datacore_lbl_mode", "Mode"), (t("datacore_mode_ready", "ready — press M") if p.can_mode_change() else chr(0x2014))),
         ]
-        out = menu.header(t("digicore_hdr_core", "DIGICORE  CORE"), self._dots())
+        out = menu.header(t("datacore_hdr_core", "DATACORE  CORE"), self._dots())
         for label, val in rows:
             out.append(f" {label:<9}", style=DIM)
             out.append(f"{val}\n", style=INK_B)
         out.append_text(menu.blanks(9 - len(rows) - 3))
-        out.append(t("digicore_hint_gaze_1", " gaze into the core to glimpse\n"), style=DIM)
-        out.append(t("digicore_hint_gaze_2", " what stirs within…\n"), style=DIM)
+        out.append(t("datacore_hint_gaze_1", " gaze into the core to glimpse\n"), style=DIM)
+        out.append(t("datacore_hint_gaze_2", " what stirs within…\n"), style=DIM)
         # the door wears its key in BOLD (menu polish 2026-07-21: the gaze
         # was easy to look over in dim prose) -- the EVOLVES "ENTER: what it
         # takes" / TROPHIES "ENTER: the album" teaching line, gaze verdicts
         # still take the slot when one is pending
-        out.append_text(menu.note(self.note if self.note != t("digicore_stirs", "the core stirs…")
-                                  else t("digicore_hint_space_gaze", "SPACE: gaze into the core"),
+        out.append_text(menu.note(self.note if self.note != t("datacore_stirs", "the core stirs…")
+                                  else t("datacore_hint_space_gaze", "SPACE: gaze into the core"),
                                   tick=self.frame_i))
-        out.append_text(menu.footer(t("digicore_hint_footer", "SPACE gaze  ←→ page  ESC out")))
+        out.append_text(menu.footer(t("datacore_hint_footer", "SPACE gaze  ←→ page  ESC out")))
         return out
 
     def _teaser_scene(self):
-        """EvolSilhouetteTransition: the core badge ZOOMS IN (digicoreExpand,
+        """EvolSilhouetteTransition: the core badge ZOOMS IN (datacoreExpand,
         canon beats 6-14 grow it 1.5x each), then the next natural evolution
         holds as a STATIC blacked-out shape (canon draws frame 0 -- the old
         pose-flicker here was the 10Hz flutter class)."""
@@ -252,18 +252,18 @@ class DigiCorePanel:
 
     def strip(self):
         """Narration only -- the gaze speaks through the message box; every
-        other digicore state leaves it alone."""
+        other datacore state leaves it alone."""
         if not self.teaser:
-            return menu.hints(("SPACE", t("digicore_key_gaze", "gaze")), ("\u2190\u2192", t("digicore_key_page", "page")),
-                              ("ESC", t("digicore_key_out", "out")))
+            return menu.hints(("SPACE", t("datacore_key_gaze", "gaze")), ("\u2190\u2192", t("datacore_key_page", "page")),
+                              ("ESC", t("datacore_key_out", "out")))
         t_val = self.teaser_t
         if t_val < MON_T:
-            return t("digicore_stirs", "the core stirs…")
+            return t("datacore_stirs", "the core stirs…")
         if t_val < MON_T + EXPAND_T:
-            return t("digicore_opens", "the core opens…")
-        return (t("digicore_final_form", "Nothing stirs — this is its final form.")
+            return t("datacore_opens", "the core opens…")
+        return (t("datacore_final_form", "Nothing stirs — this is its final form.")
                 if next_evolution(self.pet) is None
-                else t("digicore_shape_looms", "A shape looms in the core…"))
+                else t("datacore_shape_looms", "A shape looms in the core…"))
 
     def _detail_scene(self):
         """One candidate's requirement checklist (evolution.requirement_report):
@@ -279,7 +279,7 @@ class DigiCorePanel:
             report = (lines.requirement_report(self.pet, num) if lines.active(self.pet)
                       else evolution.requirement_report(self.pet, num))
         vis = DET_VIS
-        out = menu.header(t("digicore_hdr_req", "DIGICORE  {name}").format(name=name[:16].upper()), t("digicore_req_tag", "req"))
+        out = menu.header(t("datacore_hdr_req", "DATACORE  {name}").format(name=name[:16].upper()), t("datacore_req_tag", "req"))
 
         def fmt(r, i):
             met, txt = r
@@ -292,16 +292,16 @@ class DigiCorePanel:
 
         self.det_off = menu.scroll_window(out, report, self.det_off, vis, fmt)
         more = "" if len(report) <= vis else f"  ({self.det_off + 1}-{min(len(report), self.det_off + vis)}/{len(report)})"
-        out.append_text(menu.footer(t("digicore_hint_scroll_back", "↑↓ scroll{more}   ESC back").format(more=more)))
+        out.append_text(menu.footer(t("datacore_hint_scroll_back", "↑↓ scroll{more}   ESC back").format(more=more)))
         return out
 
     def _evolves_scene(self, rows, dots):
         from rich.text import Text
-        out = menu.header(t("digicore_hdr_evolves", "DIGICORE  EVOLVES"), dots)
+        out = menu.header(t("datacore_hdr_evolves", "DATACORE  EVOLVES"), dots)
         if isinstance(rows, str):                      # "(final form)"
             out.append(f" {rows}\n", style=DIM)
             out.append_text(menu.blanks(8))
-            out.append_text(menu.footer(t("digicore_hint_page_out", "←→ page    ESC out")))
+            out.append_text(menu.footer(t("datacore_hint_page_out", "←→ page    ESC out")))
             return out
 
         div = evolution.divergence_target(self.pet)
@@ -311,16 +311,16 @@ class DigiCorePanel:
             cur = j == self.evo_sel
             # the armed DNA steer wears its own word: it isn't "gates met",
             # it's the charge overriding the chart (gameplay audit B3)
-            tag = (chr(0x2713) + t("digicore_armed", " armed") if num == div
-                   else chr(0x2713) + t("digicore_ready", " ready") if ready else t("digicore_to_go", "{unmet} to go").format(unmet=unmet))
+            tag = (chr(0x2713) + t("datacore_armed", " armed") if num == div
+                   else chr(0x2713) + t("datacore_ready", " ready") if ready else t("datacore_to_go", "{unmet} to go").format(unmet=unmet))
             t = Text()
             t.append(("▸" if cur else " ") + f" {name[:20]:<21}", style=INK_B if cur else INK)
             t.append(f"{tag:>10}\n", style=INK_B if ready else DIM)
             return t
 
         self.evo_sel = menu.list_window(out, rows, self.evo_sel, 8, fmt)
-        out.append_text(menu.note(t("digicore_hint_what_it_takes", "ENTER: what it takes")))
-        out.append_text(menu.footer(t("digicore_hint_evolves", "↑↓ pick  ENTER req  ←→ page  ESC out")))
+        out.append_text(menu.note(t("datacore_hint_what_it_takes", "ENTER: what it takes")))
+        out.append_text(menu.footer(t("datacore_hint_evolves", "↑↓ pick  ENTER req  ←→ page  ESC out")))
         return out
 
     def text(self):
@@ -336,7 +336,7 @@ class DigiCorePanel:
         dots = self._dots()
         if title == "EVOLVES":
             return self._evolves_scene(rows, dots)
-        out = menu.header(t("digicore_hdr_title", "DIGICORE  {title}").format(title=title), dots)
+        out = menu.header(t("datacore_hdr_title", "DATACORE  {title}").format(title=title), dots)
         for label, val in rows:
             out.append(f" {label:<9}", style=DIM)
             out.append(f"{val}\n", style=INK_B)
@@ -344,14 +344,14 @@ class DigiCorePanel:
             # the Album row fronts a browsable book (2026-07-21): teach the
             # door the way EVOLVES teaches its checklist
             out.append_text(menu.blanks(9 - len(rows) - 1))
-            out.append_text(menu.note(t("digicore_hint_enter_album", "ENTER: the album")))
-            out.append_text(menu.footer(t("digicore_hint_album", "ENTER album  ←→ page  ESC out")))
+            out.append_text(menu.note(t("datacore_hint_enter_album", "ENTER: the album")))
+            out.append_text(menu.footer(t("datacore_hint_album", "ENTER album  ←→ page  ESC out")))
         elif title == "LEGACY":
             # the headstones front their room now too (2026-07-26)
             out.append_text(menu.blanks(9 - len(rows) - 1))
-            out.append_text(menu.note(t("digicore_hint_hall_memory", "ENTER: the hall of memory")))
-            out.append_text(menu.footer(t("digicore_hint_hall", "ENTER hall  ←→ page  ESC out")))
+            out.append_text(menu.note(t("datacore_hint_hall_memory", "ENTER: the hall of memory")))
+            out.append_text(menu.footer(t("datacore_hint_hall", "ENTER hall  ←→ page  ESC out")))
         else:
             out.append_text(menu.blanks(9 - len(rows)))
-            out.append_text(menu.footer(t("digicore_hint_page_out", "←→ page    ESC out")))
+            out.append_text(menu.footer(t("datacore_hint_page_out", "←→ page    ESC out")))
         return out

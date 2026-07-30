@@ -10,7 +10,7 @@ from functools import lru_cache  # noqa: F401
 
 _HERE = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _DATA = os.path.join(_HERE, "data")
-_RAW = _DATA  # bundled CSVs (digimon/evolutions/foods) live alongside sprites
+_RAW = _DATA  # bundled CSVs (monster/evolutions/foods) live alongside sprites
 from tuipet.data.loaders.data_core import (  # noqa: F401  (shared plumbing +
     AssetsError, _load_bundled, _open_data,  # cross-domain reads)
     _attack_index, load_requirements, load_sprites)
@@ -50,7 +50,7 @@ def attack_orb(num, attribute, power, frame_i=0):
     in deviceAttacks.csv fires ITS OWN real-hardware attack for EVERY attribute,
     exactly like the original V-Pet -- frame_i animates the 2-frame attacks at
     the caller's 10Hz clock.  Everyone else keeps DVPet checkAttackSprite: the
-    per-species special orb (attackSpritesSpecial.png, digimon.csv col 55) if set
+    per-species special orb (attackSpritesSpecial.png, monster.csv col 55) if set
     for this attribute, else the generic per-attribute orb at the power tier
     floor(power/25) from attackSprites.png."""
     orbs = load_orbs()
@@ -77,9 +77,9 @@ def _load_attacks():
     if _ATTACKS is None:
         _ATTACKS = {}
         cols = {"Vaccine": "VaccineName:Effect", "Data": "DataName:Effect", "Virus": "VirusName:Effect"}
-        for r in csv.DictReader(_open_data(os.path.join(_DATA, "digimon.csv"))):
+        for r in csv.DictReader(_open_data(os.path.join(_DATA, "monster.csv"))):
             try:
-                n = int(r["DigimonNum"])
+                n = int(r["MonsterNum"])
             except (KeyError, ValueError):
                 continue
             info = {}
@@ -92,13 +92,13 @@ def _load_attacks():
     return _ATTACKS
 
 def move_name(num, attribute):
-    """The flavour name of a Digimon's attack for an attribute (DVPet
+    """The flavour name of a Monster's attack for an attribute (DVPet
     VaccineName/DataName/VirusName columns), e.g. 'Exhaust Flame'."""
     return (_load_attacks().get(num) or {}).get(attribute, {}).get("name", "")
 
 def attack_info(num, attribute):
     """Full DVPet attack for an attribute: {name, effect, conditions[]} parsed from
-    the digimon.csv Name:Effect:Condition(s) cell (AttackEffectProcess input)."""
+    the monster.csv Name:Effect:Condition(s) cell (AttackEffectProcess input)."""
     return (_load_attacks().get(num) or {}).get(attribute) or {"name": "", "effect": "None", "conditions": []}
 
 @lru_cache(maxsize=1)
@@ -141,7 +141,7 @@ def load_enemies():
             "penalty": int(r.get("Penalty") or 0),
             "chance": int(r.get("AppearanceChance/100") or 100),
             "loot_table": int(r.get("LootTableID") or -1),
-            # only the last boss carries one ("You saved<br>the Digital<br>World!"):
+            # only the last boss carries one ("You saved<br>the Datatal<br>World!"):
             # it cues the canon victory parade after the final ZoneChange
             "parade_msg": ((r.get("BossParadeMessage") or "").replace("<br>", " ").strip()
                            if (r.get("BossParadeMessage") or "null") != "null" else ""),
@@ -149,7 +149,7 @@ def load_enemies():
     return enemies
 
 def enemies_for_stage(stage):
-    """Enemies whose Digimon are at the given stage (fallback: all)."""
+    """Enemies whose Monster are at the given stage (fallback: all)."""
     pool = [e for e in load_enemies() if e["stage"] == stage]
     return pool or load_enemies()
 
@@ -315,4 +315,4 @@ def load_icons():
 
 # (load_armor_eggs -- the armorEggs.png ghost eggs -- REMOVED 2026-07-18:
 # fan-authored art, unused even by DVPet, and Joel rejected it.  The shop's
-# crest eggs show DVPet's own Digimental item glyphs, canon display.)
+# crest eggs show DVPet's own Relic item glyphs, canon display.)

@@ -1,6 +1,6 @@
 """The roster + sim data (tier-1 split, 2026-07-17): sprites, the
 evolution graph, the requirement corpus, canonical species mapping, stage
-grammar.  Everything the SIM reads to know who a Digimon is."""
+grammar.  Everything the SIM reads to know who a Monster is."""
 from __future__ import annotations
 import csv  # noqa: F401
 import gzip  # noqa: F401
@@ -11,7 +11,7 @@ from functools import lru_cache  # noqa: F401
 
 _HERE = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _DATA = os.path.join(_HERE, "data")
-_RAW = _DATA  # bundled CSVs (digimon/evolutions/foods) live alongside sprites
+_RAW = _DATA  # bundled CSVs (monster/evolutions/foods) live alongside sprites
 
 
 class AssetsError(RuntimeError):
@@ -48,7 +48,7 @@ def _open_data(path):
     except OSError as e:
         raise _damaged(os.path.basename(path)) from e
 
-# Frame roles VERIFIED against DVPet View/SpriteAnim drawNum() args (each per-Digimon
+# Frame roles VERIFIED against DVPet View/SpriteAnim drawNum() args (each per-Monster
 # strip is 11 frames, index 0-10; sheet order preserved by extract_sprites col 0..10):
 #   0 idle/neutral base      6 attack / cheer-up (HP_Training_AttackSuccess, attackDefault)
 #   1 idle-B / walk-B / toy   7 eat-chew / cheer-down(big) / wake-end
@@ -256,7 +256,7 @@ def _gate(row, key, val):
     return (cond, v)
 
 def _attack_index(s):
-    """digimon.csv col 55 'vaccineNum:dataNum:virusNum' -> per-attribute special-orb index (-1 = none)."""
+    """monster.csv col 55 'vaccineNum:dataNum:virusNum' -> per-attribute special-orb index (-1 = none)."""
     parts = (s or "").split(":")
     out = {}
     for attr, i in (("Vaccine", 0), ("Data", 1), ("Virus", 2)):
@@ -269,11 +269,11 @@ def _attack_index(s):
 @lru_cache(maxsize=1)
 def load_requirements():
     from tuipet.i18n.translator import t_col
-    path = os.path.join(_RAW, "digimon.csv")
+    path = os.path.join(_RAW, "monster.csv")
     reqs = {}
     for r in csv.DictReader(_open_data(path)):
         try:
-            num = int(r["DigimonNum"])
+            num = int(r["MonsterNum"])
         except (KeyError, ValueError):
             continue
         prob = (r.get("Probability") or "100;100").split(";")
@@ -338,7 +338,7 @@ def load_requirements():
             # carries real values (Morning/Noon/Night; audit 2026-07-13)
             "time_pref": (r.get("TimePreference") or "None").strip() or "None",
             "time_aversion": (r.get("TimeAversion") or "None").strip() or "None",
-            # HiddenEvolution (digicore audit 2026-07-06): 130 forms are
+            # HiddenEvolution (datacore audit 2026-07-06): 130 forms are
             # CONCEALED in canon's evolution tree until first reached
             "hidden_evo": (r.get("HiddenEvolution") or "FALSE").strip().upper() == "TRUE",
             "food_aversion": (r.get("FoodAversion") or "None").strip() or "None",
@@ -358,7 +358,7 @@ def load_requirements():
             "lifespan_mod": _int_or(r.get("LifespanMod"), 0),        # per-form lifespan delta
             "give_item": _int_or(r.get("GiveItem"), -1),             # consumable granted on evolve
             "incarnations": _gate(r, "IncarnationsKey", "IncarnationsValue"),  # generation-count gate
-            "max_energy": _int_or(r.get("MaxEnergy"), 24),          # DVPet per-Digimon maxEnergy
+            "max_energy": _int_or(r.get("MaxEnergy"), 24),          # DVPet per-Monster maxEnergy
             "sleep_energy_gain": _int_or(r.get("SleepEnergyGain"), 3),
             "awake_inc": _int_or(r.get("AwakeLapseInc"), 1),   # 1 adult / 16 babies: short naps
             "can_assist": (r.get("CanAssist") or "").strip().upper() == "TRUE",   # AI Assistant pool
@@ -366,8 +366,8 @@ def load_requirements():
     return reqs
 
 def assist_pool():
-    """The digimon.csv CanAssist pool -- Evolution.getRandomAssistDigimon's
-    candidates for WHICH Digimon answers an AI Assistant contract."""
+    """The monster.csv CanAssist pool -- Evolution.getRandomAssistMonster's
+    candidates for WHICH Monster answers an AI Assistant contract."""
     return sorted(n for n, r in load_requirements().items() if r.get("can_assist"))
 
 @lru_cache(maxsize=1)
@@ -397,7 +397,7 @@ def canonical_num(num):
 
 def album_roster():
     """The album's page order: every name-canonical, non-placeholder roster
-    num, sorted.  The SINGLE SOURCE for both the digicore trophy denominator
+    num, sorted.  The SINGLE SOURCE for both the datacore trophy denominator
     and the album screen's pages — the book and its scoreboard can never
     disagree (the 1218/1547 uncompletable-album lesson, roster audit
     2026-07-14)."""

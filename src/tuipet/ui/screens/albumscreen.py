@@ -3,17 +3,17 @@ the album screen").
 
 The device has tracked every species ever raised since the collection
 long-game arc (persistence album, canonical nums), but only ever SHOWED
-the count on the digicore trophy page — a scoreboard pointing at a book
+the count on the datacore trophy page — a scoreboard pointing at a book
 that didn't exist.  THIS is the book: every name-canonical roster form in
 dex order, a discovered entry wearing its name and stage, the rest masked
-"???" (the digicore hidden-evo reveal language).  ENTER opens one entry's
+"???" (the datacore hidden-evo reveal language).  ENTER opens one entry's
 page — the REAL 16x16 rip bobbing live for a discovered form, its
 silhouette (the core-gaze tease) for one still out there.  Data only:
 roster = data.album_roster() (the trophy denominator's own set), seen =
 persistence.get_album(); nothing here is guessed or drawn.
 
 ↑↓ browse, PgUp/PgDn leap, ENTER view, ←→ page inside the book, ESC out.
-Opened from the digicore TROPHIES page (where its count already lived)."""
+Opened from the datacore TROPHIES page (where its count already lived)."""
 from __future__ import annotations
 from rich.text import Text
 import tuipet.data.loaders.data as data
@@ -143,7 +143,7 @@ class AlbumPanel:
 
     # ---- one entry's page ----------------------------------------------------
     def _detail_scene(self):
-        from tuipet.core.digicore import silhouette
+        from tuipet.core.datacore import silhouette
         num = self.roster[self.i]
         seen = num in self.seen
         rec = self._rec(num)

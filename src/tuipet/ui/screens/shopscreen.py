@@ -12,7 +12,7 @@ the classic armor evolution), R sells back half, TAB flips shop<->bag.
 
 Art law: consumables have NO DSprite icon rips (vitems carries only
 id/name/price/category), so their icon cell stays quiet -- never
-substitute lookalike art.  The crest eggs show the small Digimental
+substitute lookalike art.  The crest eggs show the small Relic
 item glyphs DVPet ITSELF draws (drawEvolutionInventory's Items-sheet
 icon, via the Pet._CREST_IDS identity the item flow uses) -- Joel
 2026-07-18: "8x8 item icons, like how the rest of the shop is"; the
@@ -24,7 +24,7 @@ Info rows are a LIVE dossier -- price with held count / shortfall,
 effect, and a crest egg names the form that would answer it RIGHT NOW
 (the same evolution.check the item runs).  Buy/sell verdicts flash in
 the footer (they were beep-only before -- self.msg was never rendered);
-the sealed Digimental waves tease there on the egg-carousel cadence.
+the sealed Relic waves tease there on the egg-carousel cadence.
 """
 from __future__ import annotations
 import textwrap
@@ -145,7 +145,7 @@ class ShopPanel:
     # ---- data ----
     def _tabs(self):
         """Shop: the classic four; a TOWN counter carries its two authored
-        shelves + the digitama band as an EGGS tab (shops-look-the-same
+        shelves + the egg band as an EGGS tab (shops-look-the-same
         2026-07-22: the market rode a separate one-off grid screen while
         the home shop had a tab -- one shop family now; honors stay a home
         prestige).  Bag: the goods tabs over what you own."""
@@ -216,7 +216,7 @@ class ShopPanel:
                              worn=t["id"] == worn)
                         for t in data.load_titles()]
             if self.town is not None:      # the town counter: authored stock
-                if name == "Eggs":         # the digitama band, shop-row shape
+                if name == "Eggs":         # the egg band, shop-row shape
                     return shop.town_egg_rows(self.town)
                 return self._grouped(
                     [e for e in shop.town_stock(self.town, pet=self.pet)
@@ -259,7 +259,7 @@ class ShopPanel:
         old = p.num
         key = e["key"]
         # the chip clears its payload on success; the inherit fx needs it
-        mem = dict(p.peek_memory()) if key == "digimemory" else None
+        mem = dict(p.peek_memory()) if key == "memory" else None
         out = p.use_item(key)
         if p.num != old:                        # a crest egg fired the armor jump
             return ("done", ("evolve", old))
@@ -290,7 +290,7 @@ class ShopPanel:
             # grow capsule flashed text while their scripts sat written
             # and their ripped art sat unused)
             return ("done", ("item_use", shop.ICON_KEYS[key], _sc, out))
-        if not refused and key == "digimemory" and mem:
+        if not refused and key == "memory" and mem:
             # the heir redeems the ancestor: the bag closes and the canon
             # inherit fx plays on the LCD (_after_shop's waiting route)
             return ("done", ("inherit", mem))
@@ -440,7 +440,7 @@ class ShopPanel:
 
     def _icon(self, sel):
         """The icon cell: honors wear the plate; a crest egg shows the crest
-        GLYPH DVPet itself draws for the Digimental (drawEvolutionInventory's
+        GLYPH DVPet itself draws for the Relic (drawEvolutionInventory's
         Items-sheet icon, via the _CREST_IDS identity the item flow uses);
         DSprite consumables have no rips -> the cell stays quiet.  (The
         armorEggs.png ghost eggs were tried and REMOVED 2026-07-18 -- fan-
@@ -471,10 +471,10 @@ class ShopPanel:
                      else "owned" if sel.get("owned") else "%db" % sel["price"])
             desc = textwrap.wrap(sel.get("desc") or "a tamer honor", tw)[:2]
             return [sel["name"][:tw], state] + desc + [""] * (2 - len(desc))
-        if sel.get("egg_idx") is not None:     # the town digitama band
+        if sel.get("egg_idx") is not None:     # the town egg band
             state = "owned" if sel.get("owned") else "%db" % sel["price"]
             return [sel["name"][:tw], state,
-                    "a digitama, bought outright"[:tw],
+                    "a egg, bought outright"[:tw],
                     "joins your hatch carousel"[:tw]]
         key = str(sel["key"])
         if self.mode == "shop":
@@ -568,7 +568,7 @@ class ShopPanel:
                         return "%-18s %3s %7s" % (e["name"][:18], "", t("shop_owned", "owned"))
                     return dim_if_short(
                         "%-18s %3s %6db" % (e["name"][:18], "", e["price"]), e, i)
-                if e.get("egg_idx") is not None:     # digitama: owned/price
+                if e.get("egg_idx") is not None:     # egg: owned/price
                     if e.get("owned"):
                         return "%-18s %3s %7s" % (e["name"][:18], "", t("shop_owned", "owned"))
                     return dim_if_short(

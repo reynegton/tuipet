@@ -137,7 +137,7 @@ def check(pet, num, item=-1, food=-1, connecting=False):
         # (the six vaccine/data/virus stat gates DROPPED 2026-07-17: they
         # were DVPet-app truth -- the humulos guides gate on mistakes/
         # trainings/battles/wins, never power numbers -- and the 0.5 economy
-        # (+1 power per win) put their digimon.csv thresholds out of reach.
+        # (+1 power per win) put their monster.csv thresholds out of reach.
         # The fulfilled-score/deviation legs still read the live stats.)
         # (the "trains at Morning/Noon/Night" TIME gate DROPPED with the
         # day/night system -- BASIC VPET 2026-07-17: an hour nothing can
@@ -316,7 +316,7 @@ def food_select(pet, food_id):
 
 
 def item_direct(pet, dexnum):
-    """Direct evolution item (items.csv DigimonID names the form): evolve into `dexnum`
+    """Direct evolution item (items.csv MonsterID names the form): evolve into `dexnum`
     if it is a reachable graph neighbour of the current form."""
     if dexnum is None or dexnum < 0:
         return None
@@ -531,7 +531,7 @@ def requirement_report(pet, num):
     if ev_item != -1:
         item = data.consumable_by_key(f"i:{ev_item}")
         # the bag stores NAMED keys (the crest eggs) -- checking the raw
-        # "i:N" icon key read a held Digimental as forever-unmet, inflating
+        # "i:N" icon key read a held Relic as forever-unmet, inflating
         # every item-locked form's unmet count (gameplay audit 2026-07-19)
         from tuipet.core.pet import Pet as _Pet
         named = next((k for k, v in _Pet._CREST_IDS.items() if v == ev_item),

@@ -28,7 +28,7 @@ def _real_eggs():
 
 
 def frames(egg_type=0):
-    """Real Digitama egg (spritesEgg0.png, the Egg-stage creature sheet): the 3 real
+    """Real Egg egg (spritesEgg0.png, the Egg-stage creature sheet): the 3 real
     DVPet frames -- [0] idle egg, [1] settle/bulge, [2] cracked-open (shell breaks,
     baby emerges). The hatch role (ROLES["hatch"]=[0,1,2]) plays all three; the
     side-to-side shake is applied as an xshift at render time, not baked into extra
@@ -56,7 +56,7 @@ def _idx(egg_type, n):
 
 
 def hatch_target(egg_type=0):
-    """A Fresh creature (DigimonNum) this egg hatches into -- chosen at random among
+    """A Fresh creature (MonsterNum) this egg hatches into -- chosen at random among
     the egg's targets, so generic "mystery" eggs surprise you (DVPet behaviour)."""
     eggs = _real_eggs()
     if not eggs:
@@ -65,7 +65,7 @@ def hatch_target(egg_type=0):
 
 
 def hatch_targets(egg_type=0):
-    """All DigimonNums this egg can hatch into (the hatch preview)."""
+    """All MonsterNums this egg can hatch into (the hatch preview)."""
     eggs = _real_eggs()
     return list(eggs[_idx(egg_type, len(eggs))]["hatch"]) if eggs else []
 
@@ -78,7 +78,7 @@ def hatch_name(egg_type=0):
 def destined_name(egg_type=0):
     """The BABY a single-target egg hatches ('' for a multi-target pool --
     the mystery is the caller's to keep).  The roster name of the hatch
-    target, NOT hatch_name: for the named banks (Kera Digitama, the field
+    target, NOT hatch_name: for the named banks (Kera Egg, the field
     eggs, Lalamon Egg...) hatch_name is the EGG's display title, and the
     'Destined to hatch' cards were promising an egg would hatch an egg
     (Joel 2026-07-21).  The classic banks store the baby's name in both,
@@ -99,7 +99,7 @@ def count():
 def record(egg_type=0):
     fr = frames(egg_type)
     w = max(len(r) for r in fr[0])
-    return {"num": -1, "name": "Digitama", "stage": "Egg",
+    return {"num": -1, "name": "Egg", "stage": "Egg",
             # (the "element" key left with the element system, 2026-07-18)
             "attribute": "None", "field": "None",
             "spriteSet": 0, "spriteNum": 0, "w": w, "h": len(fr[0]),
@@ -222,7 +222,7 @@ def owned_now():
     auto_owned only STICKS when EggSelectPanel is built (its one caller),
     so between earning an egg and next opening the carousel the persisted
     set is stale -- and the town shelf, reading it raw, offered to SELL a
-    digitama already earned (bug report 2026-07-27, v0.5.288: "breakdra egg
+    egg already earned (bug report 2026-07-27, v0.5.288: "breakdra egg
     in mountain shop didnt say owned when i own it").  Read-only on purpose:
     a shop row must not write the save file; the egg screen still does the
     banking.

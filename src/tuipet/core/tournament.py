@@ -48,7 +48,7 @@ SEASON_OF_MONTH = {3: "Primavera", 4: "Primavera", 5: "Primavera",
 
 # festival days: the whole day's board is enterable at any hour (each slot
 # still runs once -- no purse farming).  Aug 1 is Odaiba Memorial Day, the
-# fandom's own Digimon anniversary (the 1999-08-01 summer camp).
+# fandom's own Monster anniversary (the 1999-08-01 summer camp).
 HOLIDAYS = {(1, 1): "New Year Festival",
             (8, 1): "Odaiba Memorial Day",
             (10, 31): "Halloween Festival",
@@ -429,7 +429,7 @@ def _npc_winner(a, b):
 
 def _prize_key(kind, cid):
     """A cup prize id -> its CATALOG key (item expansion 2026-07-26).
-    Digimental ids speak the crest shelf's own egg_of_* identity; anything
+    Relic ids speak the crest shelf's own egg_of_* identity; anything
     that somehow fails to resolve pays the old catalog treat rather than
     nothing (a champion is never stiffed)."""
     import tuipet.core.shop as shop
@@ -657,7 +657,7 @@ class Tournament:
                 # 2026-07-26): every cup's ItemID/FoodID resolves against
                 # the grown catalog now -- 36 cups hand out their own
                 # authored relic (trampolines, evo items, even a specific
-                # DIGIMENTAL via the crest identity), 25 more pay authored
+                # RELIC via the crest identity), 25 more pay authored
                 # food hampers.  The flat energy-drink placeholder retires.
                 key = _prize_key("i", self.trophy["item"])
                 self.pet.add_item(key)

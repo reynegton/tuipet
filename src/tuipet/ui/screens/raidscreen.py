@@ -168,7 +168,7 @@ class RaidPanel(menu.SubHost):
             # the prize names come from shop.entry -- THE resolver for a
             # catalog key (item sweep 2026-07-24).  This read vitems.json,
             # which since the TUIPET catalog (2026-07-18) holds only the
-            # Digimentals plus the RETIRED consumable rows: the reward line
+            # Relics plus the RETIRED consumable rows: the reward line
             # for the game's biggest moment printed "Energy.D" (a name that
             # left the shelf) and raw keys -- "Rank 1: 12000b + Energy.D,
             # vitamin, dna_crystal".

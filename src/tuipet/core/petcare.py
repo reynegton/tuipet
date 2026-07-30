@@ -27,7 +27,7 @@ class CareMixin:
         """The obedience refusal roll left with the discipline system (BASIC
         VPET 2026-07-16): the pet obeys care commands.  TWO meter rules
         survive because they are affordability, not temperament: the energy
-        auto-refuse (a jogress/digimental/mode-change it cannot pay for) and
+        auto-refuse (a jogress/relic/mode-change it cannot pay for) and
         feed()'s own full-belly head-shake."""
         self.refused = False
         if energy_change and self.energy + math.ceil(energy_change * self.max_energy) < 0:
@@ -272,8 +272,8 @@ class CareMixin:
 
     def set_auto_care(self, on):
         """SpriteAnim's Set_AutoCare switch -> PhysicalState.setAutoCare: hiring
-        the assistant also rolls WHICH Digimon answers, from the digimon.csv
-        CanAssist pool (Evolution.getRandomAssistDigimon)."""
+        the assistant also rolls WHICH Monster answers, from the monster.csv
+        CanAssist pool (Evolution.getRandomAssistMonster)."""
         if self.dead:
             return "Descansando agora — aperte N para um novo ovo."
         self.auto_care = bool(on)
@@ -316,7 +316,7 @@ class CareMixin:
     # never a gift: a trap, a road tool, an heirloom, or a premium you'd feel
     # cheated to unwrap for free.  (Road items are already excluded by the
     # where=="home" test; listed here for intent.)
-    _GIFT_BANNED = frozenset({"poison_mushroom", "digimemory", "revive_floppy",
+    _GIFT_BANNED = frozenset({"poison_mushroom", "memory", "revive_floppy",
                               "town_transport", "disaster_transport",
                               "life_recovery",
                               # the expansion (2026-07-26): traps and earned
@@ -416,13 +416,13 @@ class CareMixin:
         item does nothing here, None-equivalent = don't have it).  The
         DSprite item table, cloned from v0.4.x (BASIC VPET 2026-07-16): the
         DVPet consumable machine -- meds, bandages, vitamins, toys, futons,
-        transports, digimentals, crafters -- left with the item system.  A
+        transports, relics, crafters -- left with the item system.  A
         _Refused message keeps the item ('consume on refusal' burned
         Rev.Floppies on live pets; clone audit 2026-07-15)."""
         if self.inventory.get(key, 0) <= 0:
             return "Nenhum sobrando."
         # the crest eggs (Armor-Spirit): the ONE clone item family that maps
-        # onto a classic system -- each virtue joins its Digimental's
+        # onto a classic system -- each virtue joins its Relic's
         # EvolItemID, so the armor evolutions stay reachable (the dub swap is
         # deliberate: reliability->Purity(18), destiny->Fate(25))
         if key.startswith("egg_of_"):
@@ -468,7 +468,7 @@ class CareMixin:
             "omni_chip_g": lambda: self._attr_chip(None, 30),
             # ---- LEGACY -----------------------------------------------------
             "revive_floppy": self._revive_item,
-            "digimemory": self._inherit_memory,
+            "memory": self._inherit_memory,
             # ---- PLAY (small LIVE dials; the SHOW is fired by the bag panel)
             "ball": lambda: self._toy(weight=-1, msg="Um chutinho incrível!"),
             "skateboard": lambda: self._toy(weight=-2, energy=-1,
@@ -535,7 +535,7 @@ class CareMixin:
         return out
 
     def _crest_egg(self, key):
-        """A crest egg -> the classic Digimental item-evolution flow."""
+        """A crest egg -> the classic Relic item-evolution flow."""
         if self.dead or self.stage == "Egg" or self.num < 0:
             return _Refused("")
         item_id = self._CREST_IDS.get(key, -1)
@@ -736,7 +736,7 @@ class CareMixin:
         Va/D/Vi are LIVE and load-bearing: hundreds of evolution rows gate
         on them, and battle power reads them.  Until now the only ways to
         raise one were winning a battle in that attribute (+1) and the
-        inheritance-only Digimemory -- so a whole live lever had nothing
+        inheritance-only Memory -- so a whole live lever had nothing
         buyable behind it.  A chip is worth about fifteen wins.
 
         Uncapped ON PURPOSE: the win path it shortcuts is uncapped too
@@ -883,9 +883,9 @@ class CareMixin:
         the 2026-07-19 pass read "+120min" as 120 REAL minutes and set
         7200, but dt is game-minutes 1:1 -- 2.5x the longest stage in the
         game, from one 500b bottle."""
-        import tuipet.core.digicore as digicore
+        import tuipet.core.datacore as datacore
         dur = self.STAGE_DURATION.get(self.stage, 0)
-        if not dur or dur >= 9e8 or not digicore.has_next(self):
+        if not dur or dur >= 9e8 or not datacore.has_next(self):
             return _Refused(f"{self.name} has nothing left to hurry.")  # noqa: F405
         ceiling = dur - 1.0                       # never reaches the gate
         target = min(self.stage_seconds + dur * GROW_CAPSULE_FRACTION,  # noqa: F405
@@ -931,7 +931,7 @@ class CareMixin:
         return "VIVO."
 
     def stash_wild_memory(self):
-        """A FOUND digimemory carries a random payload (2026-07-24, Joel:
+        """A FOUND memory carries a random payload (2026-07-24, Joel:
         "make wild chips carry a random payload").  Where an INHERITED chip
         holds a maxed ancestor's etched Va/D/Vi (tens to hundreds), a wild
         one holds a stranger's faint trace -- a small single-attribute
@@ -949,20 +949,20 @@ class CareMixin:
         """The payload the NEXT chip use will apply -- inherited first, then
         the oldest wild trace.  The inherit fx needs the numbers BEFORE
         use_item consumes them (shopscreen._use)."""
-        if self.digimemory:
-            return self.digimemory
+        if self.memory:
+            return self.memory
         return self.wild_memories[0] if self.wild_memories else {}
 
     def _inherit_memory(self):
-        """The Digimemory chip (DVPet item 32, anim Inherit): a payload's
-        Va/D/Vi joins this pet's powers (petbase DIGIMEMORY_* law).  An
+        """The Memory chip (DVPet item 32, anim Inherit): a payload's
+        Va/D/Vi joins this pet's powers (petbase MEMORY_* law).  An
         INHERITED chip's etched ancestor data takes priority; failing that,
         a FOUND chip spends the oldest wild trace (2026-07-24).  A chip with
         no payload of either kind -- a bare estate husk -- stays mute.
         (The chip's lifespan hours left with the lifespan clock -- DSprite
         mortality 2026-07-22; an OLD chip's "seconds" payload is ignored.)"""
-        inherited = bool(self.digimemory)
-        mem = self.digimemory or (self.wild_memories[0]
+        inherited = bool(self.memory)
+        mem = self.memory or (self.wild_memories[0]
                                   if self.wild_memories else None)
         if not mem:
             return _Refused("O chip está silencioso.")  # noqa: F405
@@ -970,7 +970,7 @@ class CareMixin:
         self.data_power += int(mem.get("data", 0) or 0)
         self.virus += int(mem.get("virus", 0) or 0)
         if inherited:
-            self.digimemory = {}
+            self.memory = {}
         else:
             self.wild_memories.pop(0)
         return f"{mem.get('name', 'The ancestor')}'s power lives on!"
@@ -1158,7 +1158,7 @@ class CareMixin:
     # their care gates (the item is an extra gate, not a bypass);
     # item_direct is the authored paid shortcut (graph adjacency only).
     _ITEM_EVO_IDS = {
-        "digitron": 33,
+        "datatron": 33,
         "human_fire_spirit": 43, "human_light_spirit": 44,
         "human_ice_spirit": 45, "human_wind_spirit": 46,
         "human_thunder_spirit": 47, "human_earth_spirit": 48,
@@ -1177,7 +1177,7 @@ class CareMixin:
     }
 
     def _evo_key(self, key):
-        """A dormant door opens: the spirits and the Digitron ride the same
+        """A dormant door opens: the spirits and the Datatron ride the same
         item_select flow the crest eggs do; the direct items name their form
         outright.  Refused (item kept) when nothing answers."""
         item_id = self._ITEM_EVO_IDS.get(key)

@@ -13,7 +13,7 @@ the bay bridge and the factory day/night, the tree path green/golden.  They
 are grouped and named as such in NAMES below.
 
 The egg->scene wiring is derived, not invented: each egg's hatch line maps
-through its members' natural habitats (digimon.csv Habitat, the same table
+through its members' natural habitats (monster.csv Habitat, the same table
 the habitat system read) onto the DSprite rebuild's own biome->scene map;
 lines with no habitat data fall back to their dominant FIELD.  A handful of
 flavor overrides are marked inline.
@@ -147,8 +147,8 @@ EGG_BG = {
     42: "greenhills",    # V Egg (f: WindGuardian -- Veemon is a warm dragon
                          #   warrior; open green hills beat an ice peak, 2026-07-20)
     43: "greenhills",    # Virus Busters Ver. 20th Egg (h: Plains)
-    44: "cityday",       # Digitama X3 (* the Royal Knights' white city)
-    45: "datatunnel",    # Kera Digitama (h: Hard Disk)
+    44: "cityday",       # Egg X3 (* the Royal Knights' white city)
+    45: "datatunnel",    # Kera Egg (h: Hard Disk)
 }
 
 

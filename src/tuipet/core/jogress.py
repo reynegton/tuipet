@@ -17,18 +17,18 @@ JOGRESS_SICK_CHANCE = 90       # startJogress checkSick(90): fusing with a SICK 
 #                                would need the partner's sick flag on the jogress payload
 #                                (a relay protocol addition) -- Joel names that, or nobody.
 
-# attributeJogress.csv as (result, digimon, partner) attribute triples. BOTH matrix blocks
+# attributeJogress.csv as (result, monster, partner) attribute triples. BOTH matrix blocks
 # are included (DVPet Affinity.readAttributeInfo reads all rows), so None/Free-attribute
 # fusions are covered -- not just the Vaccine/Data/Virus 3x3. 308 mons are Free-attribute and
 # 23 jogress targets (Apocalymon, Mastemon, ...) are Free, all unreachable without block 2.
 JOGRESS_PAIRS = [
     # block 1 -- partner None yields None
     ("None", "None", "None"), ("None", "Vaccine", "None"), ("None", "Data", "None"), ("None", "Virus", "None"),
-    # block 1 -- partner Vaccine / Data / Virus (the classic 3x3, plus the None-digimon column)
+    # block 1 -- partner Vaccine / Data / Virus (the classic 3x3, plus the None-monster column)
     ("None", "None", "Vaccine"), ("Vaccine", "Vaccine", "Vaccine"), ("Data", "Data", "Vaccine"), ("Vaccine", "Virus", "Vaccine"),
     ("None", "None", "Data"), ("Data", "Vaccine", "Data"), ("Data", "Data", "Data"), ("Virus", "Virus", "Data"),
     ("None", "None", "Virus"), ("Vaccine", "Vaccine", "Virus"), ("Virus", "Data", "Virus"), ("Virus", "Virus", "Virus"),
-    # block 2 -- Free-attribute combinations (a None partner or None digimon yields a real result)
+    # block 2 -- Free-attribute combinations (a None partner or None monster yields a real result)
     ("Virus", "Vaccine", "None"), ("Vaccine", "Data", "None"), ("Data", "Virus", "None"),
     ("Virus", "None", "Vaccine"), ("Vaccine", "None", "Data"), ("Data", "None", "Virus"),
 ]
@@ -36,7 +36,7 @@ ATTRS = ("Vaccine", "Data", "Virus")
 
 
 def required_partners(player_attr, target_attr):
-    """Partner attributes that fuse a `player_attr` digimon into a `target_attr` form
+    """Partner attributes that fuse a `player_attr` monster into a `target_attr` form
     (attributeJogress.csv, both blocks -- handles None/Free combinations natively)."""
     return [par for (evol, dig, par) in JOGRESS_PAIRS
             if dig == player_attr and evol == target_attr]

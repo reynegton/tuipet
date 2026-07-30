@@ -15,14 +15,14 @@ wins) — those elders stand behind the GRAVE glyph and the epitaph says only
 what the record knows; nothing here is guessed (the never-fake law).
 
 ↑↓ browse, PgUp/PgDn leap, ENTER view, ←→ page inside the book, ESC out.
-Opened from the digicore LEGACY page (where the headstones already lived),
+Opened from the datacore LEGACY page (where the headstones already lived),
 the TROPHIES→ALBUM door's exact grammar."""
 from __future__ import annotations
 from rich.text import Text
 import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
 import tuipet.utils.persistence as persistence
-from tuipet.core.digicore import _mins
+from tuipet.core.datacore import _mins
 from tuipet.utils.theme import INK, INK_B, DIM, LCD_ON, LCD_BG    # noqa: F401  (theme.apply propagation)
 from tuipet.i18n.translator import t
 

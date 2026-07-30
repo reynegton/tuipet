@@ -13,7 +13,7 @@ import tuipet.ui.screens.backgroundscreen as backgroundscreen    # noqa: F401
 import tuipet.ui.screens.bugscreen as bugscreen    # noqa: F401
 import tuipet.data.loaders.data as data    # noqa: F401
 import tuipet.ui.screens.deathscreen as deathscreen    # noqa: F401
-import tuipet.ui.screens.digicorescreen as digicorescreen    # noqa: F401
+import tuipet.ui.screens.datacorescreen as datacorescreen    # noqa: F401
 import tuipet.ui.screens.dnascreen as dnascreen    # noqa: F401
 import tuipet.core.egg as egg_mod    # noqa: F401
 import tuipet.ui.screens.eggguidescreen as eggguidescreen    # noqa: F401
@@ -68,7 +68,7 @@ class ActionsMixin:
             return
         self._new_game = False                     # the fresh start is settled
         self.pet = Pet.new_egg(egg_type=egg_type)
-        self._grant_digimemory(self.pet)
+        self._grant_memory(self.pet)
         note = getattr(self, "_boot_notice", "")   # a quarantined save's warning
         self._boot_notice = ""                     # rides THIS flash (title audit
         self.flash((note + "  ·  " if note else "")  # 2026-07-19) -- it marquees
@@ -356,28 +356,28 @@ class ActionsMixin:
         self.repaint()
 
     def action_eggguide(self):
-        # the digitama unlock book -- read-only, safe at any stage
+        # the egg unlock book -- read-only, safe at any stage
         self._open_mode(eggguidescreen.EggGuidePanel(self.pet), lambda _=None: self.repaint())
 
-    def action_digicore(self):
-        self._open_mode(digicorescreen.DigiCorePanel(self.pet), self._after_digicore)
+    def action_datacore(self):
+        self._open_mode(datacorescreen.datacorePanel(self.pet), self._after_datacore)
 
-    def _after_digicore(self, msg):
+    def _after_datacore(self, msg):
         if isinstance(msg, tuple) and msg and msg[0] == "album":
             # TROPHIES' ENTER: browse the album, then come back to the shelf
             # it opened from (the egg-guide-from-carousel round-trip shape)
             self._open_mode(albumscreen.AlbumPanel(self.pet),
                             lambda _=None: self._open_mode(
-                                digicorescreen.DigiCorePanel(self.pet, start="TROPHIES"),
-                                self._after_digicore))
+                                datacorescreen.datacorePanel(self.pet, start="TROPHIES"),
+                                self._after_datacore))
             return
         if isinstance(msg, tuple) and msg and msg[0] == "hall":
             # LEGACY's ENTER: walk the hall of memory, then back to the
             # headstone shelf (the album round-trip's exact shape)
             self._open_mode(hallscreen.HallPanel(self.pet),
                             lambda _=None: self._open_mode(
-                                digicorescreen.DigiCorePanel(self.pet, start="LEGACY"),
-                                self._after_digicore))
+                                datacorescreen.datacorePanel(self.pet, start="LEGACY"),
+                                self._after_datacore))
             return
         if isinstance(msg, tuple) and msg and msg[0] == "evolve":
             # modeChange -> State.Evolving: the same strobe as any evolution
@@ -393,7 +393,7 @@ class ActionsMixin:
                                    starving=getattr(self.pet, "_last_meal_starving", False))
         elif isinstance(msg, tuple) and msg and msg[0] == "evolve":
             # _evolve sounds INSIDE the strobe (fx snds beat 5), like DVPet evolveAnim.
-            # msg[2] = an ItemEvol's key: the Digimental's icon frames head the
+            # msg[2] = an ItemEvol's key: the Relic's icon frames head the
             # strobe with canon itemEvolve's parade
             ik = msg[2] if len(msg) > 2 else None
             self.flash(self._evolve_msg(msg[1]))

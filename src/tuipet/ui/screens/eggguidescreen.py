@@ -1,7 +1,7 @@
-"""Digitama guide — the browsable egg-unlock book (Joel 2026-07-12).
+"""Egg guide — the browsable egg-unlock book (Joel 2026-07-12).
 
 The egg SELECT carousel stays available-only (no silhouettes, no teasers);
-THIS is where the rest of the roster lives: every digitama in the game, the
+THIS is where the rest of the roster lives: every egg in the game, the
 state it is in, and — verbatim from eggUnlock.csv's LockedDescription — what
 earns it, with the live 'how close am I' counter (egg.unlock_progress).
 Data only: names, conditions and progress all come from egg.py /
@@ -55,7 +55,7 @@ class EggGuidePanel:
         self.i = 0
         self.detail = False
         self.frame_i = 0
-        self.msg = t("egg_guide_welcome", "Every digitama, and what earns it.")
+        self.msg = t("egg_guide_welcome", "Every egg, and what earns it.")
         self.sfx = None
 
     # ---- panel protocol --------------------------------------------------
@@ -117,7 +117,7 @@ class EggGuidePanel:
     def _list_scene(self):
         from rich.text import Text
         have = sum(1 for s in self.states.values() if s in ("owned", "temp"))
-        out = menu.header(t("egg_guide_header", "DIGITAMA GUIDE"), f"{have}/{self.n}")
+        out = menu.header(t("egg_guide_header", "EGG GUIDE"), f"{have}/{self.n}")
 
         def fmt(idx, j):
             cur = j == self.i
@@ -162,7 +162,7 @@ class EggGuidePanel:
 
     def _detail_scene(self):
         name = egg_mod.hatch_name(self.i)
-        out = menu.header(f"{t('egg_guide_header_single', 'DIGITAMA')}  {name[:20].upper()}", f"{self.i + 1}/{self.n}")
+        out = menu.header(f"{t('egg_guide_header_single', 'EGG')}  {name[:20].upper()}", f"{self.i + 1}/{self.n}")
         rows = self._detail_rows(self.i)
         for label, val in rows[:10]:
             out.append(f" {label:<9}", style=DIM)

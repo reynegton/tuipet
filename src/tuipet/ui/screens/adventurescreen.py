@@ -401,7 +401,7 @@ class AdventurePanel(menu.SubHost):
         key, self._find = self._find, None
         present, self._find_present = self._find_present, False
         self.pet.add_item(key)                # a CATALOG key: real, usable loot
-        if key == "digimemory":               # a WILD chip carries a random
+        if key == "memory":               # a WILD chip carries a random
             self.pet.stash_wild_memory()      # trace (2026-07-24) -- one per item
         self.adv.finds += 1
         name = (shop.entry(key) or {}).get("name", "loot")

@@ -347,7 +347,7 @@ def win_gate_progress(pet):
     return None
 
 
-# ---- data-book presentation (digicorescreen) --------------------------------
+# ---- data-book presentation (datacorescreen) --------------------------------
 
 _TXT = {"cm": "care slips", "tr": "trainings", "of": "overfeeds",
         "btl": "battles this stage", "lv": "level", "ko6": "Mega-class felled"}
@@ -355,7 +355,7 @@ _TXT = {"cm": "care slips", "tr": "trainings", "of": "overfeeds",
 # what fills a WIN window (and what doesn't): drills feed TR gates, lobby
 # duels feed nothing (L17), and a raid attempt writes NOTHING on the pet
 # (RaidBout, clone rule) -- "road" = the adventure's wilds + zone bosses.
-# <= 35 chars -- the digicore LCD row clip.
+# <= 35 chars -- the datacore LCD row clip.
 WIN_FEED_NOTE = "fed by cup & road, not pvp/raids"
 
 

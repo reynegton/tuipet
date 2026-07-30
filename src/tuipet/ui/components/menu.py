@@ -188,7 +188,7 @@ def list_window(out, rows, cursor, vis, fmt, empty=None):
     each row through fmt(item, index), padded with blanks.  Retires seven
     hand-rolled copies (audit 2026-07).  fmt returns a plain label (rendered
     via row() with the ▸ cursor) OR a styled Text owning its whole line incl.
-    the newline -- for lists with their own row grammar (digicore EVOLVES).
+    the newline -- for lists with their own row grammar (datacore EVOLVES).
     Returns the clamped cursor so callers can keep theirs in range."""
     n = len(rows)
     cursor = min(cursor, max(0, n - 1))
@@ -214,7 +214,7 @@ def page_step(cursor, n, vis, k):
     key so the caller's elif chain falls through untouched.
 
     Help and the README have promised "PgUp/PgDn leap through long lists"
-    since 0.5.64, but only the top/window scrollers (help, egg guide, digicore,
+    since 0.5.64, but only the top/window scrollers (help, egg guide, datacore,
     options, lobby) ever implemented it -- the CURSOR lists, including the
     31-row scene picker and the 24-slot cup board, silently ate the key
     (help audit 2026-07-21).  One helper so the claim stays true everywhere."""

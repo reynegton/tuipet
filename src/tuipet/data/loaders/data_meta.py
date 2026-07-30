@@ -1,5 +1,5 @@
 """The progression metadata (tier-1 split, 2026-07-17): egg unlock
-rules, care effects, digicore config, honors titles."""
+rules, care effects, datacore config, honors titles."""
 from __future__ import annotations
 import csv  # noqa: F401
 import gzip  # noqa: F401
@@ -10,7 +10,7 @@ from functools import lru_cache  # noqa: F401
 
 _HERE = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _DATA = os.path.join(_HERE, "data")
-_RAW = _DATA  # bundled CSVs (digimon/evolutions/foods) live alongside sprites
+_RAW = _DATA  # bundled CSVs (monster/evolutions/foods) live alongside sprites
 from tuipet.data.loaders.data_core import (    # noqa: F401  (shared plumbing)
     AssetsError, _load_bundled, _open_data)
 
@@ -21,17 +21,17 @@ from tuipet.data.loaders.data_core import (    # noqa: F401  (shared plumbing)
 # corpus data.)
 
 @lru_cache(maxsize=1)
-def load_digicore_config():
-    """DVPet digicoreMenuConfig.csv -> {num: {label, icon, icon_x}}.
-    Icon/IconX name the SPECIAL core badge png (setupDigicore info[1]/info[2]);
-    a literal "null" HIDES the badge for that Digimon; unlisted Digimon get the
+def load_datacore_config():
+    """DVPet datacoreMenuConfig.csv -> {num: {label, icon, icon_x}}.
+    Icon/IconX name the SPECIAL core badge png (setupDatacore info[1]/info[2]);
+    a literal "null" HIDES the badge for that Monster; unlisted Monster get the
     default X-antibody-state badges."""
     label = {"burstCore.png": "Burst", "twelveCore.png": "Twelve",
              "twoCore.png": "Two", "darkcore.png": "Dark"}
     key = {"burstCore.png": "core_burst", "twelveCore.png": "core_twelve",
            "twoCore.png": "core_two", "darkcore.png": "core_dark"}
     out = {}
-    path = os.path.join(_DATA, "digicoreMenuConfig.csv")
+    path = os.path.join(_DATA, "datacoreMenuConfig.csv")
     if not os.path.exists(path):
         return out
     for r in csv.reader(open(path)):
@@ -47,9 +47,9 @@ def load_digicore_config():
     return out
 
 @lru_cache(maxsize=1)
-def load_digicore_icons():
+def load_datacore_icons():
     """Back-compat: {num: core_label} for the Data Book PERSON page."""
-    return {n: c["label"] for n, c in load_digicore_config().items() if c["label"]}
+    return {n: c["label"] for n, c in load_datacore_config().items() if c["label"]}
 
 @lru_cache(maxsize=1)
 def load_egg_unlock():

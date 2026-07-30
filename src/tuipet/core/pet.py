@@ -35,7 +35,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     calories: int = 0               # DVPet calorie buffer; resetToEgg StartingCalories=0
     strength: int = 4               # effort hearts 0..4; resetToEgg sets FullStrength(4)
     energy: int = 24                # DVPet energy, -max_energy..+max_energy (full at max_energy)
-    max_energy: int = 24            # per-Digimon (digimon.csv MaxEnergy)
+    max_energy: int = 24            # per-Monster (monster.csv MaxEnergy)
     enthusiasm: int = 0             # DVPet spirit, MinEnthusiasm..MaxEnthusiasm (separate from mood)
     weight: int = 20
     poop: int = 0                   # pile count == DVPet countFilth()
@@ -45,7 +45,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     depressed: bool = False         # DVPet _currentMood==Depressed: a sticky STATE entered and
     #                                 left by checkDepressed's rolls, not a mood threshold
     auto_care: bool = False         # DVPet _autoCare: the hired AI Assistant is on duty
-    assistant_num: int = -1         # DVPet _assistantID: WHICH Digimon answered the contract
+    assistant_num: int = -1         # DVPet _assistantID: WHICH Monster answered the contract
     care_mistakes: int = 0
     dna_owned: dict = _dcf(default_factory=lambda: {f: 0 for f in data.DNA_FIELDS})    # banked
     dna_applied: dict = _dcf(default_factory=lambda: {f: 0 for f in data.DNA_FIELDS})  # charged
@@ -149,7 +149,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     daily_mood: dict = _dcf(default_factory=lambda: {"Feliz": 0, "Neutro": 0, "Triste": 0, "Deprimido": 0})
     last_birthday: int = 0          # last celebrated age-day
     evol_bonus: int = 0             # _bonus: birthday/win-rate credit fed into evolution odds
-    digimemory: dict = _dcf(default_factory=dict)   # held inheritance data (item 32 payload)
+    memory: dict = _dcf(default_factory=dict)   # held inheritance data (item 32 payload)
     wild_memories: list = _dcf(default_factory=list)  # FOUND-chip payloads (queue; 2026-07-24)
     birthday_note: str = ""         # transient: the HUD's birthday announcement
     saved_from_death: int = 0       # _savedFromDeath: each rescue raises the next bar
@@ -260,7 +260,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             if rec and not self.field:
                 self.field = rec.get("field", "")
             req = data.load_requirements().get(self.num, {})
-            self.max_energy = req.get("max_energy", 24)        # per-Digimon maxEnergy
+            self.max_energy = req.get("max_energy", 24)        # per-Monster maxEnergy
             self._sleep_energy_gain = req.get("sleep_energy_gain", 3)
             if self.energy > self.max_energy:
                 self.energy = self.max_energy
@@ -281,7 +281,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     def new_egg(cls, generation=1, egg_type=None):
         if egg_type is None:
             egg_type = random.randrange(egg_mod.count())
-        pet = cls(num=-1, name="Digitama", stage="Egg",
+        pet = cls(num=-1, name="Egg", stage="Egg",
                   egg_type=egg_type, generation=generation)
         if generation == 1:
             # the tamer's pocket money (gameplay polish #23, 2026-07-22): a
@@ -294,9 +294,9 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             # the heir's ESTATE (death/rebirth + item audits): canon's
             # resetToEgg never touches bits, the bag or the trophy room --
             # all device-lifetime, all inherited.  (The care BONUS rides the
-            # bonus_seed channel, granted by app._grant_digimemory -- the old
+            # bonus_seed channel, granted by app._grant_memory -- the old
             # last_gen.bonus copy was a second, partial careBonusOnReset that
-            # the seed always stomped; retired, digimemory audit 2026-07-06.)
+            # the seed always stomped; retired, memory audit 2026-07-06.)
             import tuipet.utils.persistence as _persist
             est = _persist.prev_gen_estate()
             pet.bits = est["bits"]
@@ -425,7 +425,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
                 and self.age_days >= GERIATRIC_AGE_DAYS)
 
     def stomach_capacity(self):
-        """Canon getStomachCapacity: the SPECIES stomach (digimon.csv), shrunk
+        """Canon getStomachCapacity: the SPECIES stomach (monster.csv), shrunk
         linearly through old age toward MinStomachCapacity(7) -- an elder
         fills up on smaller meals (food audit 2026-07-15).  The shrink runs
         over the first GERIATRIC_REMAIN seconds PAST the elder line (age-based
@@ -766,14 +766,14 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         if _req.get("give_item", -1) >= 0:        # GiveItem: grant a consumable (dormant in data)
             self.add_item(f"i:{_req['give_item']}")
         if _req.get("xantibody", "None") in ("Induced", "Natural"):
-            # Evolution.digivolve: becoming an X form makes the X state PERMANENT
+            # Evolution.evolve: becoming an X form makes the X state PERMANENT
             self._set_xantibody("Permanente")
         self._set_anim("happy", 2.5)
 
     def _swap_form(self, num, subtract_current=False):
-        """The Mode/revert half of Evolution.digivolve: swap the SPECIES ONLY.
+        """The Mode/revert half of Evolution.evolve: swap the SPECIES ONLY.
         No growth-clock reset, no care-record/DNA/taste reset, no lifespan
-        extension -- the transform shares the life (digivolve skips all of it
+        extension -- the transform shares the life (evolve skips all of it
         when SpecialEvol is Mode or reverting)."""
         cur = data.load_requirements().get(self.num, {})
         _req = self._become(num)
@@ -1020,7 +1020,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
 
     def final_care_grade(self):
         """careBonusOnReset: grade the ending life.  Runs at death AFTER the
-        Digimemory etch (which spends the bonus); the result seeds the next
+        Memory etch (which spends the bonus); the result seeds the next
         generation's evol_bonus."""
         b = self.evol_bonus
         b = b - self.care_mistakes if self.care_mistakes > 0 else b + 1
@@ -1037,7 +1037,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             b += 1
         # longevity: whole days lived past the growth curve (negative if short).
         # int(x / D), not x // D: canon's Java long division truncates toward
-        # ZERO, so a short life loses only its WHOLE missing days (digimemory
+        # ZERO, so a short life loses only its WHOLE missing days (memory
         # audit 2026-07-06 -- floor division over-penalized by one).  The day
         # is the MEMORIAL's day (86400s, "Lived N days"): the 1440 game-min
         # day paid +175..+295 for ANY natural life, swamping the card's +-1
@@ -1055,9 +1055,9 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
                 b += 1
         return max(0, b)
 
-    def make_digimemory(self):
-        """setNewDigimemory, the dying pet's side: with a care bonus in hand, etch
-        Va/D/Vi = floor(power * bonus * 0.01) into the Digimemory payload; the
+    def make_memory(self):
+        """setNewMemory, the dying pet's side: with a care bonus in hand, etch
+        Va/D/Vi = floor(power * bonus * 0.01) into the Memory payload; the
         bonus is spent.  Returns None with no bonus (DVPet onDie only enters
         UnlockInheritance when _bonus > 0).  (The chip's lifespan hour left
         with the lifespan clock -- DSprite mortality 2026-07-22.)"""
@@ -1065,9 +1065,9 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
             return None
         b = self.evol_bonus
         mem = {"name": self.name, "num": self.num,
-               "vaccine": int(self.vaccine * b * DIGIMEMORY_ATTR_COEF),
-               "data": int(self.data_power * b * DIGIMEMORY_ATTR_COEF),
-               "virus": int(self.virus * b * DIGIMEMORY_ATTR_COEF)}
+               "vaccine": int(self.vaccine * b * MEMORY_ATTR_COEF),
+               "data": int(self.data_power * b * MEMORY_ATTR_COEF),
+               "virus": int(self.virus * b * MEMORY_ATTR_COEF)}
         self.evol_bonus = 0
         return mem
 
@@ -1090,7 +1090,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
         return total
 
 
-    # ⛔ JP/EN DIGIMENTAL GOTCHA (armor canon audit 2026-07-17, the KO6
+    # ⛔ JP/EN RELIC GOTCHA (armor canon audit 2026-07-17, the KO6
     # stage-name class): JP 誠実 "Sincerity" is the EN dub's RELIABILITY
     # egg -- the WATER family (item 20: Submarimon/Depthmon/Tylomon...);
     # JP 純真 "Purity" is the EN dub's SINCERITY egg (item 18: Shurimon/

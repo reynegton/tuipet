@@ -79,7 +79,7 @@ def care_deco(pet, word=None):
     if pet.is_frail(): deco.append(f"[{T.NEG}]{t('deco_frail', '+frail!')}[/]")
     if pet.poop: deco.append(f"[{T.COIN}]{t('deco_poop', '~poop x{count}').format(count=pet.poop)}[/]")
     # +rude (badge audit 2026-07-24): manners drives feed/train/battle
-    # refusals below DISOBEY_BELOW, but the gauge lives only on DigiCore --
+    # refusals below DISOBEY_BELOW, but the gauge lives only on datacore --
     # a pet "torce o nariz!" with no on-card reason.  This is the ONLY
     # signal that a refusal is EARNED disobedience, not a bug.  Below the
     # ailments/needs in priority: a hungry, defiant pet shows the hunger
@@ -217,7 +217,7 @@ def home_lines(pet):
         DIV,
         # (the HP fragment was the retired classic battle's trained-HP --
         # home-card audit 2026-07-17.  The Va/Da/Vi Power ledger and the DMX
-        # Level, once DigiCore-only, now ride the two battle rows below --
+        # Level, once datacore-only, now ride the two battle rows below --
         # both were live progression the main card never showed, home-card
         # surfacing 2026-07-24 "evaluate what we can fit".)
         f"{t('status_weight', 'Weight').ljust(8)}{pet.weight}g · [{T.COIN}]{pet.bits}b[/]",
@@ -227,7 +227,7 @@ def home_lines(pet):
          f"{t('status_care', 'Care').ljust(8)}[{T.NEG if pet.care_mistakes >= 10 else T.CARE}]"
          f"✗{pet.care_mistakes} {t('status_care_this_stage', 'this stage')}[/]"),
         f"DP      [{T.ACCENT}]{'◆' * getattr(pet, 'dp', 0)}[/][dim]{'◇' * (4 - getattr(pet, 'dp', 0))}[/]",
-        # battle progression, once DigiCore-only: wins/level/trophies on one
+        # battle progression, once datacore-only: wins/level/trophies on one
         # row, the Va/Da/Vi attribute powers on the next.  Level folds in free
         # (DMX 1-10, capped by stage); the powers colour by attribute --
         # Vaccine green, Data blue, Virus red -- and are uncapped, so a big
@@ -254,12 +254,12 @@ def home_lines(pet):
 def egg_lines(pet):
     mins, secs = divmod(int(pet.age_seconds), 60)
     return [
-        f"[b]{t('egg_title', 'Digitama')}[/] [dim]· {t('egg_subtitle', 'egg')}[/]",
+        f"[b]{t('egg_title', 'Egg')}[/] [dim]· {t('egg_subtitle', 'egg')}[/]",
         DIV,
         f"[dim]{t('egg_desc', 'a new life is warming')}[/]",
         "",
         t('egg_destined', 'Destined to hatch'),
-        # the destined BABY, not the egg's display title ("Kera Digitama"
+        # the destined BABY, not the egg's display title ("Kera Egg"
         # promised an egg would hatch an egg); a pool keeps its mystery
         f"  [b]{egg_mod.destined_name(pet.egg_type) or '???'}[/]",
         DIV,
@@ -318,7 +318,7 @@ def eggselect(app):
     # carousel = hatchable eggs ONLY (Joel 2026-07-12: no silhouettes,
     # no goals); the badge/shown branches below stay defensive in case a
     # locked egg ever leaks onto it.  Carousel polish 2026-07-18: the card
-    # names the egg's wired HOME scene, keeps a multi-target digitama's
+    # names the egg's wired HOME scene, keeps a multi-target egg's
     # mystery, and badges a never-raised species.
     idx = m.carousel[m.i] if m.carousel else 0
     state = m.states.get(idx, "owned")
@@ -334,7 +334,7 @@ def eggselect(app):
         badge = ("[b]★ nunca criado[/]" if fresh
                  else {"temp": "[dim]só essa ger.[/]"}.get(state, "[dim]pronto[/]"))
     # the egg wears its NAME (Joel 2026-07-22: "shouldnt the egg carousel
-    # screen show the name of the egg?") -- the browsed digitama had no
+    # screen show the name of the egg?") -- the browsed egg had no
     # label anywhere, so matching it to its egg-guide entry meant matching
     # art by eye.  The old title ruling only banned the egg's name on the
     # HATCH line (an egg must not promise to hatch an egg); the egg's own
@@ -472,7 +472,7 @@ def shop(app):
 
 
 def eggguide(app):
-    """DIGITAMA GUIDE: the browsed egg's dossier."""
+    """EGG GUIDE: the browsed egg's dossier."""
     m = app.mode
     state = m.states.get(m.i, "locked")
     # the name shows for EVERY egg -- the guide's own list and detail
@@ -489,7 +489,7 @@ def eggguide(app):
     # the goal WRAPS to two card lines -- the one-slice clip froze the dual
     # map gate mid-word ("clear adventure map 1 (or", Joel 2026-07-28)
     goal = wrap(live, 2) if live and state == "locked" else [""]
-    card(app, "Digitama", [
+    card(app, "Egg", [
         f"[dim]{m.i + 1} of {m.n}[/]", "",
         f"Choca    [b]{name[:16]}[/]",
         f"Estado   {state}",
@@ -498,8 +498,8 @@ def eggguide(app):
         + [f"[dim]{hints}[/]"])
 
 
-def digicore(app):
-    """DIGICORE: which data page is up, and whose core it is."""
+def datacore(app):
+    """DATACORE: which data page is up, and whose core it is."""
     p, m = app.pet, app.mode
     page = m.pages[min(m.i, len(m.pages) - 1)][0]
     dc_lines = [
@@ -509,7 +509,7 @@ def digicore(app):
         f"[dim]{m.i + 1} of {len(m.pages)}[/]", ""]
     dc_lines += wrap(m.note or "", 2)          # note carries mode-change lines
     dc_lines.append("[dim]←→ páginas  SPACE núcleo[/]")
-    card(app, "DigiCore", dc_lines, subtitle=gen_subtitle(p))
+    card(app, "datacore", dc_lines, subtitle=gen_subtitle(p))
 
 
 def raid(app):
@@ -561,7 +561,7 @@ def lobby(app):
         f"[dim]{app.pet.name[:14]} rides along[/]", "",
         f"Here   {len(roster)} tamer" + ("s" if len(roster) != 1 else ""),
         f"Links  {links} lifetime", "",
-        "[dim]digite p/ chat · ENTER[/]",
+        "[dim]datate p/ chat · ENTER[/]",
         "[dim]↑↓ escolha um domador[/]"])
 
 
@@ -605,7 +605,7 @@ def bug(app):
     n = len(getattr(m, "buf", ""))
     card(app, "Bug Report", [
         "[dim]direto pro dev[/]", "",
-        f"Digitou {n} caracs", "",
+        f"Datatou {n} caracs", "",
         "[dim]diga o que você fez e[/]",
         "[dim]o que deu errado[/]", "",
         "[dim]ENTER enviar  ESC sair[/]"])
@@ -860,7 +860,7 @@ def _registry():
     """Panel class -> painter.  Built lazily: importing every screen at
     module import would be a cycle magnet."""
     from tuipet.ui.screens import (assistscreen, backgroundscreen, battlescreen, bugscreen,
-                   deathscreen, digicorescreen, disciplinescreen, dnascreen,
+                   deathscreen, datacorescreen, disciplinescreen, dnascreen,
                    eggguidescreen, eggselectscreen, feedscreen, helpscreen,
                    lobbyscreen, optionsscreen, raidscreen, shopscreen,
                    titlescreen, tournamentscreen)
@@ -877,7 +877,7 @@ def _registry():
         (feedscreen.FeedPanel, feed),
         (shopscreen.ShopPanel, shop),
         (eggguidescreen.EggGuidePanel, eggguide),
-        (digicorescreen.DigiCorePanel, digicore),
+        (datacorescreen.datacorePanel, datacore),
         (raidscreen.RaidPanel, raid),
         (lobbyscreen.LobbyPanel, lobby),
         (helpscreen.HelpPanel, help_),

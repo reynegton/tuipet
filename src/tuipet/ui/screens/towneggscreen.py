@@ -1,5 +1,5 @@
 """Town egg market (Joel 2026-07-21: "different towns sell different eggs --
-all shops feel unique").  Each town stocks a DISTINCT band of digitama
+all shops feel unique").  Each town stocks a DISTINCT band of egg
 (shop.town_egg_stock), shown as a grid of the REAL 8x8 egg thumbnails
 (downsampled x2 -- the June 21 egg-select grid, restored) with a frame around
 the selection.  ENTER buys the centred egg outright (bits -> egg_own); it

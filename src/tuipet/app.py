@@ -1,4 +1,4 @@
-"""tuipet — a terminal Digimon V-Pet rendered with halfblock sprites."""
+"""tuipet — a terminal Monster V-Pet rendered with halfblock sprites."""
 from __future__ import annotations
 # Force 24-bit color BEFORE importing Textual: SSH sessions usually do not carry
 # COLORTERM, so Textual would auto-downgrade to xterm-256 and the muted background
@@ -100,7 +100,7 @@ def keys_markup():
     l2_parts.extend([
         f"[{k}]t[/] {t('action_train', 'train')}",
         f"[{k}]x[/] {t('action_dna', 'DNA')}",
-        f"[{k}]d[/] {t('action_digicore', 'digicore')}"
+        f"[{k}]d[/] {t('action_datacore', 'datacore')}"
     ])
     l2 = "  ".join(l2_parts)
     
@@ -204,7 +204,7 @@ class TuiPetApp(ActionsMixin, App):
         ("r", "raid", t("app_menu_raid", "Raid")), ("u", "tournament", t("app_menu_cup", "Cup")),
         ("l", "lobby", t("app_menu_lobby", "Lobby")),
         ("t", "train", t("app_menu_train", "Train")), ("x", "dna", t("app_menu_dna", "DNA")),
-        ("d", "digicore", t("app_menu_digicore", "DigiCore")), ("e", "eggguide", t("app_menu_eggguide", "Egg Guide")),
+        ("d", "datacore", t("app_menu_datacore", "datacore")), ("e", "eggguide", t("app_menu_eggguide", "Egg Guide")),
         ("s", "shop", t("app_menu_shop", "Shop")), ("b", "inventory", t("app_menu_bag", "Bag")),
         ("n", "scenes", t("app_menu_scenes", "Scenes")), ("g", "options", t("app_menu_options", "Options")),
         ("i", "bug", t("app_menu_bug", "Bug")), ("question_mark", "help", t("app_menu_help", "Help")), ("q", "quit", t("app_menu_quit", "Quit")),
@@ -446,30 +446,30 @@ class TuiPetApp(ActionsMixin, App):
         leads back to the bare memorial.
 
         UnlockInheritance (onDie with _bonus > 0): the departed CAN etch
-        its Digimemory -- canon's DigiMemory_Validation is a real choice
+        its Memory -- canon's memory_Validation is a real choice
         (declining keeps the bonus for the heir), so the panel asks; the
         etch is the walk-out default.  A held UNUSED payload is
         device-lifetime (canon item 32 survives resetToEgg): back to the
-        bank first (digimemory audit 2026-07-06), where the only-one
+        bank first (memory audit 2026-07-06), where the only-one
         prompt covers it."""
         p = self.pet
         if p.death_banked:
             self._open_mode(deathscreen.DeathPanel(
-                p, old_mem=persistence.peek_digimemory()), self._after_death)
+                p, old_mem=persistence.peek_memory()), self._after_death)
             return
-        if p.digimemory:
-            persistence.bank_digimemory(dict(p.digimemory))
-            p.digimemory = {}
+        if p.memory:
+            persistence.bank_memory(dict(p.memory))
+            p.memory = {}
         b0 = p.evol_bonus
-        new_mem = p.make_digimemory()
+        new_mem = p.make_memory()
         grade_spent = p.final_care_grade()   # the etch path's seed
         p.evol_bonus = b0
         grade_kept = p.final_care_grade()    # the decline path's seed
         p.evol_bonus = 0                     # the life is spent either way
-        old_mem = persistence.peek_digimemory()
+        old_mem = persistence.peek_memory()
         banked_new = False
         if new_mem and not old_mem:
-            persistence.bank_digimemory(new_mem)    # default: etched
+            persistence.bank_memory(new_mem)    # default: etched
             banked_new = True
         persistence.bank_bonus_seed(grade_spent)    # default seed; B re-banks
         p.death_banked = True
@@ -478,20 +478,20 @@ class TuiPetApp(ActionsMixin, App):
                                                old_mem=old_mem, grade_kept=grade_kept,
                                                banked_new=banked_new), self._after_death)
 
-    def _grant_digimemory(self, pet):
+    def _grant_memory(self, pet):
         """Hand the banked inheritance data to the next generation: the payload
-        rides the pet's save; the Digimemory chip appears in its bag (DVPet
+        rides the pet's save; the Memory chip appears in its bag (DVPet
         items persist across resetToEgg -- tuipet's generations carry only
         this one).  The raw "i:32" icon key it used to ride is healed to the
         named key on load (shop.LEGACY_KEYS; gameplay audit 2026-07-19)."""
-        mem = persistence.take_digimemory()
+        mem = persistence.take_memory()
         if mem:
-            pet.digimemory = dict(mem)
+            pet.memory = dict(mem)
             # the inherited ESTATE bag may already carry the elder's unused
             # husk (the re-banked-payload case) -- never a second chip for
-            # one payload (digimemory audit 2026-07-06)
-            if pet.inventory.get("digimemory", 0) <= 0:
-                pet.add_item("digimemory")
+            # one payload (memory audit 2026-07-06)
+            if pet.inventory.get("memory", 0) <= 0:
+                pet.add_item("memory")
         # the departed's care grade seeds this generation's bonus (careBonusOnReset)
         pet.evol_bonus = persistence.take_bonus_seed()
 
@@ -986,7 +986,7 @@ class TuiPetApp(ActionsMixin, App):
         if (painter := self._status_painter()) is not None:
             painter()
         else:
-            # data/digicore browses in the LCD; keep live vitals on the right
+            # data/datacore browses in the LCD; keep live vitals on the right
             self.stats_w.paint(self.pet)
 
     def _status_painter(self):
@@ -1508,22 +1508,22 @@ class TuiPetApp(ActionsMixin, App):
         # always refused to record an egg, but this commit still advanced
         # the counter (five re-rolls pumped max_gen to 7 and opened every
         # gen-gated egg unearned), graded the EGG's "care" over the dead
-        # elder's banked seed, and dropped the etched Digimemory with the
+        # elder's banked seed, and dropped the etched Memory with the
         # discarded shell.  A re-pick keeps the generation and carries the
         # whole inheritance to the new shell.
         repick = self.pet.stage == "Egg" and not self.pet.dead
         if repick:
             gen = self.pet.generation
         elif not self.pet.dead:
-            # a LIVE retire skips the death flow entirely: canon resetDigimon
+            # a LIVE retire skips the death flow entirely: canon resetMonster
             # runs careBonusOnReset dead or alive, and a live reset never
             # offers the etch -- the FULL adjusted bonus carries to the heir
-            # (digimemory audit 2026-07-06; this seed used to be lost)
+            # (memory audit 2026-07-06; this seed used to be lost)
             persistence.bank_bonus_seed(self.pet.final_care_grade())
         persistence.snapshot_prev_gen(self.pet)   # previous-generation egg gates
         old = self.pet
         self.pet = Pet.new_egg(generation=gen, egg_type=egg_type)
-        self._grant_digimemory(self.pet)
+        self._grant_memory(self.pet)
         if repick:
             # the outgoing shell's estate moves over untouched: wallet, bag
             # (bought goods included -- the shop opens for an egg), trophy
@@ -1540,10 +1540,10 @@ class TuiPetApp(ActionsMixin, App):
             # must never mint a fresh shopping day
             self.pet.town_bought = dict(old.town_bought or {})
             self.pet.road_bounty = dict(getattr(old, "road_bounty", None) or {})
-            if getattr(old, "digimemory", None):
-                self.pet.digimemory = dict(old.digimemory)
-                if self.pet.inventory.get("digimemory", 0) <= 0:
-                    self.pet.add_item("digimemory")
+            if getattr(old, "memory", None):
+                self.pet.memory = dict(old.memory)
+                if self.pet.inventory.get("memory", 0) <= 0:
+                    self.pet.add_item("memory")
         persistence.save(self.pet)
         self._do(f"Um novo ovo apareceu! (geração {gen})")
 

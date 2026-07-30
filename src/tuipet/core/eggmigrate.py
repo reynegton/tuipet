@@ -27,8 +27,8 @@ _CLASSIC49 = [
 
 _V401_FULL = _CLASSIC49 + [
     "Breakdra Egg", "Corona Egg", "DORU Egg", "Deep Savers Egg",
-    "Digitama X", "Digitama X2", "Digitama X3", "Vorvomon Egg", "Draco Egg",
-    "Hack Egg", "Kera Digitama", "Lalamon Egg", "Lop Egg", "Ludo Egg",
+    "Egg X", "Egg X2", "Egg X3", "Vorvomon Egg", "Draco Egg",
+    "Hack Egg", "Kera Egg", "Lalamon Egg", "Lop Egg", "Ludo Egg",
     "Luna Egg", "Meicoo Egg", "Meicoomon Egg", "Metal Empire Egg",
     "Nature Spirits Egg", "Nightmare Soldiers Egg",
     "Nightmare Soldiers Ver.20th Egg", "Ryuda Egg", "Slayerdra Egg",
@@ -44,7 +44,7 @@ _V402_FULL = _CLASSIC49 + [
     "Corona Egg", "Luna Egg", "Zuba Egg", "Hack Egg", "Meicoo Egg",
     "DORU Egg", "Slayerdra Egg", "Breakdra Egg", "Ryuda Egg", "Draco Egg",
     "Lalamon Egg", "Ludo Egg", "Meicoomon Egg", "Terrier Egg", "Lop Egg",
-    "V Egg", "Virus Busters Ver. 20th Egg", "Digitama X3", "Kera Digitama"]
+    "V Egg", "Virus Busters Ver. 20th Egg", "Egg X3", "Kera Egg"]
 
 _V403_FULL = _CLASSIC49 + [
     "Version 1 Egg", "Version 2 Egg", "Version 3 Egg", "Version 4 Egg",
@@ -53,8 +53,8 @@ _V403_FULL = _CLASSIC49 + [
     "Virus Busters Egg", "Corona Egg", "Luna Egg", "Zuba Egg", "Hack Egg",
     "Meicoo Egg", "DORU Egg", "Slayerdra Egg", "Breakdra Egg", "Ryuda Egg",
     "Draco Egg", "Lalamon Egg", "Ludo Egg", "Meicoomon Egg", "Terrier Egg",
-    "Lop Egg", "V Egg", "Virus Busters Ver. 20th Egg", "Digitama X3",
-    "Kera Digitama"]
+    "Lop Egg", "V Egg", "Virus Busters Ver. 20th Egg", "Egg X3",
+    "Kera Egg"]
 
 _V404_FULL = [
     "Botamon", "Punimon", "Poyomon", "Yuramon", "Zurumon", "Babumon",
@@ -69,14 +69,14 @@ _V404_FULL = [
     "Virus Busters Egg", "Corona Egg", "Luna Egg", "Zuba Egg", "Hack Egg",
     "Meicoo Egg", "DORU Egg", "Slayerdra Egg", "Breakdra Egg", "Ryuda Egg",
     "Draco Egg", "Lalamon Egg", "Meicoomon Egg", "Terrier Egg", "Lop Egg",
-    "V Egg", "Virus Busters Ver. 20th Egg", "Digitama X3", "Kera Digitama"]
+    "V Egg", "Virus Busters Ver. 20th Egg", "Egg X3", "Kera Egg"]
 
 # a CUT egg MID-INCUBATION falls back to the surviving egg of the same baby
 # (name -> name; resolved against the live bank).  Fallbacks are for egg_type
 # ONLY -- never for eggs_owned, or a cut egg would "translate" into permanent
 # ownership of an unearned egg (the .403 Puttimon-as-starter bug).
 _CUT_FALLBACK = {
-    "Digitama X": "Puttimon", "Digitama X2": "Kiimon",
+    "Egg X": "Puttimon", "Egg X2": "Kiimon",
     # the v5 fake-egg cut (humulos provenance audit 2026-07-17): a fake egg
     # mid-incubation becomes a device egg of roughly its temperament
     "Babumon": "Botamon", "Jyarimon": "Botamon", "Datirimon": "Dokimon",

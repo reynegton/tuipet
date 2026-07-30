@@ -183,7 +183,7 @@ _ROAD_KEYS = ("town_transport", "disaster_transport", "life_recovery")
 # D5 (2026-07-24, Joel "make them findable"): cookie + cupcake join the
 # gentle biomes alongside candy, the third grant-only treat -- which has
 # ALWAYS been a road find here, so this only brings its two siblings in
-# line.  (digimemory joined the data biomes the SAME day: the later wild-
+# line.  (memory joined the data biomes the SAME day: the later wild-
 # payload ruling gave a found chip a real 5-15 point payload
 # (petcare.stash_wild_memory), so the old "a wild chip is a silent dud"
 # objection died with it -- it sits in datatunnel/factorynight below,
@@ -208,10 +208,10 @@ BIOME_FINDS = {
     "city":         ("video_game", "television", "energy_drink",
                      "cheese_burger", "skateboard", "computer_game", "capsule_c"),
     "datatunnel":   ("energy_drink", "anti_evo_chip", "video_game",
-                     "caffeine_pill", "digimemory", "computer_game",
+                     "caffeine_pill", "memory", "computer_game",
                      "capsule_c"),
     "factorynight": ("anti_evo_chip", "dumbbell", "energy_drink",
-                     "sleeping_pill", "digimemory", "capsule_d",
+                     "sleeping_pill", "memory", "capsule_d",
                      "supplement"),
     "volcano":      ("steak", "energy_drink", "dumbbell",
                      "red_pepper"),
@@ -357,7 +357,7 @@ def _assign_signatures():
     for _pool in BIOME_FINDS.values():
         already.update(_pool)
     # never a signature: the road trio (they ride EVERY pool already), and
-    # every GRANT-ONLY good -- the birthday treats and the Digimemory are
+    # every GRANT-ONLY good -- the birthday treats and the Memory are
     # deliberately unbuyable gifts (item diversity audit 2026-07-23, "by
     # design"), and making them road loot would quietly undo that.
     # ...and never the endgame table: a signature is exclusive, so signing
@@ -868,7 +868,7 @@ class Adventure:
         battle drops in adventure") -- and it was AUTHORED all along:
         every enemies.csv row carries a LootTableID into dropRate.csv.
         Wilds shed attribute chips at 2-7%, elites shed the X-Program at
-        100%, and each map's unique story boss drops its DIGIMENTAL.
+        100%, and each map's unique story boss drops its RELIC.
 
         Rationing rides the bounty's own rules: a REPLAY boss whose daily
         veteran purse is spent drops nothing either (the road_bounty
@@ -885,7 +885,7 @@ class Adventure:
         for icon, rate in table:
             cum += rate
             if roll < cum:
-                # a Digimental drop speaks the crest shelf's own key; all
+                # a Relic drop speaks the crest shelf's own key; all
                 # else resolves through the one icon->key door
                 iid = int(icon[2:]) if icon.startswith("i:") else -1
                 crest = {v: k for k, v in Pet._CREST_IDS.items()}.get(iid)

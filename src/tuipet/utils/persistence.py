@@ -46,7 +46,7 @@ def __getattr__(name):
 def load_settings(path=None):
     """App-level prefs that outlive any single pet (e.g. the lobby account).
     Falls back to the .bak rotated by save_settings -- settings hold the album,
-    lifetime wins, owned eggs and the banked Digimemory; one corrupt write must
+    lifetime wins, owned eggs and the banked Memory; one corrupt write must
     not erase a save file's whole history (audit 2026-07)."""
     path = path or SETTINGS_PATH
     for candidate in (path, path + ".bak"):
@@ -101,7 +101,7 @@ def save_settings(d, path=None):
 
 
 def get_album():
-    """Set of distinct Digimon species ever raised, NAME-CANONICAL (the
+    """Set of distinct Monster species ever raised, NAME-CANONICAL (the
     DM20-style zukan).  DVPet's dex sync is by name (checkNaturalUnlocked):
     the 1410+ egg-hatch duplicate rows and their chart twins reveal together
     -- old saves may hold either num, so entries canonicalize on read
@@ -205,8 +205,8 @@ def mega_kills_add(n=1):
 
 
 def armor_add(n=1):
-    """Lifetime armor (Digimental) evolutions performed -- the crest-wave
-    Digimental shop gate (2026-07-17)."""
+    """Lifetime armor (Relic) evolutions performed -- the crest-wave
+    Relic shop gate (2026-07-17)."""
     return _note_add("armor_evos", n)
 
 
@@ -374,7 +374,7 @@ def snapshot_prev_gen(pet):
         return
     # (the careBonusOnReset math moved to Pet.final_care_grade -> the
     # bonus_seed channel -- this copy was a second, PARTIAL grading of the
-    # same life that the seed always stomped; digimemory audit 2026-07-06)
+    # same life that the seed always stomped; memory audit 2026-07-06)
     d = load_settings()
     prog = d.setdefault("progress", {})
     prog["last_gen"] = {
@@ -399,7 +399,7 @@ def snapshot_prev_gen(pet):
     }
     # the LEGACY roll (sweep 2026-07-14): every retired generation used to
     # vanish -- only this gate snapshot survived, and it was never SHOWN.
-    # Bank a small headstone per life for the DigiCore LEGACY page.
+    # Bank a small headstone per life for the datacore LEGACY page.
     legacy = prog.setdefault("legacy", [])
     legacy.append({
         "gen": int(getattr(pet, "generation", 1)),
@@ -458,12 +458,12 @@ def prev_gen_estate():
     tw = {int(k) if str(k).lstrip("-").isdigit() else k: v
           for k, v in (last.get("trophies_won") or {}).items()}
     inv = _heal_bag(dict(last.get("inventory") or {}))
-    # digimemory items never ride the estate bag (2026-07-24): the inherited
-    # PAYLOAD travels via the bank channel (take_digimemory -> _grant re-adds
+    # memory items never ride the estate bag (2026-07-24): the inherited
+    # PAYLOAD travels via the bank channel (take_memory -> _grant re-adds
     # exactly one chip), and a WILD chip's trace is within-life loot that
     # fades with its finder.  Carrying the item without its payload would
     # deal the heir a dud -- the very thing the no-traps rule forbids.
-    inv.pop("digimemory", None)
+    inv.pop("memory", None)
     return {"bits": int(last.get("bits", 0)),
             "inventory": inv,
             "trophies": int(last.get("trophies", 0)),
@@ -491,7 +491,7 @@ def shop_unlock_add(key):
     """Canon unlockItem/unlockFood (shop/economy audit 2026-07-06): finding a
     consumable in the wild UNLOCKS its home-shop listing for good -- device-
     lifetime in canon (the bag survives resetToEgg), so the per-save progress
-    channel here.  The nine Digimentals are the payload: found once, buyable
+    channel here.  The nine Relics are the payload: found once, buyable
     (4000b) forever after."""
     d = load_settings()
     got = d.setdefault("progress", {}).setdefault("shop_unlocks", [])
@@ -505,11 +505,11 @@ def shop_unlocks():
     return set((d.get("progress") or {}).get("shop_unlocks") or [])
 
 
-def bank_digimemory(mem):
+def bank_memory(mem):
     """Park the departed's inheritance data in the generational channel (DVPet
     keeps items across resetToEgg; tuipet's per-save channel is progress, the
     same place the last_gen egg gates live).  One slot, like the device."""
-    _note_put("digimemory", dict(mem))
+    _note_put("memory", dict(mem))
 
 
 def bank_bonus_seed(n):
@@ -521,13 +521,13 @@ def take_bonus_seed():
     return int(_note_take("bonus_seed") or 0)
 
 
-def peek_digimemory():
-    return _prog().get("digimemory") or None
+def peek_memory():
+    return _prog().get("memory") or None
 
 
-def take_digimemory():
+def take_memory():
     """Pop the banked memory (the heir now carries it on its own save)."""
-    return _note_take("digimemory") or None
+    return _note_take("memory") or None
 
 
 def get_progress():
@@ -621,7 +621,7 @@ def set_account(name, pw):
 
 def erase_all():
     """Erase the WHOLE local state: pet save (+bak), settings (progress,
-    account, digimemory, +bak), sound + theme prefs -- and every other file
+    account, memory, +bak), sound + theme prefs -- and every other file
     carrying the erased pet's data: quarantined save.corrupt.* copies, the
     crash log and the stashed bug reports (persistence audit 2026-07-18:
     'for keeps' left the old pet recoverable on disk).  The cloud copy stays

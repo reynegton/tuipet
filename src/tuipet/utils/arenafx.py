@@ -144,7 +144,7 @@ GIFT_HOLD = 18                                     # the % (interval*45) settle 
 #     the skull yields to the HUD (which always says +sick anyway)
 # Everything that is a BADGE, not an actor -- medicine/bandage/vitamin/fatigue/
 # injury, the teach bulb, the care-call '!', the idle-state emotes -- lives on
-# the status side of the game (STATUS panel deco, digicore pages, the msg-box
+# the status side of the game (STATUS panel deco, datacore pages, the msg-box
 # alarm: tuipet's silkscreen chrome).  The care-fx scenes keep their own
 # in-scene emotes (cheer/jeer/dying) -- those are full-screen animations,
 # exactly how the hardware spends its pixels.
@@ -177,7 +177,7 @@ _HIDDEN_STATUS_ICONS: set[str] = set()             # add keys here to hide a sce
 # prop tucks into the arena's top-left corner on a holiday -- ambient, over
 # the same festival bonuses (double bits, sales, festival eggs) that were
 # already live.  Three ride REAL ripped icons already aboard (candy, cake, a
-# Digi-crest for the Odaiba anniversary); the present is the one DRAWN prop,
+# Data-crest for the Odaiba anniversary); the present is the one DRAWN prop,
 # design "A" (Joel approved it) -- an outline box with a centre ribbon and a
 # bow, which reads as a gift at 8x8 where a solid blob would not.  Drawing is
 # a deliberate exception to real-rips-only, made for a generic prop (not
@@ -365,8 +365,8 @@ class FxMixin:
             self.fx["snds"] = {6: "angry"}
         elif kind == "evolve":
             # DVPet evolveAnim(): _evolve sounds at the first burst beat (t5);
-            # digivolve() runs the strobe to evolFinish at 41 (was cut at 37).
-            # An ITEM evolution (Digimental) prepends canon itemEvolve's first
+            # evolve() runs the strobe to evolFinish at 41 (was cut at 37).
+            # An ITEM evolution (Relic) prepends canon itemEvolve's first
             # act: the pet parades with the item cycling its own anim frames
             # (itemEvolveLoop -> jogress.wav), THEN the strobe fires.
             # Pre-ritual (anim hardening 2026-07-14): every reference fronts
@@ -874,7 +874,7 @@ class FxMixin:
             c.overlay += _blit(bm, ix, iy + ih - len(bm))   # _stamp clips
 
     # the beamed pair of eighth notes in the special-orb bank -- Gekomon's
-    # own shot (its attack_index, digimon.csv col 55).  A REAL rip: the note
+    # own shot (its attack_index, monster.csv col 55).  A REAL rip: the note
     # is picked out of the bank, never drawn (Joel's standing art law).
     def _fxk_jeer(self, pet, fx, step, c):
         # DVPet jeer(goodScold): the SCOLD reaction -- pose alternates down(+4)/up(+6)
@@ -921,7 +921,7 @@ class FxMixin:
                 fr = rec["frames"]
                 pf = (fr[pose] if pose < len(fr) and fr[pose] else fr[0]) or c.rows
                 c.rows = pf
-            raw = data.load_icons().get(fx.get("icon"))    # ...with the Digimental
+            raw = data.load_icons().get(fx.get("icon"))    # ...with the Relic
             ic = [f for f in (raw or []) if f]             # cycling its OWN frames
             if ic:
                 f = ic[(step // 2) % len(ic)]
@@ -938,7 +938,7 @@ class FxMixin:
                 if step < 6:
                     c.rows = fr0
                 elif (step // 2) % 2 == 1:
-                    from tuipet.ui.screens.digicorescreen import silhouette
+                    from tuipet.ui.screens.datacorescreen import silhouette
                     c.rows = silhouette(fr0)
                 else:
                     c.rows = fr0

@@ -10,7 +10,7 @@ from functools import lru_cache  # noqa: F401
 
 _HERE = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _DATA = os.path.join(_HERE, "data")
-_RAW = _DATA  # bundled CSVs (digimon/evolutions/foods) live alongside sprites
+_RAW = _DATA  # bundled CSVs (monster/evolutions/foods) live alongside sprites
 from tuipet.data.loaders.data_core import (    # noqa: F401  (shared plumbing)
     AssetsError, _load_bundled, _open_data)
 
@@ -82,7 +82,7 @@ def load_foods():
 
 # DVPet DNA fields by name ("None" is Enum.Field ordinal 0 = a REAL bankable/chargeable
 # slot; only NA is excluded). Order here is tuipet's menu display order -- inventory and
-# evolution gates are keyed by NAME (digimon.csv {Field}Key/{Field}Value matched by name),
+# evolution gates are keyed by NAME (monster.csv {Field}Key/{Field}Value matched by name),
 # so this tuple's order is independent of Enum.Field ordinals.
 FOOD_CATEGORIES = ("Meat", "Fish", "Veg", "Fruit", "Med", "Junk", "Grain", "Dairy")
 
@@ -109,7 +109,7 @@ def _consumable(row, id_field):
         "enthusiasm": int(num("Enthusiasm")),   # DVPet keeps spirit separate from mood
         "weight": int(num("Weight")),
         # a FRACTIONAL energy is a share of maxEnergy (canon applyItem: the
-        # X-Program's -0.8, the Digimentals' -0.66) -- the old int() zeroed
+        # X-Program's -0.8, the Relics' -0.66) -- the old int() zeroed
         # every one of them (energy audit 2026-07-06).  Whole values stay int.
         "energy": (lambda v: v if v != int(v) else int(v))(
             num("Energy (<1 * maxEnergy)") or num("Energy")),
@@ -154,7 +154,7 @@ def _consumable(row, id_field):
         "unlocks_food": _idlist(row.get("FoodID")),
         "unlocks_item": _idlist(row.get("ItemID")),
         "action": (row.get("AnimationType") or "").strip(),  # DVPet item behaviour driver
-        "dexnum": int(num("DigimonID")),  # direct ItemEvol target form (-1 if none)
+        "dexnum": int(num("MonsterID")),  # direct ItemEvol target form (-1 if none)
         "category": (row.get("Type") or "").strip(),  # foods.csv food category for taste
         "effect_id": int(num("EffectID")) if (row.get("EffectID") or "").strip() not in ("", "-1") else -1,
         # DVPet Consumable uses-model: a held consumable carries uses up to MaxUses;
@@ -172,7 +172,7 @@ def _consumable(row, id_field):
         "t_restless": int(num("Restless")),
         "t_disposition": int(num("Disposition")),
         "health": int(num("Health")),   # permanent fullHealthPoints gain (HP Chip)
-        # items.csv AdventureLifeInc (Life Recovery, item 27): +N Digital World
+        # items.csv AdventureLifeInc (Life Recovery, item 27): +N Datatal World
         # life, gated at MaxAdventureLife (PhysicalState.useItem)
         "adv_life": int(num("AdventureLifeInc")),
 
@@ -261,7 +261,7 @@ def _load_consumables():
 # An item is "functional" in tuipet only if use_item actually applies an
 # effect.  Since the strict-DSprite item cut the live effects are the DSprite
 # name table + the egg_of_* crests; a DVPet ACTION-item (transports, Life
-# Recovery, ItemEvol relics, the Digimemory redeem) has NO handler and must
+# Recovery, ItemEvol relics, the Memory redeem) has NO handler and must
 # never count as functional -- the old "(now implemented)" claims described
 # systems that left with adventure/towns (liveness audit 2026-07-18).
 # (mood/enthusiasm/undepressed dropped 2026-07-16: those meters left with

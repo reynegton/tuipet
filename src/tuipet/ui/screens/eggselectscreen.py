@@ -117,7 +117,7 @@ class EggSelectPanel:
 
     def _note(self, idx):
         """The hatch line (carousel polish 2026-07-18): a multi-target
-        digitama keeps its mystery instead of wearing the EGG's label, and
+        egg keeps its mystery instead of wearing the EGG's label, and
         a species never raised on this profile earns its ★new badge --
         the collection game, surfaced where the choice happens."""
         state = self.states.get(idx, "owned")
