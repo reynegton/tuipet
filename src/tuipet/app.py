@@ -172,22 +172,22 @@ class TuiPetApp(ActionsMixin, App):
         # Mnemonic remap (player report 2026-07-28: "assign the correct
         # letters"): s=shop, b=bag (the frequent doors get their letters);
         # lights rides o (an on/off toggle), bug rides i (an issue).
-        ("f", "feed", "Feed"), ("h", "heal", "Heal"), ("c", "clean", "Clean"),
-        ("o", "sleep", "Lights"), ("v", "assist", "Assistant"),
-        ("p", "discipline", "Discipline"),
-        ("m", "battle", "Battle"),
-        ("a", "adventure", "Adventure"),
-        ("r", "raid", "Raid"), ("u", "tournament", "Cup"),
-        ("l", "lobby", "Lobby"),
-        ("t", "train", "Train"), ("x", "dna", "DNA"),
-        ("d", "digicore", "DigiCore"), ("e", "eggguide", "Egg Guide"),
-        ("s", "shop", "Shop"), ("b", "inventory", "Bag"),
-        ("n", "scenes", "Scenes"), ("g", "options", "Options"),
-        ("i", "bug", "Bug"), ("question_mark", "help", "Help"), ("q", "quit", "Quit"),
+        ("f", "feed", t("app_menu_feed", "Feed")), ("h", "heal", t("app_menu_heal", "Heal")), ("c", "clean", t("app_menu_clean", "Clean")),
+        ("o", "sleep", t("app_menu_lights", "Lights")), ("v", "assist", t("app_menu_assistant", "Assistant")),
+        ("p", "discipline", t("app_menu_discipline", "Discipline")),
+        ("m", "battle", t("app_menu_battle", "Battle")),
+        ("a", "adventure", t("app_menu_adventure", "Adventure")),
+        ("r", "raid", t("app_menu_raid", "Raid")), ("u", "tournament", t("app_menu_cup", "Cup")),
+        ("l", "lobby", t("app_menu_lobby", "Lobby")),
+        ("t", "train", t("app_menu_train", "Train")), ("x", "dna", t("app_menu_dna", "DNA")),
+        ("d", "digicore", t("app_menu_digicore", "DigiCore")), ("e", "eggguide", t("app_menu_eggguide", "Egg Guide")),
+        ("s", "shop", t("app_menu_shop", "Shop")), ("b", "inventory", t("app_menu_bag", "Bag")),
+        ("n", "scenes", t("app_menu_scenes", "Scenes")), ("g", "options", t("app_menu_options", "Options")),
+        ("i", "bug", t("app_menu_bug", "Bug")), ("question_mark", "help", t("app_menu_help", "Help")), ("q", "quit", t("app_menu_quit", "Quit")),
         # space rides along as a silent confirm alias (QOL 2026-07-23):
         # every in-panel confirm takes ENTER or SPACE, the home view took
         # only ENTER.  action_gift no-ops when no gift is pending.
-        ("enter,space", "gift", "Accept gift"),
+        ("enter,space", "gift", t("app_menu_gift", "Accept gift")),
     ]
 
     def __init__(self, pet: Pet | None = None):
@@ -197,12 +197,12 @@ class TuiPetApp(ActionsMixin, App):
             self._boot_version = _v("tuipet")
         except Exception:
             self._boot_version = ""
-        self._welcome = "Welcome! Raise your pet."
+        self._welcome = t("app_msg_welcome", "Welcome! Raise your pet.")
         self._new_game = False
         if pet is None:
             loaded, msg = persistence.load()
             if loaded is not None:
-                pet, self._welcome = loaded, (msg or "Welcome back!")
+                pet, self._welcome = loaded, (msg or t("app_msg_welcome_back", "Welcome back!"))
             else:
                 self._new_game = True
                 if msg:          # a QUARANTINED corrupt save -- never play it
@@ -239,7 +239,7 @@ class TuiPetApp(ActionsMixin, App):
             with Horizontal(id="top"):
                 with Vertical(id="left"):
                     yield Screen(id="lcd")
-                    yield Static("Welcome! Raise your pet.", id="msg")
+                    yield Static(t("app_msg_welcome", "Welcome! Raise your pet."), id="msg")
                 yield Stats(id="stats")
             yield Static(keys_markup(), id="keys")
 
@@ -696,9 +696,9 @@ class TuiPetApp(ActionsMixin, App):
     async def _send_bug(self, text, meta, name):
         ok = await net.submit_bug(_lobby_uri(), text, meta, name=name)
         if ok:
-            self._verdict("Bug report sent \u2014 thank you!")
+            self._verdict(t("app_msg_bug_sent", "Bug report sent \u2014 thank you!"))
         elif persistence.add_pending_bug(dict(meta, text=text, name=name)):
-            self._verdict("Offline \u2014 saved; it will send next time you are online.")
+            self._verdict(t("app_msg_bug_offline", "Offline \u2014 saved; it will send next time you are online."))
         else:
             # the stash failed too (a read-only save dir): do not promise a
             # send we cannot make (swallowed-failure sweep 2026-07-13)
@@ -847,15 +847,15 @@ class TuiPetApp(ActionsMixin, App):
         stays local, like canon's device-scoped Shared file."""
         import asyncio
         old_name, old_pw = persistence.get_account()
-        self._verdict("Switching account…")
+        self._verdict(t("app_msg_switch_acc", "Switching account…"))
         verdict, save = await asyncio.to_thread(
             cloudsync.probe, _lobby_uri(), name, pw)
         if verdict == "badpw":
-            self._verdict("Wrong password for that name.")
+            self._verdict(t("app_msg_wrong_pw", "Wrong password for that name."))
             self.beep("error", bell=False)
             return
         if verdict != "ok":
-            self._verdict("Can't reach the lobby — try again online.")
+            self._verdict(t("app_msg_lobby_fail", "Can't reach the lobby — try again online."))
             self.beep("error", bell=False)
             return
         if save is not None:
@@ -865,7 +865,7 @@ class TuiPetApp(ActionsMixin, App):
             pet_probe, _ = persistence.pet_from_save(dict(save),
                                                      strict=True)
             if pet_probe is None:
-                self._verdict("That cloud save is unreadable — kept your account.")
+                self._verdict(t("app_msg_cloud_bad", "That cloud save is unreadable — kept your account."))
                 self.beep("error", bell=False)
                 return
         persistence.save(self.pet)                   # park the pet with the OLD account
@@ -881,10 +881,10 @@ class TuiPetApp(ActionsMixin, App):
                 persistence.write_save_dict(save)
                 loaded, msg = persistence.load()
                 self.pet = loaded or Pet.new_egg()
-                self._verdict(f"Signed in as {_hud_esc(name)} — {msg or 'welcome back!'}")
+                self._verdict(t("app_msg_signed_in", "Signed in as {name} — {msg}").format(name=_hud_esc(name), msg=msg or t('app_msg_welcome_back', 'welcome back!')))
                 self.repaint()
             else:
-                self._verdict(f"Signed in as {_hud_esc(name)} — this device is current.")
+                self._verdict(t("app_msg_signed_in_cur", "Signed in as {name} — this device is current.").format(name=_hud_esc(name)))
             return
         if old_name:
             parked = await asyncio.to_thread(        # last-write-wins guarded upload
@@ -914,13 +914,13 @@ class TuiPetApp(ActionsMixin, App):
             loaded, msg = persistence.load()
             self.pet = loaded or Pet.new_egg()
             self._start_sync()
-            self._verdict(f"Signed in as {_hud_esc(name)} — {msg or 'welcome back!'}")
+            self._verdict(t("app_msg_signed_in", "Signed in as {name} — {msg}").format(name=_hud_esc(name), msg=msg or t('app_msg_welcome_back', 'welcome back!')))
             self.repaint()
         elif old_name:
             persistence.delete()                     # parked above: the old pet must not leak in
             self.pet = Pet.new_egg()                 # placeholder until the carousel picks
             self._start_sync()
-            self._verdict(f"Signed in as {_hud_esc(name)} — a fresh start.")
+            self._verdict(t("app_msg_signed_in_fresh", "Signed in as {name} — a fresh start.").format(name=_hud_esc(name)))
             self._open_mode(eggselectscreen.EggSelectPanel(self.pet),
                             self._after_egg_pick)
         else:
@@ -929,7 +929,7 @@ class TuiPetApp(ActionsMixin, App):
             # new account instead -- exactly what the first lobby login does:
             # the pet stays local and the sync pushes it up.
             self._start_sync()
-            self._verdict(f"Signed in as {_hud_esc(name)} — your pet syncs here now.")
+            self._verdict(t("app_msg_signed_in_syncs", "Signed in as {name} — your pet syncs here now.").format(name=_hud_esc(name)))
             self.repaint()
 
     def _center(self, text):
