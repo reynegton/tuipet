@@ -87,15 +87,39 @@ def keys_markup():
     EXPLORE, then GROW, then MANAGE — one layout language across the bar,
     Help and the Options→Keys page (bar tidy 2026-07-18).  GROW's egg
     guide wraps onto line 3: the line only holds 71 cells."""
+    from tuipet import SERVIDOR_ONLINE
     k = f"b {theme.KEY}"
-    return (
-        # "(meat·pill)" left 2026-07-26 (Joel: "save rome by removing (meat
-        # pill)") -- the old line sat at the 71-cell cap exactly, and its
-        # room is what the H key rides in on
-        f"[{k}]f[/] {t('action_feed', 'feed')}  [{k}]h[/] {t('action_heal', 'heal')}  [{k}]c[/] {t('action_clean', 'clean')}  [{k}]o[/] {t('action_lights', 'lights')}  [{k}]v[/] {t('action_assist', 'assist')}  [{k}]p[/] {t('action_discipline', 'discipline')}  [{k}]m[/] {t('action_battle', 'battle')}\n"
-        f"[{k}]a[/] {t('action_adventure', 'adventure')}  [{k}]r[/] {t('action_raid', 'raid')}  [{k}]u[/] {t('action_cup', 'cup')}  [{k}]l[/] {t('action_lobby', 'lobby')} [dim](pvp)[/]  [{k}]t[/] {t('action_train', 'train')}  [{k}]x[/] {t('action_dna', 'DNA')}  [{k}]d[/] {t('action_digicore', 'digicore')}\n"
-        f"[{k}]e[/] {t('action_eggs', 'eggs')}  [{k}]s[/] {t('action_shop', 'shop')}  [{k}]b[/] {t('action_bag', 'bag')}  [{k}]n[/] {t('action_scenes', 'scenes')}  [{k}]g[/] {t('action_options', 'options')}  [{k}]i[/] {t('action_bug', 'bug')}  [{k}]?[/] {t('action_help', 'help')}  [{k}]q[/] {t('action_quit', 'quit')}"
-    )
+    l1 = f"[{k}]f[/] {t('action_feed', 'feed')}  [{k}]h[/] {t('action_heal', 'heal')}  [{k}]c[/] {t('action_clean', 'clean')}  [{k}]o[/] {t('action_lights', 'lights')}  [{k}]v[/] {t('action_assist', 'assist')}  [{k}]p[/] {t('action_discipline', 'discipline')}  [{k}]m[/] {t('action_battle', 'battle')}"
+    
+    l2_parts = [f"[{k}]a[/] {t('action_adventure', 'adventure')}"]
+    if SERVIDOR_ONLINE:
+        l2_parts.append(f"[{k}]r[/] {t('action_raid', 'raid')}")
+    l2_parts.append(f"[{k}]u[/] {t('action_cup', 'cup')}")
+    if SERVIDOR_ONLINE:
+        l2_parts.append(f"[{k}]l[/] {t('action_lobby', 'lobby')} [dim](pvp)[/]")
+    l2_parts.extend([
+        f"[{k}]t[/] {t('action_train', 'train')}",
+        f"[{k}]x[/] {t('action_dna', 'DNA')}",
+        f"[{k}]d[/] {t('action_digicore', 'digicore')}"
+    ])
+    l2 = "  ".join(l2_parts)
+    
+    l3_parts = [
+        f"[{k}]e[/] {t('action_eggs', 'eggs')}",
+        f"[{k}]s[/] {t('action_shop', 'shop')}",
+        f"[{k}]b[/] {t('action_bag', 'bag')}",
+        f"[{k}]n[/] {t('action_scenes', 'scenes')}",
+        f"[{k}]g[/] {t('action_options', 'options')}"
+    ]
+    if SERVIDOR_ONLINE:
+        l3_parts.append(f"[{k}]i[/] {t('action_bug', 'bug')}")
+    l3_parts.extend([
+        f"[{k}]?[/] {t('action_help', 'help')}",
+        f"[{k}]q[/] {t('action_quit', 'quit')}"
+    ])
+    l3 = "  ".join(l3_parts)
+
+    return f"{l1}\n{l2}\n{l3}"
 
 
 # the status-card helpers live in statusbox (Joel 2026-07-17: "MODULIZE

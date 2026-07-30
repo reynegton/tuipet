@@ -10,7 +10,7 @@ VIS = 8                                   # lines shown at once in the box
 
 # (text, kind): 2 = section head (bold), 1 = a control line, 0 = prose (dim)
 def get_help():
-    return [
+    res = [
         (t("help_txt_care", "CARE"), 2),
         (t("help_txt_feed", "f feed - meat fills; the pill"), 1),
         (t("help_txt_feed_2", "  cures sickness, free and infinite"), 0),
