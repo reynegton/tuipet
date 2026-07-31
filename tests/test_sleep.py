@@ -1,7 +1,7 @@
 """Sleep system vs DVPet: lightsCall neglect, wake auto-relight, morning moods."""
 import random
 
-from tuipet.pet import Pet, LIGHTS_MISTAKE_SEC
+from tuipet.core.pet import Pet, LIGHTS_MISTAKE_SEC
 
 
 def _sleeper(lights, num=1, stage="Rookie"):
@@ -59,7 +59,7 @@ def test_sleep_length_scales_with_energy_debt():
 
 
 def test_babies_nap_constantly():
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     baby = next(n for n, r in data.load_requirements().items()
                 if r.get("sleep_lapse_inc", 1) == 9)
     p = Pet(num=baby, stage="Fresh")

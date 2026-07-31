@@ -4,11 +4,11 @@ Pins the purse: beating a wild pays its small bounty, felling the gate boss pays
 its large one, both accrue to the pet's bits and the run tally, and the
 homecoming verdict shows the run's take.
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES
-from tuipet.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
                                     TRAVEL_TICKS)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet():

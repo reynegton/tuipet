@@ -2,7 +2,8 @@
 the reachability invariant (no signal-gated egg is permanently stranded as locked).
 """
 
-from tuipet import data, egg
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
 
 
 EMPTY = {
@@ -137,7 +138,7 @@ def test_condition_met_unlocks_without_any_purchase():
 # ---- egg mood (Evolution.egg) -------------------------------------------------
 
 def test_new_egg_starts_warm():
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet.new_egg(generation=1, egg_type=0)
 
 

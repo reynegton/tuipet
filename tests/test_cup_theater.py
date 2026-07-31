@@ -5,9 +5,10 @@ wins the field's other winners parade across the arena before the bracket
 page lands, and the crown plays the podium ceremony before the tree and
 the numbers.  Both lock input and play out (own-game law).
 """
-from tuipet import data, tournament
-from tuipet.tournamentscreen import (TournamentPanel, CEREMONY_T, NPC_T)
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import tournament
+from tuipet.ui.screens.tournamentscreen import (TournamentPanel, CEREMONY_T, NPC_T)
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -113,8 +114,8 @@ def test_space_stages_the_introductions_then_the_bell():
     """MATCH INTRODUCTIONS: SPACE on the faceoff page walks the challenger
     in from the right, your mon in from the left, holds the stare-down --
     input locked -- then the fight opens itself against that SAME opponent."""
-    from tuipet.battlescreen import BattlePanel
-    from tuipet.tournamentscreen import INTRO_OPP_T, INTRO_PET_T, INTRO_HOLD_T
+    from tuipet.ui.screens.battlescreen import BattlePanel
+    from tuipet.ui.screens.tournamentscreen import INTRO_OPP_T, INTRO_PET_T, INTRO_HOLD_T
     pan = _in_bracket()
     pan.tree_view = False                      # the faceoff page
     opp = pan.tourney.current_opponent()
@@ -224,7 +225,7 @@ def test_a_held_cup_is_a_title_defense():
     """DEFENDING CHAMPION (purse shape: the veteran road's exchange rate --
     trained field, purse ×1.5, stake unchanged).  Holding the trophy makes
     re-entry a defense; town cups defend the same way."""
-    from tuipet.adventure import VETERAN_TRAININGS, VETERAN_RECORD
+    from tuipet.core.adventure import VETERAN_TRAININGS, VETERAN_RECORD
     p = _pet()
     trophy = tournament.trophy_by_id(tournament.schedule(p)[tournament._hour(p)])
     fresh = tournament.Tournament(p, trophy)
@@ -266,8 +267,8 @@ def test_the_parade_sweep_clears_both_screen_edges():
     the partial sprite -- not the old roam_bounds sweep (X1-w -> X0) that popped
     it in at the right INTERIOR edge and vanished it at the left.  Guards the
     endpoints against a regression back to the interior bounds."""
-    from tuipet import grid
-    from tuipet.tournamentscreen import NPC_T
+    from tuipet.utils import grid
+    from tuipet.ui.screens.tournamentscreen import NPC_T
     for w in (12, 16, 20):                         # a few sprite widths
         span = grid.X0 - w - grid.X1
         x_first = round(grid.X1 + span * (0 / max(1, NPC_T - 1)))

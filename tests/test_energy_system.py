@@ -10,8 +10,8 @@ stat core entirely, and can_battle/can_train carried invented hard gates
 (MinEnergyForActivity is -127 on the classic column; the refusal roll is
 canon's only gate)."""
 
-from tuipet import data
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):

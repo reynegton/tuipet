@@ -4,7 +4,7 @@ cut is total, plus the frozen dead-field save contract.
 """
 from dataclasses import asdict
 
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def test_the_care_effect_runtime_is_gone():
@@ -16,7 +16,7 @@ def test_the_care_effect_runtime_is_gone():
     assert not hasattr(p, "_tick_effect")
     assert not hasattr(p, "_effect_energy_gain")
     assert not hasattr(p, "call_paused")
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     assert not hasattr(data, "load_care_effects")
 
 
@@ -25,14 +25,14 @@ def test_the_staples_never_reach_a_fresh_bag():
     empty bag, and the shelf carries no DVPet i:*/f:* keys."""
     p = Pet.new_egg(generation=1, egg_type=0)
     assert p.inventory == {}
-    from tuipet import shop
+    from tuipet.core import shop
     assert not any(e["key"].startswith(("i:", "f:")) for e in shop.catalog())
 
 
 def test_old_saves_shed_the_staples_on_load():
     """A stocked bag from a pre-cut save (Toilet 100/Bandage 99/Futon 100)
     loses exactly the dead furniture keys -- everything else survives."""
-    from tuipet import persistence
+    from tuipet.utils import persistence
     p = Pet.from_num(29)
     p.inventory = {"i:80": 99, "i:81": 100, "i:82": 100, "i:83": 3,
                    "energy_drink": 2}

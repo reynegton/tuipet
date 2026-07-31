@@ -2,8 +2,8 @@
 import pathlib
 import re
 
-from tuipet.pet import Pet
-from tuipet.helpscreen import HelpPanel, HELP, VIS
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.helpscreen import HelpPanel, HELP, VIS
 from tuipet.app import TuiPetApp, keys_markup
 
 README = pathlib.Path(__file__).resolve().parent.parent / "README.md"
@@ -131,8 +131,11 @@ def test_help_teaches_the_grave_and_the_shop_tabs():
 
 def _long_list_panels():
     """Every cursor list a player can actually walk a long way."""
-    from tuipet import (adventure, adventurescreen, backgroundscreen,
-                        eggselectscreen, shop, shopscreen, tournamentscreen)
+    from tuipet.core import adventure
+    from tuipet.ui.screens import backgroundscreen
+    from tuipet.ui.screens import eggselectscreen
+    from tuipet.core import shop
+    from tuipet.ui.screens import shopscreen, tournamentscreen
     pet = Pet(num=100, stage="Champion", attribute="Vaccine", bits=99999)
     # a FULL bag and an opened map: the empty-list case is a no-op by design,
     # so an unstocked fixture would pass this test without exercising anything
@@ -171,7 +174,7 @@ def test_page_keys_leap_through_every_long_list():
 def test_space_equals_enter_at_the_memorial_prompts():
     """The one non-text panel that broke the SPACE=ENTER law: the digimemory
     etch prompts took ("e", "enter") only (help audit 2026-07-21)."""
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     mem = {"name": "Elder", "vaccine": 1, "data": 1, "virus": 1}
     pet = Pet(num=100, stage="Champion", attribute="Vaccine")
     pet.dead = True
@@ -231,7 +234,7 @@ def test_every_need_call_names_its_key():
     -- the three commonest calls -- named no key."""
     import asyncio
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 10 * 60.0
 
@@ -310,7 +313,7 @@ def test_the_keys_spell_themselves():
     # the shop/bag panel's opening-key-closes idiom follows the remap
     # (hotkey audit 2026-07-28: the ONE finding -- it still closed on o/i)
     import inspect
-    from tuipet import shopscreen
+    from tuipet.ui.screens import shopscreen
     src = inspect.getsource(shopscreen.ShopPanel.key)
     assert '"escape", "s", "b"' in src
     assert '"escape", "o", "i"' not in src

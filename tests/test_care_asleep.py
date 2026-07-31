@@ -11,7 +11,7 @@ import random
 
 import pytest
 
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 @pytest.fixture(autouse=True)

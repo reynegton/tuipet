@@ -12,11 +12,11 @@ target -- physically impossible in a terminal).
 """
 import pytest
 
-from tuipet import strikefx
-from tuipet.battlescreen import BattlePanel, mega_window
-from tuipet.pet import Pet
-from tuipet.strikefx import grade_lock
-from tuipet.training import TrainingPanel
+from tuipet.utils import strikefx
+from tuipet.ui.screens.battlescreen import BattlePanel, mega_window
+from tuipet.core.pet import Pet
+from tuipet.utils.strikefx import grade_lock
+from tuipet.core.training import TrainingPanel
 
 
 def _pet(**kw):
@@ -83,7 +83,7 @@ def test_the_dig_meter_grades_through_the_grace_too():
     (Joel 2026-07-23: "and the dig action in adventure is ok? the one
     that uses the bar?") -- it grades through grade_lock now, grace,
     2px marker and veteran rule included."""
-    from tuipet.adventurescreen import AdventurePanel
+    from tuipet.ui.screens.adventurescreen import AdventurePanel
     pan = AdventurePanel(_pet())
     pan._find = "meat"
     pan._dig()
@@ -104,7 +104,7 @@ def test_the_intro_mash_cannot_lock_the_bar():
     miss/normal before the player ever started timing.  His save wore
     the fingerprint: training megas, saved form "normal".  A lock now
     arms LOCK_ARM_T ticks after the bar appears; ESC stays live."""
-    from tuipet.battlescreen import LOCK_ARM_T
+    from tuipet.ui.screens.battlescreen import LOCK_ARM_T
     pan = BattlePanel(_pet())
     pan.key("space")                          # mash: skip the intro
     assert pan.phase == "ready"
@@ -131,7 +131,7 @@ def test_every_fight_wears_its_lock_on_the_card():
     showed NOTHING -- the mash bug locked a miss and the player had no
     way to see it happen.  The battle card now shows the locked grade
     from the lock onward."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
 
     class _W:
         border_subtitle = ""
@@ -164,7 +164,7 @@ def test_the_lock_is_pure_upside_pen20_shake():
     -0.10); normal and MISS both fight at your stats -- no lock ever
     makes a pet fight worse than it was raised.  Equal megas cancel
     exactly, so attentive duelists fight on the raising alone."""
-    from tuipet.battle import Side
+    from tuipet.core.battle import Side
     mega = Side(100, stage="Champion", attribute="Free", hit_type="mega")
     norm = Side(100, stage="Champion", attribute="Free", hit_type="normal")
     mega2 = Side(100, stage="Champion", attribute="Free", hit_type="mega")
@@ -184,7 +184,7 @@ def test_the_ready_screen_names_the_real_drag():
     """Pen20 honesty: the pre-fight card names THIS pet's biggest drag
     before the bell -- the starved-weight class of loss can never be
     invisible again -- and says "in top form" when nothing drags."""
-    from tuipet.battle import Side, readiness_line
+    from tuipet.core.battle import Side, readiness_line
     p = _pet()
     p._set_weight(10)                          # 15g under base: the real bug's shape
     pan = BattlePanel(p)

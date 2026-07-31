@@ -1,8 +1,9 @@
 """Regression pins for the 2026-07 full-codebase audit fixes."""
 import json
 
-from tuipet.pet import Pet
-from tuipet import persistence, data
+from tuipet.core.pet import Pet
+from tuipet.utils import persistence
+import tuipet.data.loaders.data as data
 
 
 def _pet(**kw):
@@ -71,7 +72,7 @@ def test_nap_pays_down_bedtime_pressure():
     lapse0 = p.sleep_lapse
     p.tick(1.0)
     assert p.sleep_lapse < lapse0                     # bedtime RECEDES while napping
-    from tuipet.pet import CHANGE_NAP_TO_SLEEP
+    from tuipet.core.pet import CHANGE_NAP_TO_SLEEP
     p.awake_limit = 9e9                               # hold the nap past the threshold
     for _ in range(CHANGE_NAP_TO_SLEEP + 20):
         p.tick(1.0)
@@ -102,7 +103,7 @@ def test_wolf_down_decided_before_the_meal():
 
 def test_dark_room_stays_dark_through_fx():
     import tuipet.app as app
-    import tuipet.arena as arena          # Screen resolves render_screen here now
+    import tuipet.core.arena as arena          # Screen resolves render_screen here now
     seen = {}
     real = arena.render_screen
     def spy(rows, cols, r, on, bg, **kw):

@@ -10,8 +10,10 @@ paths so a refactor can't turn them back into crashes.
 import json
 
 
-from tuipet import data, egg, persistence
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 # ---- brand-new empty account (gen 1, no previous-generation snapshot) ------
@@ -33,7 +35,7 @@ def test_empty_account_egg_flow():
 def test_buy_with_zero_bits():
     # shop.buy is the ONE purchase path (the town-counter buy_slot was cut
     # with the town chain, 2026-07-19) -- a broke pet is refused in words
-    from tuipet import shop
+    from tuipet.core import shop
     p = Pet(num=-1, stage="Rookie", bits=0)
     msg, sfx = shop.buy(p, {"key": "energy_drink", "name": "EnergyDrink",
                             "price": 500})
@@ -44,8 +46,8 @@ def test_buy_with_zero_bits():
 def test_the_town_chain_is_cut():
     """Cut-is-total (Joel 2026-07-19): the town storefront chain died with
     the towns; nothing may creep back."""
-    from tuipet import shop
-    from tuipet.pet import Pet as _P
+    from tuipet.core import shop
+    from tuipet.core.pet import Pet as _P
     for name in ("home_shop_open", "town_shop_open", "town_shop_hours",
                  "roll_town_shop", "slot_label", "slot_info", "sell_info",
                  "purchase_price"):
@@ -56,7 +58,7 @@ def test_the_town_chain_is_cut():
 def test_sell_empty_bag():
     p = Pet(num=-1, stage="Rookie")
     # shop.sell is the one live resell path (CareMixin.sell cut, LOW audit)
-    from tuipet import shop
+    from tuipet.core import shop
     assert not hasattr(p, "sell")
     msg, sfx = shop.sell(p, {"key": "f:1", "name": "Meat"})
     assert sfx == "error" and "don't have" in msg
@@ -116,12 +118,12 @@ def test_unknown_num_survives_the_first_paint():
     raw-indexed the sprite dict and crashed -- a loop, since the .bak holds
     the same num (audit 2026-07-13).  Every sprite fetch wears the
     placeholder instead."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     rec = data.record_for(999999)
     assert rec["frames"] and rec.get("_placeholder"), "unknown nums wear the placeholder"
     fr = data.bob_frame(999999, 0)
     assert fr is not None, "bob_frame must never hand a scene a None for a positive num"
-    from tuipet.arena import Screen
+    from tuipet.core.arena import Screen
     ghost = Pet(num=999999, name="Ghost", stage="Rookie")
     scr = Screen.__new__(Screen)
     rows = scr._pose_rows(ghost, "idle", 0)       # raw-indexed before the fix
@@ -150,7 +152,7 @@ def test_absurd_elapsed_is_simply_ignored(tmp_path):
     as the pet that was written."""
     import json
     import time
-    from tuipet import persistence
+    from tuipet.utils import persistence
     pet = Pet(num=-1, stage="Rookie", hunger=4)
     persistence.save(pet)
     data = json.load(open(persistence.SAVE_PATH))

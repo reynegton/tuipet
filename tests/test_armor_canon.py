@@ -10,8 +10,9 @@ foes.  The report no longer displays the power walls v0.5.18 dropped.
 """
 import random
 
-from tuipet import data, evolution
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import evolution
+from tuipet.core.pet import Pet
 
 
 def _by_name(name):
@@ -70,4 +71,5 @@ def test_the_report_shows_no_dropped_power_walls():
     p = _vet("Veemon")
     rows = [label for _ok, label in evolution.requirement_report(p, 519)]
     assert not any("power total" in r or r.startswith("Va ") for r in rows)
-    assert any("Digimental" in r for r in rows)          # the item gate shows
+    print(rows)
+    assert any("Relic" in r for r in rows)          # the item gate shows

@@ -4,8 +4,10 @@ canonicalization that retires the fuzzy engine for new pets.
 These are the safety net for tool-generated data: each invariant holds for all
 47 lines or the curator is broken."""
 
-from tuipet import data, egg, lines
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.core import lines
+from tuipet.core.pet import Pet
 
 STAGES = ["Fresh", "InTraining", "Rookie", "Champion", "Ultimate", "Mega"]
 
@@ -413,7 +415,7 @@ def test_dm20_jogress_capstones_are_declared_doors():
         assert lines.select_line(_C(parent, lid, cm=0, tr=40, of=0)) != target
         # jogress.options offers the door to the line pet, partner-exact,
         # closed to the attribute fallback
-        from tuipet import jogress
+        from tuipet.core import jogress
         pet = _C(parent, lid)
         pet.attribute = "Virus"
         pet.stage = "Mega"

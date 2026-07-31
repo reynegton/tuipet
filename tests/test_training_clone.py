@@ -7,8 +7,8 @@ WALL (the clone's battle_fx rips — DSprite is the ultimate truth for
 animations and mechanics).  Attribute powers grow only through battle
 wins now.
 """
-from tuipet import training
-from tuipet.pet import Pet, TRAIN_ENERGY_COST
+from tuipet.core import training
+from tuipet.core.pet import Pet, TRAIN_ENERGY_COST
 
 
 def _pet(**kw):
@@ -203,7 +203,7 @@ def test_wall_one_stands_through_everything_but_a_mega_break():
     crumbles it to Wall_2."""
     import json
     import os
-    import tuipet.training as tr
+    import tuipet.core.training as tr
     wall = json.load(open(os.path.join(os.path.dirname(tr.__file__),
                                        "data", "train_wall.json")))
     pan = _panel()

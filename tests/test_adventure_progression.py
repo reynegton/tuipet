@@ -4,13 +4,13 @@ Pins the journey: pet.adv_progress tracks zones conquered = the frontier index;
 zones unlock as their gate boss falls; the ZonePickPanel lists unlocked zones to
 embark on (conquered ✓, frontier ★); adv_progress persists across saves.
 """
-import tuipet.adventure as A
-from tuipet.adventure import (ZONES, unlocked_indices, is_conquered, record_win,
+import tuipet.core.adventure as A
+from tuipet.core.adventure import (ZONES, unlocked_indices, is_conquered, record_win,
                               frontier, pick_zone)
-from tuipet.adventurescreen import (ZonePickPanel, AdventurePanel, TELE_LEAVE_T,
+from tuipet.ui.screens.adventurescreen import (ZonePickPanel, AdventurePanel, TELE_LEAVE_T,
                                     TELE_ARRIVE_T, TRAVEL_TICKS)
-from tuipet import persistence
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 def _champ():
@@ -111,7 +111,7 @@ def test_the_home_card_shows_live_quest_progress():
     count: dim '▸ name' before the first run, 'N/26 ▸ name' partway, the
     cleared star at the end.  The name shortens to the gate BOSS when the
     full name overflows the 26-col stats column."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     p = _champ()
     line = statusbox.adventure_line(p)
     first = ZONES[A.PROGRESSION[0]]["name"]

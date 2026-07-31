@@ -4,10 +4,10 @@ Pins the wiring of data/zones.csv + enemies.csv into 26 run-zones: one biome per
 run (the gate boss's terrain, no mid-zone span-hopping), each with its OWN wild
 enemy table.  Joel's order: "wire the real 26 zones after encounters."
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES, pick_zone, HABITAT_SCENE
-from tuipet import backgrounds
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES, pick_zone, HABITAT_SCENE
+from tuipet.utils import backgrounds
+from tuipet.core.pet import Pet
 
 
 def _champ(num=100):
@@ -54,7 +54,7 @@ def test_every_zone_biome_is_a_real_scene():
     for z in ZONES:
         assert z["scene"] in backgrounds.NAMES, (z["name"], z["scene"])
     # the map covers every habitat id the world data actually uses
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     used = {hid for mp in data.load_maps() for zz in mp["zones"]
             for _lo, _hi, hid in zz.get("bgs", ())}
     for hid in used:

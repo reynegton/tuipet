@@ -35,10 +35,10 @@ CLEARED, not defects (each was measured before it was believed):
 """
 import pytest
 
-from tuipet import lines as L
-from tuipet import tournament
-from tuipet.pet import DAY_LENGTH, Pet
-from tuipet.raidscreen import RaidPanel
+from tuipet.core import lines as L
+from tuipet.core import tournament
+from tuipet.core.pet import DAY_LENGTH, Pet
+from tuipet.ui.screens.raidscreen import RaidPanel
 
 # real line rows, one per distinct corpus bedtime (load_lines, 2026-07-25)
 BEDTIME_ROWS = {"20:00": ("ver1", 1411), "21:00": ("ver1", 1455),
@@ -168,7 +168,7 @@ def test_a_strangers_invite_never_touches_the_pet():
     """The deliberate opposite, and the reason the parity table above is
     a rule about the PLAYER's finger: the lobby refuses a remote invite
     without waking, without a disturb (asleep sweep 2026-07-06)."""
-    from tuipet.lobbyscreen import LobbyPanel
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
 
     class _Stub:                       # the gate reads nothing but .pet
         pass
@@ -191,7 +191,8 @@ def test_waking_a_sleeper_is_never_a_care_mistake():
 
 def test_the_disturb_is_real_evolution_currency():
     """Waking it costs something that MATTERS, or the price is a lie."""
-    from tuipet import data, evolution
+    import tuipet.data.loaders.data as data
+    from tuipet.core import evolution
     reqs = data.load_requirements()
     gated = [n for n, r in reqs.items() if r["disturb"][0] != "None"]
     assert len(gated) > 150, "the disturb gate should span the corpus"
@@ -319,7 +320,7 @@ def test_the_good_morning_note_tells_the_truth_about_the_tank(monkeypatch,
                                                               frac, weary):
     """v0.5.177, Joel: "my mon woke up 'beaming' with only one energy
     bar".  The mood ROLL stays canon; the NOTE reports the night."""
-    from tuipet import petbody
+    from tuipet.core import petbody
     p = _sleeper(hour=6.0)
     p.energy = max(1, int(p.max_energy * frac))
     p.nap = False
@@ -360,7 +361,7 @@ def test_sleep_only_runs_on_the_main_view():
     can neither fall asleep nor wake behind a panel."""
     import inspect
 
-    from tuipet import app
+    from tuipet.core import app
     src = inspect.getsource(app)
     assert src.count("self.pet.tick(") == 1, "a second tick site appeared"
     body = src.split("self.pet.tick(")[0]
@@ -376,7 +377,7 @@ def test_sleep_only_runs_on_the_main_view():
 def test_the_sleep_status_card_fits_its_box(state):
     from rich.text import Text
 
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     p = _sleeper(**state)
     p.asleep = True                       # hold the state the card renders
     word = p.status_word()

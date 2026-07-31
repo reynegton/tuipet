@@ -17,7 +17,7 @@ Fixed (canon divergences):
  * The eat grimace (+9 bite) fires on an OVEREATING stomach too, not
    only disliked food (canon: hunger >= overeatLimit at anim time)."""
 import tuipet.app as app
-from tuipet.pet import Pet, OVEREAT_LIMIT
+from tuipet.core.pet import Pet, OVEREAT_LIMIT
 
 
 def _pet(**kw):
@@ -36,7 +36,7 @@ def _screen():
 
 
 def test_geriatric_pets_shuffle_on_the_aged_frames():
-    import tuipet.data as data
+    import tuipet.data.loaders.data as data
     s = _screen()
     old = _pet()
     old.age_seconds = 16 * 86400.0                # past the elder line (age-based)

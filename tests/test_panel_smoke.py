@@ -7,8 +7,8 @@ instantiates every simple-constructor panel, walks its keys, and renders each
 state.  It is deliberately shallow — its job is 'does it draw', not 'is it
 right'."""
 
-from tuipet.pet import Pet
-from tuipet.render import bitmap_text
+from tuipet.core.pet import Pet
+from tuipet.utils.render import bitmap_text
 
 
 def _pet(**kw):
@@ -66,7 +66,7 @@ def _walk(panel, keys, renders=6):
 
 
 def test_feed_panel_renders_every_selection():
-    from tuipet.feedscreen import FeedPanel, ROWS_MENU
+    from tuipet.ui.screens.feedscreen import FeedPanel, ROWS_MENU
     pan = FeedPanel(_pet())
     assert len(ROWS_MENU) == 2                      # meat + pill (the classic
     #                                                 pair; the bandage moved
@@ -77,20 +77,20 @@ def test_feed_panel_renders_every_selection():
 
 
 def test_shop_panel_renders_shop_and_bag():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     pan = ShopPanel(_pet())
     _walk(pan, ["down", "down", "i", "down", "down", "r"])   # shop rows, bag rows, a sell
 
 
 def test_the_simple_panels_all_draw():
-    from tuipet.digicorescreen import DigiCorePanel
-    from tuipet.assistscreen import AssistPanel
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     from tuipet.jogressscreen import JogressPanel
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     from tuipet.themescreen import ThemePanel
-    from tuipet.deathscreen import DeathPanel
-    from tuipet.feedscreen import FeedPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
+    from tuipet.ui.screens.feedscreen import FeedPanel
     p = _pet()
     _walk(DigiCorePanel(p), ["space", "space", "right", "right", "right",
                              "right", "right", "right", "down", "enter", "down"])
@@ -103,13 +103,13 @@ def test_the_simple_panels_all_draw():
     _walk(JogressPanel(p, p.num, p.num, p.num), ["space"])
     _walk(EggSelectPanel(), ["right", "right", "left"])
     _walk(ThemePanel(), ["down", "up", "escape"])
-    from tuipet.optionsscreen import KeysPanel
+    from tuipet.ui.screens.optionsscreen import KeysPanel
     _walk(KeysPanel((("f", "feed", "Feed"), ("enter", "gift", "Accept gift"))),
           ["down", "up"])
     dead = _pet(dead=True)
     _walk(DeathPanel(dead), [])
     _walk(FeedPanel(p), ["down", "up"])
-    from tuipet.albumscreen import AlbumPanel
+    from tuipet.ui.screens.albumscreen import AlbumPanel
     # both album phases (hard rule: every phase gets a text() walk)
     _walk(AlbumPanel(p), ["down", "pagedown", "enter", "right", "left",
                           "escape", "pageup"])
@@ -119,8 +119,8 @@ def test_shop_has_no_digitama_shelf():
     """The licence cut (2026-07-17): the shop sells goods only.  The classic
     Eggs TAB returned with the v0.5.0 bar (polish 2026-07-17), but it is the
     DIGIMENTAL shelf -- walk every tab and prove no bank digitama survives."""
-    from tuipet.shopscreen import ShopPanel
-    from tuipet import shop as _shop
+    from tuipet.ui.screens.shopscreen import ShopPanel
+    from tuipet.core import shop as _shop
     p = _pet()
     pan = ShopPanel(p)
     assert not hasattr(_shop, "EGGS_CATEGORY")
@@ -156,7 +156,7 @@ def test_the_home_scene_is_wired_to_the_egg():
     """Habitats left (BASIC VPET 2026-07-16): the scene behind the mon comes
     from the EGG the pet hatched from -- two pets from different eggs stand
     in different DSprite backdrops, and the same pet's scene never moves."""
-    from tuipet import backgrounds
+    from tuipet.utils import backgrounds
     a, b = _pet(), _pet()
     a.egg_type, b.egg_type = 0, 5                    # greenhills vs datatunnel
     sa, sb = a.background(), b.background()
@@ -172,7 +172,7 @@ def test_title_boot_flashes_transitions_then_settles_for_every_fx():
     EVERY effect must break the flash on its first step, keep moving, and
     settle to only the mascot's //4 bob.  Budget-checked every frame."""
     import random
-    from tuipet.titlescreen import TitlePanel, BOOT_BLIP, BOOT_FADE, BOOT_FX
+    from tuipet.ui.screens.titlescreen import TitlePanel, BOOT_BLIP, BOOT_FADE, BOOT_FX
     random.seed(11)
     fresh = TitlePanel()
     assert fresh.fx in BOOT_FX                    # launch draws from the fx pool
@@ -200,7 +200,7 @@ def test_title_keeps_one_mascot_and_the_prompt_pulses():
     PRESS ENTER prompt pulses bold/dim at constant visible width so the
     centred strip never jumps."""
     import random
-    from tuipet.titlescreen import TitlePanel, BOOT_BLIP, BOOT_FADE
+    from tuipet.ui.screens.titlescreen import TitlePanel, BOOT_BLIP, BOOT_FADE
     random.seed(11)
     pan = TitlePanel()
     mascot = pan.num
@@ -224,8 +224,8 @@ def test_assist_card_prices_match_canon_and_toggle_names_a_helper():
     (half the visit ladder, bit-sink design 2026-07-14); toggling ON rolls a
     REAL helper from the CanAssist pool."""
     import random
-    from tuipet.assistscreen import AssistPanel
-    from tuipet.pet import AUTO_CARE_VISIT_PRICE, AUTO_CARE_HOUR_PRICE
+    from tuipet.ui.screens.assistscreen import AssistPanel
+    from tuipet.core.pet import AUTO_CARE_VISIT_PRICE, AUTO_CARE_HOUR_PRICE
     assert AUTO_CARE_VISIT_PRICE == {"Egg": 50, "Fresh": 50, "InTraining": 100,
                                      "Rookie": 200, "Champion": 400,
                                      "Ultimate": 800, "Mega": 1600}

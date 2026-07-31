@@ -5,9 +5,10 @@ portrait and an epitaph.  These pins hold: the record carries the portrait
 fields, the panel walks clean in every state (the panel-smoke law), old
 records degrade to the grave instead of guessing, and the LEGACY page's
 ENTER is the door."""
-from tuipet import data, persistence
-from tuipet.hallscreen import HallPanel
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
+from tuipet.ui.screens.hallscreen import HallPanel
+from tuipet.core.pet import Pet
 
 
 def _elder(**kw):
@@ -103,7 +104,7 @@ def test_an_old_headstone_stands_behind_the_grave():
 # ---- the door ----------------------------------------------------------------
 
 def test_the_legacy_pages_enter_opens_the_hall():
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
     pan = DigiCorePanel(_elder(), start="LEGACY")
     assert pan.pages[pan.i][0] == "LEGACY"
     assert "ENTER: the hall of memory" in pan.text().plain

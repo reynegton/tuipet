@@ -2,10 +2,11 @@
 futons have broken in game animations" — every toy funneled into canon's
 Trampoline hop).  Each AnimationType now plays its own canon table (itemfx);
 this pins the tables' shapes, the routing, and the end chains."""
-from tuipet import data, itemfx
+import tuipet.data.loaders.data as data
+from tuipet.utils import itemfx
 from tuipet.app import Screen
-from tuipet.pet import Pet
-from tuipet.shopscreen import ShopPanel
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.shopscreen import ShopPanel
 
 
 class _FakeScreen:
@@ -122,7 +123,7 @@ def test_the_stage_lives_inside_the_window():
     left wall and sank below the grounded floor.  At the opening beat every
     grounded layout must place the WHOLE icon inside x[4,36) / above the
     floor line, for small (8x8) and tall (16x16, the balloon) icons alike."""
-    from tuipet import grid
+    from tuipet.utils import grid
     for action, sc in itemfx.SCRIPTS.items():
         if sc["layout"] == "drop":              # enters from above by design
             continue
@@ -143,7 +144,7 @@ def test_the_stage_lives_inside_the_window():
 def test_the_toys_are_unchanged_by_the_canon_lookup():
     """Regression: the 7 hand-mapped toys must resolve identically now
     that the map is gone."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert {k: shop.item_script(k) for k in
             ("ball", "skateboard", "xylophone", "video_game",
              "television")} == {
@@ -159,7 +160,7 @@ def test_the_toys_are_unchanged_by_the_canon_lookup():
 def test_the_free_wins_are_wired():
     """Four items whose scripts were ALREADY written and whose art was
     already ripped, flashing bare text because the hand-map omitted them."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert shop.item_script("textbook") == "Study"
     assert shop.item_script("dumbbell") == "Lift"
     assert shop.item_script("grow_capsule") == "Study"
@@ -172,7 +173,7 @@ def test_own_door_items_are_never_hijacked():
     the Revive Floppy keep their own flows -- the Floppy especially: its
     canon type is Play, but it is used on a DEAD pet and the bag is
     unreachable at the grave, so that show could only ever be wrong."""
-    from tuipet import shop
+    from tuipet.core import shop
     for k in ("digimemory", "revive_floppy", "town_transport",
               "disaster_transport", "life_recovery"):
         assert shop.item_script(k) is None, k
@@ -181,14 +182,15 @@ def test_own_door_items_are_never_hijacked():
 def test_food_sheet_consumables_take_no_script():
     """`f:` items are EATEN -- foods.csv has no AnimationType at all -- so
     they ride the eat fx (like the pill), never a script."""
-    from tuipet import shop
+    from tuipet.core import shop
     for k in ("vitamin", "energy_drink", "sleeping_pill", "anti_evo_chip"):
         assert shop.item_script(k) is None, k
 
 
 def test_every_wired_script_actually_exists():
     """No item may point at a script the painter cannot run."""
-    from tuipet import shop, itemfx
+    from tuipet.core import shop
+    from tuipet.utils import itemfx
     for k in shop.CATALOG:
         sc = shop.item_script(k)
         assert sc is None or sc in itemfx.SCRIPTS, (k, sc)
@@ -202,7 +204,8 @@ def _bag_on(pet, key):
     its tab+cursor between panels (_LAST_POS, a shipped QOL feature), so
     a pin must never assume it opens at row 0 -- that pollution is what
     made these pass alone and fail in file order."""
-    from tuipet import shop, shopscreen
+    from tuipet.core import shop
+    from tuipet.ui.screens import shopscreen
     shopscreen._LAST_POS.clear()
     pan = shopscreen.ShopPanel(pet, start_mode="bag")
     want = shop.CATALOG[key][0]
@@ -220,7 +223,7 @@ def test_every_food_sheet_item_is_eaten():
     because eating IS the animation.  So the six food-sheet CONSUMABLES
     eat like the pill does -- they used to flash bare text over ripped
     art -- and no actual food regresses."""
-    from tuipet import shop
+    from tuipet.core import shop
     for k in ("vitamin", "energy_drink", "slim_drink", "sleeping_pill",
               "caffeine_pill", "anti_evo_chip"):
         assert shop.item_is_eaten(k), k
@@ -234,7 +237,7 @@ def test_every_food_sheet_item_is_eaten():
 
 def test_an_item_is_never_both_eaten_and_scripted():
     """`f:` eats, `i:` takes a script -- the two doors never overlap."""
-    from tuipet import shop
+    from tuipet.core import shop
     for k in shop.CATALOG:
         assert not (shop.item_is_eaten(k) and shop.item_script(k)), k
 
@@ -242,7 +245,7 @@ def test_an_item_is_never_both_eaten_and_scripted():
 def test_the_bag_returns_the_eat_show_for_a_consumable():
     """The panel contract: using a food-sheet consumable closes the bag
     and hands the LCD an eat show carrying that item's OWN icon."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     for key, icon in (("energy_drink", "f:17"), ("vitamin", "f:5"),
                       ("sleeping_pill", "f:34")):
         p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
@@ -265,7 +268,7 @@ def test_the_sleeping_pill_eats_first_then_sleeps():
     lightsOff cover up through a care fx, so the pill's own lights-out
     blanked all 35 beats of its bite strip (bug report 2026-07-26,
     v0.5.287).  The switch is deferred to the end of the show now."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 600.0
     p.add_item("sleeping_pill")
@@ -285,7 +288,7 @@ def test_the_sleeping_pills_room_drops_only_when_its_show_ends():
     import asyncio
 
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
 
     async def scenario():
         p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
@@ -342,7 +345,7 @@ def test_the_bandage_never_leaves_the_window():
     ABSOLUTE y0-4 -- above the window top (y6) -- and was deleted for it.
     Every y is floor-relative now; this walks all 24 beats to prove the
     med stays inside the arena for small and tall icons alike."""
-    from tuipet import grid
+    from tuipet.utils import grid
     for iw, ih in ((8, 8), (16, 16)):
         for step in range(itemfx.SCRIPTS["Bandaging"]["steps"]):
             _f, _p, ix, iy, _dx, _dy = itemfx.state("Bandaging", step, iw, ih, 24)
@@ -357,7 +360,7 @@ def test_the_bandage_keeps_its_canon_animation_name():
     is a free care-menu action now), but items.csv row 80 still says
     Bandaging and the script is still the thing that plays -- only the
     door changed, from the bag to the F menu."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     assert (data.consumable_by_key("i:80") or {}).get("action") == "Bandaging"
     assert "Bandaging" in itemfx.SCRIPTS
 
@@ -365,7 +368,7 @@ def test_the_bandage_keeps_its_canon_animation_name():
 def test_the_bandage_show_only_plays_when_it_treats_something():
     """A refused heal plays nothing; a real cure plays Bandaging (the H
     key's verb -- final door 2026-07-26)."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 600.0
     assert "Nothing" in str(p.heal_bandage())         # healthy: refusal
@@ -382,7 +385,7 @@ def test_every_item_has_a_show_path():
     """41 of 44 items showed correctly; port_potty, dna_crystal and
     x_antibody flashed bare text.  Now every item either eats, plays a
     script, or rides its own door -- none falls through to a text flash."""
-    from tuipet import shop
+    from tuipet.core import shop
     for k in shop.CATALOG:
         has = (k in shop._OWN_FLOW
                or shop.item_is_eaten(k)
@@ -394,7 +397,7 @@ def test_the_port_potty_plays_its_canon_sequence():
     """DVPet portToilet() -> poopToilet(false): the pet sits (pose 4) and
     strains, the poop lands at beat 18 (pose 5 + the poop sound), back to
     neutral, into cheer.  No wash beat -- flush=false."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert shop.item_script("port_potty") == "PortToilet"
     sc = itemfx.SCRIPTS["PortToilet"]
     assert sc["end"] == "cheer"
@@ -405,7 +408,7 @@ def test_the_port_potty_plays_its_canon_sequence():
 
 def test_the_port_potty_never_leaves_the_window():
     """The layout law: every beat, both icon sizes, stays in the arena."""
-    from tuipet import grid
+    from tuipet.utils import grid
     for iw, ih in ((8, 8), (16, 16)):
         for step in range(itemfx.SCRIPTS["PortToilet"]["steps"]):
             _f, _p, ix, iy, _dx, _dy = itemfx.state("PortToilet", step, iw, ih, 40)
@@ -417,7 +420,7 @@ def test_the_evolution_chips_borrow_the_study_show():
     """DNA Crystal and X-Antibody carry items.csv's ItemEvol type but do
     NOT evolve, so the evolution animation would lie.  Remapped to Study
     (Joel 2026-07-24): the pet absorbing data / the X-program."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert shop.item_script("dna_crystal") == "Study"
     assert shop.item_script("x_antibody") == "Study"
     assert "Study" in itemfx.SCRIPTS
@@ -429,7 +432,7 @@ def test_the_music_player_plays_its_own_music_box_show():
     (2026-07-24).  It has its OWN show now (Joel 2026-07-27: "i wanna redo
     that music player"): the box's real frames, plus notes drifting across
     the sky.  The xylophone it used to borrow from is untouched."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert shop.item_script("music_player") == "MusicBox"
     assert shop.item_script("xylophone") == "InteractXylophone"
     sc = itemfx.SCRIPTS["MusicBox"]
@@ -448,7 +451,9 @@ def test_the_music_players_cell_is_the_note_orb():
     never at the one size the shelf renders: the smoke-walk lesson).  The
     still cells show the natively-8x8 beamed-note orb; the SHOW still
     plays the box's real frames."""
-    from tuipet import data, data_world, shop
+    import tuipet.data.loaders.data as data
+    from tuipet import data_world
+    from tuipet.core import shop
     assert shop.icon_art("music_player") == data_world.load_orbs()["special"]["42"]
     assert shop.icon_art("i:9") is not None     # by raw icon key too
     assert shop.icon_art("vitamin") is None     # everything else: sheet frame
@@ -474,8 +479,8 @@ def test_the_override_is_ONLY_the_deliberate_remaps():
 
 
 def test_a_bag_use_fires_the_show_for_all_three():
-    from tuipet.pet import Pet
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens.shopscreen import ShopPanel
 
     def use(key, setup=None):
         p = Pet(num=100, stage="Champion", attribute="Vaccine")
@@ -508,7 +513,7 @@ def test_the_shows_walk_the_real_strips_never_the_icon_row():
     every scripted item's whole show stays inside its strip's ANIM rows
     (Bandaging's authored frame-0 med excepted), and the bank holds the
     full strips with the padding stripped."""
-    from tuipet import shop
+    from tuipet.core import shop
 
     icons = data.load_icons()
     # the re-extraction: full strips, canon row numbering, no filler
@@ -545,7 +550,7 @@ def test_the_grow_capsule_plays_its_whole_sponge_story():
     sponge popping out and hopping off (7-8) -- and the old extraction cut
     it at the fizz.  The Study walk now visits every row once, opening on
     the drop, never on row 0 (which is a sprig icon, not capsules)."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert shop.item_script("grow_capsule") == "Study"
     frames = data.load_icons()["i:78"]
     seen = [itemfx.state("Study", step, 8, 8, 24, n=len(frames))[0]

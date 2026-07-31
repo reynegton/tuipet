@@ -6,8 +6,8 @@ combination at each parent must land on exactly one deterministic row (the
 whole point of replacing the fuzzy engine)."""
 import pytest
 
-from tuipet import lines
-from tuipet.pet import Pet
+from tuipet.core import lines
+from tuipet.core.pet import Pet
 
 
 # ---- a minimal stand-in with just the counters the grammar reads ------------
@@ -356,7 +356,7 @@ def test_corpus_pets_keep_the_fuzzy_engine():
 
 
 def test_line_fields_survive_the_save_round_trip():
-    from tuipet import persistence
+    from tuipet.utils import persistence
     p = _line_pet()
     p.stage_trainings, p.battle_log, p.mega_kills = 7, [1, 0, 1], 2
     d = persistence.to_save_dict(p)
@@ -368,7 +368,7 @@ def test_line_fields_survive_the_save_round_trip():
 # ---- digicore chart UI (panel smoke: does it draw) ----------------------------
 
 def test_digicore_pages_render_the_line_chart():
-    from tuipet.digicorescreen import DigiCorePanel, next_evolution
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel, next_evolution
     p = _line_pet()
     for _ in range(2):                           # walk to Agumon (the 5-row chart)
         p.stage_seconds = 9e8
@@ -446,7 +446,8 @@ def test_area_gate_is_the_adventure_road_or_the_raid_fallback():
     adventure's return (run care/evo arc 2026-07-21), the raid re-gate
     kept as the fallback exactly like the eggUnlock MapComplete rows.
     Alphamon's AREA 3: clear map 4, or break 4 bosses."""
-    from tuipet import adventure, persistence
+    from tuipet.core import adventure
+    from tuipet.utils import persistence
     atom = ("area", "3", None)
     p = Pet(num=100, stage="Ultimate", attribute="Vaccine")
     assert not lines._atom_met(p, atom)                # no road, no raids

@@ -27,10 +27,12 @@ import random
 
 import pytest
 
-from tuipet import grid, statusbox, strikefx
-from tuipet.battlescreen import mega_window
-from tuipet.pet import Pet
-from tuipet.training import BAR_MAX, TrainingPanel
+from tuipet.utils import grid
+from tuipet.ui.components import statusbox
+from tuipet.utils import strikefx
+from tuipet.ui.screens.battlescreen import mega_window
+from tuipet.core.pet import Pet
+from tuipet.core.training import BAR_MAX, TrainingPanel
 
 R, C = grid.ROWS, grid.COLS
 
@@ -81,8 +83,8 @@ def test_the_hurt_call_names_the_key_that_actually_cures_it():
     hotkey (2026-07-26), so the call names H -- never the F menu (meat
     and pill only) and never the bag (no item exists)."""
     from tuipet.app import TuiPetApp
-    from tuipet import shop
-    from tuipet.feedscreen import ROWS_MENU
+    from tuipet.core import shop
+    from tuipet.ui.screens.feedscreen import ROWS_MENU
     assert "bandage" not in shop.CATALOG            # not an item at all
     assert all(k != "bandage" for k, _label in ROWS_MENU)   # not an F row
     msg = TuiPetApp._need_message(None, _pet(injured=True))
@@ -174,7 +176,7 @@ def test_the_drill_and_the_bout_share_one_grading_rule():
     """One source (strikefx.grade_lock + battlescreen.mega_window), so a
     tamer's practised timing means the same thing in a real fight."""
     import inspect
-    from tuipet import training
+    from tuipet.core import training
     src = inspect.getsource(training)
     assert "strikefx.grade_lock" in src and "mega_window" in src
 

@@ -541,6 +541,13 @@ class Adventure:
         b = self.boss
         return b["name"] if b else self.name
 
+    @property
+    def boss_felled(self):
+        """True when this run ended by defeating the gate boss (done=True and
+        the zone has a boss).  Bossless zones end via 'arrived' instead, so
+        the two victory paths stay distinct in the UI."""
+        return self.done and self.boss is not None
+
     def ribbon(self, width=14):
         """The journey at a glance -- progress lives HERE, not on the pet, so
         the pet is free to just walk (the old engine's doctrine).  '◆' is you,

@@ -21,8 +21,8 @@ Fixed (canon divergences):
  * BadMedLifeDec is 3600 REAL-seconds: the port stored 3600 game-seconds
    -- a double dose cost 2.5 game-DAYS instead of one game-hour."""
 
-from tuipet.pet import Pet
-from tuipet import data
+from tuipet.core.pet import Pet
+import tuipet.data.loaders.data as data
 
 
 def _pet(**kw):

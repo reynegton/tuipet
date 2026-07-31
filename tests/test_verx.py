@@ -2,8 +2,11 @@
 DP jogress meter, and the X-Antibody retirement."""
 import random
 
-from tuipet import data, jogress, lines, persistence
-from tuipet.pet import Pet, DP_MAX
+import tuipet.data.loaders.data as data
+from tuipet.core import jogress
+from tuipet.core import lines
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet, DP_MAX
 
 
 class _C:
@@ -101,7 +104,7 @@ def test_jogress_demands_and_spends_full_dp():
 # ---- the X-Antibody retirement ------------------------------------------------------
 
 def test_no_pet_is_born_with_the_antibody():
-    import tuipet.pet as pet_mod
+    import tuipet.core.pet as pet_mod
     assert not hasattr(pet_mod, "X_BIRTH_TARGET")
     for seed in range(120):
         random.seed(seed)
@@ -111,7 +114,7 @@ def test_no_pet_is_born_with_the_antibody():
 
 
 def test_antibody_no_longer_steers_selection():
-    from tuipet import evolution
+    from tuipet.core import evolution
     random.seed(4)
     p = Pet.from_num(12)                      # corpus Koromon (fuzzy engine)
     p.x_antibody = "Permanent"                # a legacy save
@@ -126,7 +129,7 @@ def test_surrender_lands_a_loss_in_the_rolling_window():
     """Audit 2026-07-04: surrendering skipped the battle_log entirely, letting
     a player keep the 12-of-15 window loss-free by fleeing every bad fight."""
     import random
-    from tuipet.battle import Battle
+    from tuipet.core.battle import Battle
     random.seed(3)
     p = _pet()
     p.battle_log = [1] * 5
@@ -142,7 +145,7 @@ def test_surrender_after_the_bell_never_double_records():
     self.over` guard _finish has -- called after the bout ended it filed a
     SECOND record_battle (a phantom loss on top of the real result)."""
     import random
-    from tuipet.battle import Battle
+    from tuipet.core.battle import Battle
     random.seed(3)
     p = _pet()
     b = Battle(p, enemy={"num": 100, "name": "Foe", "stage": "Champion", "hp": 10,
@@ -160,7 +163,8 @@ def test_never_stuck_fallback_respects_the_induced_gate():
     check() and every divergence path enforce.  A corpus pet with no passing
     candidate could be pushed into an Induced X form, then evolve_to locked
     x_antibody="Permanent": a free X with no X egg or chip."""
-    from tuipet import data, evolution
+    import tuipet.data.loaders.data as data
+    from tuipet.core import evolution
     reqs = data.load_requirements()
     _, by_num = data.load_sprites()
     # find a parent whose stage-up children include an Induced form

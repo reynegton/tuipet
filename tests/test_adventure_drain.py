@@ -6,11 +6,11 @@ spent.  The drain lands on marched STEPS only, not on encounter/boss legs.
 """
 import pytest
 
-from tuipet import adventure
-from tuipet.adventure import (Adventure, WALK_DRAIN_EVERY, TRAVEL_EFFORT_CAP,
+from tuipet.core import adventure
+from tuipet.core.adventure import (Adventure, WALK_DRAIN_EVERY, TRAVEL_EFFORT_CAP,
                               INTERACTIVE_STEPS)
-from tuipet.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
-from tuipet.pet import Pet
+from tuipet.ui.screens.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -104,7 +104,7 @@ def test_an_empty_tank_already_fights_worse():
     Side._condition bills the energy meter into every hit roll, a full
     ten-point swing between a fresh tank and an empty one (and the coach
     line calls it out)."""
-    from tuipet.battle import Side
+    from tuipet.core.battle import Side
     p = _pet()
     foe = Side.wild(p.num)
     p._set_energy(p.max_energy)

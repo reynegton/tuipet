@@ -30,8 +30,8 @@ import os
 
 import pytest
 
-from tuipet import persistence
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 def _healthy_save():
@@ -224,7 +224,7 @@ def test_the_town_cup_honors_the_shared_cup_hour():
 def test_a_town_cup_entry_spends_the_home_boards_hour_too():
     """The other direction of the same slot, now symmetric: burned AND
     checked on both boards."""
-    from tuipet import tournament
+    from tuipet.core import tournament
     import tuipet.townscreen as ts
     p = _cup_pet()
     t1 = ts.TownPanel(p, town_id=0)
@@ -244,7 +244,7 @@ def _rich_town_pet():
 
 
 def test_a_stale_row_replay_cannot_oversell_the_ration():
-    from tuipet import shop
+    from tuipet.core import shop
     p = _rich_town_pet()
     row = next(r for r in shop.town_stock(0, pet=p) if r["left"] > 0)
     stale = dict(row)                               # the cached copy
@@ -257,7 +257,7 @@ def test_a_stale_row_replay_cannot_oversell_the_ration():
 
 
 def test_a_forged_price_cannot_underpay():
-    from tuipet import shop
+    from tuipet.core import shop
     p = _rich_town_pet()
     row = next(r for r in shop.town_stock(0, pet=p) if r["left"] > 0)
     before = p.bits

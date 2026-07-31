@@ -21,9 +21,9 @@ only consumable in either sheet carrying `Mistake = -1`.
 """
 import csv
 
-from tuipet import shop
-from tuipet.pet import Pet
-from tuipet.petbase import MIRACLE_ENERGY_GAIN, TEXTBOOK_OBEDIENCE, _Refused
+from tuipet.core import shop
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import MIRACLE_ENERGY_GAIN, TEXTBOOK_OBEDIENCE, _Refused
 
 
 def _pet(**kw):
@@ -114,7 +114,7 @@ def test_the_textbook_no_longer_erases_anything():
 
 
 def test_the_textbook_is_refused_at_a_full_gauge_and_kept():
-    from tuipet.petbase import MAX_OBEDIENCE
+    from tuipet.core.petbase import MAX_OBEDIENCE
     p = _pet()
     p.obedience = MAX_OBEDIENCE
     p.add_item("textbook")
@@ -148,8 +148,8 @@ def test_the_two_ailments_take_two_free_buttons(monkeypatch):
     """The final symmetry (2026-07-26): pill on F cures sickness, H heals
     injury -- both free -- and the canon time-heal (injLapse) stays
     underneath as the do-nothing path."""
-    import tuipet.petbody as petbody
-    from tuipet.feedscreen import ROWS_MENU
+    import tuipet.core.petbody as petbody
+    from tuipet.ui.screens.feedscreen import ROWS_MENU
     kinds = [k for k, _label in ROWS_MENU]
     assert kinds == ["meat", "pill"]
     p = _pet()
@@ -185,7 +185,7 @@ def test_a_held_bandage_is_healed_out_of_an_old_bag():
     """The item is gone for good (re-ruled 2026-07-26 after the
     expansion's one-hour revival): a bandage bought in ANY brief shelf
     era must not linger as an unusable row."""
-    from tuipet import persistence
+    from tuipet.utils import persistence
     healed = persistence._heal_bag({"bandage": 2, "fish": 1,
                                     "i:80": 3, "i:82": 1})
     assert healed == {"fish": 1}
@@ -198,7 +198,7 @@ def test_the_ancient_eraser_key_now_points_at_the_new_item():
 # ---- the care menu itself ---------------------------------------------------
 
 def test_the_menu_opens_on_the_ailment_that_is_live():
-    from tuipet.feedscreen import FeedPanel, ROWS_MENU
+    from tuipet.ui.screens.feedscreen import FeedPanel, ROWS_MENU
     # (the injured leg opens on MEAT now: its cure lives in the bag, not
     #  on this menu -- 2026-07-26)
     for sick, hurt, want in ((False, False, "meat"), (True, False, "pill"),
@@ -212,7 +212,7 @@ def test_every_feed_row_is_reachable_in_both_directions():
     """A standard list menu again (the shop-layout redo 2026-07-26
     superseded the brief RIGHT-column ruling): up/down cycles all three
     rows, honoring direction."""
-    from tuipet.feedscreen import FeedPanel, ROWS_MENU
+    from tuipet.ui.screens.feedscreen import FeedPanel, ROWS_MENU
     p = _pet()
     for key in ("down", "up"):
         pan = FeedPanel(p)
@@ -226,7 +226,8 @@ def test_every_feed_row_is_reachable_in_both_directions():
 def test_the_h_heal_plays_the_canon_bandaging_show():
     """WORN, not eaten -- the Bandaging script (items.csv i:80), fired by
     the H action on a cure and by nothing on a refusal."""
-    from tuipet import data, itemfx
+    import tuipet.data.loaders.data as data
+    from tuipet.utils import itemfx
     from tuipet.app import TuiPetApp
     assert (data.consumable_by_key("i:80") or {}).get("action") == "Bandaging"
     assert "Bandaging" in itemfx.SCRIPTS
@@ -256,7 +257,7 @@ def test_the_h_heal_plays_the_canon_bandaging_show():
 def test_the_care_menu_keeps_its_lcd_geometry():
     """12 rows x 40 cols -- the classic pixel LCD scene again (restored
     2026-07-26: "just revert the feed menu to meat and pill lcd")."""
-    from tuipet.feedscreen import FeedPanel
+    from tuipet.ui.screens.feedscreen import FeedPanel
     p = _pet()
     p.injured = True
     lines = FeedPanel(p).text().plain.split("\n")

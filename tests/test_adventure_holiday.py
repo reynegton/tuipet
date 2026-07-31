@@ -5,10 +5,11 @@ holiday a run pays DOUBLE bounties and spills MORE loot, and the zone picker
 flies a festival banner.  Ordinary days are untouched.
 """
 import datetime
-from tuipet import adventure, tournament
-from tuipet.adventure import Adventure, ZONES
-from tuipet.adventurescreen import ZonePickPanel
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.core import tournament
+from tuipet.core.adventure import Adventure, ZONES
+from tuipet.ui.screens.adventurescreen import ZonePickPanel
+from tuipet.core.pet import Pet
 
 
 def _pet():

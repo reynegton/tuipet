@@ -6,7 +6,7 @@ import glob
 import os
 import re
 
-from tuipet import sound
+from tuipet.utils import sound
 
 
 # ---- player detection --------------------------------------------------------
@@ -185,6 +185,6 @@ def test_a_fresh_install_starts_at_half_volume():
     """Joel 2026-07-23: 'make it so audio volume starts at 50% by
     default.'  A saved volume.txt still wins; only a fresh state dir
     lands on the default."""
-    from tuipet import sound
+    from tuipet.utils import sound
     assert sound.DEFAULT_VOLUME == 50
     assert sound._load_volume() == 50     # sandboxed dir: no volume.txt

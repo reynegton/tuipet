@@ -15,8 +15,10 @@ binding decision must be intentional, never csv-order luck:
 """
 import pytest
 
-from tuipet import data, lines, persistence
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import lines
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 def _by_num():
@@ -107,7 +109,7 @@ def _grown(num, by_num):
 
 
 def test_digimental_jump_reanchors_the_line(monkeypatch):
-    from tuipet import pet as pet_mod
+    from tuipet.core import pet as pet_mod
     by_num = _by_num()
     p = _grown(1615, by_num)                    # draco's Petitmon root
     p.line_id, p.energy, p.max_energy = "draco", 24, 24
@@ -120,7 +122,7 @@ def test_digimental_jump_reanchors_the_line(monkeypatch):
 
 
 def test_death_rebirth_reanchors_the_line(monkeypatch):
-    from tuipet import pet as pet_mod
+    from tuipet.core import pet as pet_mod
     by_num = _by_num()
     p = _grown(1615, by_num)
     p.line_id = "draco"

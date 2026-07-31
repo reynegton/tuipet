@@ -19,9 +19,9 @@ first ~1.5 pets.  The album axis must span GENERATIONS.
 import csv
 import os
 
-from tuipet import data_meta  # noqa: E402
-from tuipet import data
-from tuipet.pet import Pet
+from tuipet.data.loaders import data_meta  # noqa: E402
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 
 
 def _enemy(stage, num=-1):

@@ -1,8 +1,8 @@
 """The DNA slim (BASIC VPET 2026-07-16): Generate/Charge/Stats/Divergence
 survive; the gate-forgiveness and the Requirements page left; the charge
 bill rides ENERGY (the mood/spirit bills left with their systems)."""
-from tuipet.pet import Pet, DNA_SAME_FIELD_ENERGY, DNA_DIFF_FIELD_ENERGY
-from tuipet.dnascreen import DNAPanel, _HOME
+from tuipet.core.pet import Pet, DNA_SAME_FIELD_ENERGY, DNA_DIFF_FIELD_ENERGY
+from tuipet.ui.screens.dnascreen import DNAPanel, _HOME
 
 
 def _pet(**kw):
@@ -48,8 +48,8 @@ def test_the_charge_page_honors_the_dna_rulings():
     stops selling self-harm; the FIELD itself stays gate-load-bearing);
     (2) the page says what charge is FOR (the wild road, not the climb);
     (3) the bet strip prices every band honestly."""
-    from tuipet import dnascreen
-    from tuipet.pet import Pet
+    from tuipet.ui.screens import dnascreen
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", bits=5000)
     p.world_seconds = 600.0
     pan = dnascreen.DNAPanel(p)

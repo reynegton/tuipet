@@ -3,8 +3,8 @@ canon pacing curve, and the sharpened death rules."""
 import random
 
 
-from tuipet import lines
-from tuipet.pet import Pet
+from tuipet.core import lines
+from tuipet.core.pet import Pet
 
 
 def _line_pet(to_agumon=True):
@@ -193,7 +193,7 @@ def test_disturb_postpone_lands_in_the_canon_band():
     seeds so the band can't drift.  (An earlier probe misread ticks/60 as the
     unit and cried instant re-sleep: a tick IS a game-minute.)"""
     import random
-    from tuipet.pet import Pet, DISTURB_POSTPONE
+    from tuipet.core.pet import Pet, DISTURB_POSTPONE
     assert DISTURB_POSTPONE == (10, 60)
     for seed in (7, 11, 23):
         random.seed(seed)
@@ -222,7 +222,7 @@ def test_full_cared_night_refills_energy_and_dp_without_mistakes():
     """The two-night integration: bedtime -> keeper dims within grace (zero
     mistakes) -> 7:00 wake with energy and the DP meter refilled."""
     import random
-    from tuipet.pet import Pet, DAY_MINUTES, DP_MAX
+    from tuipet.core.pet import Pet, DAY_MINUTES, DP_MAX
     random.seed(7)
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus", obedience=500)
     p.line_id = "ver1"

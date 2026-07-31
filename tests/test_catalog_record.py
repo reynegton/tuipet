@@ -11,7 +11,7 @@ this record, and a silent field reshuffle would corrupt every read).
 """
 import pytest
 
-from tuipet import shop
+from tuipet.core import shop
 
 
 def test_every_entry_is_the_named_record():

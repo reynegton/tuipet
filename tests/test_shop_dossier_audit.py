@@ -6,7 +6,7 @@ unmarked-pet death roulette ran "below" -- that roulette belonged to the
 removed X-PROGRAM item (strict-DSprite shelf cut 2026-07-17) and its
 orphan constants are retired with it.  The chip is, and always was, the
 safe path."""
-from tuipet.pet import Pet, FULL_HUNGER
+from tuipet.core.pet import Pet, FULL_HUNGER
 
 
 def _pet(**kw):

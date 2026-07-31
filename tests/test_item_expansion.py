@@ -4,10 +4,12 @@ the generic sweep skips, and the new distribution channels.  Board:
 ITEM_EXPANSION_2026_07_26.md."""
 import random
 
-from tuipet import adventure as adv
-from tuipet import data, shop, tournament
-from tuipet.pet import Pet
-from tuipet.petcare import _Refused
+from tuipet.core import adventure as adv
+import tuipet.data.loaders.data as data
+from tuipet.core import shop
+from tuipet.core import tournament
+from tuipet.core.pet import Pet
+from tuipet.core.petcare import _Refused
 
 
 def _pet(stage="Rookie", num=100, **kw):
@@ -118,7 +120,7 @@ def test_eating_an_orange_can_wake_citramon():
     _, by_num = data.load_sprites()
     p = _pet(stage=by_num[holder]["stage"], num=holder)
     p.hunger = 0
-    from tuipet import evolution
+    from tuipet.core import evolution
     if evolution.check(p, target, food=42):      # gates pass on this fixture
         p.add_item("orange")
         p.use_item("orange")
@@ -156,7 +158,7 @@ def test_a_prank_capsule_pays_from_the_junk_drawer():
 
 
 def test_a_festival_open_reaches_one_tier_higher(monkeypatch):
-    from tuipet import tournament as t
+    from tuipet.core import tournament as t
     seen = set()
     monkeypatch.setattr(t, "holiday", lambda today=None: "Christmas Festival")
     random.seed(11)
@@ -347,8 +349,8 @@ def test_the_chocolate_egg_pays_a_toy_never_a_food():
     the None-reads-as-common hole).  Every prize: a priced, common, non-Feed
     item."""
     import random
-    from tuipet import shop
-    from tuipet.pet import Pet
+    from tuipet.core import shop
+    from tuipet.core.pet import Pet
     random.seed(3)
     seen = set()
     for _ in range(120):
@@ -371,9 +373,9 @@ def test_the_surprise_cheer_holds_the_prize_sprite():
     pet.pending_prize; the following cheer carries the icon and the painter
     grounds it beside the pet at hand size -- LEFT floor, clear of the
     16px mon and the right-edge emote."""
-    from tuipet import arenafx
-    from tuipet.arenafx import _FxCtx, PET_BASE_X, SCREEN_ROWS
-    from tuipet.pet import Pet
+    from tuipet.utils import arenafx
+    from tuipet.utils.arenafx import _FxCtx, PET_BASE_X, SCREEN_ROWS
+    from tuipet.core.pet import Pet
     p = Pet(num=29, stage="Rookie", attribute="Vaccine")
     p.name, p.line_id = "T", ""
     w = object.__new__(arenafx.FxMixin)
@@ -381,7 +383,7 @@ def test_the_surprise_cheer_holds_the_prize_sprite():
     c.overlay = []; c.free = []; c.xshift = 0; c.yshift = 0; c.mirror = False
     arenafx.FxMixin._fxk_cheer(w, p, {"kind": "cheer", "step": 0,
                                       "icon": "i:2", "good": True}, 0, c)
-    from tuipet import grid
+    from tuipet.utils import grid
     pet_left = PET_BASE_X + c.xshift
     prize = [(x, y) for x, y in c.overlay if x < pet_left]
     assert prize, "no prize pixels beside the pet"
@@ -399,7 +401,7 @@ def test_the_surprise_cheer_holds_the_prize_sprite():
 
 def test_the_openers_park_their_prize_for_the_cheer():
     import random
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     random.seed(5)
     p = Pet(num=100, stage="Rookie", attribute="Vaccine")
     p.name, p.line_id = "T", ""

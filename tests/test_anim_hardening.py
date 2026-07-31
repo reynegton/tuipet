@@ -6,10 +6,10 @@ fx existed but sat unwired since home battles were retired 07-07)."""
 import asyncio
 import inspect
 
-from tuipet import data
+import tuipet.data.loaders.data as data
 from tuipet.app import Screen, TuiPetApp
-from tuipet.digicorescreen import silhouette
-from tuipet.pet import Pet
+from tuipet.ui.screens.datacorescreen import silhouette
+from tuipet.core.pet import Pet
 
 
 class _FakeScreen:
@@ -59,7 +59,7 @@ def test_item_evolve_keeps_the_canon_parade():
 
 
 def test_defeat_result_alternates_like_the_win():
-    from tuipet import battlescreen
+    from tuipet.ui.screens import battlescreen
     src = inspect.getsource(battlescreen.BattlePanel._render_scene_frame)
     assert "(COLLAPSE, WEARY)" in src              # no more frozen loser pose
 
@@ -92,7 +92,7 @@ def test_cup_verdict_plays_the_home_beat():
 # ---- device-exact idle/hatch/battle beats (GML decompile 2026-07-14) -----------
 
 def test_roamer_pauses_at_the_wall_on_the_turn_pose():
-    from tuipet import anim
+    from tuipet.utils import anim
     assert anim.STEP_PX == 2 and anim.TURN_CHANCE == 0.30 and anim.WALL_PAUSE == 4
     r = anim.Roamer(0, 32, 16, face=1)
     import random
@@ -126,7 +126,7 @@ def test_hatch_wobble_accelerates():
 
 
 def test_final_winning_blow_lands_silent():
-    from tuipet.battlescreen import round_timeline
+    from tuipet.ui.screens.battlescreen import round_timeline
     tl = round_timeline(5, 1, pdmg=1, edmg=1, player_first=True)
     kill = [e for e in tl if e["m"] == "hit" and e["def"] == "foe"]
     assert kill and all(e["final"] for e in kill)      # the KO hit is marked
@@ -155,7 +155,7 @@ def test_condition_widens_the_mega_window():
     (Was 1 -> 7: the 1px starved zone fell to the timing rework 2026-07-23
     -- one 100ms step was physically impossible; test_timing_honesty owns
     the floor pin.)"""
-    from tuipet import training
+    from tuipet.core import training
     top = Pet(num=100, stage="Champion", hunger=4, strength=4, obedience=500)
     top.energy = top.max_energy
     top.wins = top.battles = 10                    # perfect record
@@ -256,7 +256,7 @@ def test_pair_cap_survives_the_overflow_shed():
 
 
 def test_ladder_award_grants_bits_exactly_once():
-    from tuipet.lobbyscreen import LobbyPanel
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
 
     class _C:
         name = "joel"
@@ -289,7 +289,7 @@ def test_ladder_award_grants_bits_exactly_once():
 
 
 def test_ladder_page_renders():
-    from tuipet.lobbyscreen import LobbyPanel
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
 
     class _C:
         name = "joel"
@@ -301,7 +301,7 @@ def test_ladder_page_renders():
     plain = pan._text_ladder().plain
     assert "season 2026-07" in plain and "wyld" in plain
     assert "▸ 2. joel" in plain.replace("  ", " ") or "joel" in plain
-    assert "resets in 17 days" in plain
+    assert "17 day(s)" in plain
     assert all(len(line) <= 40 for line in plain.splitlines())
 
 
@@ -312,7 +312,7 @@ def test_ladder_page_renders():
 
 def test_weekend_mult_true_weekday_logic():
     import time
-    from tuipet.pet import _weekend_mult
+    from tuipet.core.pet import _weekend_mult
     # build epochs from LOCAL structs so the pin holds in any timezone
     sat = time.mktime((2026, 7, 11, 12, 0, 0, 0, 0, -1))
     sun = time.mktime((2026, 7, 12, 12, 0, 0, 0, 0, -1))
@@ -329,8 +329,8 @@ def test_weekend_mult_true_weekday_logic():
 
 
 def test_weekend_tournament_purse_scales(monkeypatch):
-    from tuipet import pet as pet_mod
-    from tuipet.tournament import Tournament
+    from tuipet.core import pet as pet_mod
+    from tuipet.core.tournament import Tournament
     monkeypatch.setattr(pet_mod, "weekend_bonus", lambda now=None: 1.5)
     p = Pet(num=100, stage="Champion", bits=0)
     tm = Tournament.__new__(Tournament)
@@ -347,7 +347,7 @@ def test_a_landed_retaliation_is_shown_never_swallowed():
     the pet's blow zeroed the foe.  The pet lost 1-2 HP on record with no
     animation, and the next page's true HP contradicted the replay.  A KO'd
     side's strike is hidden only when it MISSED (nothing was applied)."""
-    from tuipet.battlescreen import round_timeline
+    from tuipet.ui.screens.battlescreen import round_timeline
     # foe at 2, pet lands 2 (KO) while the foe's simultaneous 1 also landed
     tl = round_timeline(5, 2, 2, 1, player_first=True)
     assert tl[-1]["ph"] == 4, "the applied retaliation must reach the shown HP"

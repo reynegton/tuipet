@@ -15,8 +15,8 @@ The MANIFEST (both directions, like the sound audit): every extracted icon
 is either referenced by code or allowlisted with its reason below."""
 import glob
 
-from tuipet import data
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 import tuipet.app as app
 
 

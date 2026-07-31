@@ -21,9 +21,10 @@ import random
 
 import pytest
 
-from tuipet import battle as B, statusbox
-from tuipet.battlescreen import BattlePanel, LOCK_ARM_T, SKIP_DEBOUNCE
-from tuipet.pet import Pet
+from tuipet.core import battle as B
+from tuipet.ui.components import statusbox
+from tuipet.ui.screens.battlescreen import BattlePanel, LOCK_ARM_T, SKIP_DEBOUNCE
+from tuipet.core.pet import Pet
 
 ENEMY = {"num": 120, "name": "Kuwagamon", "stage": "Champion",
          "attribute": "Virus"}
@@ -162,8 +163,8 @@ def test_the_weight_bill_floors_at_the_species_BASE():
 
 # ---- the gate --------------------------------------------------------------
 
-CONDITIONS = [("injured", "Too hurt"), ("sick", "Too sick"),
-              ("hunger", "Too hungry"), ("poop", "Clean up")]
+CONDITIONS = [("injured", "Muito machucado"), ("sick", "Muito doente"),
+              ("hunger", "Com muita fome"), ("poop", "Limpe primeiro!")]
 
 
 @pytest.mark.parametrize("field,word", CONDITIONS)
@@ -174,7 +175,7 @@ def test_every_chosen_fight_asks_the_same_condition_gate(field, word):
     p = _pet(**({field: 0} if field == "hunger" else {field: 3 if field == "poop" else True}))
     assert word in (p.battle_condition() or "")
     assert word in (p.can_battle() or "")
-    from tuipet import tournament
+    from tuipet.core import tournament
     assert word in (tournament.can_enter(p) or p.battle_condition() or "")
 
 
@@ -237,13 +238,13 @@ def test_one_battle_card_paints_for_every_door(kw):
     assert fn is not None
     fn(app)
     txt = app.stats_w.text
-    assert "You" in txt and ("battle" in txt.lower() or "raid" in txt.lower())
+    assert "You" in txt and ("batalha" in txt.lower() or "raid" in txt.lower())
 
 
 def test_the_card_reaches_a_fight_hosted_INSIDE_another_screen():
     """The cup runs its bouts as a SUB; painter_for walks the chain, or the
     cup's fights show vitals instead of HP bars."""
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
     p = _pet()
     host = TournamentPanel(p)
     host.sub = BattlePanel(p, dict(ENEMY), skip_intro=True)
@@ -283,8 +284,8 @@ def test_the_skip_debounce_still_guards_the_first_presses():
 # pounce -- and that is the one exception, pinned below so it stays one.
 
 def _road(pet):
-    from tuipet import adventure
-    from tuipet.adventurescreen import AdventurePanel
+    from tuipet.core import adventure
+    from tuipet.ui.screens.adventurescreen import AdventurePanel
     pet.adv_progress = 3
     pan = AdventurePanel(pet, zone=adventure.ZONES[adventure.PROGRESSION[0]])
     pan._trans = pan._pulse = None                # skip the teleport-out beat
@@ -343,7 +344,7 @@ class _GateClient:
 @pytest.mark.parametrize("field,word", CONDITIONS)
 def test_a_raid_volley_asks_the_body_first(field, word):
     import json
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
     boss_num = json.load(open("server/raid_pool.json"))[0]["num"]
     p = _pet(**({field: 0} if field == "hunger"
                 else {field: 3 if field == "poop" else True}))
@@ -356,7 +357,7 @@ def test_a_raid_volley_asks_the_body_first(field, word):
 
 def test_a_healthy_pet_still_gets_its_raid_volley():
     import json
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
     boss_num = json.load(open("server/raid_pool.json"))[0]["num"]
     p = _pet()
     p.world_seconds = 600.0
@@ -421,7 +422,7 @@ def test_the_panel_never_builds_a_PVP_fight():
     its own bout.  So every fight born at this bar is LOCAL, and the engine
     records it as one."""
     import inspect
-    from tuipet import battlescreen
+    from tuipet.ui.screens import battlescreen
     src = inspect.getsource(battlescreen.BattlePanel._start_fight)
     body = "\n".join(ln for ln in src.splitlines()
                      if not ln.lstrip().startswith("#"))
@@ -454,7 +455,7 @@ def test_the_panel_never_builds_a_PVP_fight():
 
 def test_a_drained_pet_may_still_face_the_road_boss():
     p = _pet(energy=0)
-    assert p.battle_condition() == "Too drained to fight."      # at HOME, no
+    assert p.battle_condition() == "Sem energia para lutar."      # at HOME, no
     assert p.battle_condition(check_energy=False) is None       # on the ROAD, yes
     pan = _road(p)
     pan._start_boss(pan.adv.boss)
@@ -473,14 +474,14 @@ def test_the_home_doors_keep_the_energy_clause():
     """The carve-out is the road's alone: the house key, the cup and the
     raid all still refuse a drained pet, because a pet at home has a bed,
     a shop and a full larder within reach."""
-    from tuipet import tournament
+    from tuipet.core import tournament
     p = _pet(energy=0)
-    assert "Too drained" in (p.can_battle() or "")
-    assert "Too drained" in (tournament.can_enter(p) or p.battle_condition() or "")
+    assert "Sem energia" in (p.can_battle() or "")
+    assert "Sem energia" in (tournament.can_enter(p) or p.battle_condition() or "")
     import json
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
     boss_num = json.load(open("server/raid_pool.json"))[0]["num"]
     p.world_seconds = 600.0
     pan = RaidPanel(p, None, client=_GateClient(boss_num))
     pan.key("space")
-    assert pan.sub is None and "Too drained" in (pan.msg or "")
+    assert pan.sub is None and "Sem energia" in (pan.msg or "")

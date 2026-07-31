@@ -11,10 +11,12 @@ _wx=14, the exact spot where none of the right-half defects manifest.
 """
 import pytest
 
-from tuipet import adventure, grid, menu
-from tuipet.adventurescreen import (AdventurePanel, HZ_TELE_T, HZ_LUNGE_T,
+from tuipet.core import adventure
+from tuipet.utils import grid
+from tuipet.ui.components import menu
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, HZ_TELE_T, HZ_LUNGE_T,
                                     INV_HOLD_T, PARADE_T, TOWN_HOLD)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 WXS = (4.0, 14.0, 20.0, 32.0)
 PH = 24                                       # ROWS * 2: the LCD pixel height
@@ -215,7 +217,7 @@ def test_a_clean_dodge_keeps_the_whiffing_pouncer_visible(wx, monkeypatch):
     for the whole tail — a successful duck read as the attacker blinking
     out of existence.  The whiff retreats out the RIGHT edge: visible at
     every tail tick, never sharing ink with the croucher."""
-    from tuipet.adventurescreen import HZ_END_T
+    from tuipet.ui.screens.adventurescreen import HZ_END_T
     impact = HZ_TELE_T + HZ_LUNGE_T
     for k in range(HZ_END_T - 2):             # the tail (the last ticks clip
         pan = _on_road(wx)                    #  out through the edge, lawful)

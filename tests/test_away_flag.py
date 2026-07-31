@@ -7,9 +7,10 @@ clear) but NOTHING ever set it — the setter died with the old adventure.
 Pins: the teleport toggles it both ways (canon), the status card's @ line
 goes live with the zone, and the assistant truly pauses on the road.
 """
-from tuipet import adventure, statusbox
-from tuipet.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.ui.components import statusbox
+from tuipet.ui.screens.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -85,7 +86,7 @@ def test_the_road_key_hint_cycles_anchor_then_labels(monkeypatch):
     cycles so every out reaches the player.  T (warp) only joins when a
     transport is held.  Every step stays within the strip box."""
     import re
-    from tuipet.adventurescreen import HINT_BEAT
+    from tuipet.ui.screens.adventurescreen import HINT_BEAT
     pan = _land(monkeypatch)
     p = pan.pet
     p.inventory = {"town_transport": 1}                # holding a warp -> T shows

@@ -13,8 +13,8 @@ import tempfile
 import pytest
 
 import tuipet.app as appmod
-from tuipet import persistence as pers
-from tuipet import update as upd
+from tuipet.utils import persistence as pers
+from tuipet.utils import update as upd
 
 
 @pytest.fixture(autouse=True)
@@ -39,7 +39,7 @@ def _run(monkeypatch, latest, argv, upgrade, auto=True):
 def test_a_newer_release_installs_itself_then_asks_for_a_restart(monkeypatch):
     app = _run(monkeypatch, "9.9.9", ["pip"], (True, "Updated"))
     assert app._updated_to == "9.9.9"
-    assert "installed" in app._update_msg and "restart" in app._update_msg
+    assert "instalado" in app._update_msg and "reinicie" in app._update_msg
 
 
 def test_being_up_to_date_says_nothing(monkeypatch):
@@ -66,7 +66,7 @@ def test_the_player_can_opt_out(monkeypatch):
     """Nobody is forced to have pip run for them: opting out still NOTIFIES."""
     app = _run(monkeypatch, "9.9.9", ["pip"], (True, "Updated"), auto=False)
     assert not getattr(app, "_updated_to", None)
-    assert "9.9.9 out" in app._update_msg
+    assert "9.9.9 disponível" in app._update_msg
 
 
 def test_auto_update_defaults_on_and_persists():

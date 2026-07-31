@@ -5,11 +5,11 @@ Pins the ambush: a marched step may spring one of the zone's own wilds
 clean, eating it costs the small engine-applied energy toll — and the march
 resumes either way (the beat never hangs).
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES, HAZARD_ENERGY
-from tuipet.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES, HAZARD_ENERGY
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
                                     HZ_TELE_T, HZ_LUNGE_T, HZ_END_T)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 HZ_TOTAL = HZ_TELE_T + HZ_LUNGE_T + HZ_END_T
 

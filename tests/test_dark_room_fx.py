@@ -7,8 +7,8 @@ toggles at the anim's final beat, so the switch AND the helper's exit render in
 the lit room (the old cut at beat 18 left the exit playing white in the dark).
 """
 import tuipet.app as app
-from tuipet import arena
-from tuipet.pet import Pet
+from tuipet.core import arena
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):

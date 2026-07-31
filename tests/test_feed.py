@@ -1,7 +1,7 @@
 """The DSprite feed menu (BASIC VPET 2026-07-16): MEAT and PILL, free and
 infinite -- the DVPet food catalog left with the item system."""
-from tuipet.pet import Pet, FULL_HUNGER, PILL_WEIGHT_GAIN
-from tuipet.feedscreen import FeedPanel, ROWS_MENU
+from tuipet.core.pet import Pet, FULL_HUNGER, PILL_WEIGHT_GAIN
+from tuipet.ui.screens.feedscreen import FeedPanel, ROWS_MENU
 
 
 def _pet(**kw):
@@ -72,7 +72,7 @@ def test_feed_alias_keeps_old_callers_fed():
 def test_the_meat_eats_through_the_dvpet_meat_strip():
     """Meat is EATEN (the source's action) through the DVPet f:0 Meat strip
     (art truth, Joel 2026-07-18: "all sprites must come from dvpet")."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     p = _pet(hunger=1)
     pan = FeedPanel(p)
     done, (outcome, item, _msg) = pan.key("enter")
@@ -94,9 +94,9 @@ def test_the_pill_is_eaten_through_its_own_menu_glyph():
     the same sprites").  Pin the whole road: panel verdict -> eat anim -> the
     sym:pill key -> the PILL/HALF_PILL strip -> the heal fx kind stays gone."""
     from tuipet.app import Screen
-    from tuipet.arenafx import FxMixin
-    from tuipet.feedscreen import FeedPanel, PILL, HALF_PILL, PILL_FRAMES
-    from tuipet.pet import Pet
+    from tuipet.utils.arenafx import FxMixin
+    from tuipet.ui.screens.feedscreen import FeedPanel, PILL, HALF_PILL, PILL_FRAMES
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 12 * 60.0
     p.sick = True
@@ -150,8 +150,8 @@ def test_the_source_refusal_gates_hold():
 def test_the_feed_card_discloses_weight_on_both_rows():
     """Full disclosure both rows (feed audit 2026-07-19): the meat row used
     to hide its weight +1 while the pill admitted its +5."""
-    from tuipet.feedscreen import FeedPanel
-    from tuipet import statusbox
+    from tuipet.ui.screens.feedscreen import FeedPanel
+    from tuipet.ui.components import statusbox
 
     class _App:
         pass

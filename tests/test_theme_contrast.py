@@ -12,7 +12,7 @@ Thresholds are the shipped floor, not aspiration: text pairs >= 3.0:1,
 status tints >= 2.0:1 (the quiet default's DIM is quiet BY DESIGN --
 grey mid sits at 2.36 and stays).  Silhouette inks are exempt: they
 draw over scene art and are meant to hug it."""
-from tuipet.theme import THEMES
+from tuipet.utils.theme import THEMES
 
 TEXT_MIN = 3.0     # on/ink and SEL (inverted)
 TINT_MIN = 2.0     # mid/dim + the status readout tints

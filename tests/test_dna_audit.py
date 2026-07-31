@@ -7,9 +7,9 @@ tells the wipe rule out loud ("charges clear at every evolution") --
 evolve_to's reset_dna was documented engine-side only, so an under-armed
 charge died silently at the line climb.  These pins close the gaps the
 existing DNA/divergence suites left open."""
-from tuipet.pet import (Pet, DNA_STABILIZER_BET,
+from tuipet.core.pet import (Pet, DNA_STABILIZER_BET,
                         DNA_RESONANT_BET, dna_field_for_rate)
-from tuipet import persistence
+from tuipet.utils import persistence
 
 
 def _pet(**kw):
@@ -33,7 +33,7 @@ def test_rate_band_edges_hold():
 def test_edge_band_resonance_splashes_one_neighbor_and_says_so():
     """DeepSaver/DarkArea have one adjacent band; the result row must not
     promise 'both'."""
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     p = _pet()
     p.dna_bet(DNA_RESONANT_BET)
     f = p.dna_minigame_award(DNA_RESONANT_BET, 10)         # DeepSaver, the edge
@@ -47,7 +47,7 @@ def test_edge_band_resonance_splashes_one_neighbor_and_says_so():
 
 
 def test_interior_resonance_still_says_both():
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     p = _pet()
     p.dna_bet(DNA_RESONANT_BET)
     f = p.dna_minigame_award(DNA_RESONANT_BET, 30)         # NatureSpirit, interior
@@ -62,7 +62,7 @@ def test_interior_resonance_still_says_both():
 def test_the_divergence_page_teaches_the_wipe_rule():
     """A Rookie Agumon HAS wild roads (the divergence suite's fixture) --
     the filled page must say the wipe rule, not just the arm hint."""
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     p = _pet(stage="Rookie")
     pan = DNAPanel(p)
     assert pan._roads, "fixture lost its roads -- rebase on test_divergence.mk"
@@ -72,7 +72,7 @@ def test_the_divergence_page_teaches_the_wipe_rule():
     # the tail rides the marquee (notes scroll, they never clip) -- pin the
     # SOURCE string, not one frozen phase (the round-two lesson)
     import inspect
-    from tuipet import dnascreen
+    from tuipet.ui.screens import dnascreen
     assert "charges clear at every evolution" in inspect.getsource(dnascreen)
 
 
@@ -108,7 +108,7 @@ def test_interrupted_wager_settles_as_a_spoiled_mash(isolate_save=None):
 def test_the_charge_meter_and_award_share_one_band_map():
     """The live mash meter's Field preview and the award must never disagree:
     both read dna_field_for_rate (single source)."""
-    from tuipet import dnascreen
+    from tuipet.ui.screens import dnascreen
     import inspect
     src = inspect.getsource(dnascreen)
     assert "dna_field_for_rate(rate)" in src               # the strip preview
@@ -125,8 +125,8 @@ def test_the_mash_scene_and_result_blink_animate():
     result's Field name blinks in on the reveal cadence.  Frames compared
     at the PIXEL tap -- .plain of a painted scene is all half-blocks and
     proves nothing (the theme-audit lesson)."""
-    from tuipet import render
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.utils import render
+    from tuipet.ui.screens.dnascreen import DNAPanel
     grabbed = {}
     real = render._paint_cells
     def tap(buf, *a, **k):
@@ -164,8 +164,8 @@ def test_the_charge_screen_alternates_both_truths():
     happens on Charge -- a 5/8 charge died silently at the stage timer.
     The note now alternates the two honest lines on the sealed-tease
     cadence (40 ticks), armed state outranking both."""
-    from tuipet.dnascreen import DNAPanel
-    from tuipet import evolution
+    from tuipet.ui.screens.dnascreen import DNAPanel
+    from tuipet.core import evolution
     p = _pet(stage="Rookie")
     pan = DNAPanel(p)
     pan.phase = "charge"
@@ -180,7 +180,7 @@ def test_the_charge_screen_alternates_both_truths():
     assert "charges clear" in union                  # truth B scrolls through
     assert len(set(frames)) > 1                      # it genuinely alternates
     import inspect
-    from tuipet import dnascreen
+    from tuipet.ui.screens import dnascreen
     src = inspect.getsource(dnascreen)
     assert "charges clear at every evolution — arm before the clock fills" in src
     p.dna_applied["DeepSaver"] = evolution.DIVERGE_NEED["Rookie"]
@@ -192,7 +192,7 @@ def test_the_charge_screen_alternates_both_truths():
 def test_the_dna_home_teaches_the_whole_loop():
     """help GROW's grammar, on the screen itself: generate, charge ONE
     Field, take the road -- 'then charge it' never said WHY."""
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     pan = DNAPanel(_pet(stage="Rookie"))
     plain = pan.text().plain
     assert "charge ONE Field" in plain and "road" in plain
@@ -204,7 +204,7 @@ def test_the_hud_carries_the_standing_armed_notice():
     every need outranks it (the cascade is untouched above it)."""
     import asyncio
     from tuipet.app import TuiPetApp
-    from tuipet import evolution
+    from tuipet.core import evolution
     p = _pet(stage="Rookie")
     p.line_id = "ver1"
     p.hunger, p.energy = 4, 24                     # no needs: the idle slot
@@ -235,7 +235,7 @@ def test_the_hud_carries_the_standing_armed_notice():
     # head here and the full wording at its source
     assert "DNA armed" in armed
     import inspect
-    from tuipet import app as app_mod
+    from tuipet.core import app as app_mod
     assert "next evolution rides the" in inspect.getsource(app_mod)
     assert "hungry" in need and "DNA armed" not in need
     assert "DNA armed" not in gone

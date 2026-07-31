@@ -1,6 +1,6 @@
 """Trained battle HP + the exercise() nuances (checkAndIncPerfectWins,
 checkExerciseTime, mood+=enthusiasm, checkWorseSick, ExerciseCalorieDec)."""
-from tuipet.pet import (Pet, DAY_LENGTH, STARTING_HEALTH_POINTS, PERFECT_WINS_LIMIT)
+from tuipet.core.pet import (Pet, DAY_LENGTH, STARTING_HEALTH_POINTS, PERFECT_WINS_LIMIT)
 
 
 def _pet(**kw):
@@ -51,12 +51,13 @@ def test_the_drill_carries_no_dead_remnants_and_the_999_canon_stands():
     v0.5.67 (training's copy fed nothing), the energy gate lives only in
     petbattle -- and the battles>=999 auto-mega is v0.4.12 verbatim, kept."""
     import inspect
-    from tuipet import training, strikefx
+    from tuipet.core import training
+    from tuipet.utils import strikefx
     src = inspect.getsource(training)
     assert not hasattr(training, "_FONT_3X5") and hasattr(strikefx, "_FONT_3X5")
     assert not hasattr(training, "ENERGY_NEED")
     assert "999" in src                          # the canon veteran rule stays
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", battles=999)
     p.world_seconds, p.hunger, p.energy, p.strength = 600.0, 3, 20, 2
     pan = training.TrainingPanel(p)

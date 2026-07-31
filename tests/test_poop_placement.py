@@ -9,10 +9,11 @@ import random
 
 import pytest
 
-from tuipet import app as A
-from tuipet import arena as AR          # Screen resolves render_screen here
-from tuipet import data, grid
-from tuipet.pet import Pet
+import tuipet.app as A
+from tuipet.core import arena as AR          # Screen resolves render_screen here
+import tuipet.data.loaders.data as data
+from tuipet.utils import grid
+from tuipet.core.pet import Pet
 
 
 def _live_num():
@@ -141,7 +142,7 @@ def test_poop_costs_weight_not_hunger():
     canon says NO (PhysicalState.poop: mood relief + weight shed + gauge +
     filth; hunger is untouched — it falls on its own decay clock).  Even the
     floor-poop obedience change is 0 in the shipped difficulty column."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus")
     p.world_seconds = 12 * 60.0
     # ABOVE the species base: since 2026-07-25 the shed FLOORS at base like

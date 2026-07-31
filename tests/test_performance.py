@@ -5,7 +5,7 @@ The 10 Hz frame loop and 1 Hz tick repeatedly call data loaders (e.g. background
 is parsed once, not re-read per frame. A missing @lru_cache once cost a fresh CSV
 parse + open() syscall ~10-30x/second; this pins the invariant.
 """
-from tuipet import data
+import tuipet.data.loaders.data as data
 
 
 def _public_loaders():

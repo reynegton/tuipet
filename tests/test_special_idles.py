@@ -3,7 +3,7 @@ audit 2026-07-06): Tantrum-while-the-call-stands, weathering's three flavors
 (checkNiceWeather: a species that LOVES this sky bounces), and the gated
 personality mood idles (Neutral does nothing)."""
 
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -59,7 +59,7 @@ def test_the_thunder_startle_is_disposition_keyed():
     key on disposition -- the sour pet barely flinches (idle<->4), neutral
     reacts (4<->6), the SUNNY one jumps hardest (9<->10, canon's inversion).
     The roles carry the canon pose pairs."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     assert data.ROLES["startle_sour"] == [0, 4]
     assert data.ROLES["startle"] == [4, 6]
     assert data.ROLES["startle_sunny"] == [9, 10]
@@ -75,9 +75,10 @@ def test_the_collapse_emote_is_fx_only_now():
     """Bandai grammar 2026-07-11: idle-state anims carry no floating emote --
     the collapse POSE is the signal; the dying/losing FX scenes still own the
     dying/dying2 pair as part of their full-screen animation."""
-    from tuipet import app as app_mod, data
+    from tuipet.utils import app as app_mod
+    import tuipet.data.loaders.data as data
     import inspect
-    import tuipet.arenafx as arena_mod   # the fx painters (tier-2 split)
+    import tuipet.utils.arenafx as arena_mod   # the fx painters (tier-2 split)
     p = _pet()
     p._set_anim("exhausted", 2.0)
     assert app_mod._effect_overlay(p, 0, 40, 24, tick=0) == []
@@ -91,7 +92,9 @@ def test_the_sick_skull_is_the_one_condition_actor():
     """Bandai grammar 2026-07-11: the condition dashboard left the LCD; only
     the skull stands in the scene, grounded at the band's right edge,
     blinking its 2-frame pair.  Extra conditions add nothing on-LCD."""
-    from tuipet import app as app_mod, data, grid
+    from tuipet.utils import app as app_mod
+    import tuipet.data.loaders.data as data
+    from tuipet.utils import grid
     E = data.load_effects()
     assert len(E["st_sick"]) == 2
     p = _pet(sick=True, sick_length=5.0, fatigue_length=5.0, inj_length=5.0)

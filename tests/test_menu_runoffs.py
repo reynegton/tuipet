@@ -12,8 +12,11 @@ import types
 from rich.cells import cell_len
 from rich.text import Text
 
-from tuipet import data, lobbychat, menu, tournament
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.network import lobbychat
+from tuipet.ui.components import menu
+from tuipet.core import tournament
+from tuipet.core.pet import Pet
 
 D = datetime.date(2026, 3, 3)
 MAX_COLS = 40
@@ -45,7 +48,7 @@ def test_cup_tree_footer_never_clips_the_forfeit_hint():
 
 # ---- the death strip ---------------------------------------------------------
 def test_death_strip_labels_esc_within_the_hud():
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     p = _pet()
     p.name = "Airdramon"
     pan = DeathPanel(p)
@@ -56,7 +59,7 @@ def test_death_strip_labels_esc_within_the_hud():
 
 # ---- DNA field columns -------------------------------------------------------
 def test_dna_field_columns_never_cut_a_word_in_half():
-    from tuipet.dnascreen import _field_word
+    from tuipet.ui.screens.dnascreen import _field_word
     for f in data.DNA_FIELDS:
         full = data.pretty_field(f)
         for w in (9, 10, 13, 17):
@@ -67,7 +70,7 @@ def test_dna_field_columns_never_cut_a_word_in_half():
 
 
 def test_dna_charge_and_stats_pages_fit_the_lcd():
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     for row in (0, 2):                            # charge, stats
         pan = DNAPanel(_pet())
         for _ in range(row):
@@ -82,7 +85,7 @@ def test_dna_charge_and_stats_pages_fit_the_lcd():
 # ---- the intro grammar -------------------------------------------------------
 def test_unnamed_pet_intro_says_you_answer(monkeypatch):
     monkeypatch.setattr(tournament, "_today", lambda: D)
-    from tuipet.tournamentscreen import TournamentPanel, INTRO_OPP_T
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel, INTRO_OPP_T
     p = _pet(bits=99999)
     p.strength = p.hunger = 4
     p._set_energy(p.max_energy)
@@ -105,24 +108,24 @@ def test_unnamed_pet_intro_says_you_answer(monkeypatch):
 def _menu_panels():
     """(name, panel) for every menu screen constructible offline."""
     p = _pet(bits=9999)
-    from tuipet.accountscreen import AccountPanel
-    from tuipet.assistscreen import AssistPanel
-    from tuipet.backgroundscreen import BackgroundPanel
-    from tuipet.bugscreen import BugReportPanel
-    from tuipet.deathscreen import DeathPanel
-    from tuipet.digicorescreen import DigiCorePanel
-    from tuipet.albumscreen import AlbumPanel
-    from tuipet.dnascreen import DNAPanel
-    from tuipet.eggguidescreen import EggGuidePanel
-    from tuipet.eggselectscreen import EggSelectPanel
-    from tuipet.feedscreen import FeedPanel
-    from tuipet.helpscreen import HelpPanel
+    from tuipet.ui.screens.accountscreen import AccountPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
+    from tuipet.ui.screens.backgroundscreen import BackgroundPanel
+    from tuipet.ui.screens.bugscreen import BugReportPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.albumscreen import AlbumPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
+    from tuipet.ui.screens.eggguidescreen import EggGuidePanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.feedscreen import FeedPanel
+    from tuipet.ui.screens.helpscreen import HelpPanel
     from tuipet.jogressscreen import JogressPanel
-    from tuipet.optionsscreen import KeysPanel, OptionsPanel, SoundPanel
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.optionsscreen import KeysPanel, OptionsPanel, SoundPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
     from tuipet.themescreen import ThemePanel
-    from tuipet.titlescreen import TitlePanel
-    from tuipet.towneggscreen import TownEggPanel
+    from tuipet.ui.screens.titlescreen import TitlePanel
+    from tuipet.ui.screens.towneggscreen import TownEggPanel
     stub = types.SimpleNamespace(state=types.SimpleNamespace(me_id=None),
                                  raid=None, raid_get=lambda: None,
                                  close=lambda: None)

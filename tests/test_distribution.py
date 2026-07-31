@@ -16,7 +16,8 @@ of an item's worth, and the bands are just a reading of it.
 """
 import collections
 
-from tuipet import adventure as adv, shop
+from tuipet.core import adventure as adv
+from tuipet.core import shop
 
 
 # ---- the tier ladder --------------------------------------------------------
@@ -185,8 +186,9 @@ def test_every_item_is_obtainable_through_some_channel():
     shelf, a road find, the gift/capsule roller, the prank drawer, an
     authored battle drop, an authored cup prize, or the Human->Beast
     spirit chain.  A key no channel reaches is stranded and fails."""
-    from tuipet import data as _data, tournament as _t
-    from tuipet.pet import Pet
+    import tuipet.data.loaders.data as _data
+    from tuipet.core import tournament as _t
+    from tuipet.core.pet import Pet
     obtainable = {k for k, v in shop.CATALOG.items() if v.price is not None}
     for z in adv.ZONES:
         obtainable.update(z["find_keys"])
@@ -309,7 +311,7 @@ def test_the_home_counter_rotates_but_never_starves():
     The rotation must never starve a key -- the band is a shuffled CYCLE,
     so one epoch deals every non-staple sellable exactly once."""
     import datetime
-    from tuipet import shop
+    from tuipet.core import shop
     D = datetime.date(2026, 8, 3)
     rows = {e["key"] for e in shop.home_stock(today=D)}
     assert shop.HOME_STAPLES <= rows, "a staple left the shelf"
@@ -333,7 +335,8 @@ def test_every_retired_key_has_a_living_heir():
     """THE RETIRED LEDGER (refactor 2026-07-27): each cut key names an heir
     in the catalog, owned copies convert in the bag heal, and every icon a
     cut key wore still resolves -- no authored channel goes dark."""
-    from tuipet import persistence, shop
+    from tuipet.utils import persistence
+    from tuipet.core import shop
     for old, heir in shop.RETIRED.items():
         assert old not in shop.CATALOG, f"{old} is both retired and live"
         assert heir in shop.CATALOG, f"{old}'s heir {heir} is not in the catalog"

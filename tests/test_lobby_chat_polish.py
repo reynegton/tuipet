@@ -10,11 +10,11 @@ lobbyscreen now goes through cell_len / set_cell_size / chop_cells.
 from rich.cells import cell_len
 from rich.console import Console
 
-from tuipet import lobbyscreen
-from tuipet.lobbyscreen import CHATW, _fit, _wrap
-from tuipet.net import ANNOUNCE, LobbyState
-from tuipet.pet import Pet
-from tuipet.theme import INK, INK_B
+from tuipet.ui.screens import lobbyscreen
+from tuipet.ui.screens.lobbyscreen import CHATW, _fit, _wrap
+from tuipet.network.net import ANNOUNCE, LobbyState
+from tuipet.core.pet import Pet
+from tuipet.utils.theme import INK, INK_B
 
 
 class _Stub:

@@ -1,8 +1,8 @@
 """Message-system audit (2026-07-04): notes must never silently clip, the
 battle defiance notice must be visible, and the evolution flash must name
 the SPECIES (the 'babys name is intraining????' confusion)."""
-from tuipet import menu
-from tuipet.menu import W, NOTE_HOLD, NOTE_STEP
+from tuipet.ui.components import menu
+from tuipet.ui.components.menu import W, NOTE_HOLD, NOTE_STEP
 
 
 def test_short_note_renders_verbatim():
@@ -46,7 +46,7 @@ def test_evolution_flash_names_the_species_not_just_the_stage():
     """'X! evolved to InTraining!' read as if the STAGE were the pet's name;
     the flash now says who evolved into whom, stage in parentheses."""
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     app = TuiPetApp.__new__(TuiPetApp)             # no Textual mount needed
     app.pet = Pet.new_egg(egg_type=1)
     app.pet._hatch_into_fresh()
@@ -54,7 +54,7 @@ def test_evolution_flash_names_the_species_not_just_the_stage():
     app.pet.stage_seconds = 9e8
     app.pet._maybe_evolve()
     msg = app._evolve_msg(old_num)
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     _, by = data.load_sprites()
     assert f"evolved into [b]{app.pet.name}[/]" in msg
     assert f"({app.pet.stage})" in msg             # the stage reads as a CLASS, not a name

@@ -4,10 +4,12 @@ didn't exist; these pins hold the book and its scoreboard to ONE source
 (data.album_roster) and the reveal language to the shipped conventions:
 undiscovered = "???" + silhouette, discovered = name, stage and the real
 rip.  A leaked name here is a spoiler bug, not a cosmetic one."""
-from tuipet import data, digicore, persistence
-from tuipet.albumscreen import AlbumPanel
-from tuipet.digicorescreen import DigiCorePanel
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.ui.screens import datacorescreen as digicore
+from tuipet.utils import persistence
+from tuipet.ui.screens.albumscreen import AlbumPanel
+from tuipet.ui.screens.datacorescreen import DigiCorePanel
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -107,13 +109,14 @@ def test_an_unseen_entry_names_its_route_home():
     """The book was a checklist with the HOW invisible: 'keep raising'
     over hundreds of masked entries while lines.load_lines() knew the
     answer.  Routes name eggs and doors, never masked forms."""
-    from tuipet import albumscreen
+    from tuipet.ui.screens import albumscreen
     assert albumscreen.route_hint(29).startswith("raised on the ")   # a line member
     assert albumscreen.route_hint(492) == "an armor jump reaches it"
 
 
 def test_every_roster_form_gets_a_route_class():
-    from tuipet import albumscreen, data
+    from tuipet.ui.screens import albumscreen
+    import tuipet.data.loaders.data as data
     hints = {n: albumscreen.route_hint(n) for n in data.album_roster()}
     for n, h in hints.items():
         assert (h.startswith("raised on") or h.endswith("reaches it")
@@ -124,8 +127,8 @@ def test_every_roster_form_gets_a_route_class():
 
 
 def test_the_unseen_detail_page_carries_the_route():
-    from tuipet.albumscreen import AlbumPanel
-    from tuipet.pet import Pet
+    from tuipet.ui.screens.albumscreen import AlbumPanel
+    from tuipet.core.pet import Pet
     pan = AlbumPanel(Pet(num=100, stage="Champion"))
     unseen = next(i for i, n in enumerate(pan.roster) if n not in pan.seen)
     pan.i, pan.detail = unseen, True

@@ -12,11 +12,12 @@ import datetime
 import pytest
 from rich.text import Text
 
-from tuipet import adventure, tournament
-from tuipet.adventurescreen import (AdventurePanel, ZonePickPanel,
+from tuipet.core import adventure
+from tuipet.core import tournament
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, ZonePickPanel,
                                     HZ_TELE_T, HZ_LUNGE_T, INV_WALK_T,
                                     INV_REVEAL_T, INV_HOLD_T)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 D = datetime.date(2026, 3, 3)
 MAX_ROWS, MAX_COLS = 12, 40
@@ -134,16 +135,16 @@ def _states(monkeypatch):
         tp.anim()
     out.append(("teleport", tp))
 
-    from tuipet import persistence
+    from tuipet.utils import persistence
     persistence.zone_best_set(0, 264)
     pk = _pet()
     pk.adv_progress = 3
     out.append(("picker", ZonePickPanel(pk)))
 
-    from tuipet.townscreen import TownPanel
+    from tuipet.ui.screens.townscreen import TownPanel
     out.append(("town-hub", TownPanel(_pet(), town_id=4)))
 
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     tb = _pet()
     tb.bits = 9999
     sp = ShopPanel(tb, town_id=4)
@@ -201,7 +202,7 @@ def test_every_state_eats_any_key_without_crashing(monkeypatch, k):
 def test_the_cup_board_respects_the_lcd_too(monkeypatch):
     """The cup audit's overflow (the featured row ran 44 cols): the board is
     in the net now, browsed across a dozen keys."""
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
     p = _pet()
     p.strength = p.hunger = 4
     p._set_energy(p.max_energy)

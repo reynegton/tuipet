@@ -3,7 +3,9 @@ OWN device's evolution chart (humulos pen20/dm20/dmx), not a borrowed tree.
 Born from Joel's 2026-07-10 bug report: the Deep Savers egg hatched the
 DM20th Corona/Luna tree because the eggs had been name-joined onto whatever
 classic line shared their baby."""
-from tuipet import data, egg, lines
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.core import lines
 
 
 def _names(lid):
@@ -119,7 +121,7 @@ def test_attribute_jogress_doors_parse_and_open():
     assert specs, "no attribute jogress doors loaded"
     assert all(set(s) <= {"Vaccine", "Data", "Virus", "None"} for s in specs)
     # a Veedramon on the V line offers its device fusions via attributes
-    from tuipet import jogress
+    from tuipet.core import jogress
 
     class _P:
         num, line_id, stage, attribute = 144, "vegg", "Champion", "Vaccine"

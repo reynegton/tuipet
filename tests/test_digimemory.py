@@ -4,8 +4,8 @@ full-strength Inherit route; config.csv DigimemoryAttributeCoefficient=0.01,
 DigimemoryLifeIncCoefficient=3600 (-> 60 game-sec, the BonusEvolutionLife scale)."""
 import json
 
-from tuipet.pet import Pet
-from tuipet import persistence
+from tuipet.core.pet import Pet
+from tuipet.utils import persistence
 
 
 def _pet(**kw):
@@ -50,7 +50,7 @@ def test_memorial_conflict_asks_and_resolves():
     """The chained prompts (digimemory audit 2026-07-06): first canon's
     DigiMemory_Validation (etch vs carry the bonus), THEN -- after an etch with
     old data standing -- the only-one choice of which generation survives."""
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     old = {"name": "Elder", "num": 29, "vaccine": 5, "data": 0, "virus": 0, "seconds": 60.0}
     new = {"name": "Gatomon", "num": 100, "vaccine": 50, "data": 30, "virus": 10, "seconds": 600.0}
     persistence.bank_digimemory(old)
@@ -75,7 +75,7 @@ def test_memorial_conflict_asks_and_resolves():
 def test_every_death_records_its_cause_and_the_memorial_tells_it():
     """Death audit 2026-07-05: six ways to die, and _die() recorded none of
     them -- the memorial couldn't say what happened."""
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
 
     def dead_pet(**kw):
         p = Pet(num=102, name="Devimon", stage="Champion", attribute="Virus")
@@ -119,7 +119,7 @@ def test_declining_the_etch_carries_the_bonus():
     """Canon DigiMemory_Validation is a real Yes/No (digimemory audit
     2026-07-06): B declines the etch -- the kept care grade re-banks as the
     heir's seed and the default-banked memory is withdrawn."""
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     new = {"name": "Gatomon", "num": 100, "vaccine": 50, "data": 30, "virus": 10, "seconds": 600.0}
     persistence.bank_digimemory(new)                 # the app's etch default
     persistence.bank_bonus_seed(2)                   # ...and its spent-grade default
@@ -172,7 +172,7 @@ def test_a_silent_husk_is_kept_not_eaten():
     p = _pet()
     p.digimemory = {}
     p.inventory["digimemory"] = 1
-    from tuipet.petbase import _Refused
+    from tuipet.core.petbase import _Refused
     assert isinstance(p.use_item("digimemory"), _Refused)
     assert p.inventory.get("digimemory") == 1
 
@@ -187,7 +187,7 @@ def test_the_raw_icon_key_heals_to_the_named_chip():
 def test_the_chip_renders_in_the_bag():
     """The bag shows only keys shop.entry() resolves -- the chip must be one
     of them (and stay OFF the shop shelf: price None is never sold)."""
-    from tuipet import shop
+    from tuipet.core import shop
     e = shop.entry("digimemory")
     assert e and e["category"] == "Evolve"  # Legacy dissolved 2026-07-27
     assert all(row["key"] != "digimemory" for row in shop.catalog())
@@ -198,7 +198,7 @@ def test_a_death_noticed_at_relaunch_still_banks_the_inheritance():
     banked ONLY in the dying-fx completion branch -- a quit/crash during the
     ~2s beat relaunched into a bare memorial that banked nothing.  The one
     ceremony now runs wherever the death is noticed, exactly once."""
-    from tuipet import app as app_mod
+    from tuipet.utils import app as app_mod
     persistence.take_digimemory()
     persistence.take_bonus_seed()
     p = _pet(vaccine=500, data_power=300, virus=100, evol_bonus=10, dead=True)
@@ -235,7 +235,7 @@ def test_a_live_retire_banks_the_full_grade():
     offer -- the full adjusted bonus seeds the heir (this seed used to be
     silently lost).  Since the M11 fix (gameplay audit 2026-07-19) the bank
     rides _hatch_new, not the menu open."""
-    from tuipet import app as app_mod
+    from tuipet.utils import app as app_mod
     persistence.take_bonus_seed()                    # start the slot empty
     p = _pet(care_mistakes=0, mood=200, obedience=100, evol_bonus=3)
     assert not p.dead
@@ -253,7 +253,7 @@ def test_a_cancelled_retire_leaves_no_headstone():
     generation BEFORE the egg carousel -- every N->ESC appended a duplicate
     headstone for the same life and recorded a still-LIVE pet as last_gen.
     The generational commit rides the actual pick now."""
-    from tuipet import app as app_mod
+    from tuipet.core import app as app_mod
     p = _pet(evol_bonus=3)
     app = app_mod.TuiPetApp.__new__(app_mod.TuiPetApp)
     app.pet = p

@@ -3,8 +3,9 @@ canon discovery order on the egg-carousel rule: a sealed Digimental is
 simply not on the shelf.  Courage & Hope from day one; the crest seven
 after the FIRST armor evolution; Light/Kindness at 25 wins; Miracles at 2
 felled raids; Destiny at generation 5."""
-from tuipet import persistence, shop
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+from tuipet.core import shop
+from tuipet.core.pet import Pet
 
 
 def _shelf_keys():

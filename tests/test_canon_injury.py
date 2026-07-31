@@ -8,9 +8,10 @@ decompile's BattleInjury table adapted (fatigue/mood coefficients left
 with their dead systems), LOCAL bouts only, the vitamin as the canon
 guard, one-dose cure in the pill's own grammar.
 """
-from tuipet import petbattle, petbody
-from tuipet.pet import Pet
-from tuipet.petbase import BATTLE_INJ_TABLE
+from tuipet.core import petbattle
+from tuipet.core import petbody
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import BATTLE_INJ_TABLE
 
 
 def _pet(**kw):
@@ -63,9 +64,9 @@ def test_online_bouts_never_wound(monkeypatch):
 
 def test_the_bandage_cures_and_the_pill_does_not():
     p = _pet(injured=True, injuries=1)
-    assert p.battle_condition() == "Too hurt to fight."        # the gate
+    assert p.battle_condition() == "Muito machucado para lutar."        # the gate
     assert p.status_word() == "injured"                        # the word
-    assert "patched" in str(p.heal_bandage())  # the H key's verb (2026-07-26)
+    assert "curado" in str(p.heal_bandage())  # the H key's verb (2026-07-26)
     assert not p.injured and p.injuries == 1                   # cured; the count keeps
     # the pill stays sick-only: it cannot have been the cure
     p2 = _pet(injured=True)
@@ -77,7 +78,7 @@ def test_the_bandage_cures_and_the_pill_does_not():
 
 def test_the_bandage_refuses_a_healthy_pet():
     p = _pet()
-    assert "Nothing" in str(p.heal_bandage())
+    assert "Nada" in str(p.heal_bandage())
 
 
 def test_an_injured_pet_still_eats():
@@ -92,9 +93,9 @@ def test_the_injury_cure_is_the_h_key_not_an_item_or_a_feed_row():
     heal".  So: the i:80 wrap is the H heal's SHOW, never a bag row --
     no shelf entry, no feed row, a free care BUTTON on H with the canon
     time-heal underneath."""
-    from tuipet import shop
+    from tuipet.core import shop
     from tuipet.app import TuiPetApp
-    from tuipet.feedscreen import ROWS_MENU
+    from tuipet.ui.screens.feedscreen import ROWS_MENU
     assert shop.entry("bandage") is None
     assert "bandage" not in [k for k, _label in ROWS_MENU]
     assert any(k == "h" and a == "heal" for k, a, _l in TuiPetApp.BINDINGS)

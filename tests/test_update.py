@@ -2,7 +2,7 @@
 bad data, or a source install (no metadata) never raises and never nags."""
 import io
 import json
-from tuipet import update as u
+from tuipet.utils import update as u
 
 
 def test_key_orders_versions_numerically():

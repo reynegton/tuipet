@@ -10,7 +10,8 @@ zone conquest still writes the maps channel), and every counter desc
 carrying its real number."""
 import re
 
-from tuipet import data, tournament
+import tuipet.data.loaders.data as data
+from tuipet.core import tournament
 
 
 def test_tourney_gated_eggs_name_their_actual_cup():

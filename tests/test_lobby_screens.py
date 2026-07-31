@@ -4,11 +4,11 @@ battle volley from the relayed result, the lobby fusion plays the offline
 jogress converge/flash/reveal.  All wire-free: state + relays are stubbed."""
 import random
 
-from tuipet.pet import Pet
-from tuipet import lobbychat
-from tuipet import lobbyscreen
-from tuipet.lobbyscreen import LobbyPanel, AccountPanel
-from tuipet.net import LobbyState
+from tuipet.core.pet import Pet
+from tuipet.network import lobbychat
+from tuipet.ui.screens import lobbyscreen
+from tuipet.ui.screens.lobbyscreen import LobbyPanel, AccountPanel
+from tuipet.network.net import LobbyState
 
 LCD_ROWS, LCD_COLS = 12, 40
 
@@ -71,7 +71,7 @@ def test_every_text_phase_fits_the_lcd():
 def test_chat_styles_tell_the_speakers_apart():
     """Chat polish 2026-07-07: my lines dim, PMs and mentions bright,
     notices dim, plain chat ink; a wrapped message hangs an indent."""
-    from tuipet.theme import INK, INK_B, DIM
+    from tuipet.utils.theme import INK, INK_B, DIM
     pan = _lobby()
     pan.state.chat = [("JoeltCo", "hello all"),          # mine
                       ("Ryo", "yo JoeltCo nice pet"),    # mentions me
@@ -138,7 +138,7 @@ def test_pvp_round_replays_the_real_volley():
 
 
 def test_lobby_fusion_plays_the_real_scene():
-    from tuipet import jogress as jmod
+    from tuipet.core import jogress as jmod
     pan = _lobby()
     pan.partner = (2, "Ryo")
     pan.phase, pan.jphase = "jogress", "waiting"
@@ -248,7 +248,7 @@ def test_prompt_lines_keep_their_hints_with_long_names():
 def test_join_leave_log_caps_at_the_shared_chat_cap():
     """The join/leave diff trims with net.CHAT_CAP — a hardcoded 200 drifted
     beside it (lobby audit 2026-07-07)."""
-    from tuipet.net import CHAT_CAP
+    from tuipet.network.net import CHAT_CAP
     pan = _lobby()
     pan._seen_ids = {"JoeltCo"}                   # a NAME set since the ghost-churn
     #                                               fix (2026-07-17): Ryo = fresh join
@@ -357,7 +357,7 @@ def test_no_death_can_originate_in_the_lobby(monkeypatch):
     so that death can no longer happen: the pet lives, the room stays open,
     and nothing starts a dying fx.  Pinned as an ABSENCE so the handler is
     never re-added to a branch that cannot reach it."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     pan = _lobby()
     app = _tick_app(pan)
     closed = []
@@ -456,7 +456,7 @@ def test_a_half_filled_confirm_speaks_up():
 def test_the_dead_pvp_bounds_are_gone():
     """MAX_PVP_HP/MAX_PVP_POWER described a clamp design that no longer
     exists -- _clamp_card in lobbybout owns the real per-field bounds."""
-    from tuipet import accountscreen
+    from tuipet.ui.screens import accountscreen
     assert not hasattr(accountscreen, "MAX_PVP_HP")
     assert not hasattr(accountscreen, "MAX_PVP_POWER")
 

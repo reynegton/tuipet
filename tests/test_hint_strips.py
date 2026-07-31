@@ -2,8 +2,8 @@
 key hints in the #msg box via strip() -- one menu.hints() convention, and every
 line holds still (plain text <= 40 cols, the never-marquee budget)."""
 from tuipet.app import _hud_plain
-from tuipet.pet import Pet
-from tuipet import menu
+from tuipet.core.pet import Pet
+from tuipet.ui.components import menu
 
 
 def _pet():
@@ -25,16 +25,16 @@ def test_hints_helper_convention():
 
 
 def test_every_screen_strip_fits_and_speaks():
-    from tuipet.shopscreen import ShopPanel
-    from tuipet.eggselectscreen import EggSelectPanel
-    from tuipet.tournamentscreen import TournamentPanel
-    from tuipet.optionsscreen import KeysPanel
-    from tuipet.feedscreen import FeedPanel
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
+    from tuipet.ui.screens.optionsscreen import KeysPanel
+    from tuipet.ui.screens.feedscreen import FeedPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     from tuipet.themescreen import ThemePanel
-    from tuipet.bugscreen import BugReportPanel
-    from tuipet.helpscreen import HelpPanel
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.bugscreen import BugReportPanel
+    from tuipet.ui.screens.helpscreen import HelpPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
 
     p = _pet()
     for mode in ("shop", "bag"):
@@ -65,14 +65,14 @@ def test_every_screen_strip_fits_and_speaks():
 def test_the_remaining_screens_strips_fit_too():
     """The 8 panels the sweep above missed (tidy sweep 2026-07-18) — every
     strip in the app now holds the 40-col never-marquee budget."""
-    from tuipet.training import TrainingPanel
-    from tuipet.digicorescreen import DigiCorePanel
-    from tuipet.eggguidescreen import EggGuidePanel
-    from tuipet.backgroundscreen import BackgroundPanel
-    from tuipet.raidscreen import RaidPanel
-    from tuipet.deathscreen import DeathPanel
-    from tuipet.titlescreen import TitlePanel
-    from tuipet.accountscreen import AccountPanel
+    from tuipet.core.training import TrainingPanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.eggguidescreen import EggGuidePanel
+    from tuipet.ui.screens.backgroundscreen import BackgroundPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
+    from tuipet.ui.screens.titlescreen import TitlePanel
+    from tuipet.ui.screens.accountscreen import AccountPanel
 
     p = _pet()
     assert "strike" in _ok(TrainingPanel(p).strip(), "training")
@@ -97,8 +97,8 @@ def test_the_egg_tease_rides_the_strip_whole():
     2026-07-19) -- the strip's OWN hud marquee carries over-wide lines,
     so the widest eggUnlock desc still reads through whole (the 0.5.63
     law: the tease never clips)."""
-    from tuipet import data
-    from tuipet.eggselectscreen import EggSelectPanel, TEASE_BEAT
+    from tuipet.ui.screens import data
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel, TEASE_BEAT
     descs = [r["desc"] for r in data.load_egg_unlock().values() if r.get("desc")]
     worst = max(descs, key=len)
     pan = EggSelectPanel()
@@ -110,7 +110,7 @@ def test_the_egg_tease_rides_the_strip_whole():
 
 
 def test_options_strip_covers_menu_and_confirm():
-    from tuipet.optionsscreen import OptionsPanel
+    from tuipet.ui.screens.optionsscreen import OptionsPanel
     p = _pet()
     op = OptionsPanel(p, lambda: True, lambda: None)
     assert "pick" in _ok(op.strip(), "options")
@@ -123,8 +123,8 @@ def test_battle_strip_follows_the_fight():
     -> result.  (The anim strip carried no hints until the QOL sweep
     2026-07-23: the hurry keys were card-only whispers, undiscovered by
     players watching the LCD.)"""
-    from tuipet.battlescreen import BattlePanel
-    from tuipet import data
+    from tuipet.ui.screens.battlescreen import BattlePanel
+    import tuipet.data.loaders.data as data
     _, by = data.load_sprites()
     foe = next(n for n, r in by.items()
                if r["stage"] == "Champion" and not data.is_placeholder(n))
@@ -139,8 +139,8 @@ def test_battle_strip_follows_the_fight():
 
 
 def test_lobby_strip_is_fully_contextual():
-    from tuipet.net import LobbyState
-    from tuipet import lobbyscreen
+    from tuipet.network.net import LobbyState
+    from tuipet.ui.screens import lobbyscreen
 
     class _Stub:
         def __init__(self, state): self.state = state
@@ -186,8 +186,8 @@ def test_the_march_hint_is_never_a_bare_keyset():
     the bare set half of all beats; every beat names its key now."""
     import os, re, tempfile
     os.environ.setdefault("TUIPET_SAVE_DIR", tempfile.mkdtemp())
-    from tuipet import adventurescreen as advs
-    from tuipet.pet import Pet
+    from tuipet.ui.screens import adventurescreen as advs
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Rookie", attribute="Vaccine")
     p.name, p.line_id = "T", ""
     p.bits, p.sleep_limit = 500, 9e9

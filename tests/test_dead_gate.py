@@ -10,7 +10,7 @@ walks the WHOLE bindings table so a new action can never ship ungated.
 import asyncio
 
 from tuipet.app import TuiPetApp
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _dead_pet():
@@ -66,7 +66,7 @@ def test_every_binding_leads_a_dead_pet_to_the_memorial():
 
 
 def _egg_app():
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     return TuiPetApp(pet=Pet.new_egg())
 
 
@@ -111,8 +111,8 @@ def test_the_egg_wears_its_own_scene():
     """The old habitat-browser crash pin, re-aimed: an EGG's background()
     resolves through egg_type (the scene is wired to the egg; BASIC VPET
     2026-07-16) and never touches the roster."""
-    from tuipet.pet import Pet
-    from tuipet import backgrounds
+    from tuipet.core.pet import Pet
+    from tuipet.utils import backgrounds
     p = Pet.new_egg()
     fr = p.background()
     assert fr and len(fr) == 24                   # the scene sheet renders
@@ -125,8 +125,8 @@ def test_training_panel_survives_a_direct_egg():
     [pet.num] sheet lookup -- the habitat-crash pattern.  Walk every drill
     phase with an egg so a future entry path can never ship a crash."""
     import random
-    from tuipet.pet import Pet
-    from tuipet.training import TrainingPanel
+    from tuipet.core.pet import Pet
+    from tuipet.core.training import TrainingPanel
     random.seed(3)
     egg = Pet.new_egg()
     assert egg.can_train()                        # the gate itself still holds
@@ -144,8 +144,8 @@ def test_battle_panel_survives_a_direct_egg():
     lobby PvP replay constructed BattlePanel with the pet directly and its
     raw [num] sheet lookup crashed on an egg -- walk every phase."""
     import random
-    from tuipet.pet import Pet
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens.battlescreen import BattlePanel
     random.seed(3)
     egg = Pet.new_egg()
     assert egg.can_battle()
@@ -159,7 +159,7 @@ def test_battle_panel_survives_a_direct_egg():
 
 
 def _dead():
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=4, stage="Rookie", attribute="Vaccine")
     p.world_seconds = 10 * 60.0
     p.dead = True
@@ -170,7 +170,8 @@ def test_every_entry_gate_has_the_dead_leg():
     """Dead sweep (2026-07-06): jogress.can_jogress and tournament.can_enter
     had NO dead leg -- a full-DP corpse passed the jogress gate (which also
     drives the lobby invite auto-decline).  Every entry gate must rest."""
-    from tuipet import jogress, tournament
+    from tuipet.core import jogress
+    from tuipet.core import tournament
     d = _dead()
     d.dp = 4
     for gate in (d.can_feed, d.can_train, d.can_battle, d.can_charge_dna,
@@ -185,7 +186,8 @@ def test_a_dead_save_loads_untouched_however_long_it_sat():
     now, dead or alive -- but the grave keeps its own pin: a corpse must
     still load as the corpse that was buried."""
     import time
-    from tuipet import persistence, data
+    from tuipet.utils import persistence
+    import tuipet.data.loaders.data as data
     d = _dead()
     d.name = data.load_sprites()[1][4]["name"]     # dex-true: no repair path
     save = persistence.to_save_dict(d)
@@ -202,12 +204,12 @@ def test_every_panel_survives_a_direct_sleeper():
     walk.  Poking a sleeper is a SYSTEM (the disturb mechanic: grumble-wake,
     mood hit, disturb count) -- these walks assert the panels merely render."""
     import random
-    from tuipet.pet import Pet
-    from tuipet.feedscreen import FeedPanel
-    from tuipet.shopscreen import ShopPanel
-    from tuipet.training import TrainingPanel
-    from tuipet.battlescreen import BattlePanel
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens.feedscreen import FeedPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
+    from tuipet.core.training import TrainingPanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
 
     def sleeper():
         p = Pet(num=4, name="Rex", stage="Rookie", attribute="Vaccine")
@@ -238,8 +240,8 @@ def test_hatching_state_contracts():
     it; every gate holds mid-crack; lights can't cancel the crack; death
     does (pet._die clears hatching)."""
     import time
-    from tuipet.pet import Pet
-    from tuipet import persistence
+    from tuipet.core.pet import Pet
+    from tuipet.utils import persistence
 
     e = Pet.new_egg()
     e.name = "Digitama"
@@ -277,8 +279,9 @@ def test_mid_strobe_contracts():
     save round-trips clean; the strobe resolves into the chained cheer;
     death REPLACES the ceremony with the dying flow (correct priority)."""
     import asyncio
-    from tuipet import data, persistence
-    from tuipet.pet import Pet
+    import tuipet.data.loaders.data as data
+    from tuipet.utils import persistence
+    from tuipet.core.pet import Pet
     from tuipet.app import TuiPetApp
 
     async def go():

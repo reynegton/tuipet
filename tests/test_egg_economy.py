@@ -3,8 +3,10 @@ Petitmon = collector, Dodomon = Mega kills), live unlock progress, and the
 carousel that shows every egg (silhouettes for the sealed ones)."""
 import random
 
-from tuipet import data, egg, persistence
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 def _prog(**kw):
@@ -84,7 +86,7 @@ def test_fallback_pool_and_mystery_eggs_are_gone():
 # ---- the carousel -----------------------------------------------------------------
 
 def _panel(prog=None):
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     pan = EggSelectPanel()
     if prog is not None:
         pan.prog = prog
@@ -116,7 +118,7 @@ def test_no_user_facing_name_leaks_html_tags():
     """DVPet's Java CSVs embed <br> in names ("Vaccine<br>Chip G") -- every
     loader must strip them (2026-07-04: the food loader showed the tag raw in
     the shop; the shared consumable parser already stripped it)."""
-    from tuipet import data as d
+    import tuipet.data.loaders.data as data
     for f in d.load_foods():
         assert "<br>" not in f["name"] + str(f.get("desc", "")), f["name"]
     for key in list(getattr(d, "_consumables", lambda: {})() or {}) or []:
@@ -158,13 +160,14 @@ def test_a_gated_egg_is_hidden_until_earned_then_appears():
     """Earned-access after the licence cut: a gated egg stays OUT of the
     carousel until its milestone is met, then joins it directly -- no shop
     in between, and the panel persists the win (auto_owned)."""
-    from tuipet import persistence, egg as egg_mod
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.utils import persistence
+    from tuipet.core import egg as egg_mod
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     idx = _rule("Sakumon")["idx"]                    # the battle egg: 50 wins
     assert egg_mod.egg_state(idx, _prog(), set()) == "locked"
     assert idx not in EggSelectPanel().carousel      # locked -> hidden
     persistence.wins_add(50)
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     pan = EggSelectPanel()                           # milestone met on open
     assert idx in pan.carousel                       # earned -> hatchable, no purchase
     assert idx in persistence.get_eggs_owned()       # and persisted permanent
@@ -175,7 +178,7 @@ def test_fresh_profile_carousel_never_empty():
     carousel would ZeroDivision.  The data guarantees the floor: the
     DefaultUnlock starters are always hatchable, so the carousel can't be
     empty even on a wiped profile."""
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     pan = EggSelectPanel()                        # sandboxed = a fresh profile
     assert pan.n >= 5                             # the starter floor
     assert len(pan.carousel) == pan.n > 0
@@ -187,7 +190,8 @@ def test_carousel_polish_scene_mystery_and_new_badge():
     """Carousel polish 2026-07-18: the backdrop follows the browsed egg's
     wired scene, a multi-target digitama keeps its mystery, and an unraised
     species wears the ★new badge (raised ones don't)."""
-    from tuipet import backgrounds, data as _d
+    from tuipet.utils import backgrounds
+    import tuipet.data.loaders.data as data
     pan = _panel()
     # scene: the browsed egg's own backdrop, not a flat void
     idx0 = pan.carousel[0]
@@ -229,7 +233,7 @@ def test_the_carousel_is_pure_scene_with_neighbour_peeks():
     SCENE only -- the dossier lives on the status card, the words on the
     strip -- and the neighbour egg edges PEEK again at rest (cutting them
     in 0.5.87 'went backwards')."""
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     pan = EggSelectPanel()
     pan.scroll = pan.pos = 1.0
     plain = pan.text().plain

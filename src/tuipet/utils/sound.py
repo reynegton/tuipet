@@ -37,8 +37,8 @@ _DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sounds"
 # volume choice on iOS and escaped the test sandbox.  erase_all sweeps
 # volume.txt + sndcache/ now; it never had either).
 def _state_dir():
-    import tuipet.utils.persistence as persistence
-    return persistence.SAVE_DIR
+    import tuipet.utils.persistio as persistio
+    return persistio.SAVE_DIR
 
 
 def _vol_conf():

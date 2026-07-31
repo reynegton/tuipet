@@ -10,7 +10,8 @@ traps this pins:
 """
 import importlib
 
-from tuipet import hostinfo, sound
+from tuipet.utils import hostinfo
+from tuipet.utils import sound
 
 
 def _as_ios(monkeypatch):
@@ -164,7 +165,8 @@ def test_volume_and_cache_ride_the_save_dir(tmp_path, monkeypatch):
     sandbox), and erase_all finally sweeps them (the volume pref was
     never in its list)."""
     import os
-    from tuipet import persistence, sound
+    from tuipet.utils import persistence
+    from tuipet.utils import sound
     monkeypatch.setattr(persistence, "SAVE_DIR", str(tmp_path))
     sound.set_volume(40) if hasattr(sound, "set_volume") else sound._save_volume(40)
     assert (tmp_path / "volume.txt").exists()

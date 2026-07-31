@@ -6,7 +6,7 @@ persistence.album_add() stores the CANONICAL num, so `seen` can only ever
 reach the canonical count.  The digicore compared it to the RAW row count, so
 the album read 1218/1547: impossible to finish, however perfectly you played.
 """
-from tuipet import data
+import tuipet.data.loaders.data as data
 
 
 def test_the_album_denominator_is_actually_reachable():
@@ -21,9 +21,9 @@ def test_the_album_denominator_is_actually_reachable():
     # the reachable canonical count, and the trophy row must read from it
     assert len(data.album_roster()) == reachable, \
         "the Album total must count canonical species, not raw rows"
-    from tuipet import digicore
+    from tuipet.core import datacore
     import inspect
-    assert "album_roster()" in inspect.getsource(digicore._trophy_rows), \
+    assert "album_roster()" in inspect.getsource(datacore._trophy_rows), \
         "the trophy row must count the SHARED roster, not its own set"
 
 

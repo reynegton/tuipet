@@ -34,6 +34,7 @@ DET_VIS = 8                        # requirement-checklist rows shown at once
 # the data model lives in datacore.py (modularized 2026-07-17); the old
 # names stay importable for callers and the test suite
 DATACORE_BASE_RATE = core.DATACORE_BASE_RATE
+DIGICORE_BASE_RATE = core.DATACORE_BASE_RATE  # legacy alias
 core_number = core.core_number
 core_badge_key = core.core_badge_key
 core_background = core.core_background
@@ -355,3 +356,6 @@ class datacorePanel:
             out.append_text(menu.blanks(9 - len(rows)))
             out.append_text(menu.footer(t("datacore_hint_page_out", "←→ page    ESC out")))
         return out
+
+# legacy aliases kept for test imports
+DigiCorePanel = datacorePanel

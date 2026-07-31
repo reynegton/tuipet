@@ -13,7 +13,8 @@ generation.  The Price column is dead (licence cut 2026-07-17) and the
 rows that used it carry device-story gates instead.  Obedience/FoodUsed/
 ItemUsed/HabitatOwned/ZoneEnemyBeat are data-empty (noted; the loader's
 latent current-vs-prev column mis-source was corrected for purity)."""
-from tuipet import data, egg
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
 
 
 def _prog(**kw):

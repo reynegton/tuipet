@@ -3,9 +3,10 @@ backgrounds").  The egg still decides the DEFAULT scene; a pick overrides it
 for the pet's life and rides the save (bg_pick)."""
 from dataclasses import asdict
 
-from tuipet import backgrounds, data
-from tuipet.backgroundscreen import BackgroundPanel
-from tuipet.pet import Pet
+from tuipet.utils import backgrounds
+import tuipet.data.loaders.data as data
+from tuipet.ui.screens.backgroundscreen import BackgroundPanel
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):

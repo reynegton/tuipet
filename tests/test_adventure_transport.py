@@ -6,9 +6,9 @@ gets ambushed on arrival; a Life Recovery (gameplay polish 2026-07-22) refills
 the hearts where the pet stands.  All are bag items spent mid-march (press T);
 Zone/Continent warps are obsolete (the zone picker replaced worldmap warping).
 """
-from tuipet.adventure import Adventure, ZONES, MAX_LIVES
-from tuipet.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
-from tuipet.pet import Pet
+from tuipet.core.adventure import Adventure, ZONES, MAX_LIVES
+from tuipet.ui.screens.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
+from tuipet.core.pet import Pet
 
 
 def _pet():

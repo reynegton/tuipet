@@ -7,7 +7,7 @@ counters, the 6h malady death) stayed removed; these pin the CLONE's rules.
 import random
 
 
-from tuipet.pet import (Pet, SICK_POOP_P, SICK_OVERWEIGHT_P, DEATH_SICK_P)
+from tuipet.core.pet import (Pet, SICK_POOP_P, SICK_OVERWEIGHT_P, DEATH_SICK_P)
 
 
 def _pet(**kw):
@@ -104,7 +104,7 @@ def test_a_revival_never_comes_back_sick():
 
 
 def test_the_epitaph_tells_a_sickness_death():
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     p = _pet()
     p._die("sickness")
     pan = DeathPanel(p)

@@ -10,7 +10,7 @@ keep it that way without needing the gitignored _extract/raw_resources."""
 import csv
 import os
 
-from tuipet import data
+import tuipet.data.loaders.data as data
 
 
 def _roster_attack_indices():

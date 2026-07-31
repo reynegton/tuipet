@@ -64,7 +64,7 @@ def test_done_result_still_closes_not_quits():
 
 
 def test_title_q_quits_other_keys_start():
-    from tuipet import titlescreen
+    from tuipet.ui.screens import titlescreen
     t = titlescreen.TitlePanel.__new__(titlescreen.TitlePanel)
     assert t.key("q") == ("quit", None)
     assert t.key("enter") == ("done", None)
@@ -104,7 +104,7 @@ def test_non_text_screen_ignores_character_translation():
 # --- toggle-close consistency: a screen's opening key also closes it -----------
 
 def test_tournament_closes_with_its_opening_key_in_all_phases():
-    from tuipet import tournamentscreen
+    from tuipet.ui.screens import tournamentscreen
     p = tournamentscreen.TournamentPanel.__new__(tournamentscreen.TournamentPanel)
     p.sub = None
     p.phase = "select"

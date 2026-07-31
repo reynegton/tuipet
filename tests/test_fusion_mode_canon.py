@@ -13,8 +13,10 @@ fixed: Bolgmon→Blitzmon's reversion edge is missing — dormant with the
 whole itemless Spirit family."""
 import random
 
-from tuipet import data, evolution, jogress
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import evolution
+from tuipet.core import jogress
+from tuipet.core.pet import Pet
 
 
 def _by_name(name):

@@ -2,9 +2,10 @@
 processAutoCarePrice + Evolution.getRandomAssistDigimon, config.csv AutoCare*."""
 import json
 
-from tuipet.pet import (Pet, AUTO_CARE_VISIT_PRICE, AUTO_CARE_HOUR_PRICE,
+from tuipet.core.pet import (Pet, AUTO_CARE_VISIT_PRICE, AUTO_CARE_HOUR_PRICE,
                         AUTO_CARE_PAYMENT_MIN, AUTO_CARE_VISIT_SPACING)
-from tuipet import data, persistence
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
 
 
 def _pet(**kw):
@@ -113,7 +114,7 @@ def test_contract_survives_the_save_round_trip():
 
 
 def test_assist_panel_toggles_and_shows_the_stage_prices():
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     p = _pet(bits=1000)
     pan = AssistPanel(p)
     t = pan.text().plain
@@ -144,7 +145,7 @@ def test_the_assistant_feeds_a_sick_pet_and_never_bills_a_headshake():
     assert p.hunger == 1                     # the serving LANDED
     assert p.anim == "eat"                   # no head-shake
     assert p.sick                            # the assistant feeds; curing is yours
-    from tuipet.pet import AUTO_CARE_VISIT_PRICE
+    from tuipet.core.pet import AUTO_CARE_VISIT_PRICE
     assert b0 - p.bits == AUTO_CARE_VISIT_PRICE[p.stage]   # one honest fee
     assert p.auto_care                       # still on duty
 
@@ -154,7 +155,7 @@ def test_the_assistant_feeds_a_sick_pet_and_never_bills_a_headshake():
 def test_assist_keys_ride_the_strip_only():
     """The in-LCD 'ENTER toggle' footer doubled the strip's keys -- gone,
     like raid/DM/shop before it (one hint surface per family)."""
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     p = _pet(bits=1000)
     pan = AssistPanel(p)
     t = pan.text().plain
@@ -167,7 +168,7 @@ def test_the_contract_names_its_quit_clause():
     """Full disclosure (the feed-card precedent): the helper walks off duty
     when the bits run dry -- the card says so BEFORE you hire, not only
     via the after-the-fact quit note."""
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     t = AssistPanel(_pet(bits=1000)).text().plain
     assert "quits if they run dry" in t
 
@@ -176,11 +177,11 @@ def test_only_an_earned_verdict_rides_home():
     """ESC used to return the standing blurb every time (and the app
     discarded it -- dead on both ends).  A toggle's verdict now rides
     home; a look-and-leave returns None."""
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     p = _pet(bits=1000)
     pan = AssistPanel(p)
     assert pan.key("escape") == ("done", None)     # looked, left: no noise
     pan2 = AssistPanel(p)
     pan2.key("enter")                              # hired
     done, msg = pan2.key("escape")
-    assert done == "done" and "on duty" in msg
+    assert done == "done" and "serviço" in msg

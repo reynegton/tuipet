@@ -4,7 +4,7 @@ the DNA card 28 wide (its hint line wrapped mid-box) and raw-minutes ages
 ('4325m40s').  Same lesson as the LCD box-clip: pixels aren't the box."""
 import re
 
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 CARD_W, CARD_H = 26, 16
 
@@ -94,7 +94,7 @@ def test_wrap_never_splits_a_word_and_caps_with_ellipsis():
     """The helper the Options card now uses: word boundaries only, a lone
     over-wide token still breaks (never overruns the card), and past the cap
     the last line ends in an ellipsis rather than dropping the tail silently."""
-    from tuipet import statusbox as sb
+    from tuipet.ui.components import statusbox as sb
     out = sb.wrap("A flips launch auto-install", 3)
     assert all(len(l) <= CARD_W for l in out)
     assert "auto-install" in out                 # kept whole, not "auto-instal"
@@ -109,7 +109,8 @@ def test_options_card_wraps_every_desc_and_the_update_msg():
     restart prompt's tail.  Now every option's desc and the longest update
     message fit the card with NO word lost."""
     import re
-    from tuipet import statusbox, optionsscreen as _opts
+    from tuipet.ui.components import statusbox
+    from tuipet.ui.screens import optionsscreen as _opts
 
     class _Mode:
         def __init__(self, cursor, msg): self.cursor, self.msg = cursor, msg
@@ -142,7 +143,7 @@ def _no_words_lost(fake, tag, *sources):
 
 
 def test_scenes_card_wraps_its_picker_message():
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     class _M:
         rows, cursor = [0, 1], 1
         msg = "pick a scene — it hangs behind the mon"    # 38 chars
@@ -155,7 +156,8 @@ def test_scenes_card_wraps_its_picker_message():
 
 
 def test_shop_card_wraps_the_longest_effect_line():
-    from tuipet import statusbox, shop
+    from tuipet.ui.components import statusbox
+    from tuipet.core import shop
     # skateboard carries the 51-char effect_line
     eff = shop.effect_line({"key": "skateboard"})
     assert len(eff) > 26                                   # the audit premise
@@ -171,7 +173,7 @@ def test_shop_card_wraps_the_longest_effect_line():
 
 
 def test_digicore_card_wraps_its_note():
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     class _M:
         pages, i = [("EvolutionState",), ("DATA",)], 0
         note = "It rests now — press N for a new egg."      # 37 chars
@@ -182,7 +184,7 @@ def test_digicore_card_wraps_its_note():
 
 
 def test_battle_card_wraps_the_result_note():
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     class _M:
         battle, enemy, raid = None, {"name": "MetalGreymon"}, False
         hud_php, hud_fhp = 3, 4

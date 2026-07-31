@@ -18,7 +18,7 @@ import os
 import re
 
 from tuipet.app import Screen
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 class _FakeScreen:
@@ -100,8 +100,8 @@ def test_the_drills_three_verdicts_route_to_three_fx():
     two-way anim, so the middle grade took the full cheer.  Each verdict
     pose now routes to its own show -- Cheering / the deserved 4/6 jeer /
     the 10/9 slump."""
-    from tuipet import appactions
-    from tuipet.pet import Pet
+    from tuipet.core import appactions
+    from tuipet.core.pet import Pet
 
     class _App:
         def __init__(self, anim):
@@ -140,9 +140,9 @@ def test_eat_fx_survives_a_blank_last_food_frame():
     The golden always fed f:8 (4 real frames), so it never saw one: exercise
     the exact crashing food, every step."""
     import random
-    from tuipet import app as app_mod
-    from tuipet import data
-    from tuipet.pet import Pet
+    from tuipet.core import app as app_mod
+    import tuipet.data.loaders.data as data
+    from tuipet.core.pet import Pet
     frames = data.load_icons()["f:7"]
     assert frames[-1] is None                    # the landmine is real data
 
@@ -172,10 +172,10 @@ def test_hatch_render_follows_the_canon_beats():
     made the rock stutter and the crack land a beat late; the beat is rounded
     now.  Pinned through the real paint path on both drive styles (direct
     timer set AND accumulated advance_hatch subtraction)."""
-    from tuipet import app as app_mod
-    from tuipet import arena as arena_mod   # Screen resolves render_screen here
-    from tuipet import egg as egg_mod
-    from tuipet.pet import Pet
+    from tuipet.core import app as app_mod
+    from tuipet.core import arena as arena_mod   # Screen resolves render_screen here
+    from tuipet.core import egg as egg_mod
+    from tuipet.core.pet import Pet
 
     cap = {}
     real = arena_mod.render_screen
@@ -292,7 +292,7 @@ def test_the_emote_grammar_matches_the_decompile():
     player hits most never blew smoke), and the ambient sulk."""
     import inspect
 
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     src = {fn: inspect.getsource(getattr(Screen, fn))
            for fn in ("_fxk_cheer", "_fxk_jeer", "_fxk_losing")}
     assert '"happy"' in src["_fxk_cheer"], "cheer lost the SUN"
@@ -316,7 +316,8 @@ def test_the_frustration_dance_paints_its_smoke_beside_the_pet(monkeypatch):
     """The smoke actually REACHES the screen on both frustration shows, on
     the same beat and in the same slot the cheer's sun uses -- and stays
     inside the 32px window (7px cloud at the pet's right edge, x28..34)."""
-    from tuipet import data, grid
+    import tuipet.data.loaders.data as data
+    from tuipet.utils import grid
     from tuipet.app import PET_BASE_X, SPRITE_W
     E = data.load_effects()
     ink = [sum(r.count("1") for r in f) for f in E["unhappy"]]
@@ -413,7 +414,7 @@ def test_assistant_feed_drops_off_and_chains_the_real_eat():
     -- tuipet kept the helper on-screen through a simplified 12-beat chew.
     Now: a 12-step drop-off, then the real eat fx chains with its descent
     stages skipped (the meal is already on the floor)."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus")
     p.world_seconds = 12 * 60.0
     s = _FakeScreen()
@@ -436,8 +437,8 @@ def test_the_present_rides_the_whole_return_leg():
     """Gift-anim audit 2026-07-05: canon gifting() pushes the present home in
     LOCKSTEP (meatButton.moveRight(3) beside the pet from off-screen left) --
     tuipet popped it in only at the arrival hold."""
-    from tuipet import app as app_mod
-    from tuipet.pet import Pet
+    from tuipet.core import app as app_mod
+    from tuipet.core.pet import Pet
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus")
     p.world_seconds = 12 * 60.0
 
@@ -481,7 +482,7 @@ def _paint_harness(roamer_x=8.0):
     # off the x12 anchor) -- the old 22.0 parked the pet past the grid's own
     # right wall (X1 - sprite = 20), a spot the real roamer can't reach and
     # one the icon-rail sweep's universal clamp now corrects (2026-07-10)
-    from tuipet.anim import Roamer
+    from tuipet.utils.anim import Roamer
     from tuipet.app import SCREEN_COLS, SPRITE_W
     s = type("_S", (), {})()
     for m in ("paint", "_paint_fx", "_pose_rows", "_pose_rows_idx",
@@ -520,7 +521,7 @@ def _capture_render(monkeypatch):
 
 
 def test_yawn_tell_plays_in_place_with_status_ui(monkeypatch):
-    from tuipet import grid
+    from tuipet.utils import grid
     from tuipet.app import COND_W, _filth_right
     cap = _capture_render(monkeypatch)
     s = _paint_harness()
@@ -555,7 +556,7 @@ def test_poopdance_tell_plays_in_place(monkeypatch):
 
 
 def test_sick_shuffle_holds_the_roamers_spot(monkeypatch):
-    from tuipet import anim as anim_mod
+    from tuipet.utils import anim as anim_mod
     cap = _capture_render(monkeypatch)
     s = _paint_harness()
     p = _pose_pet(poop=0, sick=True)
@@ -593,7 +594,7 @@ def test_food_descends_uncut_inside_the_window(monkeypatch):
     matrix edge (the no-poop scene born at x3).  The whole canon-abutted pair
     now slides right instead: every descent beat shows the food's FULL ink,
     entirely inside the 32x16 window."""
-    from tuipet import grid
+    from tuipet.utils import grid
     cap = _capture_render(monkeypatch)
     s = _paint_harness()
     p = _pose_pet(poop=0)
@@ -614,7 +615,8 @@ def test_emote_riders_pop_whole_inside_the_window(monkeypatch):
     (y=1), so the window clip beheaded them.  They now ride the pet's right
     edge at head height (grid.TOP): every up-beat shows the emote's FULL
     ink, entirely inside the 32x16 window."""
-    from tuipet import data, grid
+    import tuipet.data.loaders.data as data
+    from tuipet.utils import grid
     cap = _capture_render(monkeypatch)
     E = data.load_effects()
     for kind, ekey in (("cheer", "happy"), ("jeer", "unhappy"),
@@ -645,7 +647,8 @@ def test_the_fx_engine_split_holds_its_boundaries():
     widget; every old name resolves from arena (and app's re-export), and
     the render_screen patch point still catches fx frames."""
     import inspect
-    from tuipet import arena, arenafx
+    from tuipet.core import arena
+    from tuipet.utils import arenafx
     assert arenafx.FxMixin in arena.Screen.__mro__
     room = inspect.getsource(arena)
     for name in ("start_fx", "advance_fx", "_paint_fx", "_fxk_eat",
@@ -664,7 +667,9 @@ def test_the_app_split_holds_its_boundaries():
     handler; appboot owns the launch plumbing; app.py is the shell and
     re-exports the old names."""
     import inspect
-    from tuipet import app, appactions, appboot
+    from tuipet import app
+    from tuipet import appactions
+    from tuipet import appboot
     assert appactions.ActionsMixin in app.TuiPetApp.__mro__
     shell = inspect.getsource(app)
     for name in ("action_feed", "action_shop", "action_lobby",
@@ -682,7 +687,7 @@ def test_dna_charge_badge_feeds_in_at_chip_scale():
     sprites during the eating animation" -- the charge's feed-in).  It halves
     like the eat fx's food: every pre-wash frame keeps the badge inside an
     8x8 box, and the whole 44-step fx plays through."""
-    from tuipet import arenafx
+    from tuipet.utils import arenafx
 
     class S:
         fx = None

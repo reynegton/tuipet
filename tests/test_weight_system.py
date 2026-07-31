@@ -5,8 +5,8 @@ The audit found no setWeight semantics: the body's hard clamp at baseWeight
 was missing (weight grew unbounded past the Over tier), the calorie buffer
 had no rising-overflow BM bump, and _apply_consumable added weight (and
 obedience) raw where canon scales both by the item modifier."""
-from tuipet import evolution
-from tuipet.pet import (Pet, WEIGHT_LIMIT_MULTIPLE, CALORIE_LIMIT)
+from tuipet.core import evolution
+from tuipet.core.pet import (Pet, WEIGHT_LIMIT_MULTIPLE, CALORIE_LIMIT)
 
 
 def _pet(**kw):

@@ -13,7 +13,7 @@ import os
 import re
 
 
-from tuipet import theme
+from tuipet.utils import theme
 
 
 _COLOR_NAMES = set(theme._NAMES)
@@ -67,7 +67,7 @@ def test_every_theme_binder_is_discovered_and_retinted():
 
 
 def test_apply_propagates_to_a_screen_module():
-    from tuipet import menu
+    from tuipet.ui.components import menu
     theme.apply("grey")                       # known baseline
     grey_ink = menu.INK
     try:
@@ -130,7 +130,7 @@ def test_load_sprites_cache_is_intact():
     STOLE its @lru_cache decorator -- every call re-parsed the gzip atlas and
     the app crawled (the suite 'hang').  Pin cache identity for the hot atlas
     loaders so a displaced decorator can never ship again."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     assert data.load_sprites() is data.load_sprites()
     assert data.load_icons() is data.load_icons()
     assert data.load_effects() is data.load_effects()
@@ -146,7 +146,7 @@ def test_gameboy_render_reserves_the_sprite_ink_for_sprites():
     """End-to-end layering pin: over ANY background art, the darkest green on
     the rendered LCD comes only from sprite/overlay ink -- a sprite-less
     render of dark art must contain no #0f380f at all."""
-    from tuipet.render import render_scene
+    from tuipet.utils.render import render_scene
     dark = ["000000" * 12] * 8
     try:
         theme.apply("gameboy")
@@ -184,7 +184,7 @@ def test_the_arena_backdrop_is_one_look_now():
     """BackgroundAnim checkBack: tournaments + PvP battles play in front of
     tourneyBack -- flattened to its single DAY look when the day/night
     system left (BASIC VPET 2026-07-17)."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     frames = data.load_backgrounds().get("tourneyBack")
     assert frames and len(frames) == 1
     assert all(len(r) == 40 * 6 for fr in frames for r in fr)
@@ -193,8 +193,8 @@ def test_the_arena_backdrop_is_one_look_now():
 def test_background_file_override_picks_the_arena_sheet():
     """Pet.background(file=...) swaps the SHEET -- the arena look, not the
     egg's home scene."""
-    from tuipet import data
-    from tuipet.pet import Pet
+    import tuipet.data.loaders.data as data
+    from tuipet.core.pet import Pet
     p = Pet(num=-1, stage="Rookie")
     arena = p.background(file="tourneyBack")
     home = p.background()
@@ -212,7 +212,7 @@ def test_the_background_quantizer_is_gone():
     """Joel 2026-07-18: "get rid of the green and white background pallet
     switcher in gameboy and paper" -- backdrops render full colour on every
     theme; the DMG/ink shades survive only in chrome and sprites."""
-    from tuipet import render
+    from tuipet.utils import render
     import inspect
     assert not hasattr(theme, "themed_bg")
     assert not hasattr(theme, "_quant_frame")
@@ -225,7 +225,8 @@ def test_theme_choice_rides_the_save_dir(tmp_path, monkeypatch):
     """theme.txt resolves through persistence.SAVE_DIR at call time (naming
     audit 2026-07-19): the old hardcoded ~/.local path ignored the sandbox
     and the iOS dir pick, and erase_all swept a file that wasn't it."""
-    from tuipet import persistence, theme
+    from tuipet.utils import persistence
+    from tuipet.utils import theme
     monkeypatch.setattr(persistence, "SAVE_DIR", str(tmp_path))
     theme.save_choice("amber")
     assert (tmp_path / "theme.txt").read_text() == "amber"
@@ -238,7 +239,7 @@ def test_every_theme_carries_the_renamed_schema():
     """The naming audit's renames hold across all themes: care (was mood --
     it tints the care row), sil_scene / sil_lightsoff (was day/night --
     the arena clock is gone)."""
-    from tuipet import theme
+    from tuipet.utils import theme
     for name, t in theme.THEMES.items():
         for key in ("care", "sil_scene", "sil_lightsoff",
                     "heart", "energy", "life", "coin"):
@@ -264,7 +265,7 @@ def test_every_readout_clears_the_contrast_floor():
     on grey joined it 2026-07-28 at 2.0-2.4:1 on the light box).  Every
     STATUS readout tint holds >= 2.5:1 against its own theme's ground --
     `mid` is exempt, dim is its job."""
-    from tuipet import theme
+    from tuipet.utils import theme
     for name, t in theme.THEMES.items():
         for role in ("on", "accent", "pos", "neg",
                      "heart", "energy", "care", "life", "coin"):
@@ -277,8 +278,9 @@ def test_the_powers_trio_is_distinct_on_every_theme():
     2026-07-28).  It shipped with D on ACCENT -- and accent IS the neg hex
     on mono and amber, so Data and Virus rendered as literal twins.  The
     three roles the row wears must stay pairwise distinct in every theme."""
-    from tuipet import statusbox, theme
-    from tuipet.pet import Pet
+    from tuipet.ui.components import statusbox
+    from tuipet.utils import theme
+    from tuipet.core.pet import Pet
     for name, t in theme.THEMES.items():
         trio = (t["life"], t["pos"], t["neg"])
         assert len(set(trio)) == 3, f"{name}: the V/D/Vi trio collapsed: {trio}"

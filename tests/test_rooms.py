@@ -18,9 +18,9 @@ import time
 
 import pytest
 
-from tuipet import lobbyscreen
-from tuipet.net import LobbyClient, LobbyState
-from tuipet.pet import Pet
+from tuipet.ui.screens import lobbyscreen
+from tuipet.network.net import LobbyClient, LobbyState
+from tuipet.core.pet import Pet
 
 
 def _srv():

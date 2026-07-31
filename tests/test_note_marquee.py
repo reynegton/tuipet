@@ -4,7 +4,7 @@ message — panels pass their own frame counter or inherit menu.TICK, which
 app.on_frame advances at 10 Hz.  Panels that had no animation (shop/bag,
 assistant, themes) carry a heartbeat anim() so the scroll actually renders.
 """
-from tuipet import menu
+from tuipet.ui.components import menu
 
 
 def test_long_note_scrolls_instead_of_clipping():

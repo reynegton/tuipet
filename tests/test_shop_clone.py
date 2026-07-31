@@ -2,9 +2,9 @@
 table -- DSprite's mechanics grammar wearing DVPet art on every cell --
 plus the classic EGG shelf and HONORS board riding the last tabs."""
 
-from tuipet import shop
-from tuipet.pet import Pet, FULL_HUNGER
-from tuipet.shopscreen import ShopPanel
+from tuipet.core import shop
+from tuipet.core.pet import Pet, FULL_HUNGER
+from tuipet.ui.screens.shopscreen import ShopPanel
 
 
 def _pet(**kw):
@@ -55,7 +55,7 @@ def test_the_item_effects_apply():
 
 
 def test_a_refusal_keeps_the_item():
-    from tuipet.petbase import MAX_OBEDIENCE
+    from tuipet.core.petbase import MAX_OBEDIENCE
     p = _pet()
     p.obedience = MAX_OBEDIENCE               # the Textbook's refusal (R4)
     p.add_item("textbook")
@@ -96,7 +96,7 @@ def test_crest_egg_maps_to_the_classic_digimental():
     Reliability egg is JP Sincerity 誠実 = the WATER family (item 20,
     Submarimon); the EN Sincerity egg is JP Purity 純真 (item 18, Shurimon).
     v0.5.5 had them backwards."""
-    from tuipet.pet import Pet as _P
+    from tuipet.core.pet import Pet as _P
     assert _P._CREST_IDS["egg_of_reliability"] == 20     # water armors
     assert _P._CREST_IDS["egg_of_sincerity"] == 18       # ninja/plant armors
     assert _P._CREST_IDS["egg_of_destiny"] == 25         # Fate
@@ -119,7 +119,8 @@ def test_citramon_is_reachable_by_timed_care_now():
     """Joel 2026-07-16: the food lock is unlocked -- the corpus' one
     food-locked form competes like everyone since the orange left with the
     food catalog."""
-    from tuipet import data, evolution
+    import tuipet.data.loaders.data as data
+    from tuipet.core import evolution
     citra = next((n for n, r in data.load_requirements().items()
                   if r.get("evol_food", -1) != -1), None)
     assert citra is not None, "the food-locked row vanished from the data"
@@ -196,7 +197,7 @@ def test_the_bag_dossier_shows_resale():
 def test_crest_note_is_the_live_gate():
     """The Armor-Spirit dossier names the form the jump would land NOW --
     the same evolution.check the crest egg runs on use."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     _, by_num = data.load_sprites()
     goburimon = next(n for n, r in by_num.items()
                      if r["name"] == "Goburimon" and r["stage"] == "Rookie")
@@ -235,7 +236,7 @@ def test_the_eggs_tab_renders_like_every_other_tab():
     The ghost-egg scene is GONE (armorEggs.png = fan art, rejected); the
     Eggs tab uses the standard layout, and the icon cell shows the crest
     glyph DVPet itself draws for the Digimental (i:15..25)."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     assert not hasattr(data, "load_armor_eggs")
     p = _pet()
     pan = ShopPanel(p)
@@ -256,7 +257,7 @@ def test_every_item_wears_its_own_dvpet_art():
     """TUIPET catalog 2026-07-18 ("you can make the items whatever you want
     using the sprites"): EVERY cell is illustrated with a real DVPet strip --
     the capsule-placeholder era is over."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     ic = data.load_icons()
     assert shop.ICON_KEYS["energy_drink"] == "f:17"   # exact name matches
     assert shop.ICON_KEYS["sleeping_pill"] == "f:34"
@@ -294,7 +295,7 @@ def test_the_toys_turn_live_dials():
     # An owned copy converts to Ball through the RETIRED ledger.)
     q = _pet()
     q.add_item("bubble_bath")                   # a pre-refactor bag survives
-    from tuipet import persistence
+    from tuipet.utils import persistence
     persistence._heal_bag(q.inventory)
     assert q.inventory.get("ball", 0) >= 1 and "bubble_bath" not in q.inventory
 
@@ -314,7 +315,7 @@ def test_the_dna_crystal_banks_own_field():
 def test_legacy_bags_migrate_one_to_one():
     """The shelf turnover loses nobody's goods: every old key maps to its
     heir at load (shop.LEGACY_KEYS drives the save-heal)."""
-    from tuipet import persistence
+    from tuipet.utils import persistence
     p = _pet()
     save = persistence.to_save_dict(p)
     save["inventory"] = {"best_fruit": 2, "alarm_clock": 1, "time_gear": 3,
@@ -355,7 +356,8 @@ def test_short_icons_anchor_to_the_baseline_not_the_ceiling():
     empty -- verified against spritesFood0.png); the lie was icon_cell
     top-floating short art over a dead bottom row.  Foods sit on plates:
     short art bottom-aligns, full-height art is untouched."""
-    from tuipet import data, menu
+    from tuipet.ui.components import data
+    from tuipet.ui.components import menu
     icons = data.load_icons()
     giga = menu.icon_cell(icons["f:28"][0])          # 24x18: one short row
     assert giga[0].strip() == ""                     # the dead row is on TOP...
@@ -421,8 +423,8 @@ def test_bag_header_counts_only_what_the_shelves_show():
     """An inventory key the catalog doesn't know (a newer build's item riding
     cloud sync past the bag heal) must not inflate the header: "8 items" over
     5 visible read as a broken bag (deep-state sweep 2026-07-22)."""
-    from tuipet.shopscreen import ShopPanel
-    from tuipet.pet import Pet
+    from tuipet.ui.screens.shopscreen import ShopPanel
+    from tuipet.core.pet import Pet
     p = Pet(num=29, stage="Champion", attribute="Vaccine")
     p.inventory = {"cupcake": 2, "sleeping_pill": 3, "from_the_future": 7}
     pan = ShopPanel(p, start_mode="bag", bag_only=True)

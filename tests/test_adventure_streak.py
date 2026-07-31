@@ -4,10 +4,10 @@ Pins the chain: consecutive won fights grow a run-local streak that scales
 bounties (+25%/win past the first, capped at double); a loss or flee breaks
 it, and so does ANY town rest (waypoint or warp) — the push-on gamble.
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES, STREAK_CAP
-from tuipet.adventurescreen import AdventurePanel
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES, STREAK_CAP
+from tuipet.ui.screens.adventurescreen import AdventurePanel
+from tuipet.core.pet import Pet
 
 
 def _pet():

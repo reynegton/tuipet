@@ -6,10 +6,10 @@ frames, a sleeping traveller halts the whole journey as the roadside nap,
 and a pet pushed PAST EMPTY plants its feet (today's deliberately-soft
 calibration: negative energy only — never chance-based).
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES
-from tuipet.adventurescreen import AdventurePanel, REFUSE_T, TRAVEL_TICKS
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES
+from tuipet.ui.screens.adventurescreen import AdventurePanel, REFUSE_T, TRAVEL_TICKS
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -28,7 +28,7 @@ def _on_the_road(monkeypatch, p=None):
 
 
 def test_a_sick_pet_trudges_at_half_pace(monkeypatch):
-    from tuipet import menu
+    from tuipet.ui.components import menu
     pan = _on_the_road(monkeypatch)
     pan.pet.sick = True
     x0 = pan._wx
@@ -45,7 +45,7 @@ def test_a_sick_pet_trudges_at_half_pace(monkeypatch):
 
 
 def test_a_geriatric_pet_walks_the_aged_shuffle(monkeypatch):
-    from tuipet import menu
+    from tuipet.ui.components import menu
     pan = _on_the_road(monkeypatch)
     p = pan.pet
     p.age_seconds = 16 * 86400.0                       # past the elder line

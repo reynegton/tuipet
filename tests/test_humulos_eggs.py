@@ -2,7 +2,10 @@
 the connection unlock signal, and the cross-bank save migration.  Frameless
 eggs and frameless digimon were CUT; the provenance audit (2026-07-17) then
 cut the 22 fake eggs, leaving the 46 device-verified digitama."""
-from tuipet import data, egg, lines, persistence
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.core import lines
+from tuipet.utils import persistence
 
 
 def _prog(**over):
@@ -202,7 +205,7 @@ def test_owned_eggs_never_gain_cut_or_temp_eggs():
 
 
 def test_every_egg_renders_an_icon():
-    from tuipet import menu
+    from tuipet.ui.components import menu
     for i in range(egg.count()):
         cell = menu.item_icon({"egg_idx": i})
         assert any(ch.strip() for ln in cell for ch in ln), (i, egg.hatch_name(i))
@@ -224,8 +227,10 @@ def test_destined_to_hatch_names_the_baby_not_the_egg():
     (Joel 2026-07-21) -- the named banks store the EGG's display title in
     hatch_name.  destined_name resolves the hatch TARGET's roster name for
     every single-target bank; pools return '' so the cards keep the mystery."""
-    from tuipet import data, egg, statusbox
-    from tuipet.pet import Pet
+    import tuipet.data.loaders.data as data
+    from tuipet.core import egg
+    from tuipet.ui.components import statusbox
+    from tuipet.core.pet import Pet
     _, by_num = data.load_sprites()
     for i in range(egg.count()):
         ts = egg.hatch_targets(i)

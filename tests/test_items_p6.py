@@ -19,8 +19,8 @@ doesn't quietly undo the reasoning.
 """
 import csv
 
-from tuipet import shop
-from tuipet.pet import Pet
+from tuipet.core import shop
+from tuipet.core.pet import Pet
 
 CHIPS = {
     "vaccine_chip": ("f:10", "vaccine", 15),
@@ -137,7 +137,7 @@ def test_the_attribute_TRADE_items_refuse_an_empty_bank():
     below its 15-point stake, so a negative can never be minted."""
     assert shop.key_for_icon("i:5") == "board_game"
     assert shop.key_for_icon("i:8") == "computer_game"
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Rookie", attribute="Vaccine")
     p.line_id = ""
     p.vaccine = p.virus = 14                 # one under the stake

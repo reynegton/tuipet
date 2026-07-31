@@ -8,8 +8,9 @@ grind-gate, not a wall -- while a Mega meets a Mega evenly, and raids pay
 KO6 at claim besides.  Pin the GRADIENT and the floor, not old numbers."""
 import random
 
-from tuipet import battle, data
-from tuipet.pet import Pet
+from tuipet.core import battle
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 
 
 def _a_mega():

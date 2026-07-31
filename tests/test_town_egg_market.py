@@ -3,10 +3,13 @@
 stocks a DISTINCT band of the earnable digitama, shown as the real 8x8 egg
 thumbnails (downsampled x2 -- the June 21 grid); ENTER buys one outright.
 """
-from tuipet import shop, egg as egg_mod, persistence, data
-from tuipet.towneggscreen import TownEggPanel
-from tuipet.townscreen import TownPanel, _MENU
-from tuipet.pet import Pet
+from tuipet.core import shop
+from tuipet.core import egg as egg_mod
+from tuipet.utils import persistence
+import tuipet.data.loaders.data as data
+from tuipet.ui.screens.towneggscreen import TownEggPanel
+from tuipet.ui.screens.townscreen import TownPanel, _MENU
+from tuipet.core.pet import Pet
 
 
 def _pet(bits=5000):
@@ -41,7 +44,7 @@ def test_the_grid_renders_real_8x8_egg_thumbnails():
     lit = sum(sum(row) for row in buf)
     assert 40 < lit < 40 * 16                           # real egg pixels, not blank, not solid
     # each stocked egg is the real digitama sprite downsampled to 8x8
-    from tuipet.render import downsample
+    from tuipet.utils.render import downsample
     thumb = downsample(egg_mod.record(pan.stock[0])["frames"][0], 2)
     assert len(thumb) == 8 and len(thumb[0]) == 8
 
@@ -74,7 +77,7 @@ def test_town_hub_has_an_eggs_slot_that_mounts_the_market():
     are different than the normal shops'): the Eggs door opens the SHOP's
     own Eggs tab now -- one shop family, one layout -- with this town's
     digitama band as ordinary shelf rows."""
-    from tuipet import shop
+    from tuipet.core import shop
     assert any(m[0] == "eggs" for m in _MENU)
     t = TownPanel(_pet(), town_id=2)
     t.cursor = next(i for i, m in enumerate(_MENU) if m[0] == "eggs")

@@ -14,7 +14,7 @@ the 20-mistake cap, Pen20 elder frailty (LINES_SPEC §5 contract) and the
 window, and that NOTHING in the codebase burns or reads a lifespan."""
 import pytest
 
-from tuipet.pet import (Pet, DEATH_MISTAKES, DEATH_AGE, DEATH_SICK_P,
+from tuipet.core.pet import (Pet, DEATH_MISTAKES, DEATH_AGE, DEATH_SICK_P,
                         GERIATRIC_AGE_DAYS, AGE_DAY)
 
 
@@ -46,7 +46,7 @@ def _hazard(p):
 def test_the_immunity_window_holds():
     """The clone's promise: <5 mistakes, healthy, under age 15 = the roll
     CANNOT kill.  Even a forced 0.0 draw leaves d == 0 -> no roll at all."""
-    import tuipet.petbody as body
+    import tuipet.core.petbody as body
     p = _pet(care_mistakes=4)
     assert _hazard(p) == 0.0
     real = body.random.random
@@ -83,7 +83,7 @@ def test_the_whisper_folds_into_one_roll():
 
 
 def test_roll_causes_read_the_dominant_reason(monkeypatch):
-    import tuipet.petbody as body
+    import tuipet.core.petbody as body
     monkeypatch.setattr(body.random, "random", lambda: 0.0)
     old = _pet()
     old.age_seconds = 16 * AGE_DAY
@@ -122,7 +122,7 @@ def test_no_lifespan_survives_anywhere():
     source.  A pre-port save carrying "lifespan" still loads (the key is
     simply dropped)."""
     import dataclasses
-    from tuipet import persistence
+    from tuipet.utils import persistence
     assert "lifespan" not in {f.name for f in dataclasses.fields(Pet)}
     assert not hasattr(_pet(), "_burn_life")
     d = persistence.to_save_dict(_pet())
@@ -137,7 +137,10 @@ def test_dead_system_lifedecs_stay_gone():
     """The whole LifeDec constant family left with the clock -- nothing may
     quietly re-import it."""
     import inspect
-    from tuipet import petbody, petcare, pet as petmod, petbase
+    from tuipet.core import petbody
+    from tuipet.core import petcare
+    from tuipet.core import pet as petmod
+    from tuipet.core import petbase
     src = "".join(inspect.getsource(m) for m in (petbody, petcare, petmod))
     for dead in ("LIFE_DEC", "_burn_life", "BONUS_LIFE_INC", "REVIVAL_LIFE",
                  "INSTANT_DEATH_GRACE", "life_penalty_note"):

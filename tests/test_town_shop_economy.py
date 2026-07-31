@@ -12,8 +12,10 @@ town steak against the 2000b catalog is a money printer.
 """
 import datetime
 
-from tuipet import data, persistence, shop
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
+from tuipet.core import shop
+from tuipet.core.pet import Pet
 
 D = datetime.date(2026, 3, 3)          # an ordinary day (no festival)
 FEST = datetime.date(2026, 1, 1)       # New Year — a festival day
@@ -111,8 +113,8 @@ def test_the_daily_stock_cap_stops_the_money_printer():
 
 
 def test_the_town_panel_serves_the_counter(monkeypatch):
-    from tuipet import tournament
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.core import tournament
+    from tuipet.ui.screens.shopscreen import ShopPanel
     monkeypatch.setattr(tournament, "_today", lambda: D)
     p = _pet()
     p.bits = 10_000

@@ -16,9 +16,10 @@ races, and every page against the box.
 """
 import pytest
 
-from tuipet import grid, lobbyscreen
-from tuipet.net import LobbyState
-from tuipet.pet import Pet
+from tuipet.utils import grid
+from tuipet.ui.screens import lobbyscreen
+from tuipet.network.net import LobbyState
+from tuipet.core.pet import Pet
 
 R, C = grid.ROWS, grid.COLS
 
@@ -158,7 +159,7 @@ def test_blocking_sweeps_the_log_it_promises_to_silence():
 # ---- the bout's accounting, under network races ------------------------
 
 def _bout(bphase="fight"):
-    from tuipet import battle as B
+    from tuipet.core import battle as B
     pan, _st = _panel(phase="battle", bphase=bphase, partner=(2, "mika"),
                       is_host=True,
                       opp_card={"num": 120, "name": "Kuwagamon",

@@ -10,10 +10,10 @@ import time
 
 import pytest
 
-from tuipet.net import LobbyClient, LobbyState
-from tuipet import lobbychat
-from tuipet.pet import Pet
-from tuipet import lobbyscreen
+from tuipet.network.net import LobbyClient, LobbyState
+from tuipet.network import lobbychat
+from tuipet.core.pet import Pet
+from tuipet.ui.screens import lobbyscreen
 
 
 # ---- unit: _handle ----------------------------------------------------------
@@ -146,7 +146,7 @@ def test_the_seeded_race_plays_identically_and_logs_damage():
     """0.5 BATTLE: both nonces in -> the precomputed race builds and each
     round logs plain damage (move names left with the pick-a-move engine)."""
     import hashlib
-    from tuipet import lobbyscreen as lmod
+    from tuipet.ui.screens import lobbyscreen as lmod
     s = LobbyState()
     pan = _panel(s)
     pan.partner = (9, "kai")
@@ -317,7 +317,7 @@ def test_egg_sessions_are_gated_both_directions():
     are fine for an egg) but sessions must honour the offline gates -- an egg
     could INVITE battle/jogress and ACCEPT a battle invite, and the PvP round
     replay then CRASHED on the egg's missing roster sheet."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     s = LobbyState()
     s.connected = True
     s.me_id, s.me_name = 1, "joel"
@@ -350,7 +350,7 @@ def test_remote_invite_never_disturbs_a_sleeper():
     whose guard DISTURBS a sleeper (grumble-wake + mood hit + disturb count)
     and rolls a refusal -- a stranger's night invite silently woke the pet.
     The remote gate is PURE now: decline, pet untouched."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     s = LobbyState()
     s.connected = True
     s.me_id, s.me_name = 1, "joel"
@@ -383,7 +383,7 @@ def test_remote_invite_never_disturbs_a_sleeper():
 def test_apply_dna_no_longer_marks_a_false_disturb():
     """canon applyDNA calls disturb() -- a no-op on an AWAKE pet; the old port
     incremented the evolution disturb counter on every charge."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus")
     p.world_seconds = 10 * 60.0
     p.dna_owned["DragonsRoar"] = 5
@@ -398,9 +398,9 @@ def test_the_engine_reads_species_truth_not_wire_claims():
     SPECIES RECORD of the claimed num (Side.wild) -- a forged attribute
     string on the dict never reaches the hit formula, the same anti-forge
     line _clamp_card draws for PvP cards."""
-    from tuipet import battle as battle_mod
-    from tuipet.pet import Pet
-    from tuipet import data
+    from tuipet.core import battle as battle_mod
+    from tuipet.core.pet import Pet
+    import tuipet.data.loaders.data as data
     q = Pet(num=102, name="Q", stage="Champion", attribute="Virus")
     q.world_seconds = 600.0
     rec = data.record_for(100)
@@ -537,7 +537,7 @@ def test_jogress_is_lobby_only_and_battle_rides_m():
 
 def _jogress_session(monkeypatch, peer_two_phase=True):
     """A panel sitting at the jogress RESULT screen with a stubbed partner."""
-    from tuipet import jogress
+    from tuipet.core import jogress
     relays = []
     s = LobbyState()
     pan = _panel(s)
@@ -608,7 +608,7 @@ def test_jogress_resolution_failure_notifies_the_partner(monkeypatch):
     that dozed off or lost DP after inviting), I must relay an abort so the
     partner isn't left hanging at its result screen waiting for a confirm I'll
     never send.  Before the fix the failed side returned silently."""
-    from tuipet import jogress
+    from tuipet.core import jogress
     relays = []
     s = LobbyState()
     pan = _panel(s)
@@ -651,7 +651,7 @@ def test_malicious_pm_cannot_crash_the_flash():
 def test_chat_input_buffer_is_capped():
     """The local input buffer was unbounded -- a long paste grew it without
     limit (the server clips the SENT text, not the buffer)."""
-    from tuipet import lobbyscreen
+    from tuipet.ui.screens import lobbyscreen
     s = LobbyState()
     pan = _panel(s)
     for _ in range(lobbyscreen.CHAT_MAX + 200):
@@ -724,7 +724,7 @@ def test_folded_lines_never_overflow_the_box():
 def test_dm_threads_survive_leaving_the_pm_and_the_lobby():
     """Joel 2026-07-10: messages STAY after leaving a PM -- the thread and its
     unread badges persist on Esc (thread + lobby) and reload on reconnect."""
-    from tuipet import persistence
+    from tuipet.utils import persistence
     s = _room(1)
     s.roster[1]["name"] = "mika"
     s.dms["mika"] = [("mika", "hey"), ("joel", "yo")]
@@ -849,7 +849,7 @@ def test_ladder_claim_notes_only_on_the_ack():
     """Take-then-send closed: the persistent claimed-note waits for the
     ladder_reward ack -- a claim lost to a dropped socket must leave the
     award claimable next session (the server still owes it)."""
-    from tuipet import persistence
+    from tuipet.utils import persistence
     s = LobbyState()
     pan = _panel(s)
     sent = []

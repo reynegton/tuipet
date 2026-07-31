@@ -10,9 +10,9 @@ can_battle's >= 10 entry gate, -5 per bout, ~3 per full tank.
 import random
 
 from tuipet.app import TuiPetApp, keys_markup
-from tuipet.battle import Battle, pick_enemy
-from tuipet.battlescreen import BattlePanel
-from tuipet.pet import Pet
+from tuipet.core.battle import Battle, pick_enemy
+from tuipet.ui.screens.battlescreen import BattlePanel
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -63,7 +63,7 @@ def test_the_home_panel_keeps_the_home_scene():
 def test_the_home_bout_wears_the_battle_card():
     """painter_for must resolve a TOP-LEVEL BattlePanel to the battle
     card -- the home bout is the first top-level use of the panel."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     fn = statusbox.painter_for(BattlePanel(_pet()))
     assert fn is statusbox.battle
 

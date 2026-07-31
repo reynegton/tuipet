@@ -10,7 +10,7 @@ begging-gauge mistake rolls ported last arc keyed on a branch that never
 runs; removed.  The pile cap stays Joel's 4 (real-toy match)."""
 import random
 
-from tuipet.pet import Pet, POOP_MAX_PILES
+from tuipet.core.pet import Pet, POOP_MAX_PILES
 
 
 def _pet(**kw):

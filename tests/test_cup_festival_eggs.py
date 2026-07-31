@@ -6,10 +6,13 @@ egg (Hack -> the Fall Champion Cup) and the game's first festival egg (DORU
 / Alphamon, the grand festival prize -- a targeted Royal Knight, swapped in
 for Draco's grab-bag tree 2026-07-20), plus the festival signal that feeds it.
 """
-from tuipet import data, egg, persistence, adventure
-from tuipet.adventure import ZONES
-from tuipet.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T, TRAVEL_TICKS
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.utils import persistence
+from tuipet.core import adventure
+from tuipet.core.adventure import ZONES
+from tuipet.ui.screens.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T, TRAVEL_TICKS
+from tuipet.core.pet import Pet
 
 
 def _by():

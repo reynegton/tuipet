@@ -4,10 +4,11 @@ Cosmetic tamer titles priced 10k..250k: profile-level like egg licences
 (they survive generations), bought on the shop's Honors tab, toggled worn
 with ENTER, and shown on the STATUS border + the lobby presence card.
 """
-from tuipet import data, persistence
-from tuipet import lobbychat
-from tuipet.pet import Pet
-from tuipet.shopscreen import ShopPanel
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
+from tuipet.network import lobbychat
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.shopscreen import ShopPanel
 
 
 def _panel(bits=500_000):
@@ -84,7 +85,7 @@ def test_the_status_subtitle_wears_the_honor():
 
 
 def test_the_lobby_card_carries_the_worn_title_only():
-    from tuipet.lobbyscreen import LobbyPanel
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
     p = Pet(num=100, stage="Champion")
     pan = LobbyPanel.__new__(LobbyPanel)
     pan.pet = p
@@ -108,8 +109,8 @@ def test_the_honors_tab_renders():
 # ---- the honor in the ROOM (roster star + own you-line, 2026-07-14) -----------
 
 def _fake_lobby():
-    from tuipet.lobbyscreen import LobbyPanel
-    from tuipet.net import LobbyState
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
+    from tuipet.network.net import LobbyState
 
     class _C:
         def chat(self, t): pass
@@ -167,7 +168,7 @@ def test_the_prestige_ladder_reaches_a_million():
     """Gameplay polish #25 (2026-07-22): after 435k of honors the bankroll
     went inert.  Two rungs extend the existing ladder — same system, same
     plate, no new economy."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     ts = data.load_titles()
     assert len(ts) == 7
     prices = [t["price"] for t in ts]

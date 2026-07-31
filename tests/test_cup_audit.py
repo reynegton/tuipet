@@ -24,9 +24,11 @@ import random
 
 import pytest
 
-from tuipet import grid, statusbox, tournament as T
-from tuipet.pet import Pet
-from tuipet.tournamentscreen import TournamentPanel
+from tuipet.utils import grid
+from tuipet.ui.components import statusbox
+from tuipet.core import tournament as T
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.tournamentscreen import TournamentPanel
 
 LCD_ROWS, LCD_COLS = grid.ROWS, grid.COLS      # the box the app gives a panel
 
@@ -189,7 +191,7 @@ def test_the_egg_gate_cups_are_the_ones_the_board_names():
     The label is 1-based ("#0 reads like a bug"), so those are the same cup
     -- pinned because an off-by-one here sends a tamer to win the WRONG
     tournament for an egg that never unlocks."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     rules = data.load_egg_unlock()
     for egg_i, tid, name in ((12, 146, "Summer Open #147"),
                              (32, 187, "Fall Open #188")):

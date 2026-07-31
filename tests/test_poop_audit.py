@@ -17,7 +17,7 @@ PostponePoopMoodChange (-1): canon's anim-state machine can BLOCK a poop and
 charge mood per blocked minute; tuipet has no blocking state (the pile drops
 the tick the gauge crosses), so the postpone path cannot exist.
 """
-from tuipet.pet import (POOP_INC_WEIGHT_FACTOR,
+from tuipet.core.pet import (POOP_INC_WEIGHT_FACTOR,
                         POOP_INC_WEIGHT_FACTOR_SMALL, POOP_MAX_PILES, Pet)
 
 
@@ -65,7 +65,7 @@ def test_sick_diarrhea_is_compressed_not_machine_gun():
     """SickLapsePenaltyBM rides the x5 count compression (2026-07-15): a full
     max-length illness hurries roughly one-to-two extra poops out of an awake
     pet -- not canon-proportional's nine in five real minutes."""
-    from tuipet.pet import (MAX_SICK_LENGTH, SICK_LAPSE_MIN,
+    from tuipet.core.pet import (MAX_SICK_LENGTH, SICK_LAPSE_MIN,
                             SICK_LAPSE_PENALTY_BM)
     p = _pet()
     p.sick, p.sick_length = True, float(MAX_SICK_LENGTH * SICK_LAPSE_MIN)

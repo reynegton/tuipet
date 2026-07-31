@@ -15,8 +15,8 @@ to crop.
 import pytest
 from rich.text import Text
 
-from tuipet import statusbox
-from tuipet.pet import Pet
+from tuipet.ui.components import statusbox
+from tuipet.core.pet import Pet
 
 CARD_W = 26          # #stats interior: width 30 - round border 2 - padding 2
 CARD_H = 16
@@ -75,7 +75,7 @@ def _paint(pan, pet=None):
 # ---- the state factories ----------------------------------------------------
 
 def _battle(phase):
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     p = _worst_pet()
     pan = BattlePanel(p, {"num": 100, "name": "Metalgarurumon X"})
     if phase in ("result-won", "result-lost"):
@@ -92,7 +92,7 @@ def _battle(phase):
 
 def _raid_panel(**view_kw):
     import time
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
     pan = RaidPanel.__new__(RaidPanel)
     pan.pet = _worst_pet()
     pan.sub = None
@@ -109,7 +109,7 @@ def _raid_panel(**view_kw):
 
 
 def _dna(phase):
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     p = _worst_pet()
     pan = DNAPanel(p)
     pan.phase = phase
@@ -147,7 +147,7 @@ def _grave():
 
 @state("feed")
 def _feed():
-    from tuipet.feedscreen import FeedPanel
+    from tuipet.ui.screens.feedscreen import FeedPanel
     p = _worst_pet()
     return FeedPanel(p), p
 
@@ -168,7 +168,7 @@ state("battle-lost")(lambda: _battle("result-lost"))
 
 @state("raid-volley-card")
 def _raid_volley():
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     pan, p = _raid_panel()
     enemy = {"num": 214, "name": "Omnimon Merciful Mode", "boss": True,
              "pool": (5_400_000, 5_500_000)}
@@ -185,7 +185,7 @@ state("raid-incoming")(lambda: _raid_panel(
 
 @state("cup-select")
 def _cup_select():
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
     p = _worst_pet()
     pan = TournamentPanel.__new__(TournamentPanel)
     pan.pet, pan.tourney, pan.sub = p, None, None
@@ -195,11 +195,11 @@ def _cup_select():
 @state("cup-bracket")
 def _cup_bracket():
     import random
-    from tuipet import tournament
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.core import tournament
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
     random.seed(3)
     p = _worst_pet()
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     troph = dict(data.load_tournies()[0], bit_mod=1.5)
     pan = TournamentPanel.__new__(TournamentPanel)
     pan.pet, pan.sub = p, None
@@ -228,14 +228,14 @@ for ph in ("home", "charge", "stats", "bet", "mash", "result", "roads"):
 
 @state("training")
 def _training():
-    from tuipet.training import TrainingPanel
+    from tuipet.core.training import TrainingPanel
     p = _worst_pet()
     return TrainingPanel(p), p
 
 
 @state("lobby-connecting")
 def _lobby():
-    from tuipet.lobbyscreen import LobbyPanel
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
     p = _worst_pet()
     pan = LobbyPanel.__new__(LobbyPanel)
     pan.pet, pan.state, pan._last_name, pan.sub = p, None, "joel", None
@@ -244,7 +244,7 @@ def _lobby():
 
 @state("death-etch")
 def _death():
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     p = _worst_pet()
     p.dead = True
     mem = {"name": "Maximilianmon", "vaccine": 9, "data": 9, "virus": 9}
@@ -253,48 +253,48 @@ def _death():
 
 @state("assist")
 def _assist():
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     p = _worst_pet()
     return AssistPanel(p), p
 
 
 @state("eggselect")
 def _eggselect():
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     p = _worst_pet()
     return EggSelectPanel(p), p
 
 
 @state("eggguide")
 def _eggguide():
-    from tuipet.eggguidescreen import EggGuidePanel
+    from tuipet.ui.screens.eggguidescreen import EggGuidePanel
     return EggGuidePanel(), _worst_pet()
 
 
 @state("digicore")
 def _digicore():
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
     p = _worst_pet()
     return DigiCorePanel(p), p
 
 
 @state("scenes")
 def _scenes():
-    from tuipet.backgroundscreen import BackgroundPanel
+    from tuipet.ui.screens.backgroundscreen import BackgroundPanel
     p = _worst_pet()
     return BackgroundPanel(p), p
 
 
 @state("shop")
 def _shop():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     p = _worst_pet()
     return ShopPanel(p), p
 
 
 @state("bag")
 def _bag():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     p = _worst_pet()
     p.add_item("energy_drink")
     return ShopPanel(p, start_mode="bag"), p
@@ -302,21 +302,21 @@ def _bag():
 
 @state("town-eggs")
 def _town_eggs():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     p = _worst_pet()
     return ShopPanel(p, town_id=0, start_tab="Eggs"), p
 
 
 @state("help")
 def _help():
-    from tuipet.helpscreen import HelpPanel
+    from tuipet.ui.screens.helpscreen import HelpPanel
     p = _worst_pet()
     return HelpPanel(p), p
 
 
 @state("options")
 def _options():
-    from tuipet.optionsscreen import OptionsPanel
+    from tuipet.ui.screens.optionsscreen import OptionsPanel
     op = OptionsPanel.__new__(OptionsPanel)
     op.cursor, op.msg, op.sub = 0, "", None
     return op, _worst_pet()
@@ -324,14 +324,14 @@ def _options():
 
 @state("bug")
 def _bug():
-    from tuipet.bugscreen import BugReportPanel
+    from tuipet.ui.screens.bugscreen import BugReportPanel
     p = _worst_pet()
     return BugReportPanel(p), p
 
 
 @state("title")
 def _title():
-    from tuipet.titlescreen import TitlePanel
+    from tuipet.ui.screens.titlescreen import TitlePanel
     return TitlePanel(), _worst_pet()
 
 

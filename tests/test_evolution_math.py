@@ -20,8 +20,8 @@ import random
 
 import pytest
 
-from tuipet.pet import Pet
-from tuipet import evolution
+from tuipet.core.pet import Pet
+from tuipet.core import evolution
 
 
 def _req(**over):
@@ -102,7 +102,7 @@ def test_the_antibody_no_longer_skips_the_probability_roll(monkeypatch, pet):
 
 
 def test_becoming_an_x_form_makes_the_state_permanent():
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     natural = next((n for n, r in data.load_requirements().items()
                     if r.get("xantibody") in ("Natural", "Induced")
                     and not data.is_placeholder(n)), None)

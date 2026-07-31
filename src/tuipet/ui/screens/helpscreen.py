@@ -167,3 +167,6 @@ class HelpPanel:
             out.append((text or " ") + "\n", style=style)
         out.append_text(menu.footer(self._more_cue()))
         return out
+
+# module-level alias so tests can 'from helpscreen import HELP'
+HELP = get_help

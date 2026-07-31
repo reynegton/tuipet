@@ -25,10 +25,15 @@ import random
 
 import pytest
 
-from tuipet import data, digicore, egg as egg_mod, evolution, grid
-from tuipet import lines as L, shop
-from tuipet.digicorescreen import DigiCorePanel
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.ui.screens import datacorescreen as digicore
+from tuipet.core import egg as egg_mod
+from tuipet.core import evolution
+from tuipet.utils import grid
+from tuipet.core import lines as L
+from tuipet.core import shop
+from tuipet.ui.screens.datacorescreen import DigiCorePanel
+from tuipet.core.pet import Pet
 
 R, C = grid.ROWS, grid.COLS
 
@@ -181,7 +186,7 @@ def test_evolving_resets_the_stage_counters_and_keeps_the_life_ones():
 def test_the_elder_gate_cannot_strand_a_pet_mid_ladder():
     """Evolution freezes at elder.  That must sit far beyond the whole
     ladder, or a slow raiser would be locked out of its own Mega."""
-    from tuipet.petbase import AGE_DAY, GERIATRIC_AGE_DAYS
+    from tuipet.core.petbase import AGE_DAY, GERIATRIC_AGE_DAYS
     p = Pet(num=100, stage="Fresh", attribute="Vaccine")
     ladder = sum(d for d in p.STAGE_DURATION.values() if d < 9e8)
     assert GERIATRIC_AGE_DAYS * AGE_DAY > ladder * 10

@@ -1,6 +1,7 @@
 """Canon-fidelity fixes from the SpriteAnim sweep (see ANIMATION_SPEC.md):
 the happy/cheer pose pair, the net-zero sick shuffle, and the idle mood poses."""
-from tuipet import anim, data
+from tuipet.utils import anim
+import tuipet.data.loaders.data as data
 
 
 def test_happy_role_is_the_praise_pair_not_the_scold_pair():
@@ -40,7 +41,7 @@ class _StubPet:
 
 def test_mood_pose_reads_live_state():
     assert anim.mood_pose(_StubPet(energy=0)) in (10, 9, 2)          # spent -> weary
-    assert anim.mood_pose(_StubPet(word="Unhappy")) in (4, 6)        # sick/starving -> sour
+    assert anim.mood_pose(_StubPet(word="Triste")) in (4, 6)        # sick/starving -> sour
     assert anim.mood_pose(_StubPet(cond=3)) == 5                     # well-kept -> bright
     assert anim.mood_pose(_StubPet()) is None                        # ordinary -> walk pose
 
@@ -49,7 +50,7 @@ def test_bright_is_earned_not_frozen():
     """The frozen-meter bug: mood sat at its hatch value (100) forever, so
     the bright pose fired for every pet.  Now it demands condition 3 -- a
     REAL pet fresh out of care neglect must read neutral, not bright."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.world_seconds = 600.0
     p.mood = 100                              # the frozen hatch value
@@ -76,7 +77,7 @@ def test_play_is_the_jump_pair_not_the_cheer_pair():
 
 def test_render_yshift_lifts_the_sprite():
     """yshift raises the sprite (the play hop); enough yshift lifts it off the top."""
-    from tuipet.render import render_screen
+    from tuipet.utils.render import render_screen
     sprite = ["1111", "1111"]
     empty = render_screen([], 8, 6)
     ground = render_screen(sprite, 8, 6)
@@ -88,7 +89,7 @@ def test_battle_strong_hit_sfx_branches_on_double():
     """DVPet doubleAttack launches/lands with the strong sting/impact; a normal hit
     uses the plain ones.  _emit_sfx is pure over (timeline[i], _last_m) -- drive it on
     a stub so we don't have to build a whole battle."""
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
 
     def _sfx(marker, double):
         stub = type("S", (), {"sfx": None, "_last_m": None, "i": 0,
@@ -108,8 +109,8 @@ def test_a_duplicate_slot_sheet_still_dances():
     rip, so the happy dance ([5,7]) and poopdance ([4,5]) flipped between
     identical images.  _flip_frames alternates with a different REAL frame
     of the same species instead; a distinct-slot species is untouched."""
-    from tuipet import data
-    from tuipet.arena import _flip_frames
+    import tuipet.data.loaders.data as data
+    from tuipet.core.arena import _flip_frames
     _, by = data.load_sprites()
     rec = by[1574]                                # Bubbmon
     fr = rec["frames"]

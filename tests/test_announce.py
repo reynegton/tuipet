@@ -7,8 +7,9 @@ Persistence is sandboxed by the autouse isolate_save fixture.
 """
 import asyncio
 
-from tuipet import persistence, data
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 from tuipet.app import TuiPetApp
 
 
@@ -18,23 +19,23 @@ def test_need_message_priority_and_text():
     app = TuiPetApp(pet=p)                         # __init__ only; no mount needed
     assert app._need_message(p) == ""             # no need -> nothing to announce
     p.hunger = 0
-    assert "hungry" in app._need_message(p)
+    assert "fome" in app._need_message(p)
     p.sick = True
-    assert "sick" in app._need_message(p)         # sick outranks hunger
+    assert "doente" in app._need_message(p)         # sick outranks hunger
     p.sick = False
     p.hunger = 4
     p.poop = 4
-    assert "cleaning" in app._need_message(p)
+    assert "limpo" in app._need_message(p)
     p.poop = 0
     p.energy = 0
-    assert "exhausted" in app._need_message(p)
+    assert "exausto" in app._need_message(p)
     # ...but NEVER while it already rests (bug report 2026-07-26,
     # v0.5.280: the nag rode through the recovery doze) -- this is the
     # one call whose cure IS the state the pet is in
     p.asleep = True
-    assert "exhausted" not in app._need_message(p)
+    assert "exausto" not in app._need_message(p)
     p.asleep = False
-    assert "exhausted" in app._need_message(p)    # awake again: the nag returns
+    assert "exausto" in app._need_message(p)    # awake again: the nag returns
     p.energy = 10
     # (the misbehaving announcement left with the discipline system)
     # the pet's name appears in the announcement
@@ -90,10 +91,10 @@ def test_hud_announces_yields_and_clears():
             return announced, held, reasserted, cleared
 
     announced, held, reasserted, cleared = asyncio.run(go())
-    assert "hungry" in announced
+    assert "fome" in announced
     assert "FRESH-ACTION" in held, "a fresh flash must hold over the care-need"
-    assert "hungry" in reasserted, "the need re-asserts after the flash hold"
-    assert "hungry" not in cleared and cleared.strip() == "", "met need clears the box"
+    assert "fome" in reasserted, "the need re-asserts after the flash hold"
+    assert "fome" not in cleared and cleared.strip() == "", "met need clears the box"
 
 
 def test_alarm_beeps_on_onset_then_nags_every_90s():
@@ -143,7 +144,7 @@ def test_the_lights_call_is_the_one_asleep_alarm():
     """Canon lightsCall fires ASLEEP (alive && asleep && lights) -- the one
     call a sleeper raises; awake calls include the effort gauge (strengthCall,
     which used to empty silently).  Sleep-screens audit 2026-07-06."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=140)
     p.world_seconds = 10 * 60.0
     p.hunger, p.strength = 4, 2
@@ -162,26 +163,26 @@ def test_frailty_warning_announces_before_the_elder_death():
     """Joel 2026-07-13 (MetalGreymon died of frailty with 8 unseen mistakes):
     an Ultimate/Mega at 3+ care mistakes warns in the message box, counting
     the slips left before the 5-mistake elder death."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     import tuipet.app as appmod
     app = appmod.TuiPetApp.__new__(appmod.TuiPetApp)
     p = Pet(num=220, stage="Ultimate", obedience=500)
     p.world_seconds = 10 * 60.0
     p.care_mistakes = 2
     assert not p.is_frail()
-    assert "frail" not in appmod.TuiPetApp._need_message(app, p)
+    assert "frágil" not in appmod.TuiPetApp._need_message(app, p)
     p.care_mistakes = 3
     assert p.is_frail()
     msg = appmod.TuiPetApp._need_message(app, p)
-    assert "frail" in msg and "2 more slips" in msg
+    assert "frágil" in msg and "2 erros" in msg
     p.care_mistakes = 4
-    assert "1 more slip" in appmod.TuiPetApp._need_message(app, p)
+    assert "1 erro" in appmod.TuiPetApp._need_message(app, p)
     p.stage = "Champion"                      # only elders are frail
     assert not p.is_frail()
 
 
 def test_frail_badge_rides_the_hud_deco():
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     from tuipet.app import _care_deco
     p = Pet(num=220, stage="Ultimate", obedience=500)
     p.world_seconds = 10 * 60.0
@@ -232,10 +233,10 @@ def test_a_lone_pile_gets_the_quiet_tidy_nudge():
             return nudged, beeped, cleared, alarmed
 
     nudged, beeped, cleared, alarmed = asyncio.run(go())
-    assert "to clean" in nudged
+    assert "para limpar" in nudged
     assert "alarm" not in beeped               # the nudge itself is silent
-    assert "to clean" not in cleared
-    assert "needs cleaning" in alarmed         # the 3-pile call is unchanged
+    assert "para limpar" not in cleared
+    assert "limpo" in alarmed         # the 3-pile call is unchanged
 
 
 def test_frailty_beeps_once_at_onset():
@@ -274,7 +275,7 @@ def test_the_morning_tier_reaches_the_hud():
     pose (petbody._wake).  The note now flashes; a DISTURBED wake keeps
     reporting the disturbance instead."""
     import asyncio
-    from tuipet import petbody
+    from tuipet.core import petbody
     from tuipet.app import TuiPetApp
 
     # unit half: the roll writes the note, the disturb path clears it
@@ -330,9 +331,9 @@ def test_the_egg_wait_has_a_pointer_and_an_eta():
     4-second flash.  The idle HUD now holds the pointer all wait long and
     the card counts down the real incubation clock."""
     import asyncio
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=-1, stage="Egg")
     p.stage_seconds = 10.0
     card = "\n".join(statusbox.egg_lines(p))
@@ -350,7 +351,7 @@ def test_the_egg_wait_has_a_pointer_and_an_eta():
             return str(app.msg_w.render())
 
     hud = asyncio.run(go())
-    assert "help" in hud                         # the standing pointer
+    assert "ajuda" in hud                         # the standing pointer
 
 
 def test_the_alarm_ring_count_carries_the_class():

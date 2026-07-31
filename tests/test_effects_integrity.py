@@ -3,7 +3,7 @@ clobbered curated sprites (the MultiVPet poop, the st_* status icons, the dying
 emote) because they're authored directly in effects.json.gz, not by the script.
 The extractor now merges instead of overwriting; this pins the curated set so a
 future clobber fails CI instead of shipping silently."""
-from tuipet import data
+import tuipet.data.loaders.data as data
 
 
 def test_curated_effect_sprites_are_present():
@@ -28,7 +28,7 @@ def test_hit_explosion_is_the_full_burst_not_the_center_crop():
     shipped before.  It should span most of the 40-wide LCD."""
     import json
     import os
-    from tuipet import data as _d
+    import tuipet.data.loaders.data as data
     ov = json.load(open(os.path.join(os.path.dirname(_d.__file__), "data", "battle_overlays.json")))
     expl = ov["hit_explosion"]
     assert len(expl) == 2, "explosion strobes between 2 frames (outline + filled)"

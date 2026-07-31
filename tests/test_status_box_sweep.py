@@ -6,7 +6,7 @@ real app painters, not re-implementations."""
 
 
 from tuipet.app import TuiPetApp, Stats
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 class _FakeStats(Stats):
@@ -46,7 +46,7 @@ def _card(app, mode):
 
 
 def test_feed_card():
-    from tuipet.feedscreen import FeedPanel
+    from tuipet.ui.screens.feedscreen import FeedPanel
     app = _app()
     txt = _card(app, FeedPanel(app.pet))
     assert "Feed" in txt and "Hunger" in txt and "Meat" in txt
@@ -55,7 +55,7 @@ def test_feed_card():
 
 
 def test_shop_and_bag_cards():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     app = _app()
     txt = _card(app, ShopPanel(app.pet))
     assert "Shop" in txt and "Price" in txt and "Bits" in txt
@@ -66,21 +66,21 @@ def test_shop_and_bag_cards():
 
 
 def test_eggguide_card():
-    from tuipet.eggguidescreen import EggGuidePanel
+    from tuipet.ui.screens.eggguidescreen import EggGuidePanel
     app = _app()
     txt = _card(app, EggGuidePanel())
     assert "Digitama" in txt and "Hatches" in txt
 
 
 def test_digicore_card():
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
     app = _app()
     txt = _card(app, DigiCorePanel(app.pet))
     assert "DigiCore" in txt and "Page" in txt
 
 
 def test_raid_card_offline():
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
     app = _app()
     pan = RaidPanel.__new__(RaidPanel)          # no relay in tests
     pan.pet, pan.sub = app.pet, None
@@ -90,7 +90,7 @@ def test_raid_card_offline():
 
 
 def test_lobby_card_connecting():
-    from tuipet.lobbyscreen import LobbyPanel
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
     app = _app()
     pan = LobbyPanel.__new__(LobbyPanel)
     pan.pet, pan.state, pan._last_name, pan.sub = app.pet, None, "joel", None
@@ -99,9 +99,9 @@ def test_lobby_card_connecting():
 
 
 def test_help_options_bug_cards():
-    from tuipet.helpscreen import HelpPanel
-    from tuipet.optionsscreen import OptionsPanel
-    from tuipet.bugscreen import BugReportPanel
+    from tuipet.ui.screens.helpscreen import HelpPanel
+    from tuipet.ui.screens.optionsscreen import OptionsPanel
+    from tuipet.ui.screens.bugscreen import BugReportPanel
     app = _app()
     assert "tuipet" in _card(app, HelpPanel(app.pet))
     op = OptionsPanel.__new__(OptionsPanel)
@@ -111,8 +111,8 @@ def test_help_options_bug_cards():
 
 
 def test_death_and_assist_cards():
-    from tuipet.deathscreen import DeathPanel
-    from tuipet.assistscreen import AssistPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
+    from tuipet.ui.screens.assistscreen import AssistPanel
     app = _app()
     app.pet.dead = True
     app.pet.death_cause = "a deadly fruit"
@@ -125,7 +125,7 @@ def test_death_and_assist_cards():
 
 
 def test_scenes_and_eggselect_still_covered():
-    from tuipet.backgroundscreen import BackgroundPanel
+    from tuipet.ui.screens.backgroundscreen import BackgroundPanel
     app = _app()
     assert "Scenes" in _card(app, BackgroundPanel(app.pet))
 
@@ -136,7 +136,7 @@ def test_eat_readout_charts_only_live_systems():
     system removed 2026-07-16 -- frozen numbers.  The live card: hunger,
     weight, effort, satiety.  (Fuel/calorie bar removed 2026-07-20 -- a
     DVPet-only mechanic feeding never touched.)"""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     app = _app()
     app.mode = None
     statusbox.eat(app)
@@ -149,8 +149,8 @@ def test_eat_readout_charts_only_live_systems():
 def test_dna_card_bills_energy_not_dead_systems():
     """The DNA charge bill lies no more: spirit and mood are gone; applyDNA
     costs ENERGY (1/unit own Field, x2 off)."""
-    from tuipet import statusbox
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.components import statusbox
+    from tuipet.ui.screens.dnascreen import DNAPanel
     app = _app()
     app.mode = DNAPanel(app.pet)
     statusbox.dna(app)
@@ -180,8 +180,8 @@ def test_the_egg_carousel_card_names_the_egg():
     it to its egg-guide entry meant matching art by eye.  The card wears
     the egg's TITLE now; the hatch line still names the BABY only (the
     egg-must-not-promise-an-egg ruling is untouched)."""
-    from tuipet import egg as egg_mod
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.core import egg as egg_mod
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     app = _app()
     pan = EggSelectPanel(app.pet)
     assert pan.n, "starters must populate the carousel"
@@ -197,10 +197,10 @@ def test_every_embedded_fight_shows_the_battle_card():
     painter_for walks sub chains, so ANY host's embedded fight gets THE
     battle card — the cup's, the road wild's, the town cup's two layers
     deep, the raid volley's.  One fight, one card."""
-    from tuipet import adventure
-    from tuipet.adventurescreen import AdventurePanel
-    from tuipet.battlescreen import BattlePanel
-    from tuipet.townscreen import TownPanel
+    from tuipet.core import adventure
+    from tuipet.ui.screens.adventurescreen import AdventurePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
+    from tuipet.ui.screens.townscreen import TownPanel
     app = _app()
 
     road = AdventurePanel(app.pet, zone=adventure.ZONES[0])
@@ -222,8 +222,9 @@ def test_every_embedded_fight_shows_the_battle_card():
 def test_the_shop_eggs_tab_buys_through_the_single_source():
     """Shops-look-the-same: the tab's ENTER runs shop.town_egg_buy — the
     exact path the old market panel now delegates to."""
-    from tuipet import persistence, shop
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.utils import persistence
+    from tuipet.core import shop
+    from tuipet.ui.screens.shopscreen import ShopPanel
     app = _app()
     app.pet.bits = 5000
     pan = ShopPanel(app.pet, town_id=1, start_tab="Eggs")

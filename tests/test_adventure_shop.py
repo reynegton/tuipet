@@ -4,11 +4,12 @@ Pins the road shelf: transports + Life Recovery go on sale once the tamer has
 CLEARED MAPS (the profile `maps` signal), felling a map's last boss records it,
 and found loot resolves to real CATALOG keys the bag can show and use.
 """
-from tuipet import adventure, shop
-from tuipet.adventure import ZONES, is_map_cleared
-from tuipet.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
+from tuipet.core import adventure
+from tuipet.core import shop
+from tuipet.core.adventure import ZONES, is_map_cleared
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
                                     TRAVEL_TICKS)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -58,7 +59,7 @@ def test_felling_a_maps_last_boss_records_the_map(monkeypatch):
     monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
     recorded = []
-    from tuipet import persistence
+    from tuipet.utils import persistence
     monkeypatch.setattr(persistence, "map_complete_add", lambda m: recorded.append(m))
     # a pet at map 1's DEEPEST road stop: felling its boss clears map 1
     p = _pet()
@@ -83,7 +84,7 @@ def test_a_mid_map_zone_win_records_no_map(monkeypatch):
     monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
     recorded = []
-    from tuipet import persistence
+    from tuipet.utils import persistence
     monkeypatch.setattr(persistence, "map_complete_add", lambda m: recorded.append(m))
     p = _pet()
     p.adv_progress = 2                   # early road: no map near completion
@@ -109,7 +110,7 @@ def test_a_mid_map_zone_win_records_no_map(monkeypatch):
 def test_every_sold_category_has_a_home_in_the_tab_grammar():
     """The ratchet: a future category added to the CATALOG without a tab
     would go silently unsellable again."""
-    from tuipet import shopscreen
+    from tuipet.ui.screens import shopscreen
     tabbed = set()
     for _name, cats in shopscreen.GROUPS:
         tabbed |= set(cats or ())
@@ -118,8 +119,8 @@ def test_every_sold_category_has_a_home_in_the_tab_grammar():
 
 
 def test_the_unlocked_road_shelf_renders_on_the_items_tab(monkeypatch):
-    from tuipet import persistence
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.utils import persistence
+    from tuipet.ui.screens.shopscreen import ShopPanel
     monkeypatch.setattr(persistence, "get_progress", lambda: {"maps": {0, 1}})
     pan = ShopPanel(_pet())
     pan.tab = pan._tabs().index("Items")
@@ -135,8 +136,8 @@ def test_the_town_counter_sells_its_authored_transports(monkeypatch):
     town 0 sits on map 1's first leg and sold both warps to a tamer who had
     cleared nothing.  The counter still carries them; it carries them once
     they are EARNED."""
-    from tuipet import persistence
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.utils import persistence
+    from tuipet.ui.screens.shopscreen import ShopPanel
     monkeypatch.setattr(persistence, "get_progress", lambda: {"maps": {0, 1}})
     pan = ShopPanel(_pet(), town_id=0)         # authored SID1/SID2 = the warps
     pan.tab = pan._tabs().index("Items")
@@ -150,7 +151,8 @@ def test_a_town_counter_honours_the_map_clear_gate(monkeypatch):
     road item since v0.5.114, but no town shelf ever asked -- so the
     earned-access rule could be walked around at the first town on the
     road."""
-    from tuipet import persistence, shop as shop_mod
+    from tuipet.utils import persistence
+    from tuipet.core import shop as shop_mod
     monkeypatch.setattr(persistence, "get_progress", lambda: {"maps": set()})
     locked = {e["key"] for e in shop_mod.town_stock(0)}
     assert not ({"town_transport", "disaster_transport", "life_recovery"}
@@ -167,7 +169,8 @@ def test_the_daily_deal_never_lands_on_a_locked_row(monkeypatch):
     """The v0.5.164 lesson, re-pinned: a deal the tamer cannot see is no
     deal.  The road rows exist on every shelf now, so the deal must be
     dealt over the OPEN ones."""
-    from tuipet import persistence, shop as shop_mod
+    from tuipet.utils import persistence
+    from tuipet.core import shop as shop_mod
     monkeypatch.setattr(persistence, "get_progress", lambda: {"maps": set()})
     for tid in sorted(shop_mod._town_maps()):
         sid = shop_mod.town_deal_sid(tid)
@@ -183,7 +186,8 @@ def test_every_town_carries_the_whole_road_shelf_once_earned(monkeypatch):
     guest slot can never fill the gap (its pool excludes Adventure so the
     gate holds).  The road shelf is the road's own tools -- a counter ON
     the road carries all three."""
-    from tuipet import persistence, shop as shop_mod
+    from tuipet.utils import persistence
+    from tuipet.core import shop as shop_mod
     monkeypatch.setattr(persistence, "get_progress", lambda: {"maps": {0, 1}})
     road = {k for k, v in shop_mod.CATALOG.items() if v.category == "Adventure"}
     for tid in sorted(shop_mod._town_maps()):
@@ -192,7 +196,7 @@ def test_every_town_carries_the_whole_road_shelf_once_earned(monkeypatch):
 
 
 def test_a_held_road_item_shows_in_the_bag():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     p = _pet()
     p.add_item("town_transport")
     pan = ShopPanel(p, start_mode="bag", bag_only=True)

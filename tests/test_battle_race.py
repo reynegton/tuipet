@@ -2,8 +2,8 @@
 from the clone's test_clone_sim battle block, adapted to classic stages)."""
 import random
 
-from tuipet import battle
-from tuipet.pet import Pet
+from tuipet.core import battle
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -64,7 +64,7 @@ def test_999_battles_forces_mega():
 
 
 def test_online_purse_values(monkeypatch):
-    from tuipet import pet as pet_mod
+    from tuipet.core import pet as pet_mod
     import time
     monkeypatch.setattr(pet_mod, "weekend_bonus", pet_mod._weekend_mult)
     base = time.mktime((2026, 7, 6, 12, 0, 0, 0, 0, -1))
@@ -119,7 +119,7 @@ def test_raid_bout_reports_damage_and_records_nothing():
 
 
 def test_the_panel_bar_locks_and_replays_the_race():
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     random.seed(5)
     p = _pet()
     pan = BattlePanel(p, {"num": 4, "name": "X", "stage": "Champion",
@@ -195,7 +195,7 @@ def test_a_true_draw_is_flagged():
 def test_the_result_note_tells_margin_draw_or_why():
     """#1+#5 on the card: win = HP to spare, draw = the rule, loss = the
     coach line."""
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     p = _pet()
     pan = BattlePanel(p, enemy={"num": 100})
     pan.battle = battle.Battle(_side(), {"num": 100})

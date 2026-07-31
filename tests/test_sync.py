@@ -11,8 +11,9 @@ import time
 
 import pytest
 
-from tuipet import persistence, cloudsync
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+from tuipet.network import cloudsync
+from tuipet.core.pet import Pet
 
 
 # ---- payload helpers (no network) ------------------------------------------
@@ -177,7 +178,7 @@ def test_real_syncclient_keeps_saving_after_a_lobby_login(server):
     SyncClient autosaving while a real LobbyClient logs in on the same account —
     the autosave must still land afterwards."""
     import asyncio
-    from tuipet.net import SyncClient, LobbyClient
+    from tuipet.network.net import SyncClient, LobbyClient
 
     async def scenario():
         sync = SyncClient(server, "joel", "secret")
@@ -396,8 +397,8 @@ def test_oversized_saves_are_refused_before_the_wire():
     """The server silently drops frames over 64KB -- a huge save would 'sync'
     forever without landing.  The pusher refuses pre-send and raises the flag
     the app's warn pass reads; the blocking quit-push refuses too."""
-    from tuipet.net import SyncClient, SAVE_WIRE_MAX
-    from tuipet import cloudsync
+    from tuipet.network.net import SyncClient, SAVE_WIRE_MAX
+    from tuipet.network import cloudsync
     c = SyncClient("ws://x", "joel")
     big = {"blob": "x" * (SAVE_WIRE_MAX + 1)}
     c.push_save(big)
@@ -410,7 +411,7 @@ def test_oversized_saves_are_refused_before_the_wire():
 def test_saved_ack_why_maps_to_the_right_warning():
     """ok=False used to mean 'newer session' whatever the cause; the ack's
     `why` now separates the lease loss from a format rejection."""
-    from tuipet.net import SyncClient
+    from tuipet.network.net import SyncClient
     c = SyncClient("ws://x", "joel")
     c._handle('{"t": "saved", "ok": false, "why": "invalid"}')
     assert c.save_invalid is True and c.cloud_dropped is False
@@ -425,7 +426,7 @@ def test_saved_ack_why_maps_to_the_right_warning():
 def test_reconnect_grace_matches_the_servers_real_conflict_line():
     """The grace branch guarded on "already online" -- a string the server
     never sends (drifted dead branch).  It now matches the real line."""
-    from tuipet.net import LobbyClient
+    from tuipet.network.net import LobbyClient
     c = LobbyClient("ws://x/", "joel")
     c._had_welcome = True
     c._handle('{"t": "login_failed", "msg": "Signed in on a newer session."}')

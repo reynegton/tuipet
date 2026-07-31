@@ -4,7 +4,8 @@ These guard against a data refresh (re-running setup_assets.sh) silently droppin
 a column or changing a format — the kind of break that wouldn't surface until the
 egg screen misbehaved in play.
 """
-from tuipet import data, egg
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
 
 
 # (test_care_effects_load left with the careEffect runtime:

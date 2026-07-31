@@ -9,8 +9,8 @@ natural timed care exactly like the item (Digimental) forms.
 """
 import pytest
 
-from tuipet import data
-from tuipet.pet import (AGE_DAY, GERIATRIC_AGE_DAYS, GERIATRIC_REMAIN,
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import (AGE_DAY, GERIATRIC_AGE_DAYS, GERIATRIC_REMAIN,
                         MIN_STOMACH_CAPACITY, Pet)
 
 

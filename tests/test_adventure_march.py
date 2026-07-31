@@ -5,11 +5,11 @@ the panel's auto-march that rides the teleport home with the victory verdict.
 The risk systems (encounters, boss, drain, towns) are later phases and absent.
 """
 import pytest
-from tuipet import adventure
-from tuipet.adventure import Adventure, INTERACTIVE_STEPS, ZONES, pick_zone
-from tuipet.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, INTERACTIVE_STEPS, ZONES, pick_zone
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
                                     TRAVEL_TICKS)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _champ(num=100):
@@ -91,7 +91,7 @@ def test_the_walking_sequence_crosses_the_window(no_encounters):
     Joel: "mon should walk across the screen"): travelling, the mon walks
     clear across the window, exits the RIGHT edge fully, and re-enters from
     hidden LEFT (the lawful exits) -- never stepping in place at an anchor."""
-    from tuipet import grid
+    from tuipet.utils import grid
     pan = AdventurePanel(_champ())
     pan._trans = None
     pan._landed = True
@@ -114,7 +114,7 @@ def test_the_walking_sequence_crosses_the_window(no_encounters):
 def test_beats_play_where_the_mon_stands_not_at_centre(no_encounters):
     """A road beat (the glint stop) plays at the CLAMPED march x -- "beats
     play wherever it stands" (old build) -- not snapped back to centre."""
-    from tuipet import grid
+    from tuipet.utils import grid
     pan = AdventurePanel(_champ())
     pan._trans = None
     pan._landed = True
@@ -131,7 +131,7 @@ def test_beats_play_where_the_mon_stands_not_at_centre(no_encounters):
 def test_the_march_faces_the_direction_of_travel(no_encounters, monkeypatch):
     """Marching, the mon FACES the way it's going (mirror flip -- the art's
     native facing is the other way), like the old build's crossing."""
-    from tuipet import menu
+    from tuipet.ui.components import menu
     pan = AdventurePanel(_champ())
     pan._trans = None
     pan._landed = True
@@ -166,7 +166,7 @@ def test_the_road_strip_fits_the_box_in_cells_every_beat(no_encounters):
     absorbs the squeeze: EVERY hint-cycle beat must fit, worst case."""
     from rich.cells import cell_len
     from rich.text import Text
-    from tuipet.adventurescreen import HINT_BEAT, STRIP_W
+    from tuipet.ui.screens.adventurescreen import HINT_BEAT, STRIP_W
     p = _champ()
     p.energy = 125                                # 3-digit ⚡
     pan = AdventurePanel(p)

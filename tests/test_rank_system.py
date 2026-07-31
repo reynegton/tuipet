@@ -10,8 +10,8 @@ the WEAK injury tables keyed on the static species aversion, the food
 forced-meal decs, and the PERSONALITY TRACKER (childhood energy/weight/mood
 tallies re-rolling the temperament at the Champion evolution)."""
 
-from tuipet import data
-from tuipet.pet import (Pet)
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import (Pet)
 
 
 def _pet(**kw):

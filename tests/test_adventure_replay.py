@@ -6,10 +6,10 @@ species fight like trained veterans — through the REAL hit-formula terms
 — and pays bounties half again for it.  No new persistence: "conquered"
 is the tier.  Zone dicts are shared and cached: the scaling must copy.
 """
-from tuipet import adventure
-from tuipet.adventure import (Adventure, ZONES, VETERAN_TRAININGS,
+from tuipet.core import adventure
+from tuipet.core.adventure import (Adventure, ZONES, VETERAN_TRAININGS,
                               VETERAN_RECORD)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet(prog=0):
@@ -47,7 +47,7 @@ def test_veteran_foes_carry_the_trained_side_and_the_originals_stay_clean():
 
 
 def test_the_veteran_side_actually_hits_harder():
-    from tuipet.battle import Side
+    from tuipet.core.battle import Side
     z = _wild_zone()
     num = z["randoms"][0]["num"]
     me = Side.of_pet(_pet())
@@ -59,7 +59,7 @@ def test_the_veteran_side_actually_hits_harder():
 
 
 def test_battle_consumes_the_veteran_side():
-    from tuipet.battle import Battle
+    from tuipet.core.battle import Battle
     z = _wild_zone()
     pos = adventure.PROGRESSION.index(adventure.zone_index(z))
     a = Adventure(_pet(prog=pos + 1), zone=z)
@@ -81,7 +81,7 @@ def test_veteran_bounties_pay_half_again():
 
 
 def test_the_picker_teases_the_veteran_road():
-    from tuipet.adventurescreen import ZonePickPanel
+    from tuipet.ui.screens.adventurescreen import ZonePickPanel
     p = _pet(prog=3)                                        # 3 conquered, 4th frontier
     pk = ZonePickPanel(p)
     pk.cursor = 0                                           # a conquered zone

@@ -2,8 +2,9 @@
 NAME sync across duplicate roster rows (the 1410+ egg-hatch block mirrors the
 chart's canonical rows), persisted device-lifetime (saves/Shared/tree.txt ->
 tuipet's settings progress channel).  Audit 2026-07-06."""
-from tuipet import data, persistence
-from tuipet.egg import _conditions_met
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
+from tuipet.core.egg import _conditions_met
 
 
 def test_name_twins_share_one_canonical_num():

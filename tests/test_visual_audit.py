@@ -24,10 +24,12 @@ import itertools
 
 import pytest
 
-from tuipet import data, itemfx, placeholder
-from tuipet.anim import Roamer
+import tuipet.data.loaders.data as data
+from tuipet.utils import itemfx
+from tuipet.utils import placeholder
+from tuipet.utils.anim import Roamer
 from tuipet.app import SCREEN_COLS, SPRITE_W, Screen
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 UNKNOWN_NUM = 99999                     # no roster record -> wears the stand-in
 

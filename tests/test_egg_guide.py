@@ -4,8 +4,9 @@ The carousel stays available-only; the GUIDE is where every egg in the game
 shows its state and — verbatim from eggUnlock.csv — what earns it, with the
 live unlock_progress counter.  These tests pin the two-surface split, the
 verbatim-data rule, the 38-col / 12-row LCD budget, and the hint convention."""
-from tuipet import data, egg
-from tuipet.eggguidescreen import EggGuidePanel, _wrap
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.ui.screens.eggguidescreen import EggGuidePanel, _wrap
 
 
 def _rule(name):
@@ -27,7 +28,7 @@ def test_guide_lists_every_egg():
 def test_guide_page_jumps_and_clamps():
     """PageUp/PageDown page the 46-row list, lobby-chat style (grammar
     sweep 2026-07-18)."""
-    from tuipet.eggguidescreen import VIS
+    from tuipet.ui.screens.eggguidescreen import VIS
     pan = EggGuidePanel()
     pan.key("pagedown")
     assert pan.i == VIS - 1
@@ -112,7 +113,7 @@ def test_key_protocol():
 
 
 def test_strip_follows_the_hint_convention():
-    from tuipet import menu
+    from tuipet.ui.components import menu
     pan = EggGuidePanel()
     assert pan.strip() == menu.hints(("↑↓", "browse"), ("ENTER", "story"), ("ESC", "out"))
     pan.key("enter")
@@ -132,7 +133,7 @@ def test_e_opens_the_guide_in_the_real_app():
     title and home -- escape past it)."""
     import asyncio
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
 
     async def go():
         p = Pet(num=4, name="Rex", stage="Rookie", attribute="Vaccine")
@@ -174,12 +175,12 @@ def test_the_card_reveals_and_speaks_the_phase():
     """The card masked locked names as ??? while the guide's own list and
     detail header revealed them -- one policy now.  And its hints follow
     the phase: inside the story, the keys are the story's."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     locked = next((i for i, s in EggGuidePanel().states.items()
                    if s == "locked"), None)
     if locked is None:
         return                                     # a maxed profile: nothing locked
-    import tuipet.egg as egg_mod
+    import tuipet.core.egg as egg_mod
 
     class _App:                                    # the card protocol shim
         def __init__(self, m): self.mode, self.lines = m, []
@@ -208,9 +209,11 @@ def test_a_map_egg_tells_one_wrapped_story_everywhere():
     CLIPPED mid-word ("...(or fe"); the card clipped the same line at 26.
     One shared sentence now (data_meta.map_goal), wrapped on word
     boundaries in both panels, never sliced."""
-    from tuipet import data, data_meta, statusbox
-    from tuipet.eggguidescreen import EggGuidePanel
-    from tuipet.pet import Pet
+    import tuipet.data.loaders.data as data
+    from tuipet.ui.screens import data_meta
+    from tuipet.ui.components import statusbox
+    from tuipet.ui.screens.eggguidescreen import EggGuidePanel
+    from tuipet.core.pet import Pet
 
     rules = data.load_egg_unlock()
     idx = next(i for i, r in rules.items() if r.get("map") == 0)

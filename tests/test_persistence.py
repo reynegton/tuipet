@@ -6,8 +6,8 @@ All I/O is sandboxed by the autouse `isolate_save` fixture in conftest.
 import json
 import time
 
-from tuipet import persistence
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 def test_isolation_is_real(tmp_path):
@@ -150,7 +150,7 @@ def test_snapshot_ignores_egg():
 def test_dna_bank_rides_the_estate():
     """DNA polish 2026-07-17: the BANKED DNA (bits + mash paid for it) is
     device-lifetime like the bag; the CHARGED distribution dies with the pet."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.world_seconds = 600.0
     p.bits = 777
@@ -170,7 +170,8 @@ def test_the_persistence_split_holds_its_boundaries():
     save_failed flag (delegated via __getattr__); eggmigrate owns the bank
     tables; persistence keeps progress/estate and re-exports the old names."""
     import inspect
-    from tuipet import eggmigrate, persistio
+    from tuipet.core import eggmigrate
+    from tuipet.utils import persistio
     src = inspect.getsource(persistence)
     for name in ("_atomic_write_json", "_pick_save_dir", "_migrate_egg_index",
                  "acquire_instance_lock"):
@@ -191,7 +192,7 @@ def test_a_poisoned_egg_type_heals_at_load():
     the poisoned pet, so every launch died in the egg renderer.  A non-int
     egg_type must heal to a valid index at load, and the renderer itself
     must survive whatever reaches it."""
-    from tuipet import egg
+    from tuipet.core import egg
     p = Pet(num=-1, stage="Egg", attribute="None", egg_type=3)
     p.world_seconds = 100.0
     d = persistence.to_save_dict(p)

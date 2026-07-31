@@ -6,9 +6,12 @@ names its detected backend.  The erase is typed-YES gated and wipes the whole
 local state (the cloud copy stays with the account)."""
 import os
 
-from tuipet import optionsscreen, persistence, sound, theme
-from tuipet.optionsscreen import KeysPanel, OptionsPanel, SoundPanel, _ROWS
-from tuipet.pet import Pet
+from tuipet.ui.screens import optionsscreen
+from tuipet.utils import persistence
+from tuipet.utils import sound
+from tuipet.utils import theme
+from tuipet.ui.screens.optionsscreen import KeysPanel, OptionsPanel, SoundPanel, _ROWS
+from tuipet.core.pet import Pet
 
 
 def _panel(sound_on=None, **kw):
@@ -156,7 +159,7 @@ def test_account_row_hosts_the_switcher():
     """ENTER on Account opens the lobby AccountPanel; Esc keeps the login,
     a confirmed name+password closes options with the app's switch verdict.
     While the form is up, letters are TEXT (q must not quit)."""
-    from tuipet.lobbyscreen import AccountPanel
+    from tuipet.ui.screens.lobbyscreen import AccountPanel
     persistence.set_account("joel", "pw")
     pan, _ = _panel()
     _to(pan, "account")
@@ -327,8 +330,9 @@ def test_erase_flows_into_the_egg_carousel_not_an_auto_egg():
     lobby asks for a login when it's first opened, not before gameplay."""
     import asyncio
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
-    from tuipet import eggselectscreen, titlescreen
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens import eggselectscreen
+    from tuipet.ui.screens import titlescreen
 
     async def go():
         p = Pet(num=4, name="Rex", stage="Rookie", attribute="Vaccine")
@@ -358,11 +362,12 @@ def test_switch_account_app_flow(monkeypatch):
     save loads as the new pet; an empty account opens the egg carousel and
     the old local save must not leak in."""
     import asyncio
-    from tuipet import cloudsync, eggselectscreen
+    from tuipet.ui.screens import cloudsync
+    from tuipet.ui.screens import eggselectscreen
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
 
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     rec = data.load_sprites()[1][4]                # strict probe wants the DEX
     other = Pet(num=4, name=rec["name"],           # name/stage pairing exactly
                 stage=rec["stage"], attribute="Vaccine")
@@ -424,9 +429,10 @@ def test_switch_account_never_destroys_the_only_copy(monkeypatch):
     sync_down timestamp guard (a stale cloud save must not clobber a newer
     local pet) and never reaches delete()."""
     import asyncio
-    from tuipet import cloudsync, eggselectscreen
+    from tuipet.ui.screens import cloudsync
+    from tuipet.ui.screens import eggselectscreen
     from tuipet.app import TuiPetApp
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
 
     async def go():
         p = Pet(num=100, name="Champ", stage="Champion", attribute="Vaccine")
@@ -456,7 +462,7 @@ def test_switch_account_never_destroys_the_only_copy(monkeypatch):
                                  and not isinstance(app.mode,
                                                     eggselectscreen.EggSelectPanel))
             # 3) same-name re-login with a STALE cloud save: the pet stands
-            from tuipet import data
+            import tuipet.data.loaders.data as data
             rec = data.load_sprites()[1][4]
             other = Pet(num=4, name=rec["name"], stage=rec["stage"],
                         attribute="Vaccine")
@@ -510,7 +516,8 @@ def test_restart_offer_renders_its_own_page():
 
 
 def test_auto_off_still_names_the_version(monkeypatch):
-    from tuipet import optionsscreen, persistence
+    from tuipet.ui.screens import optionsscreen
+    from tuipet.utils import persistence
     pan, _ = _panel()
     monkeypatch.setattr(persistence, "get_auto_update", lambda: False)
     monkeypatch.setattr(optionsscreen.update_check, "current_version",
@@ -524,7 +531,7 @@ def test_install_completion_rides_the_verdict_channel(monkeypatch):
     with it.  The completion ALSO routes through the app's verdict channel
     -- parked under any mode, flashed back home."""
     import threading
-    from tuipet import update as update_check
+    from tuipet.utils import update as update_check
     verdicts = []
     done = threading.Event()
 
@@ -543,7 +550,7 @@ def test_install_completion_rides_the_verdict_channel(monkeypatch):
 def test_concurrent_upgrades_are_refused():
     """The in-flight latch lives at MODULE level (options audit 2026-07-19):
     the per-panel flag let a close/reopen race a second pip run."""
-    from tuipet import update as update_check
+    from tuipet.utils import update as update_check
     update_check._UPGRADING = True
     try:
         ok, msg = update_check.run_upgrade()

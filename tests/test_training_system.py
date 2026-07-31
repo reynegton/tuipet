@@ -6,7 +6,7 @@ monkeypatched to no-ops where a stray catch would muddy an assertion, and the
 fatigue roll is forced (randrange -> 0) or silenced (-> 99) as the test needs.
 """
 
-from tuipet.pet import (Pet)
+from tuipet.core.pet import (Pet)
 
 
 def _pet(**kw):

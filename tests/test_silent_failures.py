@@ -9,7 +9,7 @@ import importlib
 import os
 import tempfile
 
-from tuipet import persistence
+from tuipet.utils import persistence
 
 
 def test_a_rejected_cloud_save_is_heard_not_ignored():
@@ -18,7 +18,7 @@ def test_a_rejected_cloud_save_is_heard_not_ignored():
     saves).  The client had no "saved" branch, so a device whose lease was
     taken went on believing it was syncing while the server binned every
     push: cross-device progress vanished, silently."""
-    from tuipet.net import SyncClient
+    from tuipet.network.net import SyncClient
     c = SyncClient("ws://x", "joel")
     assert c.cloud_dropped is False
     c._handle('{"t": "saved", "ok": true}')
@@ -52,14 +52,14 @@ def test_a_bug_report_never_promises_a_send_it_cannot_make(monkeypatch):
         monkeypatch.setenv("HOME", home)
         for k in ("TUIPET_SAVE_DIR", "XDG_DATA_HOME"):
             monkeypatch.delenv(k, raising=False)
-        from tuipet import persistio
+        from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
         importlib.reload(persistence)
         assert persistence.add_pending_bug({"text": "x"}) is False, \
             "an unstashable report must say so"
     finally:
         os.chmod(home, 0o755)
-        from tuipet import persistio
+        from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
         importlib.reload(persistence)
 
@@ -83,7 +83,7 @@ def test_quarantine_notice_survives_the_new_game_flow(tmp_path, monkeypatch):
     first launch, the very thing the 07-14 sweep exists to prevent.  It
     rides the post-pick flash now."""
     import asyncio
-    from tuipet import persistence
+    from tuipet.utils import persistence
     monkeypatch.setattr(persistence, "SAVE_DIR", str(tmp_path))
     monkeypatch.setattr(persistence, "SAVE_PATH", str(tmp_path / "save.json"))
     monkeypatch.setattr(persistence, "SETTINGS_PATH", str(tmp_path / "settings.json"))

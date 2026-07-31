@@ -3,8 +3,9 @@ client pushed a rebuild-era save (stage 'Child', empty name, alien dex space)
 through the cloud probe; the local pet became a blank-named ghost that could
 never evolve.  The cloud boundary now REJECTS foreign formats; the local load
 REPAIRS them into a playable line pet instead of wiping to a fresh egg."""
-from tuipet import lines, persistence
-from tuipet.pet import Pet
+from tuipet.core import lines
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 def _foreign_save(**kw):

@@ -19,10 +19,12 @@ import os
 import sys
 
 
-from tuipet import data, egg, persistence
-from tuipet.net import LobbyClient
-from tuipet.pet import Pet
-from tuipet.raidscreen import RaidPanel
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.utils import persistence
+from tuipet.network.net import LobbyClient
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.raidscreen import RaidPanel
 
 
 def _srv(tmp_path):
@@ -94,7 +96,7 @@ def test_kill_archives_and_pays_rank_one_exactly_once(tmp_path):
     assert r["ok"] and r["defeated"] and r["rank"] == 1
     assert r["bits"] in (srv.RAID_RANK_BITS[1], int(srv.RAID_RANK_BITS[1] * 1.5))
     assert len(r["items"]) == srv.RAID_RANK_ITEMS[1]
-    from tuipet import shop
+    from tuipet.core import shop
     assert all(k in shop.CATALOG for k in r["items"])   # real TUIPET prizes
     assert not srv._raid_claim("joel", rid, now=1003.0)["ok"]   # double-claim refused
     # a bystander who never hit it has nothing to claim
@@ -332,7 +334,7 @@ def test_a_raid_bout_writes_nothing_on_the_pet():
     at the panel's report seam alone (Joel 2026-07-28 "bill the body
     only" -- see test_a_thrown_volley_bills_the_body_only), so a
     precompute, a preview or a test replay can never double-bill."""
-    from tuipet import battle as battle_mod
+    from tuipet.core import battle as battle_mod
     import random
     random.seed(3)
     p = _pet()
@@ -351,7 +353,7 @@ def test_a_thrown_volley_bills_the_body_only():
     progression channel (battles, log, exp, trainings, injury roll) --
     while the walk-away before the bell still costs nothing at all."""
     import random
-    from tuipet.petbase import BATTLE_ENERGY_COST, BATTLE_WEIGHT_COST
+    from tuipet.core.petbase import BATTLE_ENERGY_COST, BATTLE_WEIGHT_COST
 
     random.seed(3)
     pan = _panel()
@@ -455,7 +457,7 @@ def test_the_panel_reports_honestly_and_stays_live():
     cadence line promises the x1.5 the relay actually pays, never 2x."""
     import inspect
     from types import SimpleNamespace
-    from tuipet.raidscreen import RaidPanel
+    from tuipet.ui.screens.raidscreen import RaidPanel
 
     calls = []
     client = SimpleNamespace(state=SimpleNamespace(me_id=1),
@@ -537,8 +539,8 @@ def test_the_ready_bar_is_the_training_sprite():
     same sprite as the training slide bar'): the drill delegates to
     strikefx.timing_bar, and the battle/raid ready page renders that pixel
     bar over the arena — the old text-glyph track is gone."""
-    from tuipet import strikefx
-    from tuipet.training import TrainingPanel
+    from tuipet.utils import strikefx
+    from tuipet.core.training import TrainingPanel
     pan = _panel()
     pan.client.raid = _view(_mega())
     pan.key("space")                                 # open the bout
@@ -603,7 +605,7 @@ def test_the_walk_away_is_not_a_whiff():
 
 def test_unranked_shows_a_dash_not_rank_zero():
     """The rule moved to the CARD with the numbers (uncramp 2026-07-23)."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
 
     class _W:
         txt = ""
@@ -684,7 +686,7 @@ def test_the_volley_card_shows_the_pool_never_the_stub():
     """The status card during a raid volley showed the boss at 5/5 —
     RaidBout's display stub leaking through the battle card.  The card
     shows the COMMUNITY POOL now, and the player fights from 10."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     pan = _panel()
     pan.client.raid = _view(_mega())
     pan.anim()
@@ -737,7 +739,7 @@ def test_the_intro_never_shows_the_classic_five_on_a_raid_tank():
     10/10 when the battle starts' — the banner/reveal frames carry no HP
     and fell back to the classic literal 5.  The fallback is the panel's
     own raid-aware hud now: 10/10 from the first banner frame."""
-    from tuipet.battle import RAID_PLAYER_HP
+    from tuipet.core.battle import RAID_PLAYER_HP
     pan = _panel()
     pan.client.raid = _view(_mega())
     pan.anim()

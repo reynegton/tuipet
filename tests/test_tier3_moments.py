@@ -1,10 +1,11 @@
 """Tier-3 professionalism pins (sweep 2026-07-14): moment framing.  The game
 already computed what happened while you were away, which firsts fell, and
 which generations came before -- it just never SAID any of it."""
-from tuipet import data, persistence
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
 from tuipet.app import TuiPetApp
-from tuipet.digicorescreen import _legacy_rows, _trophy_rows
-from tuipet.pet import Pet
+from tuipet.ui.screens.datacorescreen import _legacy_rows, _trophy_rows
+from tuipet.core.pet import Pet
 
 
 # ---- the welcome back went with the offline catch-up ----------------------

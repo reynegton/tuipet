@@ -8,9 +8,9 @@ tuipet's declared tuning: EXP_PER_WIN=100 (the manual leaves the award
 unspecified), PvP excluded like KO6.  The old DVPet getLevel read powers +
 trained HP -- both starved by the 0.5 conversions, walling all 73 LV atoms.
 """
-from tuipet import lines
-from tuipet.lines import DMX_EXP_LEVELS, DMX_LEVEL_CAP, _pet_level
-from tuipet.pet import Pet, EXP_PER_WIN
+from tuipet.core import lines
+from tuipet.core.lines import DMX_EXP_LEVELS, DMX_LEVEL_CAP, _pet_level
+from tuipet.core.pet import Pet, EXP_PER_WIN
 
 
 def _pet(stage="Ultimate", exp=0):

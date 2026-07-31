@@ -1,5 +1,5 @@
 """Missed-day / birthday vs DVPet setTimeToAge + _mistakeDay + _bonus."""
-from tuipet.pet import (Pet, DAY_LENGTH,
+from tuipet.core.pet import (Pet, DAY_LENGTH,
                         GOOD_BIRTHDAY_FOOD, BAD_BIRTHDAY_FOOD, NORMAL_BIRTHDAY_FOOD)
 # (the BonusLifeInc/Dec legs left with the lifespan clock -- DSprite
 # mortality 2026-07-22; birthdays move evol_bonus and treats only)
@@ -16,7 +16,7 @@ def _pet(**kw):
 
 def test_good_birthday_needs_happy_majority_and_zero_slips():
     p = _pet(mistake_day=0)
-    p.daily_mood = {"Happy": 100, "Neutral": 10, "Unhappy": 0, "Depressed": 0}
+    p.daily_mood = {"Feliz": 100, "Neutro": 10, "Triste": 0, "Deprimido": 0}
     bonus0 = p.evol_bonus
     p._birthday()
     assert p.evol_bonus == bonus0 + 1
@@ -26,7 +26,7 @@ def test_good_birthday_needs_happy_majority_and_zero_slips():
 
 def test_one_slip_spoils_the_good_birthday():
     p = _pet(mistake_day=1)
-    p.daily_mood = {"Happy": 100, "Neutral": 0, "Unhappy": 0, "Depressed": 0}
+    p.daily_mood = {"Feliz": 100, "Neutro": 0, "Triste": 0, "Deprimido": 0}
     p._birthday()
     assert p.evol_bonus == 0                                    # normal day: no credit
     assert p.inventory.get(NORMAL_BIRTHDAY_FOOD) == 1           # a Cookie
@@ -34,7 +34,7 @@ def test_one_slip_spoils_the_good_birthday():
 
 def test_bad_birthday_costs_bonus():
     p = _pet(mistake_day=3, evol_bonus=2)
-    p.daily_mood = {"Happy": 0, "Neutral": 5, "Unhappy": 50, "Depressed": 0}
+    p.daily_mood = {"Feliz": 0, "Neutro": 5, "Triste": 50, "Deprimido": 0}
     p._birthday()
     assert p.evol_bonus == 1
     assert p.inventory.get(BAD_BIRTHDAY_FOOD) == 1              # consolation Candy
@@ -42,7 +42,7 @@ def test_bad_birthday_costs_bonus():
 
 def test_mood_tie_yields_a_normal_day():
     p = _pet(mistake_day=0)
-    p.daily_mood = {"Happy": 50, "Neutral": 50, "Unhappy": 0, "Depressed": 0}
+    p.daily_mood = {"Feliz": 50, "Neutro": 50, "Triste": 0, "Deprimido": 0}
     bonus0 = p.evol_bonus
     p._birthday()
     assert p.evol_bonus == bonus0                               # getMajority tie -> None

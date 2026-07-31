@@ -6,8 +6,8 @@ training/battle/tournament/digicore scenes washed the sprite white.
 SIL_LIGHTSOFF is reserved for the lights-off dark room (pure-black bg)."""
 from rich.console import Console
 
-from tuipet.pet import Pet
-from tuipet import theme
+from tuipet.core.pet import Pet
+from tuipet.utils import theme
 import tuipet.app as app
 
 
@@ -60,7 +60,9 @@ def test_night_care_fx_keep_the_dark_silhouette():
 
 
 def test_night_scene_screens_keep_the_dark_silhouette():
-    from tuipet import training, battlescreen, battle
+    from tuipet.core import training
+    from tuipet.ui.screens import battlescreen
+    from tuipet.core import battle
     p = _pet()
     p.energy = p.max_energy
     p.check_refused = lambda **kw: False

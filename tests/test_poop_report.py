@@ -43,10 +43,11 @@ constant.
 """
 import pytest
 
-from tuipet import arenafx, data
-from tuipet import lines as L
-from tuipet.pet import DAY_LENGTH, Pet
-from tuipet.petbase import (POOP_INTERVAL_BASE, POOP_SIZE_FITTING_MAX,
+from tuipet.utils import arenafx
+import tuipet.data.loaders.data as data
+from tuipet.core import lines as L
+from tuipet.core.pet import DAY_LENGTH, Pet
+from tuipet.core.petbase import (POOP_INTERVAL_BASE, POOP_SIZE_FITTING_MAX,
                             POOP_SPREAD_CAP)
 
 PXH = arenafx.SCREEN_ROWS * 2

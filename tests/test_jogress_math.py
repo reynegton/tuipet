@@ -22,8 +22,9 @@ Fixed (canon divergences):
 import math
 import random
 
-from tuipet.pet import Pet, dna_field_for_rate, MAX_DNA_INVENTORY
-from tuipet import jogress, evolution
+from tuipet.core.pet import Pet, dna_field_for_rate, MAX_DNA_INVENTORY
+from tuipet.core import jogress
+from tuipet.core import evolution
 
 
 def _pet(**kw):

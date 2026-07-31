@@ -27,9 +27,10 @@ import dataclasses
 
 import pytest
 
-from tuipet import shop, persistence
-from tuipet.pet import Pet
-from tuipet.petbase import _Refused
+from tuipet.core import shop
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import _Refused
 
 
 def _pet(**kw):
@@ -48,7 +49,7 @@ def test_the_grow_capsule_buys_a_quarter_of_the_STAGE():
 
     ⚠ THE UNIT LAW still governs the constant it replaced: 7200 was
     "+120min" read as REAL minutes, 2.5x the longest stage in the game."""
-    from tuipet.petbase import GROW_CAPSULE_FRACTION
+    from tuipet.core.petbase import GROW_CAPSULE_FRACTION
     for stage in ("InTraining", "Rookie", "Champion", "Ultimate"):
         p = _pet(stage=stage)
         p.stage_seconds = 0.0
@@ -135,7 +136,7 @@ def test_a_spent_deal_warns_before_it_charges_full_price(monkeypatch):
     """The one-press guard (the bag's `_retarget` grammar): the ration runs
     out mid-mash and the row keeps selling at full price -- so the next
     ENTER must SAY the price changed instead of quietly taking 4x."""
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     p = _pet()
     key = shop.home_deal_key()
     p.town_bought = {"day": shop._today_ordinal(),

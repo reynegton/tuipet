@@ -16,9 +16,11 @@ thing this fixes -- so the pins guard the accounting hard.
 """
 import random
 
-from tuipet import adventure as adv, persistence, shop
-from tuipet.pet import Pet
-from tuipet.petbase import WILD_MEMORY_MIN, WILD_MEMORY_MAX, _Refused
+from tuipet.core import adventure as adv
+from tuipet.utils import persistence
+from tuipet.core import shop
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import WILD_MEMORY_MIN, WILD_MEMORY_MAX, _Refused
 
 
 def _pet():
@@ -42,7 +44,7 @@ def test_a_wild_payload_is_a_small_single_attribute_trace():
 
 def test_a_wild_trace_is_weaker_than_the_base_chip():
     """A free road find must not out-punch a 1500b rare chip."""
-    from tuipet.petbase import _clamp  # noqa: F401  (sanity that the module loads)
+    from tuipet.core.petbase import _clamp  # noqa: F401  (sanity that the module loads)
     assert WILD_MEMORY_MAX < 15 or WILD_MEMORY_MAX == 15
     # the base chip grants +15; the wild ceiling is at most that, never more
     assert WILD_MEMORY_MAX <= 15

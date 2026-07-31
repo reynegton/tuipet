@@ -4,10 +4,10 @@ Pins the loot roll: a marched step may spot a find from the zone's own loot
 table (rand_items/rand_foods); the player digs it into the bag or walks on;
 towns are safe rest, not scavenging (no finds).
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES
-from tuipet.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES
+from tuipet.ui.screens.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -34,7 +34,7 @@ def _spot(pan):
 
 
 def test_every_real_zone_has_a_loot_pool_of_named_consumables():
-    from tuipet import shop
+    from tuipet.core import shop
     for z in ZONES:
         assert z["find_keys"]                          # 26/26 have loot
         for k in z["find_keys"]:
@@ -69,7 +69,7 @@ def test_find_pools_key_on_the_biome_not_the_slot():
 
 def test_the_final_zone_of_every_map_digs_the_rare_tier():
     """The endgame used to dig exactly ONE item (the chip)."""
-    from tuipet.adventure import FINAL_ZONE_FINDS, _ROAD_KEYS
+    from tuipet.core.adventure import FINAL_ZONE_FINDS, _ROAD_KEYS
     for m in sorted({z["map"] for z in ZONES}):
         last = max(z["zone"] for z in ZONES if z["map"] == m)
         pool = _by_mz(m, last)["find_keys"]
@@ -82,8 +82,8 @@ def test_the_road_feeds_you_and_carries_its_tools():
     """Audit F3: 18 items were never finds -- including every food except
     tuna and candy.  Fish by the water now, and the road items ride
     every pool."""
-    from tuipet import shop
-    from tuipet.adventure import _ROAD_KEYS
+    from tuipet.core import shop
+    from tuipet.core.adventure import _ROAD_KEYS
     findable = set()
     for z in ZONES:
         assert set(_ROAD_KEYS) <= set(z["find_keys"]), z["name"]
@@ -138,7 +138,7 @@ def test_the_discover_sequence_plays_out_and_resumes_the_march(monkeypatch):
     up X!" verdict (with the reward chime) at the reveal, carries the find
     back, and puts the mon back on the road -- input locked throughout (no
     skips: own-game law)."""
-    from tuipet.adventurescreen import (INV_WALK_T, INV_REVEAL_T, INV_END_T)
+    from tuipet.ui.screens.adventurescreen import (INV_WALK_T, INV_REVEAL_T, INV_END_T)
     monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "FIND_CHANCE", 1.0)
@@ -176,7 +176,7 @@ def test_the_discover_sequence_plays_out_and_resumes_the_march(monkeypatch):
 def _at_the_meter(monkeypatch, p=None):
     """Spot a glint, ENTER, walk out -- returns (pan, key) with the timed-dig
     meter live."""
-    from tuipet.adventurescreen import INV_WALK_T
+    from tuipet.ui.screens.adventurescreen import INV_WALK_T
     monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "FIND_CHANCE", 1.0)
@@ -194,7 +194,8 @@ def test_the_timed_dig_meter_is_the_canon_bar(monkeypatch):
     """At the dig spot the CANON timing bar owns the window -- the same
     sprite and mega window as the training drill and the battle bell (one
     bar everywhere) -- with the dig hint on the strip."""
-    from tuipet import menu, strikefx
+    from tuipet.ui.components import menu
+    from tuipet.utils import strikefx
     pan, _key = _at_the_meter(monkeypatch)
     m = pan._scene["meter"]
     calls = []
@@ -212,7 +213,7 @@ def test_a_mega_lock_banks_a_second_copy(monkeypatch):
     """Inside the mega window the dig pays DOUBLE -- pinned through the
     verbatim battles>=999 never-whiff rule the drill and the bell share --
     and the reveal verdict says x2."""
-    from tuipet.adventurescreen import INV_REVEAL_T
+    from tuipet.ui.screens.adventurescreen import INV_REVEAL_T
     p = _pet()
     p.battles = 999                                    # never whiffs (DSprite truth)
     pan, key = _at_the_meter(monkeypatch, p)
@@ -232,7 +233,7 @@ def test_a_wide_miss_still_keeps_the_find(monkeypatch):
     """The meter is pure upside: a wide miss scrapes the find out all the
     same -- one copy, nothing lost -- only the verdict (and the cancel
     thunk) says you blew the timing."""
-    from tuipet.battlescreen import BAR_MAX
+    from tuipet.ui.screens.battlescreen import BAR_MAX
     pan, key = _at_the_meter(monkeypatch)
     p = pan.pet
     before = p.inventory.get(key, 0)
@@ -248,7 +249,7 @@ def test_the_dig_meter_times_out_and_locks_itself(monkeypatch):
     """No press: the countdown burns out and the spade falls wherever the
     marker stands -- the sequence still plays to its end and the march
     resumes (the show never hangs on a missing hand)."""
-    from tuipet.adventurescreen import DIG_METER_T, INV_END_T
+    from tuipet.ui.screens.adventurescreen import DIG_METER_T, INV_END_T
     pan, _key = _at_the_meter(monkeypatch)
     for _ in range(DIG_METER_T + 2):
         pan.anim()
@@ -264,7 +265,7 @@ def test_the_dig_meter_times_out_and_locks_itself(monkeypatch):
 def test_the_glint_wears_the_attention_bounce(monkeypatch):
     """Waiting at a glint, the mon plays the DiscoverCall attention bounce
     (happy poses) instead of a mute stand -- restored old-build behavior."""
-    from tuipet import menu
+    from tuipet.ui.components import menu
     monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
     monkeypatch.setattr(adventure, "FIND_CHANCE", 1.0)

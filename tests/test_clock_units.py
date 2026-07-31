@@ -15,7 +15,7 @@ documented in pet.py and pinned here so a future audit cannot "correct" them:
 """
 import inspect
 
-from tuipet import pet as P
+from tuipet.core import pet as P
 
 
 def test_the_clock_maps_a_game_minute_to_a_real_second():
@@ -82,9 +82,14 @@ def test_good_care_is_never_punished_by_the_faster_pressure():
 def test_the_pet_split_holds_its_boundaries():
     """Tier-5 (2026-07-17): pet.py is the identity/evolution core composing
     four mixins; constants live in petbase and star-import back, so
-    `from tuipet.pet import ANYTHING` never moved."""
+    `from tuipet.core.pet import ANYTHING` never moved."""
     import inspect
-    from tuipet import pet, petbase, petbattle, petbody, petcare, petdna
+    from tuipet.core import pet
+    from tuipet.core import petbase
+    from tuipet.core import petbattle
+    from tuipet.core import petbody
+    from tuipet.core import petcare
+    from tuipet.core import petdna
     mro = pet.Pet.__mro__
     for m in (petcare.CareMixin, petdna.DnaMixin,
               petbattle.BattleMixin, petbody.BodyMixin):

@@ -3,9 +3,10 @@
 Pins: a town cup is its OWN trophy (id 900+, never a home cup), an open bracket
 run by the real Tournament engine, a stake + purse, and one entry per town visit.
 """
-from tuipet import tournament, persistence
-from tuipet.townscreen import TownPanel, _MENU
-from tuipet.pet import Pet
+from tuipet.core import tournament
+from tuipet.utils import persistence
+from tuipet.ui.screens.townscreen import TownPanel, _MENU
+from tuipet.core.pet import Pet
 
 
 def _pet(bits=5000):
@@ -110,12 +111,12 @@ def test_an_unfit_pet_is_refused_at_the_town_gate_too():
 def test_the_trophy_room_names_town_cups():
     """trophy_name speaks every id space: home labels, Town Cup #N for the
     900+ road trophies, the raw fallback only for truly unknown ids."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     home = data.load_tournies()[0]
     assert tournament.trophy_name(home["id"]) == tournament.trophy_label(home)
     assert tournament.trophy_name(tournament.TOWN_TROPHY_BASE + 11) == "Town Cup #12"
     assert tournament.trophy_name(899) == "cup 899"   # not a town, not a cup
-    from tuipet import digicore
+    from tuipet.core import digicore
     p = _pet()
     p.trophies_won = {tournament.TOWN_TROPHY_BASE + 3: "day 2"}
     rows = digicore._trophy_rows(p)

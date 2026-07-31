@@ -6,8 +6,10 @@ threshold steers evolution onto the graph's next-stage edge in that Field.
 Unarmed pets must be bit-identical to before (the goldens enforce the rest).
 """
 
-from tuipet import data, evolution, lines
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import evolution
+from tuipet.core import lines
+from tuipet.core.pet import Pet
 
 
 def mk(num, stage, lid="ver1", charge=None):
@@ -85,7 +87,7 @@ def test_divergence_roads_maps_the_doors():
 def test_dna_screen_surfaces_the_roads():
     """Legibility (arc 2): the Divergence page lists the fields' wild roads,
     the charge page marks road-bearing fields, and arming shows on the tag."""
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     p = mk(29, "Rookie")
     pan = DNAPanel(p)
     assert "DeepSaver" in pan._roads and pan._armed() == ""

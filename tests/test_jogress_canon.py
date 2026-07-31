@@ -12,8 +12,10 @@ canon); the name-intersection channel let two WarGreymons mirror-fuse
 both-or-neither lobby could never open -- the COMPANION role fixes it.
 (Alphamon Ouryuken stays out: Ouryuken isn't in the DVPet roster.)
 """
-from tuipet import data, jogress, lines
-from tuipet.pet import Pet, DP_MAX
+import tuipet.data.loaders.data as data
+from tuipet.core import jogress
+from tuipet.core import lines
+from tuipet.core.pet import Pet, DP_MAX
 
 # canon one-sided doors: the companion never evolves (wikimon/humulos DMX3)
 ONE_SIDED = {(863, 1),          # Jesmon X companion -> Jesmon GX (x3a/x3b)

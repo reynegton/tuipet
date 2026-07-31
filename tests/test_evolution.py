@@ -14,7 +14,7 @@ Graph-only; no randomness, so these are stable. Skips if sprite assets are absen
 """
 import pytest
 
-from tuipet import data
+import tuipet.data.loaders.data as data
 
 STAGE = {s: i for i, s in enumerate(data.STAGE_ORDER)}
 MEGA = STAGE["Mega"]

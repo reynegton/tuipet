@@ -2,8 +2,8 @@
 bowel gauge, sleep holds it to 2x, backlog makes a bigger pile.  (Placement
 law lives in test_poop_placement.py.)  NOTE: poop does NOT touch hunger --
 the coupling is eat -> bmGauge -> poop -> weight, one-directional."""
-from tuipet.pet import Pet
-from tuipet import data
+from tuipet.core.pet import Pet
+import tuipet.data.loaders.data as data
 
 
 def _pet(**kw):

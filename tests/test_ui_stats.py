@@ -11,8 +11,8 @@ import pytest
 from rich.text import Text
 
 from tuipet.app import Stats, _status_line
-from tuipet.pet import Pet
-from tuipet import data
+from tuipet.core.pet import Pet
+import tuipet.data.loaders.data as data
 
 INNER_W = 26
 INNER_H = 16
@@ -116,7 +116,7 @@ def test_status_line_no_deco():
 def test_footer_literals_fit_width():
     import pathlib
     import re
-    from tuipet import menu
+    from tuipet.ui.components import menu
     srcdir = pathlib.Path(__file__).resolve().parents[1] / "src" / "tuipet"
     over = []
     for f in sorted(srcdir.glob("*.py")):

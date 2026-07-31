@@ -5,9 +5,9 @@ cost ~20 timed presses, round boundaries must not eat skip input, the
 hurry keys must be discoverable on the strip, and a sick pet's feed
 menu must open on the cure the HUD just told you to give.
 """
-from tuipet.battlescreen import SKIP_DEBOUNCE, BattlePanel
-from tuipet.feedscreen import FeedPanel
-from tuipet.pet import Pet
+from tuipet.ui.screens.battlescreen import SKIP_DEBOUNCE, BattlePanel
+from tuipet.ui.screens.feedscreen import FeedPanel
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -101,7 +101,7 @@ def test_feed_opens_on_the_pill_when_sick_and_meat_when_well():
 # ============ Batch 2: menus & shops =========================================
 
 def _fresh_shop(pet=None, **kw):
-    from tuipet import shopscreen
+    from tuipet.ui.screens import shopscreen
     shopscreen._LAST_POS.clear()
     return shopscreen.ShopPanel(pet or _pet(bits=5000), **kw)
 
@@ -109,8 +109,8 @@ def _fresh_shop(pet=None, **kw):
 # ---- M1/M6: album + egg guide wrap; detail views page ----------------------
 
 def test_album_and_eggguide_lists_wrap_both_ends():
-    from tuipet.albumscreen import AlbumPanel
-    from tuipet.eggguidescreen import EggGuidePanel
+    from tuipet.ui.screens.albumscreen import AlbumPanel
+    from tuipet.ui.screens.eggguidescreen import EggGuidePanel
     for pan in (AlbumPanel(_pet()), EggGuidePanel()):
         pan.key("up")
         assert pan.i == pan.n - 1, type(pan).__name__   # top wraps to bottom
@@ -119,7 +119,7 @@ def test_album_and_eggguide_lists_wrap_both_ends():
 
 
 def test_detail_views_honor_the_page_keys():
-    from tuipet.albumscreen import AlbumPanel
+    from tuipet.ui.screens.albumscreen import AlbumPanel
     pan = AlbumPanel(_pet())
     pan.key("enter")                       # open the book
     assert pan.detail
@@ -153,7 +153,7 @@ def test_shop_bag_toggle_keeps_both_positions():
     p = _pet(bits=5000)
     p.add_item("energy_drink")
     p.add_item("energy_drink")
-    from tuipet import shopscreen
+    from tuipet.ui.screens import shopscreen
     pan = shopscreen.ShopPanel(p)
     pan.key("right")
     pan.key("down")
@@ -165,7 +165,7 @@ def test_shop_bag_toggle_keeps_both_positions():
 
 
 def test_home_shop_reopens_where_you_left_off():
-    from tuipet import shopscreen
+    from tuipet.ui.screens import shopscreen
     p = _pet(bits=5000)
     pan = _fresh_shop(p)
     pan.key("right")
@@ -216,7 +216,7 @@ def test_moving_the_cursor_disarms_the_retarget_guard():
 # ---- M3: affordability at a glance ------------------------------------------
 
 def test_unaffordable_shelf_rows_render_dim():
-    from tuipet.theme import DIM
+    from tuipet.utils.theme import DIM
     pan = _fresh_shop(_pet(bits=0))        # broke: everything is short
     out = pan.text()
     assert any(sp.style == DIM and out.plain[sp.start:sp.end].strip()
@@ -230,7 +230,7 @@ def test_menu_family_footers_are_gone():
     """The Sound footer said "↑↓ pick ENTER go" while its strip said
     "←→ volume · ENTER hear it" -- both visible at once.  The strip is
     the single key surface now (QOL 2026-07-23)."""
-    from tuipet.optionsscreen import OptionsPanel, SoundPanel
+    from tuipet.ui.screens.optionsscreen import OptionsPanel, SoundPanel
     from tuipet.themescreen import ThemePanel
     sp = SoundPanel(lambda: True, lambda: None)
     assert "ENTER go" not in sp.text().plain
@@ -246,7 +246,7 @@ def test_menu_family_footers_are_gone():
 # ---- C3/C4: standing buffs + the hired helper are visible at home -----------
 
 def test_satiety_and_autoclean_wear_home_badges():
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     p = _pet(world_seconds=1000.0)
     plain = " ".join(statusbox.care_deco(p))
     assert "sated" not in plain and "tidy" not in plain
@@ -260,7 +260,7 @@ def test_satiety_and_autoclean_wear_home_badges():
 
 
 def test_the_hired_assistant_wears_a_home_badge():
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     p = _pet()
     assert "helper" not in " ".join(statusbox.care_deco(p))
     p.set_auto_care(True)
@@ -277,8 +277,8 @@ def test_low_manners_wears_the_rude_badge():
     The +rude badge is the on-card tell that disobedience is EARNED.  Boundary
     matches manners_refusal exactly: refusals need obedience STRICTLY below the
     threshold, so the badge does too (at the line, a pet never refuses)."""
-    from tuipet import statusbox
-    from tuipet.petbase import DISOBEY_BELOW, MAX_OBEDIENCE
+    from tuipet.ui.components import statusbox
+    from tuipet.core.petbase import DISOBEY_BELOW, MAX_OBEDIENCE
     p = _pet()
     p.obedience = DISOBEY_BELOW                 # at the line: never refuses
     assert "rude" not in " ".join(statusbox.care_deco(p))
@@ -294,7 +294,7 @@ def test_injury_wears_a_badge_even_when_sick_owns_the_word():
     'sick' -- and injury takes a BANDAGE, a different cure than the pill.  The
     badge surfaces the second ailment, suppressing only when 'injured' already
     IS the word (no redundancy, mirroring +sick)."""
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     p = _pet()
     assert "hurt" not in " ".join(statusbox.care_deco(p))
     p.injured = True
@@ -334,7 +334,7 @@ class _CardApp:
 
 
 def _feed_card(pet, cursor):
-    from tuipet import statusbox
+    from tuipet.ui.components import statusbox
     pan = FeedPanel(pet)
     pan.cursor = cursor
     app = _CardApp(pet, pan)
@@ -347,7 +347,7 @@ def test_feed_card_flags_a_refusable_meat_row():
     assert "refused — sick" in _feed_card(p, 0)
     p = _pet(poop=2)
     assert "refused — clean first" in _feed_card(p, 0)
-    from tuipet.petcare import FULL_HUNGER
+    from tuipet.core.petcare import FULL_HUNGER
     p = _pet(hunger=FULL_HUNGER)
     assert "refused — belly is full" in _feed_card(p, 0)
     assert "refused" not in _feed_card(_pet(hunger=1), 0)   # feedable: no flag
@@ -381,7 +381,7 @@ def test_space_is_a_gift_alias_on_the_home_view():
 # ---- O1/O4: fast-fail connects, hurryable backoff ---------------------------
 
 def test_the_live_socket_caps_its_open_and_offers_a_hurry():
-    from tuipet.net import _WsClient
+    from tuipet.network.net import _WsClient
     assert _WsClient._open_timeout <= 6.0     # a dead host fails FAST
     c = _WsClient.__new__(_WsClient)
     c.retry_now()
@@ -431,7 +431,7 @@ def test_retry_now_cuts_the_backoff_and_resets_the_ramp():
 # ---- O2: a first-ever failed connect never claims a lost connection ---------
 
 def test_first_connect_failure_is_not_a_lost_connection():
-    from tuipet import lobbyscreen
+    from tuipet.ui.screens import lobbyscreen
     pan = lobbyscreen.LobbyPanel.__new__(lobbyscreen.LobbyPanel)
     pan.client = type("C", (), {"_had_welcome": False})()
     assert "Can't reach the lobby" in pan._down_status()
@@ -442,7 +442,7 @@ def test_first_connect_failure_is_not_a_lost_connection():
 # ---- O6: the ladder page can time out and retry -----------------------------
 
 def test_a_stalled_ladder_fetch_says_so_and_tab_retries():
-    from tuipet import lobbyscreen
+    from tuipet.ui.screens import lobbyscreen
     pan = lobbyscreen.LobbyPanel.__new__(lobbyscreen.LobbyPanel)
     pan.pet, pan.phase, pan.sub = _pet(), "ladder", None
     asked = {"n": 0}
@@ -464,7 +464,7 @@ def test_a_stalled_ladder_fetch_says_so_and_tab_retries():
 # ---- O7/O8: the account panel -----------------------------------------------
 
 def test_login_note_marquees_instead_of_clipping():
-    from tuipet.accountscreen import AccountPanel
+    from tuipet.ui.screens.accountscreen import AccountPanel
     long_note = ("That name is already registered — pick another one "
                  "or type its password to log in.")
     pan = AccountPanel(note=long_note)
@@ -475,7 +475,7 @@ def test_login_note_marquees_instead_of_clipping():
 
 
 def test_password_peeks_its_last_char_only_while_typing():
-    from tuipet.accountscreen import AccountPanel
+    from tuipet.ui.screens.accountscreen import AccountPanel
     pan = AccountPanel()
     for ch in "joel":
         pan.key(ch)
@@ -492,7 +492,7 @@ def test_password_peeks_its_last_char_only_while_typing():
 # ---- O10: the town hub keeps your last pick for the session -----------------
 
 def test_town_hub_remembers_the_last_choice():
-    from tuipet import townscreen
+    from tuipet.ui.screens import townscreen
     townscreen._LAST_CURSOR[0] = 0
     pan = townscreen.TownPanel(_pet(), town_id=0)
     pan.key("down")

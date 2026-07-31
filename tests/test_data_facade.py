@@ -4,7 +4,11 @@ its owner; no loader body remains in data.py; the domains hold what the
 plan assigned them."""
 import inspect
 
-from tuipet import data, data_core, data_meta, data_shop, data_world
+import tuipet.data.loaders.data as data
+from tuipet.data.loaders import data_core
+from tuipet.data.loaders import data_meta
+from tuipet.data.loaders import data_shop
+from tuipet.data.loaders import data_world
 
 
 def test_facade_is_thin_and_complete():

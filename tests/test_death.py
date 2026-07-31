@@ -12,7 +12,7 @@ eggs are immune, a dead pet stays frozen, and feeding resets the starvation cloc
 A healthy pet is constructed (hunger full, no filth) so the only death is the one
 under test. num=-1 keeps tick() deterministic and sprite-free.
 """
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _healthy(stage="Rookie", **kw):
@@ -60,7 +60,7 @@ def test_starvation_clock_resets_when_fed():
 
 def test_the_hazard_roll_is_fatal(monkeypatch):
     # the DSprite roll (2026-07-22): mistakes bracket + age bracket, one roll
-    import tuipet.petbody as body
+    import tuipet.core.petbody as body
     monkeypatch.setattr(body.random, "random", lambda: 0.0)
     p = _healthy(care_mistakes=5)
     p.tick(0.1)
@@ -104,7 +104,7 @@ def test_save_from_death_restores_life_and_costs_bonus():
 
 
 def test_death_evolution_fires_when_a_dark_form_accepts():
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     # find any form with a Death-special evolution target
     src = next(n for n, targets in data.load_evolutions().items()
                if any(data.load_requirements().get(t, {}).get("special") == "Death"
@@ -138,7 +138,7 @@ def test_memorial_grave_beat_absorbs_the_save_mash():
     """Canon deading(): 20 ticks of just the grave (dieLoop -> error, x2)
     before the memorial takes input -- without it the frantic save-mash
     overshoots INTO the memorial, where 'n' starts a new egg unread."""
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus", dead=True)
     p.world_seconds = 12 * 60.0
     pan = DeathPanel(p, hold=20)
@@ -164,7 +164,7 @@ def test_memorial_grave_beat_absorbs_the_save_mash():
 def test_revive_bar_rises_with_each_rescue():
     """dying(): numHits > HitsToSave x (savedFromDeath + 1) -- every rescue
     doubles down on the next one's mash bar."""
-    from tuipet.pet import HITS_TO_SAVE
+    from tuipet.core.pet import HITS_TO_SAVE
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus")
     p.world_seconds = 12 * 60.0
     assert p.saved_from_death == 0
@@ -195,7 +195,7 @@ def test_a_between_ticks_death_still_gets_the_dying_beat():
     un-ceremonied pet with no dying fx in flight starts the beat on the
     next tick, wherever the death landed."""
     import asyncio
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     from tuipet.app import TuiPetApp
     _, by = data.load_sprites()
     num = next((n for n, r in by.items()

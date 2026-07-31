@@ -2,8 +2,9 @@
 egg rules (Chibickmon 10 / V 25 / Slayerdra 30 / Sakumon 50 / Zuba 60).
 The unlock-spread pass (2026-07-20) moved Hack to the cup axis and X3 to the
 Mega axis, so they no longer ride wins (DORU carries the festival axis)."""
-from tuipet.pet import Pet
-from tuipet import egg, persistence
+from tuipet.core.pet import Pet
+from tuipet.core import egg
+from tuipet.utils import persistence
 
 
 def _pet(**kw):

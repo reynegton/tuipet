@@ -4,8 +4,9 @@ import random
 
 import pytest
 
-from tuipet.pet import Pet
-from tuipet import data, jogress
+from tuipet.core.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import jogress
 
 
 def _jogress_parent():
@@ -58,15 +59,17 @@ def test_dp_refusal_names_only_the_refill_that_exists():
     sleep is the ONE refill since nutrition left (jogress audit 2026-07-19).
     The sick-partner catch stays a deliberately dormant canon record."""
     import inspect
-    from tuipet import jogress
-    from tuipet.pet import Pet, DP_MAX
+    from tuipet.core import jogress
+    from tuipet.core.pet import Pet, DP_MAX
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.world_seconds = 600.0
     p.dp = DP_MAX - 1
     msg = jogress.can_jogress(p)
     assert msg and "sleep" in msg and "protein" not in msg
     # the one DP grant in the codebase is the sleep tick
-    from tuipet import petbody, petcare, shop
+    from tuipet.core import petbody
+    from tuipet.core import petcare
+    from tuipet.core import shop
     assert "dp += 1" in inspect.getsource(petbody)
     for mod in (petcare, shop):
         assert "dp +=" not in inspect.getsource(mod)

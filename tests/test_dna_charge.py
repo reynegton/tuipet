@@ -5,8 +5,8 @@ gauge: charging DNA nudges Effort UP toward a ceiling of limit-1 (=3, "DNA
 can't top you off"), but it is a CEILING, never a penalty -- a pet already
 trained to full 4 keeps its heart (DNA audit 2026-07-08).
 """
-from tuipet import data
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 
 
 def _pet():
@@ -51,7 +51,7 @@ def test_classic_wager_is_untouched():
 
 
 def test_premium_volume_caps_at_the_bank_and_never_refunds():
-    from tuipet.pet import MAX_DNA_INVENTORY
+    from tuipet.core.pet import MAX_DNA_INVENTORY
     p = _pet()
     p.bits = 0
     p.dna_owned["DragonsRoar"] = 0
@@ -61,7 +61,7 @@ def test_premium_volume_caps_at_the_bank_and_never_refunds():
 
 
 def test_owned_overflow_still_refunds_like_the_device():
-    from tuipet.pet import MAX_DNA_INVENTORY
+    from tuipet.core.pet import MAX_DNA_INVENTORY
     p = _pet()
     p.bits = 0
     p.dna_owned["DragonsRoar"] = 90
@@ -71,7 +71,7 @@ def test_owned_overflow_still_refunds_like_the_device():
 
 
 def test_stabilized_wager_never_spoils():
-    from tuipet.pet import DNA_STABILIZER_BET
+    from tuipet.core.pet import DNA_STABILIZER_BET
     p = _pet()
     # an over-mash (>80) and an under-mash (<=8) both clamp into the edge bands
     assert p.dna_minigame_award(DNA_STABILIZER_BET, 95) == "DarkArea"
@@ -83,7 +83,7 @@ def test_stabilized_wager_never_spoils():
 
 
 def test_resonant_wager_splashes_the_neighbors():
-    from tuipet.pet import DNA_RESONANT_BET, MAX_DNA_INVENTORY
+    from tuipet.core.pet import DNA_RESONANT_BET, MAX_DNA_INVENTORY
     p = _pet()
     p.dna_owned = {f: 0 for f in data.DNA_FIELDS}
     p.dna_minigame_award(DNA_RESONANT_BET, 48)               # DragonsRoar
@@ -99,8 +99,8 @@ def test_resonant_wager_splashes_the_neighbors():
 
 
 def test_bet_screen_pages_and_caps_at_the_wager_limit():
-    from tuipet.pet import MAX_DNA_WAGER
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.core.pet import MAX_DNA_WAGER
+    from tuipet.ui.screens.dnascreen import DNAPanel
     p = _pet()
     p.bits = 50_000
     pan = DNAPanel(p)
@@ -118,8 +118,8 @@ def test_the_result_page_reports_what_actually_banked():
     """DNA review 2026-07-18: near the 99 cap the overflow refunds as bits,
     and the result page said "Got 99" while 9 landed.  It now reports the
     true banked delta and the refund."""
-    from tuipet import dnascreen
-    from tuipet.pet import Pet
+    from tuipet.ui.screens import dnascreen
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 12 * 60.0
     p.bits = 5000

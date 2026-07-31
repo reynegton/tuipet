@@ -13,10 +13,10 @@ Polish:
 """
 import asyncio
 
-from tuipet import persistence
-from tuipet.net import LobbyState, LobbyClient
-from tuipet.pet import Pet
-from tuipet import lobbyscreen
+from tuipet.utils import persistence
+from tuipet.network.net import LobbyState, LobbyClient
+from tuipet.core.pet import Pet
+from tuipet.ui.screens import lobbyscreen
 
 
 # --- shared minimal lobby panel (mirrors tests/test_lobby.py::_panel) --------
@@ -112,7 +112,7 @@ def test_save_dms_trims_to_the_persisted_tail():
 
 # --- P1: the Options Keys page shows glyphs, not Textual identifiers ---------
 def test_options_keys_page_shows_glyphs_not_ids():
-    from tuipet import optionsscreen
+    from tuipet.ui.screens import optionsscreen
     rows = optionsscreen.KeysPanel([
         ("question_mark", "help", "Help"),
         ("enter", "gift", "Accept gift"),
@@ -126,7 +126,7 @@ def test_options_keys_page_shows_glyphs_not_ids():
 
 # --- P2: jogress is lobby-only; the home DNA line must not claim it ----------
 def test_help_home_line_drops_the_lobby_only_jogress():
-    from tuipet import helpscreen
+    from tuipet.ui.screens import helpscreen
     texts = [t for t, _kind in helpscreen.HELP]
     # (the combined "x DNA   d digicore" row split when the guide learned
     # to tell the DNA story -- 2026-07-22; the P2 guard is the jogress claim)

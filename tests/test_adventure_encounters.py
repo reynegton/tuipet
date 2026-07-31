@@ -5,10 +5,10 @@ and the panel integration: a fight rides BattlePanel as a SubHost child on the
 road's own biome, and a real bout runs to a verdict through the sub.
 """
 import random
-from tuipet import adventure
-from tuipet.adventure import Adventure, MAX_LIVES
-from tuipet.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
-from tuipet.pet import Pet
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, MAX_LIVES
+from tuipet.ui.screens.adventurescreen import AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T
+from tuipet.core.pet import Pet
 
 
 def _champ():

@@ -11,11 +11,11 @@ loot, revealed like a gift, capped at rare.
 import collections
 import random
 
-from tuipet import adventure as adv
-from tuipet.adventure import ZONES
-from tuipet.adventurescreen import AdventurePanel
-from tuipet.arenafx import _PRESENT
-from tuipet.pet import Pet
+from tuipet.core import adventure as adv
+from tuipet.core.adventure import ZONES
+from tuipet.ui.screens.adventurescreen import AdventurePanel
+from tuipet.utils.arenafx import _PRESENT
+from tuipet.core.pet import Pet
 
 
 def _adv(holiday):

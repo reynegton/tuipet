@@ -8,8 +8,9 @@ passing gates only).  Found three timer-off/scoring slips (the two habitat
 ones are HISTORICAL now -- the habitat system left, BASIC VPET 2026-07-16),
 and
 the X-antibody score is Induced-only (the Natural arm over-scored)."""
-from tuipet import data, evolution
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import evolution
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):

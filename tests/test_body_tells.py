@@ -13,8 +13,8 @@ class of miss that hid the `losing` fx earlier the same day.
 The duplicate was removed.  These pins now guard the ORIGINAL path, so
 nobody (me) re-adds a second one.
 """
-from tuipet.pet import Pet
-from tuipet.petbase import POOPDANCE_AT
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import POOPDANCE_AT
 
 
 def _pet(**kw):
@@ -29,7 +29,7 @@ def _pet(**kw):
 
 def test_both_fx_are_real_painted_shows():
     """Guard against wiring a name the painter cannot run."""
-    from tuipet.arenafx import FxMixin
+    from tuipet.utils.arenafx import FxMixin
     for kind in ("poopdance", "yawn"):
         assert hasattr(FxMixin, f"_fxk_{kind}"), kind
 
@@ -37,10 +37,11 @@ def test_both_fx_are_real_painted_shows():
 def test_the_app_owns_the_only_tell_trigger():
     """ONE source.  If a second trigger ever appears, this fails."""
     import inspect
-    from tuipet import app, petbody
-    assert "poopdance" in inspect.getsource(app)
+    from tuipet.app_mixins import timers
+    from tuipet.core import petbody
+    assert "poopdance" in inspect.getsource(timers)
     assert "poopdance" not in inspect.getsource(petbody)
-    assert "idle_fx" not in inspect.getsource(app)
+    assert "idle_fx" not in inspect.getsource(timers)
     assert "idle_fx" not in inspect.getsource(petbody)
 
 
@@ -60,10 +61,10 @@ def test_the_yawn_gate_is_the_canon_helper():
     """near_bedtime() is the canon eligibility -- not a fraction someone
     invents at the call site."""
     import inspect
-    from tuipet import app
+    from tuipet.app_mixins import timers
     p = _pet()
     assert isinstance(p.near_bedtime(), bool)
     # the app's tell roll must ASK the pet, not re-derive a fraction
-    src = inspect.getsource(app)
+    src = inspect.getsource(timers)
     assert "near_bedtime()" in src
     assert "YAWN_AT" not in src

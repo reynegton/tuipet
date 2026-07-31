@@ -14,9 +14,9 @@ Three changes:
 import collections
 import random
 
-from tuipet import shop
-from tuipet.pet import Pet
-from tuipet.petbase import GIFT_FESTIVAL_MULT
+from tuipet.core import shop
+from tuipet.core.pet import Pet
+from tuipet.core.petbase import GIFT_FESTIVAL_MULT
 
 BANNED = {"poison_mushroom", "digimemory", "revive_floppy",
           "town_transport", "disaster_transport", "life_recovery"}
@@ -76,7 +76,7 @@ def test_common_treats_are_the_usual_gift():
 # ---- the festival frequency boost -------------------------------------------
 
 def test_a_festival_pet_gifts_far_more_often():
-    import tuipet.tournament as T
+    import tuipet.core.tournament as T
 
     def hits(hol):
         T.holiday = lambda today=None, h=hol: h
@@ -102,8 +102,9 @@ def test_a_festival_pet_gifts_far_more_often():
 # ---- the wrapped-present surprise -------------------------------------------
 
 def test_the_gift_fx_carries_the_present_box_not_the_item():
-    from tuipet import arenafx, grid
-    from tuipet.arenafx import _FxCtx, GIFT_OUT
+    from tuipet.utils import arenafx
+    from tuipet.utils import grid
+    from tuipet.utils.arenafx import _FxCtx, GIFT_OUT
 
     class Host(arenafx.FxMixin):
         def __init__(self):
@@ -141,7 +142,8 @@ def test_the_reveal_is_deferred_to_the_end_of_the_amble():
     """action_gift teases first and stores the reveal; the app fires it only
     once the fx finishes -- so the contents are a genuine surprise."""
     import inspect
-    from tuipet import appactions, app
+    from tuipet import appactions
+    from tuipet import app
     a = inspect.getsource(appactions.ActionsMixin.action_gift)
     assert "_pending_gift_reveal" in a
     assert "Let's see" in a or "see what" in a          # the tease

@@ -5,11 +5,11 @@ some energy, suppresses encounters on its ground, fires ONCE per span, and the
 panel pauses to rest there.  Town spans come from data.load_maps z['towns']
 mapped onto the ~40 interactive legs.
 """
-from tuipet import adventure
-from tuipet.adventure import Adventure, ZONES, MAX_LIVES
-from tuipet.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
+from tuipet.core import adventure
+from tuipet.core.adventure import Adventure, ZONES, MAX_LIVES
+from tuipet.ui.screens.adventurescreen import (AdventurePanel, TELE_LEAVE_T, TELE_ARRIVE_T,
                                     TRAVEL_TICKS)
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet(num=100):
@@ -92,7 +92,7 @@ def test_the_panel_stops_at_the_town_to_visit_or_walk_on(monkeypatch):
 def test_the_town_hub_opens_the_shop_and_leaves():
     """T1 town hub (2026-07-20): a visitable stop -- the real ShopPanel (same
     layout as home) rides as a child; Leave / ESC returns to the road."""
-    from tuipet.townscreen import TownPanel
+    from tuipet.ui.screens.townscreen import TownPanel
     t = TownPanel(_pet(), town_id=0)
     assert "TOWN" in t.text().plain and "Shop" in t.text().plain
     # ENTER on Shop opens the REAL home ShopPanel (reused, not a rebuild)
@@ -104,7 +104,7 @@ def test_the_town_hub_opens_the_shop_and_leaves():
     t._sub_done(None)
     assert t.sub is None
     # move to Leave, ENTER -> back to the road
-    from tuipet.townscreen import _MENU
+    from tuipet.ui.screens.townscreen import _MENU
     t.cursor = next(i for i, m in enumerate(_MENU) if m[0] == "leave")
     assert t.key("enter") == ("done", None)
     # ESC from the menu also leaves
@@ -114,7 +114,7 @@ def test_the_town_hub_opens_the_shop_and_leaves():
 def test_the_town_sell_slot_opens_the_bag():
     """T2 Sell (2026-07-20): the real ShopPanel bag (use / sell back), same
     layout as the home bag -- reused, not rebuilt."""
-    from tuipet.townscreen import TownPanel, _MENU
+    from tuipet.ui.screens.townscreen import TownPanel, _MENU
     p = _pet()
     p.add_item("ball")
     t = TownPanel(p, 0)

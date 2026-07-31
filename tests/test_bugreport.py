@@ -5,9 +5,10 @@ import json
 import os
 import sys
 
-from tuipet.pet import Pet
-from tuipet.bugscreen import BugReportPanel, wrap
-from tuipet import net, persistence
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.bugscreen import BugReportPanel, wrap
+from tuipet.network import net
+from tuipet.utils import persistence
 
 
 def _pet():
@@ -134,7 +135,7 @@ def test_flush_survives_an_outage_and_drops_damaged_lines(tmp_path, monkeypatch)
     empty-text damage instead of re-stashing it forever."""
     import asyncio
     from tuipet.app import TuiPetApp
-    from tuipet import net
+    from tuipet.network import net
     monkeypatch.setattr(persistence, "SAVE_DIR", str(tmp_path))
     persistence.add_pending_bug({"text": "", "name": "damaged"})
     persistence.add_pending_bug({"text": "first", "name": "x"})

@@ -8,8 +8,9 @@ isolate_save fixture; an account is preset so the first-launch panel is skipped.
 """
 import asyncio
 
-from tuipet import persistence, data
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+import tuipet.data.loaders.data as data
+from tuipet.core.pet import Pet
 from tuipet.app import TuiPetApp
 
 

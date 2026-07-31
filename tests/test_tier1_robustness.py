@@ -10,8 +10,9 @@ import sys
 
 import pytest
 
-from tuipet import data, persistence
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 
 
 # ---- corrupt-save quarantine -------------------------------------------------
@@ -145,7 +146,8 @@ def test_missing_csv_raises_players_words(tmp_path, monkeypatch):
     """The csv loaders speak the same plain words as the gz atlases (data
     audit 2026-07-18): a damaged install used to crash them with a raw
     FileNotFoundError traceback."""
-    from tuipet import data_world, data_meta
+    from tuipet import data_world
+    from tuipet import data_meta
     monkeypatch.setattr(data_world, "_DATA", str(tmp_path))
     monkeypatch.setattr(data_meta, "_DATA", str(tmp_path))
     for loader in (data.load_tournies, data.load_titles):

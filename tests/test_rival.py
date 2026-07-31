@@ -6,8 +6,8 @@ rematches, the cadence is deterministic, the tally lives in record_battle
 generation, and the PERSON page speaks the score."""
 import random
 
-from tuipet import rival
-from tuipet.pet import Pet
+from tuipet.core import rival
+from tuipet.core.pet import Pet
 
 
 def _pet(stage="Rookie", battles=0):
@@ -30,7 +30,7 @@ def test_the_mint_names_a_tamer_and_a_line():
 
 
 def test_the_rival_is_never_the_player(monkeypatch):
-    from tuipet import persistence
+    from tuipet.utils import persistence
     monkeypatch.setattr(persistence, "get_account", lambda: ("Kai", "pw"))
     random.seed(0)
     for _ in range(30):
@@ -44,7 +44,7 @@ def test_the_rival_is_never_the_player(monkeypatch):
 def test_the_form_tracks_our_stage_and_holds_still():
     p = _pet(stage="Rookie")
     rival.ensure(p)
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     by_num = data.load_sprites()[1]
     rk = rival.form_for(p)
     assert by_num[rk]["stage"] == "Rookie"
@@ -59,7 +59,7 @@ def test_the_form_tracks_our_stage_and_holds_still():
 def test_an_odd_stage_borrows_the_rookie_bracket():
     p = _pet(stage="Fresh")               # below the ladder -> Rookie's pick
     rival.ensure(p)
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     assert data.load_sprites()[1][rival.form_for(p)]["stage"] == "Rookie"
 
 
@@ -111,7 +111,7 @@ def test_the_ledger_rides_the_save():
 # ---- the surfacing -----------------------------------------------------------
 
 def test_the_person_page_speaks_the_score():
-    from tuipet import digicore
+    from tuipet.core import digicore
     p = _pet()
     rival.ensure(p)
     p.rival_wins, p.rival_losses = 3, 2
@@ -123,7 +123,7 @@ def test_the_person_page_speaks_the_score():
 
 
 def test_a_rival_bout_renders_in_the_arena():
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     p = _pet(battles=2)
     p.energy = 20
     foe = rival.maybe_challenge(p)

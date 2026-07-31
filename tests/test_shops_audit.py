@@ -41,9 +41,10 @@ import textwrap
 
 import pytest
 
-from tuipet import persistence, shop
-from tuipet.pet import Pet
-from tuipet.shopscreen import ShopPanel
+from tuipet.utils import persistence
+from tuipet.core import shop
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.shopscreen import ShopPanel
 
 D = datetime.date(2026, 3, 3)          # an ordinary day
 FEST = datetime.date(2026, 1, 1)       # a festival
@@ -59,7 +60,7 @@ def _no_session_memory():
     player would be sitting on, so without this they hand the next test a
     shop already open on Titles — which is exactly how this file first
     broke `test_shop_and_bag_cards`."""
-    import tuipet.shopscreen as ss
+    import tuipet.ui.screens.shopscreen as ss
     saved = dict(ss._LAST_POS)
     ss._LAST_POS.clear()
     yield
@@ -95,7 +96,7 @@ def test_the_wave_tease_is_the_same_in_every_process():
     """The bug, pinned the only way it can be: across REAL processes with
     different hash seeds.  A tie used to be a coin flip per launch."""
     code = (
-        "from tuipet import shop\n"
+        "from tuipet.core import shop\n"
         "B = {'album':{},'mega_kills':0,'max_stage':0,'xanti_ever':False,\n"
         "     'maps':set(),'wins':0,'raids':0,'max_gen':5,'armor_evos':0}\n"
         "print(shop.wave_status(B)[1])\n"
@@ -118,7 +119,7 @@ def test_the_whole_shop_reads_the_same_in_every_process():
     proved how easy that is to lose."""
     code = (
         "import datetime, hashlib\n"
-        "from tuipet import shop\n"
+        "from tuipet.core import shop\n"
         "D = datetime.date(2026, 3, 3)\n"
         "towns = sorted(shop._town_maps())\n"
         "out = ([shop.town_deal_sid(t, D) for t in towns],\n"
@@ -428,8 +429,8 @@ def test_the_purse_never_goes_negative_or_pays_for_nothing():
 def test_every_shop_panel_renders_inside_the_lcd(kind):
     from rich.text import Text
 
-    from tuipet import grid
-    from tuipet.towneggscreen import TownEggPanel
+    from tuipet.utils import grid
+    from tuipet.ui.screens.towneggscreen import TownEggPanel
     p = _buyer()
     if kind == "home":
         panel = ShopPanel(p)

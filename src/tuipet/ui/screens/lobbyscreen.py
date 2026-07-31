@@ -255,8 +255,8 @@ class LobbyPanel(BoutMixin, ChatMixin):
             # survive the very conversation you watched arrive (round 30)
             s.unread.discard(self.dm_peer[1])
         for m in list(s.inbox):
-            t = m.get("t")
-            if t == "invite":
+            msg_type = m.get("t")
+            if msg_type == "invite":
                 if m.get("kind") not in ("jogress", "battle"):
                     # the relay forwards kind verbatim: an unknown kind used
                     # to reach _enter_session, set a dangling partner and
@@ -560,7 +560,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         """The monthly rankings: online PvP wins, top ten, your rank, and the
         days left in the season.  Data is the server's ladder message; a page
         opened before the reply shows a fetching line and fills in live."""
-        t = Text()
+        t_obj = Text()
         lad = getattr(self.client, "ladder", None) if self.client else None
         if not lad:
             t_obj.append(t("lob_lad_hdr", "  LADDER\n\n"), style=INK_B)

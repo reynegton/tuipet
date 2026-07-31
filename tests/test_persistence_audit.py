@@ -10,8 +10,9 @@ silently drops oversized messages at."""
 import json
 import os
 
-from tuipet.pet import Pet
-from tuipet import persistence, cloudsync
+from tuipet.core.pet import Pet
+from tuipet.utils import persistence
+from tuipet.network import cloudsync
 
 
 def _pet(**kw):

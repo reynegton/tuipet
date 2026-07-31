@@ -7,8 +7,8 @@ answers it (+25), PRAISE answers a proud moment (+10, windows opened by
 battle wins and mega drills, never farmable).  Refusals stay SOFT (the
 standing recalibration) — discipline is the tantrum economy.
 """
-from tuipet import petbody
-from tuipet.pet import Pet
+from tuipet.core import petbody
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -25,7 +25,7 @@ def test_the_gauge_is_live_and_clamped():
     clamped 0..100 while every constant writing here -- the clean
     reward, the surrender set (15), the stage seeds -- is calibrated
     against 150, so the low clamp silently distorted all of them."""
-    from tuipet.petbase import MAX_OBEDIENCE
+    from tuipet.core.petbase import MAX_OBEDIENCE
     assert MAX_OBEDIENCE == 150
     p = _pet()
     p._set_obedience(500)
@@ -62,10 +62,10 @@ def test_an_ignored_tantrum_costs(monkeypatch):
 def test_scold_answers_the_call_and_wrong_scold_lands_nothing():
     p = _pet(discipline_call=True)
     p.scold_window = p.world_seconds + 600.0
-    assert "lesson" in p.scold()
+    assert "lição" in p.scold()
     assert not p.discipline_call and p.obedience == 75
     p2 = _pet()
-    assert "sulks" in p2.scold()
+    assert "beicinho" in p2.scold()
     assert p2.obedience == 50                         # no gain, no loss
 
 
@@ -73,9 +73,9 @@ def test_praise_pays_only_in_a_proud_window():
     p = _pet()
     p.record_battle(True, {"num": 4, "stage": "Champion", "attribute": "Data"})
     assert p.world_seconds <= p.praise_window         # a win opens the window
-    assert "pride" in p.praise()
+    assert "orgulho" in p.praise()
     assert p.obedience == 60 and p.praise_window == 0.0
-    assert "unsure" in p.praise()                     # farming lands nothing
+    assert "satisfeito" in p.praise()                     # farming lands nothing
     assert p.obedience == 60
 
 
@@ -105,7 +105,7 @@ def test_clean_pays_the_canon_obedience_reward_again():
 
 
 def test_the_panel_picks_scold_on_an_open_call_and_applies():
-    from tuipet.disciplinescreen import DisciplinePanel
+    from tuipet.ui.screens.disciplinescreen import DisciplinePanel
     p = _pet(discipline_call=True)
     p.scold_window = p.world_seconds + 600.0
     pan = DisciplinePanel(p)
@@ -114,14 +114,14 @@ def test_the_panel_picks_scold_on_an_open_call_and_applies():
         assert len(line) <= 40
     done = pan.key("enter")
     # the panel hands back (message, show) now -- a LANDED scold jeers
-    assert done[0] == "done" and "lesson" in done[1][0]
+    assert done[0] == "done" and "lição" in done[1][0]
     assert done[1][1] == "jeer"
     assert p.obedience == 75
 
 
 def test_the_panel_wears_its_own_card():
-    from tuipet import statusbox
-    from tuipet.disciplinescreen import DisciplinePanel
+    from tuipet.ui.components import statusbox
+    from tuipet.ui.screens.disciplinescreen import DisciplinePanel
     fn = statusbox.painter_for(DisciplinePanel(_pet()))
     assert fn is statusbox.discipline
 
@@ -130,7 +130,7 @@ def test_the_panel_wears_its_own_card():
 # have happy and sad animations ... already wired in") -----------------------
 
 def _panel(pet):
-    from tuipet.disciplinescreen import DisciplinePanel
+    from tuipet.ui.screens.disciplinescreen import DisciplinePanel
     return DisciplinePanel(pet)
 
 
@@ -179,8 +179,8 @@ def test_manners_fade_while_awake():
     mark.  Cadence is scaled x5 (THE UNIT LAW: canon's minutes are device
     real-minutes and our clock runs 60x faster); neutral works out to -2
     per 10 real minutes, against a tantrum's +25 per ~90."""
-    from tuipet import petbody
-    import tuipet.petbody as pb
+    from tuipet.core import petbody
+    import tuipet.core.petbody as pb
     old = pb.random.random
     pb.random.random = lambda: 0.99          # no tantrum/sickness rolls
     try:
@@ -216,14 +216,14 @@ def test_manners_fade_while_awake():
 
 def test_a_sour_pet_fades_faster_than_a_sunny_one():
     """Canon's 3:2:1 disposition ratio survives the scaling."""
-    from tuipet.petbase import OBEDIENCE_LAPSE_MIN
+    from tuipet.core.petbase import OBEDIENCE_LAPSE_MIN
     assert OBEDIENCE_LAPSE_MIN[-1] < OBEDIENCE_LAPSE_MIN[0] < OBEDIENCE_LAPSE_MIN[1]
 
 
 def test_a_sleeper_never_fades():
     """Canon MinObedienceAsleep == MaxObedience makes the lapse
     unreachable in sleep, and the fade rides the awake path only."""
-    import tuipet.petbody as pb
+    import tuipet.core.petbody as pb
     old = pb.random.random
     pb.random.random = lambda: 0.99
     try:
@@ -251,8 +251,8 @@ def test_dead_meter_saves_get_one_manners_heal():
     alive" through no fault of its tamer, and D3 would call every one of
     them disobedient.  Seed those saves once, marked so a neglected pet
     cannot reset its gauge by restarting."""
-    from tuipet import persistence as P
-    from tuipet.petbase import FRESH_OBEDIENCE, ROOKIE_OBED_DEFAULT
+    from tuipet.utils import persistence as P
+    from tuipet.core.petbase import FRESH_OBEDIENCE, ROOKIE_OBED_DEFAULT
     base = dict(num=93, name="Greymon", stage="Champion", attribute="Vaccine",
                 world_seconds=600.0, age_seconds=600.0)
     pet, _ = P.pet_from_save(dict(base, obedience=0))
@@ -269,7 +269,7 @@ def test_dead_meter_saves_get_one_manners_heal():
 # ---- D3: earned disobedience (2026-07-23) ----------------------------------
 
 def _neglected(**kw):
-    from tuipet.petbase import DISOBEY_BELOW
+    from tuipet.core.petbase import DISOBEY_BELOW
     p = _pet(obedience=0, **kw)
     p._set_energy(p.max_energy)
     assert p.obedience < DISOBEY_BELOW
@@ -279,16 +279,16 @@ def _neglected(**kw):
 def test_a_well_raised_pet_never_refuses(monkeypatch):
     """The half of the soft-refusal rule that MUST survive: the old spam
     punished good raising, this punishes neglect only."""
-    import tuipet.petcare as pc
+    import tuipet.core.petcare as pc
     monkeypatch.setattr(pc.random, "random", lambda: 0.0)   # worst-case roll
-    from tuipet.petbase import DISOBEY_BELOW
+    from tuipet.core.petbase import DISOBEY_BELOW
     p = _pet(obedience=DISOBEY_BELOW)
     for kind in ("feed", "train", "battle"):
         assert p.manners_refusal(kind) is False, kind
 
 
 def test_a_neglected_pet_can_blow_you_off(monkeypatch):
-    import tuipet.petcare as pc
+    import tuipet.core.petcare as pc
     monkeypatch.setattr(pc.random, "random", lambda: 0.0)
     p = _neglected(hunger=3)
     assert p.manners_refusal("feed") and p.manners_refusal("train")
@@ -298,8 +298,8 @@ def test_a_neglected_pet_can_blow_you_off(monkeypatch):
 def test_the_odds_ramp_with_neglect():
     """0 at the threshold, DISOBEY_MAX_P at empty -- the first refusals
     are a warning, not a wall."""
-    import tuipet.petcare as pc
-    from tuipet.petbase import DISOBEY_BELOW, DISOBEY_MAX_P
+    import tuipet.core.petcare as pc
+    from tuipet.core.petbase import DISOBEY_BELOW, DISOBEY_MAX_P
     seen = {}
     for obed in (DISOBEY_BELOW, DISOBEY_BELOW // 2, 0):
         p = _pet(obedience=obed)
@@ -315,34 +315,34 @@ def test_the_odds_ramp_with_neglect():
 
 def test_medicine_and_cleaning_are_never_refused(monkeypatch):
     """A pet you cannot clean or heal is a softlock, not a personality."""
-    import tuipet.petcare as pc
+    import tuipet.core.petcare as pc
     monkeypatch.setattr(pc.random, "random", lambda: 0.0)
     p = _neglected(poop=2)
-    assert "Cleaned" in p.clean()
+    assert "Limpou" in p.clean()
     p.sick = True
     p.poop = 0
-    assert "pill" in p.feed_pill().lower() or "Took" in p.feed_pill()
+    assert "Tomou" in p.feed_pill()
     assert not p.sick
     p.injured = True
-    assert "patched" in str(p.heal_bandage())   # the H key (2026-07-26)
+    assert "curado" in str(p.heal_bandage())   # the H key (2026-07-26)
     for kind in ("clean", "pill", "bandage", "item"):
         assert p.manners_refusal(kind) is False, kind
 
 
 def test_a_starving_pet_is_never_refused_food(monkeypatch):
     """Starvation kills -- attitude must never close the door that saves it."""
-    import tuipet.petcare as pc
+    import tuipet.core.petcare as pc
     monkeypatch.setattr(pc.random, "random", lambda: 0.0)
     p = _neglected(hunger=0)
     assert p.manners_refusal("feed") is False
-    assert "Fed" in p.feed_meat()
+    assert "Alimentado" in p.feed_meat()
 
 
 def test_evolution_doors_keep_their_energy_only_rule(monkeypatch):
     """Plan-audit P2: check_refused's only callers are jogress and the
     mode change.  Manners must NEVER reach them, or neglect would start
     silently refusing evolutions."""
-    import tuipet.petcare as pc
+    import tuipet.core.petcare as pc
     monkeypatch.setattr(pc.random, "random", lambda: 0.0)
     p = _neglected()
     assert p.check_refused() is False                  # no energy change asked
@@ -352,8 +352,8 @@ def test_a_new_pet_is_not_born_disobedient():
     """The dataclass default was 0 -- harmless while the meter was a
     no-op, but under D3 a bare Pet() would be born NEGLECTED and start
     blowing off commands.  Born TRUSTING (canon FreshObedience)."""
-    from tuipet.pet import Pet
-    from tuipet.petbase import DISOBEY_BELOW, FRESH_OBEDIENCE
+    from tuipet.core.pet import Pet
+    from tuipet.core.petbase import DISOBEY_BELOW, FRESH_OBEDIENCE
     p = Pet(num=100, stage="Champion")
     assert p.obedience == FRESH_OBEDIENCE >= DISOBEY_BELOW
     assert p.manners_refusal("feed") is False

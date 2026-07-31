@@ -15,9 +15,10 @@ The pins below guard the thing the plan called goal 1: ONE grouping, not
 three.  Before this arc the catalog said six categories, use_item's
 comments said five, and the tab bar said four.
 """
-from tuipet import shop, shopscreen
-from tuipet.pet import Pet
-from tuipet.shopscreen import ShopPanel
+from tuipet.core import shop
+from tuipet.ui.screens import shopscreen
+from tuipet.core.pet import Pet
+from tuipet.ui.screens.shopscreen import ShopPanel
 
 ITEM_CATEGORIES = ("Feed", "Rest", "Cure", "Drill", "Manners", "Power",
                    "Treasure", "Evolve", "Road")  # the eight ACTS (+Treasure),

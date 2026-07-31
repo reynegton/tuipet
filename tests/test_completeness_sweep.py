@@ -3,8 +3,8 @@ mechanics -- the attribute-trade compensation and the away-filth gate.
 (The sweep's dead list: checkFilthyPersonality is DEFINED-NEVER-CALLED,
 CareEffect Pause* flags all FALSE on the one shipped row, EvolFood ships
 on a single row consumed by the audited food-req path.)"""
-from tuipet.pet import Pet
-from tuipet import data
+from tuipet.core.pet import Pet
+import tuipet.data.loaders.data as data
 
 
 def _pet(**kw):

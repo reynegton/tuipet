@@ -11,8 +11,8 @@ clamp >= 0.  (The obedience legs left with the discipline system -- the
 pinned-0 meter docked EVERY life -1; MED audit 2026-07-19.)"""
 import random
 
-from tuipet.pet import Pet, BONUS_STAGE, BONUS_INC_OBEDIENCE, BONUS_DEC_OBEDIENCE
-from tuipet import persistence
+from tuipet.core.pet import Pet, BONUS_STAGE, BONUS_INC_OBEDIENCE, BONUS_DEC_OBEDIENCE
+from tuipet.utils import persistence
 
 
 def _pet(**kw):

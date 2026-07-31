@@ -9,7 +9,7 @@ import asyncio
 
 from rich.text import Text
 
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -54,7 +54,7 @@ def test_dna_card_wraps_guidance_instead_of_clipping():
 
 def test_bug_prompt_fits_the_lcd():
     """The report prompt overran 40 cols and clipped mid-word on screen."""
-    from tuipet.bugscreen import BugReportPanel
+    from tuipet.ui.screens.bugscreen import BugReportPanel
     pan = BugReportPanel(_pet())
     assert len(pan.msg) <= 40
     for ln in pan.text().plain.split("\n"):
@@ -64,7 +64,7 @@ def test_bug_prompt_fits_the_lcd():
 def test_help_scroll_markers_are_arrows():
     """The more-below marker was an ASCII 'v' — it read as a stray letter
     sitting beside the footer hints."""
-    from tuipet.helpscreen import HelpPanel
+    from tuipet.ui.screens.helpscreen import HelpPanel
     pan = HelpPanel(_pet())
     pan.key("down")                       # off the top: both markers show
     foot = pan.text().plain.rstrip().split("\n")[-1]
@@ -74,7 +74,7 @@ def test_help_scroll_markers_are_arrows():
 
 def test_account_panel_speaks_the_hint_language():
     """The login had bracket-style [Tab] hints and an empty message box."""
-    from tuipet.lobbyscreen import AccountPanel
+    from tuipet.ui.screens.lobbyscreen import AccountPanel
     pan = AccountPanel()
     strip = Text.from_markup(pan.strip()).plain
     assert "TAB" in strip and "ENTER" in strip and "ESC" in strip

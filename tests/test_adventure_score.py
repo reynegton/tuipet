@@ -4,11 +4,12 @@ Pins the score: one number rolled from the tallies the summary card already
 shows, recorded per zone as a standing best (profile-level), bragged on the
 card when beaten, and shown in the zone picker as the number to chase.
 """
-from tuipet import adventure, persistence
-from tuipet.adventure import (Adventure, ZONES, SCORE_WIN, SCORE_FIND,
+from tuipet.core import adventure
+from tuipet.utils import persistence
+from tuipet.core.adventure import (Adventure, ZONES, SCORE_WIN, SCORE_FIND,
                               SCORE_LIFE, SCORE_STREAK, SCORE_CONQUEST)
-from tuipet.adventurescreen import AdventurePanel, ZonePickPanel
-from tuipet.pet import Pet
+from tuipet.ui.screens.adventurescreen import AdventurePanel, ZonePickPanel
+from tuipet.core.pet import Pet
 
 
 def _pet():

@@ -26,7 +26,7 @@ Fixed (canon divergences):
    scale) and adds the worse-sick path; the STARVATION sickness the old
    roll invented does not exist in canon and is gone."""
 
-from tuipet.pet import Pet
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -71,7 +71,7 @@ def test_an_unhappy_pet_actually_reaches_the_sulk_over_a_day():
     game-day before the fix: sick 0 sulks, filthy 0, starving-but-trained
     0.  This walks the REAL tick, not the branch."""
     import random
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
 
     def sulks_per_day(**state):
         random.seed(7)
@@ -103,7 +103,7 @@ def test_good_care_no_longer_mutes_the_happy_idles():
     fuming unreachable for anyone who trains, and this pin's old
     `idled(4, sick=True) == "idle"` line WAS that rule.  An unhappy pet
     sulks at any effort, drained or not."""
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
 
     def idled(strength, sick=False, energy=None, poop=0):
         p = Pet(num=100, stage="Champion", attribute="Vaccine")

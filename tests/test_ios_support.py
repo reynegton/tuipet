@@ -11,14 +11,14 @@ import os
 import tempfile
 
 
-from tuipet import persistence
+from tuipet.utils import persistence
 
 
 def _reload(**env):
     for k in ('TUIPET_SAVE_DIR', 'XDG_DATA_HOME'):
         os.environ.pop(k, None)
     os.environ.update(env)
-    from tuipet import persistio
+    from tuipet.utils import persistio
     importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
     importlib.reload(persistence)
     return persistence
@@ -32,7 +32,7 @@ def test_ios_read_only_home_falls_back_to_documents(monkeypatch):
         monkeypatch.setenv('HOME', home)
         p = _reload()
         assert p.SAVE_DIR == os.path.join(home, 'Documents', 'tuipet')
-        from tuipet.pet import Pet
+        from tuipet.core.pet import Pet
         pet = Pet(num=100, stage='Champion', attribute='Vaccine', obedience=500)
         pet.world_seconds = 600.0
         p.save(pet)
@@ -40,7 +40,7 @@ def test_ios_read_only_home_falls_back_to_documents(monkeypatch):
         assert not p.save_failed
     finally:
         os.chmod(home, 0o755)
-        from tuipet import persistio
+        from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
         importlib.reload(persistence)
 
@@ -51,14 +51,14 @@ def test_an_unwritable_disk_is_reported_not_swallowed(monkeypatch):
     try:
         monkeypatch.setenv('HOME', home)
         p = _reload()
-        from tuipet.pet import Pet
+        from tuipet.core.pet import Pet
         pet = Pet(num=100, stage='Champion', attribute='Vaccine', obedience=500)
         pet.world_seconds = 600.0
         p.save(pet)
         assert p.save_failed, 'a silently unsaveable install used to eat the pet'
     finally:
         os.chmod(home, 0o755)
-        from tuipet import persistio
+        from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
         importlib.reload(persistence)
 
@@ -70,7 +70,7 @@ def test_save_dir_override_wins(monkeypatch):
     try:
         assert p.SAVE_DIR == d
     finally:
-        from tuipet import persistio
+        from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
         importlib.reload(persistence)
 
@@ -82,7 +82,7 @@ def test_the_normal_linux_home_is_unchanged(monkeypatch):
     try:
         assert p.SAVE_DIR == os.path.join(home, '.local', 'share', 'tuipet')
     finally:
-        from tuipet import persistio
+        from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
         importlib.reload(persistence)
 
@@ -108,9 +108,9 @@ def test_save_failed_clears_when_the_same_file_recovers(monkeypatch, tmp_path):
     """A transient refusal must not stick forever (persistence audit
     2026-07-18) -- but only the SAME file writing clean clears the flag: a
     settings write succeeding must not mute a save.json still refusing."""
-    from tuipet import persistio
-    from tuipet import persistence as pers
-    from tuipet.pet import Pet
+    from tuipet.utils import persistio
+    from tuipet.utils import persistence as pers
+    from tuipet.core.pet import Pet
     pet = Pet(num=100, stage='Champion', attribute='Vaccine', obedience=500)
     pet.world_seconds = 600.0
     blocked = tmp_path / 'blocked'

@@ -18,8 +18,8 @@ life.  See CARE_AUDIT_2026_07_25.md §2.
 """
 import pytest
 
-from tuipet.pet import DAY_LENGTH, Pet
-from tuipet.petbase import STARVE_DEATH_MIN
+from tuipet.core.pet import DAY_LENGTH, Pet
+from tuipet.core.petbase import STARVE_DEATH_MIN
 
 
 def _pet(**kw):
@@ -192,7 +192,7 @@ def test_every_care_mistake_has_exactly_one_source(monkeypatch):
     second slip mid-wait.  That only ever showed in SUITE ORDER, where the
     RNG arrives in a different state, which is exactly why it is patched
     rather than seeded."""
-    import tuipet.petbody as pb
+    import tuipet.core.petbody as pb
     monkeypatch.setattr(pb.random, "random", lambda: 0.99)
     # an ignored hunger call.  ISOLATED: the body has other callers (the
     # effort gauge, a discipline tantrum), and with the retuned clock two

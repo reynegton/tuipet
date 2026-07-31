@@ -6,8 +6,10 @@ really exists in backgrounds.json.gz (a typo'd key would render a silent
 black arena), the arena keeps its 5-frame sheet, and the manifest holds in
 both directions like the icon/sound audits.
 """
-from tuipet import backgrounds, data, egg
-from tuipet.pet import Pet
+from tuipet.utils import backgrounds
+import tuipet.data.loaders.data as data
+from tuipet.core import egg
+from tuipet.core.pet import Pet
 
 
 def test_every_egg_is_wired_to_a_real_scene():
@@ -84,7 +86,7 @@ def test_scene_display_names_follow_the_family_law():
     not a seafloor (zero structural correlation with them); the real seafloor
     is ONE undersea scene at three lightings -- underwater/seafloor/sunsetshore.
     Display names stay unique; keys never change (saves carry them)."""
-    from tuipet import backgrounds as bgs
+    from tuipet.utils import backgrounds as bgs
     for k in ("forestgate", "goldenwood", "tealhollow"):
         assert "Hollow" in bgs.NAMES[k], k
     # the seafloor trio is one undersea scene, day/deep/sunset -- NOT cove
@@ -105,7 +107,7 @@ def test_cliffside_and_water_eggs_stand_on_the_right_ground():
     sunsetshore are seabed art, not shore).  Ketomon keeps that coast; Yuramon
     moved OFF it 2026-07-20 -- it's a Palmon PLANT line, so it belongs in the
     forest, not on a sea cliff.  The water lines stay submerged on purpose."""
-    from tuipet import backgrounds as bgs
+    from tuipet.utils import backgrounds as bgs
     assert bgs.EGG_BG[3] == "forestgate"         # Yuramon -- plant, in the wood
     assert bgs.EGG_BG[14] == "islandsea"         # Ketomon (Cliffside) -- the coast
     for i in (13, 18, 24):                       # the water lines: seabed is HOME

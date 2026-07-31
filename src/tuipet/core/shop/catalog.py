@@ -1,23 +1,8 @@
-"""The shop: a fixed catalog of priced items (the DSprite item system,
-cloned from the v0.4.x rebuild -- BASIC VPET 2026-07-16).
-
-Every priced entry in vitems.json is on the shelf, grouped by its own
-category column; buying moves it into the bag at face value; the bag can
-sell it back for half.  Effects live in Pet.use_item — the token text here
-mirrors those exact effects so the shelf, the bag and the belly can never
-disagree.  The DVPet rolled-slot/town-hours shop machine is retired; the
-town counters serve the same catalog.  The egg-licence shelf was cut
-2026-07-17 ("i never wanted egg licenses"): eggs unlock by condition only,
-like the real devices -- the shop sells goods, never egg.
-"""
-from __future__ import annotations
-import random
-from functools import lru_cache
-from math import gcd as _gcd
 from typing import NamedTuple
-
 import tuipet.data.loaders.data as data
-
+from functools import lru_cache
+from tuipet.i18n.translator import t
+from tuipet.core.petbase import *
 
 class Item(NamedTuple):
     """One catalog entry, with its fields NAMED (items refactor P1,
@@ -57,18 +42,6 @@ class Item(NamedTuple):
     tier: str | None = None  # distribution arc populates this
 
 
-# ============================ THE TUIPET CATALOG ============================
-# Authored 2026-07-18 (Joel: "we can pretty much make anything we want. i
-# need you to make tuipet items" / "you can make the items whatever you
-# want using the sprites").  The law of the set: DSprite is the mechanics
-# GRAMMAR, DVPet is the ART -- every entry wears a real DVPet atlas strip
-# (all 59 foods + 84 items carry 4-frame rips; zero placeholders), and
-# every effect lands on a meter that is LIVE today.  vitems.json stays a
-# pristine rip: it now feeds only the 11 Relics; the consumable shelf
-# is THIS table.  price None = never sold (birthday-only treats).
-# key: (name, icon, price, category, effect-text mirroring use_item, tagline)
-# -- authored positionally, then wrapped into `Item` (P1) so every reader
-# gets named fields.  Keep the alignment: this table is meant to be read.
 _AUTHORED = {
     # ---- FOOD (eaten on the LCD through their own 4-frame strips) ----------
     "fish":            ("Fish",            "f:1",  50,   "Feed", "hunger +1", "a captura do dia a dia"),
@@ -227,19 +200,251 @@ _AUTHORED = {
     "beast_dark_spirit":("Beast Dark Spirit",   "i:62", None,  "Evoluir", "a spirit evolution, if one answers", "uma herança elemental"),
 }
 
-# ---------------------------------------------------------------------------
-# WHAT EACH ITEM ACTUALLY MOVES (items refactor P2, 2026-07-23)
-#
-# Read out of petcare.use_item's handlers one by one -- NOT inferred from
-# the effect text, which is the very thing that can drift (plan §1g).
-# Every name here is a real Pet dataclass field; test_catalog_touches.py
-# proves that and proves none of them is a DORMANT stat.
-#
-# Omitted on purpose: the indirect billing inside shared helpers.
-# `_set_energy` stings obedience when a drop lands in the red and
-# `_disturbed()` books a care mistake -- those are the helpers' effects,
-# not the item's, and listing them would make every energy item look like
-# a discipline item.
+
+def tier_for_price(price):
+    """The band a price falls in, or None for a grant-only item."""
+    if price is None:
+        return None
+    for ceiling, name in TIER_BANDS:
+        if price <= ceiling:
+            return name
+    return TIER_TOP
+
+
+def tier_weight(key):
+    """Roll weight for `key` -- the find pools and any weighted shelf pick."""
+    if key in _WEIGHT_OVERRIDE:
+        return _WEIGHT_OVERRIDE[key]
+    v = CATALOG.get(key)
+    return TIER_WEIGHT.get((v.tier if v else None) or "common", 1)
+
+
+def tier_stock(key):
+    v = CATALOG.get(key)
+    return TIER_STOCK.get((v.tier if v else None) or "common", 1)
+
+
+def adventure_open(key, prog=None):
+    """Is this road-shelf item unlocked (enough maps cleared)?  Non-gated keys
+    are always open."""
+    need = ADVENTURE_GATES.get(key)
+    if need is None:
+        return True
+    if prog is None:
+        import tuipet.utils.persistence as persistence
+        prog = persistence.get_progress()
+    return len(prog.get("maps", ()) or ()) >= need
+
+
+def key_for_icon(icon):
+    """The CATALOG key whose sprite is `icon`, or None (unmapped loot).
+    A RETIRED key's icon resolves to its heir -- authored loot rows, cup
+    prizes and town stock lines written against a cut item keep paying."""
+    k = _BY_ICON.get(icon)
+    if k is not None:
+        return k
+    old = _RETIRED_ICONS.get(icon)
+    return RETIRED.get(old) if old else None
+
+
+def icon_art(key):
+    """A still-cell's substitute sprite for `key` (catalog key or raw icon
+    key), or None to use the sheet frame.  Falls back to None if the orb
+    bank is missing so the frame path always still renders something."""
+    k = key if key in CATALOG else (key_for_icon(key) or "")
+    ref = _ICON_ART.get(k)
+    if not ref:
+        return None
+    import tuipet.data.loaders.data_world as data_world
+    group, idx = ref
+    return (data_world.load_orbs().get(group) or {}).get(idx)
+
+
+def icon_frame(key):
+    """The display frame for a CATALOG key or a raw icon key ('i:9')."""
+    k = key if key in CATALOG else (key_for_icon(key) or "")
+    return _ICON_FRAME.get(k, 0)
+
+
+def item_is_eaten(key):
+    """True when USING this item should play the EAT show.
+
+    The canon rule is the SHEET (item-show audit 2026-07-23, Joel "do
+    the eat show for the consumables too"): foods.csv carries no
+    AnimationType column at all, because eating IS the animation --
+    exactly how the pill already works ("the pill is EATEN, the
+    source's EATING action, same as meat", pill-anim fix 2026-07-18).
+    So every `f:` item eats: the 11 foods as before, plus the six
+    food-sheet CONSUMABLES that used to flash bare text -- both
+    drinks, both pills, the vitamin and the anti-evo chip.  `i:`
+    items take a script instead (see item_script)."""
+    return ICON_KEYS.get(key, "").startswith("f:")
+
+
+def item_script(key):
+    """The canon SHOW for a catalog item, or None.
+
+    ONE SOURCE (item-show audit 2026-07-23, Joel: "is all of that
+    already wired in?"): items.csv carries an AnimationType for every
+    row, and our icon key `i:N` IS that row id -- so the mapping is
+    free.  This replaces TOY_SCRIPTS, a 7-entry hand-map that
+    duplicated the column and left 19 items with ripped art and no
+    show at all.  Returns None for anything without an implemented
+    script, for own-door items, and for `f:` consumables -- food-sheet
+    items are EATEN (foods.csv has no AnimationType at all) and ride
+    the eat fx, exactly like the pill."""
+    if key in _OWN_FLOW:
+        return None
+    import tuipet.utils.itemfx as itemfx
+    if key in itemfx._SCRIPT_OVERRIDE:      # a canon type with no usable show,
+        return itemfx._SCRIPT_OVERRIDE[key]  # remapped to a fitting one (2026-07-24)
+    icon = ICON_KEYS.get(key, "")
+    if not icon.startswith("i:"):
+        return None
+    act = (data.consumable_by_key(icon) or {}).get("action") or ""
+    return act if act in itemfx.SCRIPTS else None
+
+
+def relic_open(key, prog=None):
+    """Is this Relic's wave reached?  (Non-relic keys are open.)"""
+    gate = RELIC_GATES.get(key)
+    if gate is None:
+        return True
+    if prog is None:
+        import tuipet.utils.persistence as persistence
+        prog = persistence.get_progress()
+    sig, need = gate
+    return int(prog.get(sig, 0)) >= need
+
+
+def _price(v):
+    return int(v.get("price") or DEFAULT_PRICE)
+
+
+def _usable(key, category):
+    """Only goods Pet.use_item can actually APPLY are sold.  Since the
+    TUIPET catalog (2026-07-18) the consumables are authored in CATALOG;
+    vitems contributes only the Relics (its theme_* skins,
+    storage_drive and retired consumables never reach the shelf)."""
+    return category == ARMOR_CATEGORY or key in CATALOG
+
+
+def catalog():
+    """Every buyable entry: [{key, name, price, category}], price order.
+    The consumable shelf is the authored CATALOG (price None = unsold);
+    the 11 Relics still come from vitems.json.  A Relic whose
+    wave isn't reached is SEALED: it stays off the shelf entirely (the
+    egg-carousel rule), though entry() still resolves it so an
+    already-owned one renders in the bag."""
+    import tuipet.utils.persistence as persistence
+    prog = persistence.get_progress()
+    out = []
+    for k, v in CATALOG.items():
+        if v.price is not None and adventure_open(k, prog):  # road shelf gated by maps
+            out.append({"key": k, "name": v.name, "price": v.price,
+                        "category": v.category})
+    for k, v in data.load_vitems().items():
+        if isinstance(v, dict) and v.get("category") == ARMOR_CATEGORY \
+                and relic_open(k, prog):
+            out.append({"key": k, "name": v.get("name", k),
+                        "price": _price(v),
+                        "category": ARMOR_CATEGORY})
+    out.sort(key=lambda e: (e["category"], e["price"], e["name"]))
+    return out
+
+
+def entry(key):
+    """Resolve any key: the authored CATALOG first (an unsold treat still
+    renders in the bag at a nominal resale), then vitems (Relics)."""
+    c = CATALOG.get(key)
+    if c is not None:
+        return {"key": key, "name": c.name,
+                "price": c.price if c.price is not None else 100,
+                "category": c.category}
+    v = data.load_vitems().get(key)
+    if not isinstance(v, dict):
+        return None
+    return {"key": key, "name": v.get("name", key),
+            "price": _price(v),
+            "category": v.get("category", "Item")}
+
+
+def categories():
+    have = {e["category"] for e in catalog()}
+    out = [c for c in CATEGORY_ORDER if c in have]
+    return out + sorted(have - set(out))
+
+
+def shelf(cat):
+    return [e for e in catalog() if e["category"] == cat]
+
+
+def crest_answer(pet, key):
+    """The forms THIS pet's armor jump would land right now -- the same
+    evolution.check gate the crest egg runs on use (display only, no
+    roll).  [] when nothing answers (not a crest key, egg/dead, gates
+    unmet)."""
+    import tuipet.core.evolution as evolution
+    from tuipet.core.pet import Pet
+    item_id = Pet._CREST_IDS.get(key, -1)
+    if (item_id < 0 or pet is None or getattr(pet, "num", -1) < 0
+            or getattr(pet, "dead", False) or pet.stage == "Egg"):
+        return []
+    _, by_num = data.load_sprites()
+    return sorted({by_num[t]["name"]
+                   for t in data.load_evolutions().get(pet.num, [])
+                   if t in by_num and not data.is_placeholder(t)
+                   and evolution.check(pet, t, item=item_id)})
+
+
+def wave_status(prog=None):
+    """(sealed_count, closest-wave tease) from live RELIC_GATES
+    progress -- (0, '') once every relic is on the shelf."""
+    if prog is None:
+        import tuipet.utils.persistence as persistence
+        prog = persistence.get_progress()
+    sealed = [g for k, g in RELIC_GATES.items()
+              if g is not None and not relic_open(k, prog)]
+    if not sealed:
+        return 0, ""
+
+    def ratio(g):
+        sig, need = g
+        return min(1.0, int(prog.get(sig, 0)) / need)
+    # DETERMINISTIC TIE-BREAK (shops audit 2026-07-25).  `max(set(...))`
+    # walked a SET, so when two sealed waves tied on ratio the winner fell
+    # out of string-hash iteration order -- which Python randomises PER
+    # PROCESS.  Measured: the same save printed "wins 0/25 wake Light &
+    # Kindness" or "generation 0/5 wakes Destiny" depending on the launch,
+    # and 7% of sampled progress states tie (any player at gen 5+ with no
+    # armor evo and no wins sits in one).  A shop's character is supposed
+    # to be STABLE -- the same law that keeps a town's guest good crc32-
+    # ordered and its deal fixed for the day.  Ties now break toward the
+    # NEAREST goal in absolute terms (smallest `need`), which is also the
+    # more useful tease: "your 1st armor evo" over "wins 0/25".
+    sig, need = max(sorted(set(sealed)), key=lambda g: (ratio(g), -g[1]))
+    have = min(int(prog.get(sig, 0)), need)
+    tease = _WAVE_TEASE.get((sig, need), "mais relíquias surgem por aí")
+    return len(sealed), tease.format(have=have, need=need)
+
+
+def effect_line(e):
+    if e.get("category") == ARMOR_CATEGORY:
+        return "an armor evolution (the right Child)"
+    k = e["key"]
+    eff = EFFECTS.get(k, "uma curiosidade")
+    fl = FLAVORS.get(k)
+    # the dossier speaks effect AND character ("polish up the shop
+    # descriptions" 2026-07-18) -- but the info block holds exactly two
+    # 26-col rows, so a long effect keeps the stage to itself
+    if fl:
+        import textwrap
+        joined = f"{eff} — {fl}"
+        if len(textwrap.wrap(joined, 26)) <= 2:
+            return joined
+    return eff
+
+
 _TOUCHES = {
     # ---- FOOD ----
     "fish": ("hunger",),
@@ -1015,7 +1220,8 @@ def _base_rows(town_id):
     if not t:
         return []
     ov = data.load_shop_overrides()
-    foods, items = data._load_consumables()
+    import tuipet.data.loaders.data_shop as data_shop
+    foods, items = data_shop._load_consumables()
     rows = []
     for sid in t["items_override"] + t["foods_override"]:
         o = ov.get(sid)
@@ -1231,214 +1437,3 @@ HOME_STAPLES = frozenset({
     "capsule_a",
 })
 HOME_BAND_SIZE = 10
-
-
-def home_band(today=None):
-    """The day's rotating guest rows.
-
-    A SHUFFLED CYCLE, not a random draw (audit 2026-07-27): the first cut
-    of this was tier-weighted sampling, and a 40-day probe caught it simply
-    never dealing Flaming Wings -- a shelf that MAY show a thing eventually
-    is the slot machine, not the store.  Joel's actual question ("are items
-    spread out evenly thoughout the week?") is the spec: the non-staple pool
-    is shuffled once per EPOCH (seeded, so every device deals the same week)
-    and dealt out in day-sized hands, so every sellable key is guaranteed a
-    home-shelf day each cycle (~1 week).  Rarity stays where it belongs --
-    in prices, town curation and the tier rations -- not in whether the
-    counter will ever stock the good at all."""
-    pool = [k for k, v in sorted(CATALOG.items())
-            if v.price is not None and k not in HOME_STAPLES
-            and v.category != "Road"]        # road rows ride their own gate
-    if not pool:
-        return []
-    days = -(-len(pool) // HOME_BAND_SIZE)          # hands per full cycle
-    o = _today_ordinal(today)
-    epoch, day = divmod(o, days)
-    deck = list(pool)
-    random.Random(f"homeband:{epoch}").shuffle(deck)
-    hand = deck[day * HOME_BAND_SIZE:(day + 1) * HOME_BAND_SIZE]
-    # the last hand of a short deck tops up from the front, never short-shelves
-    if len(hand) < HOME_BAND_SIZE:
-        hand += deck[:HOME_BAND_SIZE - len(hand)]
-    return hand
-
-
-def _ration_left(shop_id, key, taken):
-    """Today's remaining ration for a tier-limited row -- THE one place the
-    arithmetic lives (assembly dedup 2026-07-27: home and town each hand-
-    rolled this line, the seam where the two shelves could drift)."""
-    return max(0, tier_stock(key) - int(taken.get(f"{shop_id}:{key}", 0)))
-
-
-def home_stock(today=None, pet=None):
-    """The home shelf: staples + the day's band + the deal, decorated the
-    same way a town counter is (shops-look-the-same law).
-
-    Pricing and rationing are unchanged from the audit rulings: staples and
-    band rows sell UNLIMITED at full catalog price (a flip at catalog is
-    always a loss -- item sweep 2026-07-24), the one deal row and the
-    capsule keep their daily tier rations, and a spent deal ration falls
-    back to full price rather than a shut door."""
-    deal = home_deal_key(today)
-    band = set(home_band(today))
-    taken = _town_taken(pet, today) if pet is not None else {}
-    out = []
-    for e in catalog():
-        k = e["key"]
-        if (k != deal and k not in HOME_STAPLES and k not in band
-                and e["category"] not in (ARMOR_CATEGORY, "Road")):
-            # not on today's shelf -- come back tomorrow.  TWO shelves
-            # bypass the band, because both are DOORS, not stock: the
-            # Relic shelf (the crest system's single door) and the
-            # ROAD shelf (map-clear gated -- a tamer who just earned the
-            # warp must not wait three days to buy it; the gate IS its
-            # scarcity).  Everything else rotates.
-            continue
-        if k in HOME_RATIONED and k != deal:
-            # THE CAPSULE RATION (expansion audit 2026-07-26): its contents
-            # out-value its price by construction, so the always-open shelf
-            # rations it like a deal row or it prints bits
-            left = _ration_left(HOME_SHOP_ID, k, taken)
-            out.append(dict(e, left=left, town_id=HOME_SHOP_ID))
-            continue
-        if k == deal:
-            base = e["price"]
-            left = _ration_left(HOME_SHOP_ID, k, taken)
-            e = (dict(e, deal=True, base_price=base, left=left,
-                      town_id=HOME_SHOP_ID,
-                      price=max(1, base // HOME_DEAL_FACTOR)) if left > 0
-                 else dict(e, deal_spent=True))
-        out.append(e)
-    return out
-
-
-def _stocked(town_id, key):
-    """This town's shelf row for `key`, or None (the demand test)."""
-    for _sid, k, o, local in _town_rows(town_id):
-        if k == key:
-            return o, local
-    return None
-
-
-def _town_taken(pet, today=None):
-    """The day's purchase ledger for this pet ({} once the day turns)."""
-    tb = getattr(pet, "town_bought", None) or {}
-    return tb if tb.get("day") == _today_ordinal(today) else {}
-
-
-def town_stock(town_id, today=None, pet=None):
-    """The town shop's shelves as ready entries [{key,name,price,category,
-    base_price,deal,left,town_id}].  The day's rotating deal (and, on a
-    FESTIVAL, every row -- the festival market) sells at the canon
-    checkSale price: price // SaleFactor.  `left` is the authored maxStock
-    minus the day's take (the anti-pump: town prices are DVPet's own,
-    far under the catalog -- the daily cap is what makes the demand
-    resale a treat instead of a printer)."""
-    import tuipet.core.adventure as adventure
-    import tuipet.utils.persistence as persistence
-    prog = persistence.get_progress()
-    deal = town_deal_sid(town_id, today, prog)
-    fest = bool(adventure.active_holiday(today))
-    taken = _town_taken(pet, today) if pet is not None else {}
-    out = []
-    for sid, k, o, local in _open_rows(town_id, prog):
-        e = entry(k)
-        if not e:
-            continue
-        on = fest or sid == deal
-        price = local // max(1, o["sale_factor"]) if on else local
-        # TIERED STOCK (D1, 2026-07-24): rarity now limits how many a town
-        # will part with in a day, on the same ladder the road rolls -- a
-        # legendary good is one-per-town-per-day, a common one three.  The
-        # authored maxStock and the global daily cap still bound it.
-        # the authored maxStock and the global cap still bound the shared ration
-        left = min(_ration_left(town_id, k, taken),
-                   max(0, min(o["max_stock"], TOWN_DAILY_CAP)
-                       - int(taken.get(f"{town_id}:{k}", 0))))
-        out.append(dict(e, price=max(1, price), base_price=local,
-                        deal=on, left=left, town_id=town_id))
-    return out
-
-
-def town_egg_rows(town_id):
-    """The town's egg band as SHOP ROWS (shops-look-the-same,
-    2026-07-22: Joel — "the egg tabs in town shops are different than the
-    normal shops, why arent these things modulized").  Same entry shape
-    the shelf renders everywhere; `egg_idx` rides the existing menu icon
-    plumbing (shop eggs draw their real egg frames)."""
-    import tuipet.core.egg as egg_mod
-    owned = egg_mod.owned_now()          # earned-but-unbanked counts as owned
-    return [{"key": f"egg:{i}", "name": egg_mod.hatch_name(i)[:18],
-             "price": egg_price(i), "category": "Egg",
-             "egg_idx": i, "owned": i in owned, "town_id": town_id}
-            for i in town_egg_stock(town_id)]
-
-
-def town_egg_buy(pet, idx):
-    """Buy a egg outright (bits -> persistence.egg_own) -> (msg, sfx).
-    THE single buy path — the town egg panel and the shop's Eggs tab both
-    call here (single-source law)."""
-    import tuipet.data.loaders.data as data
-    import tuipet.core.egg as egg_mod
-    import tuipet.utils.persistence as persistence
-    rule = data.load_egg_unlock().get(idx)
-    if rule is not None and not rule["can_perm"]:
-        # the single buy path guards what the shelf filter promises: a
-        # lineage egg is never permanently ownable (egg audit 2026-07-25)
-        return ("Um ovo de linhagem — choca para quem o conquista.", "error")
-    if idx in egg_mod.owned_now():       # same read as the shelf: never sell
-        return ("Você já possui esse ovo.", "error")   # what's already earned
-    price = egg_price(idx)
-    if not pet.spend_bits(price):
-        return (f"{price}b — bits insuficientes.", "error")
-    persistence.egg_own(idx)
-    return (f"Comprou o ovo de {egg_mod.hatch_name(idx)} — "
-            "it's on your carousel!", "reward")
-
-
-def town_buy(pet, e, today=None):
-    """A town counter purchase: blocked once the day's authored stock is
-    gone, recorded in the pet's daily ledger otherwise.
-
-    THE LIVE ROW, never the caller's copy (live-play audit 2026-07-25):
-    this is the ONE rationed counter door, and it trusted the entry dict
-    it was handed -- a stale row replayed after the ration was spent
-    oversold the deal at the deal price.  The UI rebuilds rows every
-    keypress so no key reaches it today, but any future caller that
-    caches a row would mint discounted stock.  Re-fetch the row from its
-    own builder and buy THAT: forged/stale `left` and `price` both die
-    here."""
-    tid = e.get("town_id", HOME_SHOP_ID)
-    rows = (home_stock(today, pet) if tid == HOME_SHOP_ID
-            else town_stock(tid, today, pet))
-    live = next((r for r in rows if r.get("key") == e.get("key")
-                 and r.get("left") is not None), None)
-    if live is None or live.get("left", 0) <= 0:
-        return ("Esgotado hoje — volte amanhã.", "error")
-    e = live
-    msg, sfx = buy(pet, e)
-    if sfx == "confirm":
-        day = _today_ordinal(today)
-        tb = getattr(pet, "town_bought", None) or {}
-        if tb.get("day") != day:
-            tb = {"day": day}                  # a new day sweeps the ledger
-        k = f"{e['town_id']}:{e['key']}"
-        tb[k] = int(tb.get(k, 0)) + 1
-        pet.town_bought = tb
-    return (msg, sfx)
-
-
-def town_sell_price(key, town_id):
-    """Buy-low/sell-high: a good this town STOCKS resells at the canon
-    local_price // ResellFactor (it has plenty); one it DOESN'T stock is
-    in DEMAND -- 70% of catalog price, better than home's half.  The
-    trade window: buy a family's exclusive ON DEAL, carry it to the
-    OTHER family's towns."""
-    hit = _stocked(town_id, key)
-    if hit is not None:
-        o, local = hit
-        return max(1, local // max(1, o["resell_factor"]))
-    e = entry(key)
-    if not e:
-        return 1
-    return max(1, e["price"] * TOWN_DEMAND_NUM // TOWN_DEMAND_DEN)

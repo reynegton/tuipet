@@ -4,8 +4,8 @@ key hints stand still; the app's _hud whole-line marquee stays as the safety
 net, but a strip that ALWAYS overflowed slid its hints out of view."""
 from rich.text import Text
 
-from tuipet.pet import Pet
-from tuipet.render import marquee
+from tuipet.core.pet import Pet
+from tuipet.utils.render import marquee
 
 LCD_COLS, HUD_W = 40, 40
 LONGEST = "AncientMegatherimon"          # the widest real dex name (19)
@@ -36,7 +36,7 @@ def test_marquee_holds_then_scrolls_and_loops():
 
 
 def test_death_strip_states_fit_with_the_longest_name():
-    from tuipet.deathscreen import DeathPanel
+    from tuipet.ui.screens.deathscreen import DeathPanel
     dead = _pet()
     dead.dead = True
     dead.death_cause = "neglect"
@@ -52,8 +52,8 @@ def test_death_strip_states_fit_with_the_longest_name():
 
 
 def test_lobby_jogress_lines_fit_with_a_24_char_partner():
-    from tuipet import lobbyscreen
-    from tuipet.net import LobbyState
+    from tuipet.ui.screens import lobbyscreen
+    from tuipet.network.net import LobbyState
 
     class _Stub:
         def __init__(self, state): self.state = state
@@ -70,7 +70,7 @@ def test_lobby_jogress_lines_fit_with_a_24_char_partner():
         lines = pan.text().plain.split("\n")
         assert max(map(len, lines)) <= LCD_COLS
     pan.jphase, pan.jresult = "result", {"num": 649, "name": LONGEST}
-    from tuipet import jogressscreen
+    from tuipet.core import jogressscreen
     show = jogressscreen.JogressPanel(pan.pet, 649, 286, 649)
     show.phase = "fused"
     pan.jshow = show

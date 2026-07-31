@@ -12,9 +12,10 @@ reversing a clean integer upscale, not a lossy shrink.
 """
 import datetime
 
-from tuipet import arenafx, grid
-from tuipet.pet import Pet
-from tuipet.render import blit as _blit
+from tuipet.utils import arenafx
+from tuipet.utils import grid
+from tuipet.core.pet import Pet
+from tuipet.utils.render import blit as _blit
 
 DATES = {
     "Halloween Festival": datetime.date(2026, 10, 31),
@@ -25,7 +26,7 @@ DATES = {
 
 
 def test_every_holiday_maps_to_a_decoration():
-    from tuipet import tournament
+    from tuipet.core import tournament
     for name in tournament.HOLIDAYS.values():
         assert name in arenafx.HOLIDAY_DECOR, name
         assert arenafx._holiday_decor(DATES[name]) is not None, name
@@ -62,7 +63,7 @@ def test_the_food_props_are_recovered_native_not_upscaled():
 
 
 def test_the_decoration_draws_on_the_home_arena_only_on_a_holiday():
-    import tuipet.tournament as T
+    import tuipet.core.tournament as T
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     plain = arenafx._effect_overlay(p, 0, arenafx.SCREEN_COLS, grid.PXH, tick=0)
     _orig = T.holiday
@@ -83,7 +84,7 @@ def test_the_decoration_clears_a_resting_pet():
 
 
 def test_a_dead_pet_shows_no_decoration():
-    import tuipet.tournament as T
+    import tuipet.core.tournament as T
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.dead = True
     _orig = T.holiday
@@ -98,6 +99,6 @@ def test_a_dead_pet_shows_no_decoration():
 def test_the_festival_bonuses_are_unchanged_underneath():
     """The decoration is purely visual -- the double bits / sales / festival
     egg machinery is the same holiday() the decor reads, untouched."""
-    from tuipet import adventure
+    from tuipet.core import adventure
     assert adventure.active_holiday(DATES["Christmas Festival"]) == "Christmas Festival"
     assert adventure.HOLIDAY_BITS_MULT == 2

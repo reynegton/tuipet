@@ -6,8 +6,8 @@ import datetime
 
 import pytest
 
-from tuipet import tournament
-from tuipet.pet import Pet
+from tuipet.core import tournament
+from tuipet.core.pet import Pet
 
 
 WED = datetime.date(2026, 7, 15)          # a Summer weekday
@@ -127,8 +127,8 @@ def test_weekend_featured_is_winnable_by_the_pet(monkeypatch):
     """Cup ruling 2026-07-18: the weekend headliner draws from the PET's own
     bracket or the open tier -- never a bracket the pet can only lose."""
     import datetime as dt
-    from tuipet import tournament
-    from tuipet.pet import Pet
+    from tuipet.core import tournament
+    from tuipet.core.pet import Pet
     sat = dt.date(2026, 7, 18)                    # a real Saturday
     champ = Pet(num=100, stage="Champion", attribute="Vaccine")
     champ.world_seconds = 600.0
@@ -144,8 +144,8 @@ def test_weekend_featured_is_winnable_by_the_pet(monkeypatch):
 def test_the_grand_chain_names_the_missing_season(monkeypatch):
     """Cup ruling 2026-07-18: a prelim wall from ANOTHER real season says so
     -- the year-long arc reads as a journey, not a mystery wall."""
-    from tuipet import tournament
-    from tuipet.pet import Pet
+    from tuipet.core import tournament
+    from tuipet.core.pet import Pet
     monkeypatch.setattr(tournament, "real_season", lambda today=None: "Winter")
     p = Pet(num=100, stage="Mega", attribute="Vaccine", bits=99999)
     p.world_seconds = 600.0

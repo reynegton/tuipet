@@ -6,7 +6,7 @@ import json
 import os
 import sys
 
-from tuipet.net import LobbyClient, SyncClient
+from tuipet.network.net import LobbyClient, SyncClient
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "server"))
 import server  # noqa: E402

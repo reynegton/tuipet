@@ -7,9 +7,9 @@ test here drives a REAL flow (seeded) and renders after every step.  Shallow on
 purpose: the assertion is 'it draws in every phase'."""
 import random
 
-from tuipet.pet import Pet
-from tuipet.net import LobbyState
-from tuipet import lobbyscreen
+from tuipet.core.pet import Pet
+from tuipet.network.net import LobbyState
+from tuipet.ui.screens import lobbyscreen
 
 
 def _pet(**kw):
@@ -35,8 +35,8 @@ def _step(pan, k=None, ticks=1):
 
 
 def test_tournament_panel_select_and_a_full_cup():
-    from tuipet.tournamentscreen import TournamentPanel
-    from tuipet import tournament
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
+    from tuipet.core import tournament
     random.seed(7)
     p = _pet()
     tournament.schedule(p)
@@ -78,12 +78,12 @@ def test_jogress_panel_fuses():
 
 
 def test_dna_panel_every_page():
-    from tuipet.dnascreen import DNAPanel
+    from tuipet.ui.screens.dnascreen import DNAPanel
     random.seed(5)
     p = _pet()
     for f in p.dna_owned:
         p.dna_owned[f] = 30
-    from tuipet.dnascreen import _HOME
+    from tuipet.ui.screens.dnascreen import _HOME
     pan = DNAPanel(p)
     for i in range(len(_HOME)):                  # open every home entry, render, back out
         pan.phase = "home"
@@ -101,7 +101,7 @@ def test_dna_panel_every_page():
 
 
 def test_battle_panel_full_fight_and_forfeit():
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     random.seed(2)
     p = _pet()
     pan = BattlePanel(p)
@@ -124,7 +124,7 @@ def test_battle_panel_full_fight_and_forfeit():
 
 
 def test_battle_surrender_ask_renders():
-    from tuipet.battlescreen import BattlePanel
+    from tuipet.ui.screens.battlescreen import BattlePanel
     random.seed(9)
     p = _pet(obedience=0, mood=-9000)            # a faltering pet asks to quit
     for attempt in range(30):
@@ -144,7 +144,7 @@ def test_battle_surrender_ask_renders():
 
 
 def test_training_all_four_drills():
-    from tuipet.training import TrainingPanel
+    from tuipet.core.training import TrainingPanel
     random.seed(6)
     for drill in "1234":
         p = _pet()
@@ -271,7 +271,7 @@ def test_jogress_panel_full_fuse():
     died with the home jogress, v0.2.348 -- the lobby resolves the match;
     this drives the cinematic it hands over)."""
     from tuipet.jogressscreen import JogressPanel, FUSE_STEPS
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     random.seed(4)
     _, by = data.load_sprites()
     reqs, evo = data.load_requirements(), data.load_evolutions()
@@ -296,8 +296,8 @@ def test_jogress_panel_full_fuse():
 
 
 def test_tournament_bracket_runs_when_eligible():
-    from tuipet.tournamentscreen import TournamentPanel
-    from tuipet import tournament
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
+    from tuipet.core import tournament
     random.seed(1)
     p = _pet()
     tournament.schedule(p)
@@ -330,7 +330,7 @@ def test_tournament_bracket_runs_when_eligible():
 
 
 def test_shop_walks_clean_without_a_digitama_shelf():
-    from tuipet.shopscreen import ShopPanel
+    from tuipet.ui.screens.shopscreen import ShopPanel
     p = _pet()
     pan = ShopPanel(p)
     for _ in range(len(pan._tabs())):
@@ -342,7 +342,7 @@ def test_shop_walks_clean_without_a_digitama_shelf():
 
 
 def test_eggselect_code_entry():
-    from tuipet.eggselectscreen import EggSelectPanel
+    from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     pan = EggSelectPanel()
     _step(pan, "c")                              # secret-code mode
     for ch in "notacode":
@@ -358,12 +358,12 @@ def test_battle_panel_across_varied_foes():
     variants.  (Renamed 2026-07-18: the old "battlefx" name described the
     dead AttackEffectProcess port, deleted that day -- these tests always
     drove the live BattlePanel.)"""
-    from tuipet.battlescreen import BattlePanel
-    from tuipet import battle as battle_mod
+    from tuipet.ui.screens.battlescreen import BattlePanel
+    from tuipet.core import battle as battle_mod
     random.seed(12)
     p = _pet()
     enemies = battle_mod.pick_enemy(p) and None  # warm the table
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     pool = [e for e in data.load_enemies() if e.get("stage") == "Champion"][:10]
     for e in pool:
         pan = BattlePanel(_pet(), enemy=dict(e))
@@ -383,8 +383,8 @@ def test_battle_panel_every_attack_carrier_fights():
     volley replay.  (Renamed 2026-07-18: "checkEffect branches" described
     the dead DVPet effect engine; the 0.5 HP race has no attack effects --
     this walk exercises sprite/attack variety through the live panel.)"""
-    from tuipet.battlescreen import BattlePanel
-    from tuipet import data
+    from tuipet.ui.screens.battlescreen import BattlePanel
+    import tuipet.data.loaders.data as data
     random.seed(8)
     _, by = data.load_sprites()
     carriers = {}
@@ -459,7 +459,10 @@ def test_the_lobby_split_holds_its_boundaries():
     the old names stay importable.  The transplant lesson is pinned: exactly
     one LobbyPanel class exists."""
     import inspect
-    from tuipet import accountscreen, lobbybout, lobbychat, lobbyscreen
+    from tuipet.ui.screens import accountscreen
+    from tuipet.ui.screens import lobbybout
+    from tuipet.ui.screens import lobbychat
+    from tuipet.ui.screens import lobbyscreen
     assert lobbyscreen.AccountPanel is accountscreen.AccountPanel
     assert lobbyscreen._clamp_card is lobbybout._clamp_card
     mro = lobbyscreen.LobbyPanel.__mro__
@@ -478,8 +481,8 @@ def test_online_payout_survives_the_bout():
     """The live-smoke catch (2026-07-17): pet.add_bits died with the classic
     revert, so _battle_over crashed BOTH sides of every online bout at the
     payout since v0.5.0.  Drive the real method on a rigged panel."""
-    from tuipet.lobbyscreen import LobbyPanel
-    from tuipet.pet import Pet
+    from tuipet.ui.screens.lobbyscreen import LobbyPanel
+    from tuipet.core.pet import Pet
     p = Pet(num=100, name="Rex", stage="Champion", attribute="Vaccine",
             obedience=500)
     p.world_seconds = 12 * 60.0
@@ -504,9 +507,9 @@ def test_the_update_offers_a_restart(monkeypatch):
     ("restart",) verdict; ESC defers politely.  The app-side handler saves,
     flags the re-exec and exits Textual cleanly."""
     import threading
-    from tuipet import update as update_check
-    from tuipet.optionsscreen import OptionsPanel
-    from tuipet.pet import Pet
+    from tuipet.utils import update as update_check
+    from tuipet.ui.screens.optionsscreen import OptionsPanel
+    from tuipet.core.pet import Pet
 
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     pan = OptionsPanel(p, lambda: False, lambda: None)
@@ -540,7 +543,7 @@ def test_any_key_skips_the_converge():
     """The stated contract ("any key skips") is the real one now -- only
     ENTER/SPACE/ESC used to land."""
     from tuipet.jogressscreen import JogressPanel
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.world_seconds = 600.0
     pan = JogressPanel(p, p.num, p.num, p.num)
@@ -552,9 +555,9 @@ def test_any_key_skips_the_converge():
 def test_the_companion_prompt_says_lend_not_fuse():
     """A one-sided door's lender stays itself (canon Jesmon X) -- the
     prompt verb must not promise a fusion."""
-    from tuipet.net import LobbyState
-    from tuipet import lobbyscreen
-    from tuipet.pet import Pet
+    from tuipet.network.net import LobbyState
+    from tuipet.ui.screens import lobbyscreen
+    from tuipet.core.pet import Pet
 
     class _Stub:
         def __init__(self, state): self.state = state

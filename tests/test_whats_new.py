@@ -2,8 +2,8 @@
 build announces the release in the msg box; the seen stamp persists in
 settings so it shows exactly once per build.  Persistence is sandboxed by the
 autouse isolate_save fixture."""
-from tuipet import persistence
-from tuipet.pet import Pet
+from tuipet.utils import persistence
+from tuipet.core.pet import Pet
 from tuipet.app import TuiPetApp
 
 

@@ -13,8 +13,9 @@ Hard invariant, swept at the pixel level: sprites never draw on another."""
 import random
 
 import tuipet.app as app
-from tuipet import arena, grid
-from tuipet.pet import Pet
+from tuipet.core import arena
+from tuipet.utils import grid
+from tuipet.core.pet import Pet
 
 
 def _pet(**kw):
@@ -211,7 +212,7 @@ def test_the_window_law(monkeypatch):
     actor overlays arrive pre-clipped; weather alone rides the free channel
     over the whole LCD; ink pushed past an edge is cut at the matrix edge
     (the lawful LEFT/RIGHT exit)."""
-    from tuipet import render
+    from tuipet.utils import render
     cap = _paint_capture(monkeypatch)
     p = _pet(weather="Raining", sick=True, sick_length=99.0,
              poop=2, poop_sizes=[2, 3])
@@ -234,8 +235,8 @@ def test_egg_carousel_is_never_window_clipped(monkeypatch):
     """Joel 2026-07-12: the carousel got mangled by a blind clip.  Its canvas
     is a 40x16 STRIP (ROWS=8), not the full LCD -- the 32x16 window rect
     beheads every egg there.  The reel renders UNCLIPPED, exactly as built."""
-    from tuipet import eggselectscreen as es
-    from tuipet.pet import Pet
+    from tuipet.ui.screens import eggselectscreen as es
+    from tuipet.core.pet import Pet
     seen = {}
     real = es.render_scene
 
@@ -260,7 +261,7 @@ def test_battle_banner_and_flash_fill_the_window_not_the_lcd():
     LCD-centring parked their top two rows in the bezel sky at y4-5 on every
     battle (audit 2026-07-13).  _full anchors at the window like training's
     explosion, and the battle scene renders under the window clip."""
-    from tuipet import battlescreen as bs
+    from tuipet.ui.screens import battlescreen as bs
     for key in ("battle_banner", "hit_explosion"):
         frames = bs.BANNER if key == "battle_banner" else bs.EXPLODE
         lit_any = False
@@ -279,8 +280,8 @@ def test_battle_dodge_leap_never_exits_upward():
     """The dodge's blank-row lift is clamped to the mon's headroom (a 16px mon
     has none -- the sideways hop carries it, like real hardware): pre-clamp it
     pushed sprite ink to y3-5, above the window top (audit 2026-07-13)."""
-    from tuipet.pet import Pet
-    from tuipet import battlescreen as bs
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens import battlescreen as bs
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 600.0
     pan = bs.BattlePanel(p)
@@ -298,9 +299,9 @@ def test_dodge_turns_away_while_airborne():
     deviation -- ANIM_REFERENCE): airborne (dt 1-9) the dodger wears the
     OPPOSITE of its battle facing; touchdown (dt 10) and the return steps
     land it facing the foe again."""
-    from tuipet import strikefx
-    from tuipet.pet import Pet
-    from tuipet import battlescreen as bs
+    from tuipet.utils import strikefx
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens import battlescreen as bs
     rows = ["0110", "1100", "0110"]                    # asymmetric ink
     # the seam: turn inverts each side's normal mirror flag
     place, _ = strikefx.place_combatant(True, rows)
@@ -345,9 +346,9 @@ def test_the_ambient_sulk_is_pose_only():
     the smoke and, when the sick skull owned the right corridor, tucked it
     LEFT -- neither the attachment nor the left-tuck was ever Joel's order.
     The tantrum POSE is the whole discouraged show."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     from tuipet.app import Screen
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     s = object.__new__(Screen)
     s.frame_i = 0
     s.roamer = None

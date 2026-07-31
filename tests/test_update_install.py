@@ -10,7 +10,8 @@ import subprocess
 
 import pytest
 
-from tuipet import hostinfo, update
+from tuipet.utils import hostinfo
+from tuipet.utils import update
 
 
 def test_the_upgrade_targets_the_environment_we_actually_run_in():
@@ -89,8 +90,8 @@ def test_success_always_asks_for_a_restart(monkeypatch):
 
 
 def test_the_options_row_offers_the_install_then_asks_for_a_restart():
-    from tuipet.optionsscreen import OptionsPanel
-    from tuipet.pet import Pet
+    from tuipet.ui.screens.optionsscreen import OptionsPanel
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 600.0
     pan = OptionsPanel(p, sound_get=lambda: True, sound_toggle=lambda: None)
@@ -108,8 +109,8 @@ def test_enter_on_restart_to_apply_actually_restarts():
     it must RESTART -- not re-check and say 'up to date' (current_version reads
     the freshly-upgraded disk).  Regression: Joel 2026-07-20, 'the first reset
     should update the game'."""
-    from tuipet.optionsscreen import OptionsPanel, _ROWS
-    from tuipet.pet import Pet
+    from tuipet.ui.screens.optionsscreen import OptionsPanel, _ROWS
+    from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 600.0
 

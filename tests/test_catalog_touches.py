@@ -24,8 +24,8 @@ import dataclasses
 
 import pytest
 
-from tuipet import shop
-from tuipet.pet import Pet
+from tuipet.core import shop
+from tuipet.core.pet import Pet
 
 _PET_FIELDS = {f.name for f in dataclasses.fields(Pet)}
 
@@ -137,5 +137,5 @@ def test_the_free_cure_buttons_are_never_paywalled():
             assert v.price == allowed[key], key
     from tuipet.app import TuiPetApp
     assert any(k == "h" and a == "heal" for k, a, _l in TuiPetApp.BINDINGS)
-    from tuipet.feedscreen import ROWS_MENU
+    from tuipet.ui.screens.feedscreen import ROWS_MENU
     assert any(k == "pill" for k, _label in ROWS_MENU)

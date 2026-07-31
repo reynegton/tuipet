@@ -8,10 +8,11 @@ via world_seconds (day 0 = Spring, day 1 = Summer, ...).
 """
 import random
 
-from tuipet import data, tournament
-from tuipet.tournament import (Tournament, TOURNEY_BITS, TOURNEY_MAX_BITS,
+import tuipet.data.loaders.data as data
+from tuipet.core import tournament
+from tuipet.core.tournament import (Tournament, TOURNEY_BITS, TOURNEY_MAX_BITS,
                                TOURNEY_AGES, HOME_LIMIT)
-from tuipet.pet import Pet, DAY_LENGTH
+from tuipet.core.pet import Pet, DAY_LENGTH
 
 
 def _trophy(id=1, season="Spring", field_req="", attr_req="", age_limit="",
@@ -137,7 +138,7 @@ def test_prelim_qualification_never_expires(monkeypatch):
 def test_cross_season_grand_chain_is_reachable():
     """The real data: cups 92/170/248 must accept a prelim beaten in the
     prior season (their prelims live in a different season by design)."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     by = {t["id"]: t for t in data.load_tournies()}
     for qid, pid in ((92, 14), (170, 92), (248, 170)):
         assert by[qid]["season"] != by[pid]["season"]   # the data really crosses
@@ -209,7 +210,7 @@ def test_npc_rounds_shrink_the_bracket():
 
 
 def test_champion_feeds_egg_unlock_progress():
-    from tuipet import persistence
+    from tuipet.utils import persistence
     random.seed(4)
     p = _pet("Rookie")
     tm = Tournament(p, _trophy(id=7))
@@ -268,7 +269,7 @@ def test_bracket_tree_records_every_round():
 
 
 def test_bracket_page_renders_and_toggles():
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
     random.seed(4)
     p = _pet("Rookie")
     p.name = "Rookling"
@@ -293,8 +294,8 @@ def test_bracket_preview_bobs_at_the_walk_beat():
     """The bracket faceoff/result idle bob runs at the standard ~2Hz WALK_BEAT
     (frame_i // 5) like every other scene -- this screen alone flipped poses
     every fast-tick, a 10Hz flutter calmed on Joel's call (2026-07-05)."""
-    from tuipet.tournamentscreen import TournamentPanel
-    from tuipet import data
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
+    import tuipet.data.loaders.data as data
     p = _pet()
     num = next(n for n in sorted(data.load_sprites()[1])
                if n >= 0 and not data.is_placeholder(n))
@@ -315,8 +316,8 @@ def test_mid_bracket_contracts():
     CANON (Tourney_Registration gates only checkTourneyClosed + isEligible --
     no entered flag; the hour window is the throttle)."""
     import random
-    from tuipet import data
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.ui.screens import data
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
 
     def champ():
         rec = data.load_sprites()[1][100]
@@ -331,7 +332,7 @@ def test_mid_bracket_contracts():
     # the one pool holds every cup now (2026-07-17): entry only opens at the
     # CURRENT hour, so move the clock to a slot whose cup will actually take
     # this champ instead of trusting seed-luck
-    from tuipet.pet import DAY_LENGTH
+    from tuipet.core.pet import DAY_LENGTH
     p.world_seconds = DAY_LENGTH / 48                # hour 0, day 0
     sched = tournament.schedule(p)
     slot = next(i for i, tid in enumerate(sched) if tid >= 0
@@ -364,7 +365,7 @@ def test_mid_bracket_contracts():
     pan3.key("space"); pan3.key("space")        # into the round-one bout
     # the MATCH INTRODUCTIONS play first (cup theater 2026-07-21): the
     # walk-ins hold the stage, then the bell opens the fight itself
-    from tuipet.tournamentscreen import INTRO_OPP_T, INTRO_PET_T, INTRO_HOLD_T
+    from tuipet.ui.screens.tournamentscreen import INTRO_OPP_T, INTRO_PET_T, INTRO_HOLD_T
     assert pan3._intro is not None and pan3.sub is None
     for _ in range(INTRO_OPP_T + INTRO_PET_T + INTRO_HOLD_T + 1):
         pan3.anim()
@@ -425,7 +426,7 @@ def test_the_purse_truncates_per_entrant():
 def test_the_cup_renders_in_the_arena(monkeypatch):
     """The tournament screen's LCD scenes pull the tourneyBack sheet, not the
     home scene (BackgroundAnim checkBack; theme/rendering audit 2026-07-06)."""
-    from tuipet import tournamentscreen
+    from tuipet.ui.screens import tournamentscreen
     random.seed(4)
     p = _pet("Rookie")
     seen = []
@@ -444,7 +445,7 @@ def test_the_cup_renders_in_the_arena(monkeypatch):
 def test_next_winnable_points_at_an_enterable_cup():
     """The home-cup hint (Joel 2026-07-09) returns the next hour today whose cup
     the pet can actually enter -- eligibility passes and the hour is not behind us."""
-    import tuipet.tournament as T
+    import tuipet.core.tournament as T
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500, bits=999)
     p.world_seconds = 10 * 60.0
     nw = T.next_winnable(p)
@@ -465,8 +466,8 @@ def test_a_cup_runs_once_per_hour():
     per hour.  Entering spends the slot; the next hour brings a fresh cup;
     the day roll clears the ledger."""
     import random
-    from tuipet.pet import Pet
-    from tuipet import tournament as tm
+    from tuipet.core.pet import Pet
+    from tuipet.core import tournament as tm
     random.seed(3)
     p = Pet(num=964, stage="Mega", attribute="Vaccine", obedience=900, bits=10_000)
     p.world_seconds = 600.0
@@ -500,8 +501,8 @@ def test_a_cup_runs_once_per_hour():
 
 def test_next_winnable_skips_hours_already_run():
     import random
-    from tuipet.pet import Pet
-    from tuipet import tournament as tm
+    from tuipet.core.pet import Pet
+    from tuipet.core import tournament as tm
     random.seed(5)
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=800)
     p.world_seconds = 600.0
@@ -596,7 +597,7 @@ def test_esc_at_the_bar_backs_out_never_forfeits():
     silent stake-losing forfeit (the raid treats the same signal as "the
     attempt keeps").  It returns to the bracket now, match still owed; the
     bracket page's own ESC stays the labeled forfeit."""
-    from tuipet import tournamentscreen
+    from tuipet.ui.screens import tournamentscreen
 
     class _Sub:                       # a bout reporting ESC-before-the-bell
         def key(self, k):
@@ -656,13 +657,13 @@ def test_cup_rows_wear_one_whole_tag(monkeypatch):
     per row now, dominant state first (OPEN > alarm > +item), and every
     row fits the 38-cell budget whole."""
     from rich.cells import cell_len
-    from tuipet import tournament
-    from tuipet.tournamentscreen import TournamentPanel
+    from tuipet.core import tournament
+    from tuipet.ui.screens.tournamentscreen import TournamentPanel
     p = _pet("Rookie")
     pan = TournamentPanel(p)
     pan.phase = "select"
     # force an ITEMED trophy into every slot, the alarm onto hour 1
-    from tuipet import data as _data
+    import tuipet.data.loaders.data as _data
     tr = next(t for t in _data.load_tournies() if t["item"] >= 0)
     monkeypatch.setattr(tournament, "trophy_by_id",
                         lambda tid: dict(tr, id=tid))   # distinct ids, all itemed
@@ -686,7 +687,7 @@ def test_the_bracket_ramps_toward_the_final():
     """Gameplay polish #4 (2026-07-22): QF fights the fresh wild, the semi
     part-trained, the final near-veteran -- and a title DEFENSE's veteran
     field (attached at init) stays strictly harder than the ramp."""
-    from tuipet import adventure
+    from tuipet.core import adventure
     random.seed(4)
     p = _pet("Rookie")
     tm = Tournament(p, _trophy())

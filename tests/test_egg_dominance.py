@@ -9,7 +9,8 @@ Every other same-line group in the game is an ALTERNATE ROUTE (buy it with
 adventure winnings / earn it in the lobby / earn it by raising well).  This pins
 that rule: eggs that give the SAME thing must be earned in DIFFERENT ways.
 """
-from tuipet import data, egg as egg_mod
+import tuipet.data.loaders.data as data
+from tuipet.core import egg as egg_mod
 
 # the gate columns a player can actually work toward
 _GATES = ("album_n", "wins", "mega", "tourney", "connections", "price",

@@ -28,11 +28,13 @@ discarded shell -- died with it.  A re-pick now moves the whole estate to
 the new shell: wallet, bag, trophies, DNA bank, the taken seed and the
 etched memory, one chip only.
 """
-from tuipet import data, eggmigrate, persistence
-from tuipet import egg as egg_mod
-from tuipet import lines as L
-from tuipet import shop
-from tuipet.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.core import eggmigrate
+from tuipet.utils import persistence
+from tuipet.core import egg as egg_mod
+from tuipet.core import lines as L
+from tuipet.core import shop
+from tuipet.core.pet import Pet
 
 
 def _temp_eggs():

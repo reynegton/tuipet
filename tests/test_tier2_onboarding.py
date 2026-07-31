@@ -2,11 +2,11 @@
 No account wall before gameplay, no release notes for brand-new installs, a
 help nudge on the fresh egg, a confirm before retiring a living pet, weather
 finally explained, and the egg guide reachable from the picker."""
-from tuipet import persistence
+from tuipet.utils import persistence
 from tuipet.app import TuiPetApp
-from tuipet.eggselectscreen import EggSelectPanel
-from tuipet.optionsscreen import OptionsPanel, _ROWS
-from tuipet.pet import Pet
+from tuipet.ui.screens.eggselectscreen import EggSelectPanel
+from tuipet.ui.screens.optionsscreen import OptionsPanel, _ROWS
+from tuipet.core.pet import Pet
 
 
 def _options(pet):
@@ -36,7 +36,7 @@ def test_whats_new_skipped_and_stamped_on_a_first_install():
     app = TuiPetApp.__new__(TuiPetApp)
     app._new_game = True
     assert app._whats_new() is None
-    from tuipet import update
+    from tuipet.utils import update
     assert persistence.load_settings()["seen_version"] == update.current_version()
     app._new_game = False                          # ...and it STAYS skipped
     assert app._whats_new() is None

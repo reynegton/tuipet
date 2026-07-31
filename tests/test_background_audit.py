@@ -3,7 +3,7 @@ dissolve -- plus the BASIC VPET re-pins (2026-07-17): every scene is the
 single-frame DSprite backdrop, identical around the clock (the day/night
 system, per-habitat triples, weather tints and the winter-sunset quirk all
 left with their systems)."""
-from tuipet.pet import Pet, DAY_LENGTH
+from tuipet.core.pet import Pet, DAY_LENGTH
 
 
 def _pet(**kw):
@@ -44,7 +44,7 @@ def test_every_scene_is_one_look_around_the_clock():
 def test_background_swap_dissolves_instead_of_cutting():
     # animateBack: BackgroundOpacityChange -0.05/tick -- a swap eases through
     # intermediate frames and lands exactly on the target
-    from tuipet import arena
+    from tuipet.core import arena
     s = arena.Screen()
     a = ["000000" * 8] * 4
     b = ["ffffff" * 8] * 4
@@ -60,7 +60,7 @@ def test_background_swap_dissolves_instead_of_cutting():
 def test_crossfade_retargets_from_the_visible_frame():
     # a mid-fade weather flap (rain -> clear -> rain) must fade back from
     # whatever is on screen, never jump
-    from tuipet import arena
+    from tuipet.core import arena
     s = arena.Screen()
     a = ["000000" * 8] * 4
     b = ["ffffff" * 8] * 4

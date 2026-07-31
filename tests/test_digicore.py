@@ -1,7 +1,7 @@
 """Digicore vs DVPet setupDigicore / getDigicoreBackground / EvolSilhouette."""
-from tuipet.pet import Pet
-from tuipet import data
-from tuipet.digicorescreen import (DigiCorePanel, core_number, core_badge_key,
+from tuipet.core.pet import Pet
+import tuipet.data.loaders.data as data
+from tuipet.ui.screens.datacorescreen import (DigiCorePanel, core_number, core_badge_key,
                                    core_background, silhouette, DIGICORE_BASE_RATE)
 
 
@@ -118,7 +118,7 @@ def test_mode_change_demands_a_full_bar():
 
 
 def test_can_mode_change_gates():
-    from tuipet import evolution
+    from tuipet.core import evolution
     assert _mode_pet().can_mode_change()
     plain = Pet(num=4, name="A", stage="Rookie", attribute="Vaccine")
     assert plain.can_mode_change() == evolution.can_mode_change(plain)
@@ -148,7 +148,7 @@ def _champ():
 
 
 def test_requirement_report_mirrors_check():
-    from tuipet import evolution
+    from tuipet.core import evolution
     p = _champ()
     for num, name, ready, _ in evolution.candidates(p):
         rows = evolution.requirement_report(p, num)
@@ -161,7 +161,7 @@ def test_requirement_report_mirrors_check():
 
 
 def test_requirement_report_skips_unconstrained_gates():
-    from tuipet import evolution
+    from tuipet.core import evolution
     p = _champ()
     num = evolution.candidates(p)[0][0]
     for met, txt in evolution.requirement_report(p, num):
@@ -204,7 +204,7 @@ def test_teaser_zooms_in_then_holds_a_still_silhouette():
     the core badge in over the opening beats, then the silhouette holds as a
     STILL frame-0 shape (the old teaser flickered idle poses at 10Hz), and the
     way back is the evolSilhouetteBack dark blink."""
-    from tuipet.digicorescreen import EXPAND_T, MON_T
+    from tuipet.ui.screens.datacorescreen import EXPAND_T, MON_T
     p = _pet()
     panel = DigiCorePanel(p)
     panel.key("space")
@@ -236,7 +236,7 @@ def test_core_page_keeps_native_pixels_and_separates_the_badge():
     16px-tall mon to 14 rows AND the badge overlay drew dead-centre on top of
     it -- the two merged into a broken-looking mass.  Native pixels, pet in
     the LEFT cell, badge in the RIGHT."""
-    from tuipet import grid
+    from tuipet.utils import grid
     p = _pet(num=102, stage="Champion")          # Devimon: a full 16px sprite
     panel = DigiCorePanel(p)
     rows, x, _mirror = panel._core_place(panel._pet_rows(102, idx=0), cell=0)
@@ -252,7 +252,7 @@ def test_badges_are_real_symbols_not_specks():
     """fields.png is 1x-authored art: the /3 block-mean crushed the ~16px
     field badges to 5x5 specks (and the 28px cores to 9x9).  Extraction is
     1x / half-res now -- every badge must stay >= 12px."""
-    from tuipet import data
+    import tuipet.data.loaders.data as data
     E = data.load_effects()
     for k, f in E.items():
         if k.startswith("field_") or k.startswith("core_"):
@@ -267,8 +267,8 @@ def test_every_digicore_page_speaks_the_menu_language():
     Joel brought digicore into the v0.2.399 hint convention -- the idle strip
     speaks the hint language; the gaze teaser still owns the box."""
     import random
-    from tuipet.pet import Pet
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.core.pet import Pet
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
     random.seed(2)
     p = Pet(num=102, name="Devimon", stage="Champion", attribute="Virus", obedience=500)
     p.world_seconds = 12 * 60.0
@@ -293,7 +293,7 @@ def test_the_core_gaze_looms_over_the_core_background():
     silhouette -- over the core backdrop, narrated through the message box,
     with no key hints anywhere."""
     import random
-    from tuipet.pet import Pet
+    from tuipet.core.pet import Pet
     from tuipet import digicorescreen as dc
     random.seed(2)
     p = Pet(num=102, name="Devimon", stage="Champion", attribute="Virus", obedience=500)
@@ -347,8 +347,8 @@ def test_egg_gaze_shows_the_egg_and_teases_the_hatchling():
     hatch as the egg's next evolution -- the gaze said 'final form' over an
     egg and its first beat rendered an EMPTY LCD (num -1 has no roster sheet;
     the egg's art lives in egg data)."""
-    from tuipet import theme
-    from tuipet.digicorescreen import next_evolution
+    from tuipet.utils import theme
+    from tuipet.ui.screens.datacorescreen import next_evolution
     egg = Pet(num=-1, stage="Egg", attribute="None")
     egg.world_seconds = 600.0
     nxt = next_evolution(egg)
@@ -385,8 +385,10 @@ def test_egg_data_pages_leak_no_sentinels_and_labels_never_collide():
 def test_hidden_evolutions_mask_until_first_reached():
     """HiddenEvolution (digicore audit 2026-07-06): 130 forms are concealed in
     canon's tree until reached; the album (Evolution.setUnlocked) reveals."""
-    from tuipet import data, persistence, digicorescreen
-    from tuipet.pet import Pet
+    import tuipet.data.loaders.data as data
+    from tuipet.utils import persistence
+    from tuipet import digicorescreen
+    from tuipet.core.pet import Pet
     reqs = data.load_requirements()
     evo = data.load_evolutions()
     _, by = data.load_sprites()
@@ -420,14 +422,14 @@ def test_evolves_page_shows_next_form_at_every_age():
     """Canon shows the chart at EVERY stage (DVPet drawEvolutionMenu never
     gates on age; setupDigicore counts hatching as the egg\x27s evolution).
     The "(too young)" stonewall was a tuipet invention -- Joel 2026-07-10."""
-    from tuipet.digicorescreen import _evo_rows
+    from tuipet.ui.screens.datacorescreen import _evo_rows
     egg_pet = Pet(num=-1, stage="Egg", attribute="None", egg_type=1)
     rows = _evo_rows(egg_pet)
     assert isinstance(rows, list) and rows, rows          # the hatchling shows
     assert rows[0][0] in data.load_sprites()[1]
     # the multi-target digitama (X3 hatches both dmx ver.3 babies) keeps
     # its surprise ("???" -- the mystery eggs left with the fake-egg cut)
-    from tuipet import egg as _egg
+    from tuipet.core import egg as _egg
     egg_pet.egg_type = next(i for i in range(_egg.count())
                             if len(_egg.hatch_targets(i)) > 1)
     rows = _evo_rows(egg_pet)
@@ -443,7 +445,8 @@ def test_the_data_model_is_modular_and_live():
     """Modularize 2026-07-17: digicore.py owns every page/row computation;
     digicorescreen only renders (old names stay as aliases).  The liveness
     law holds: no dead-system rows (Spirit label, injury fragment, Nutri)."""
-    from tuipet import digicore, digicorescreen
+    from tuipet import digicore
+    from tuipet import digicorescreen
     assert digicorescreen.build_pages is digicore.build_pages
     assert digicorescreen._evo_rows is digicore._evo_rows
     assert digicorescreen.next_evolution is digicore.next_evolution
@@ -471,7 +474,8 @@ def test_the_meter_and_the_core_page_agree_on_line_pets():
     so line parents whose onward roads are line-only (the jogress/X Megas)
     showed the life meter while the Meter row said an evolution neared.
     One predicate (has_next) drives both now."""
-    from tuipet import digicore, lines
+    from tuipet.core import digicore
+    from tuipet.core import lines
     # Aegisdramon (ver4): its onward row (RustTyrannomon) is line-only
     p = Pet(num=396, name="Aegisdramon", stage="Mega", attribute="Vaccine")
     p.line_id = "ver4"
@@ -500,7 +504,7 @@ def test_the_none_dna_field_is_load_bearing():
 def test_requirement_checklist_page_jumps():
     """PageUp/PageDown page the requirement scroll, lobby-chat style
     (grammar sweep 2026-07-18); pageup clamps at the head."""
-    from tuipet.digicorescreen import DET_VIS
+    from tuipet.ui.screens.datacorescreen import DET_VIS
     pan = DigiCorePanel(_pet())
     pan.detail = (100, "X")
     pan.key("pagedown")
@@ -517,7 +521,8 @@ def test_legacy_headstones_speak_real_time(tmp_path, monkeypatch):
     the STATUS Age row and the memorial epitaph.  The old //1440 mis-cited
     the clock law and inflated every headstone 60x ('270d' for a 4.5-day
     life)."""
-    from tuipet import digicore, persistence
+    from tuipet.utils import digicore
+    from tuipet.utils import persistence
     p = _pet(name="Vetmon", stage="Champion")
     p.age_seconds = 388800.0                    # 4.5 real days of ticks
     persistence.snapshot_prev_gen(p)
@@ -544,8 +549,8 @@ def test_book_sorts_closest_first(monkeypatch):
     """M10 (gameplay audit 2026-07-19): the corpus book sorted ASCENDING by
     fulfilled score -- the top 'closest' row was the form the engine was
     LEAST likely to pick, disagreeing with the silhouette beside it."""
-    from tuipet import digicore
-    from tuipet import evolution
+    from tuipet.core import digicore
+    from tuipet.core import evolution
     p = _pet()
     monkeypatch.setattr(evolution, "candidates",
                         lambda pet: [(1, "Far", False, 0.2),
@@ -560,7 +565,7 @@ def test_item_row_reads_the_named_bag_key():
     """M10's other half: the checklist checked the raw 'i:N' icon key
     against a bag that stores NAMED keys, so a held Digimental's row always
     read unmet."""
-    from tuipet import evolution
+    from tuipet.core import evolution
     p = _pet(stage="Champion")
     target = 492                                   # evol_item 15 (Courage)
     unmet = dict((label, met) for met, label in
@@ -577,7 +582,7 @@ def test_core_page_teaches_the_gaze_in_bold():
     """The gaze door wears its key in the note slot (menu polish 2026-07-21:
     dim prose alone was easy to look over) — the EVOLVES/TROPHIES teaching
     pattern.  A pending gaze verdict still owns the slot."""
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
     pan = DigiCorePanel(_pet())
     assert "SPACE: gaze into the core" in pan.text().plain
     pan.note = "Nothing stirs — this is its final form."
@@ -594,7 +599,7 @@ def test_core_page_teaches_the_gaze_in_bold():
 def _armed_pet():
     """A ver1 Agumon with DeepSaver charged to the Rookie threshold:
     divergence_target == 88 (Coelamon), the single plain DeepSaver edge."""
-    from tuipet import evolution
+    from tuipet.core import evolution
     p = Pet(num=29, stage="Rookie", attribute="Vaccine")
     p.line_id = "ver1"
     p.dna_applied["DeepSaver"] = evolution.DIVERGE_NEED["Rookie"]
@@ -603,7 +608,8 @@ def _armed_pet():
 
 
 def test_the_gaze_teases_the_armed_steer_not_the_line():
-    from tuipet import digicore, lines
+    from tuipet.core import digicore
+    from tuipet.core import lines
     p = _armed_pet()
     line_next = [r[0] for r in lines.evo_rows(p)]
     assert 88 not in line_next                 # the chart alone would lie
@@ -624,7 +630,7 @@ def test_the_evolves_chart_tops_with_the_armed_row():
 
 
 def test_the_armed_row_wears_its_own_tag_and_sheet():
-    from tuipet.digicorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import DigiCorePanel
     p = _armed_pet()
     pan = DigiCorePanel(p)
     while pan.pages[pan.i][0] != "EVOLVES":    # page over to the chart
