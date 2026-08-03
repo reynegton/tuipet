@@ -63,7 +63,7 @@ def use_item(pet, key):
     DSprite item table, cloned from v0.4.x (BASIC VPET 2026-07-16): the
     DVPet consumable machine -- meds, bandages, vitamins, toys, futons,
     transports, relics, crafters -- left with the item system.  A
-    _Refused message keeps the item ('consume on refusal' burned
+    Refused message keeps the item ('consume on refusal' burned
     Rev.Floppies on live pets; clone audit 2026-07-15)."""
     if pet.inventory.get(key, 0) <= 0:
         return "Nenhum sobrando."
@@ -125,11 +125,11 @@ def use_item(pet, key):
         "television": lambda: pet._toy(energy=3, weight=1,
                                         msg="Colado na tela."),
         # ---- ADVENTURE (spent ON THE ROAD, not from the home bag) -------
-        "town_transport": lambda: _Refused("Save it for the road (press T)."),
-        "disaster_transport": lambda: _Refused("Save it for the road (press T)."),
-        "life_recovery": lambda: _Refused("Restores adventure lives — use it on the road."),
-        "zone_transport": lambda: _Refused("Save it for the road (press T)."),  # noqa: F405
-        "continent_transport": lambda: _Refused("Save it for the road (press T)."),  # noqa: F405
+        "town_transport": lambda: Refused("Save it for the road (press T)."),
+        "disaster_transport": lambda: Refused("Save it for the road (press T)."),
+        "life_recovery": lambda: Refused("Restores adventure lives — use it on the road."),
+        "zone_transport": lambda: Refused("Save it for the road (press T)."),  # noqa: F405
+        "continent_transport": lambda: Refused("Save it for the road (press T)."),  # noqa: F405
         # ---- THE EXPANSION's singular doors (2026-07-26) ----------------
         "med": pet._med_item,
         "elixir": pet._elixir,
@@ -163,9 +163,9 @@ def use_item(pet, key):
     # life-state guard: only the Rev.Floppy works on the dead, and
     # NOTHING works on an egg
     if pet.dead and key != "revive_floppy":
-        return _Refused("")
+        return Refused("")
     if pet.stage == "Egg" or pet.num < 0:
-        return _Refused("")
+        return Refused("")
     # item on a sleeper: the alarm wakes mistake-FREE (its whole point),
     # the sleeping pill is pointless, the cold shower runs its OWN disturb
     # (same law, applied inside so "AWAKE and bracing" can be true),
@@ -176,7 +176,7 @@ def use_item(pet, key):
                                    "futon"):
         pet._disturbed()
     out = fx()
-    if not isinstance(out, _Refused) and out is not None:
+    if not isinstance(out, Refused) and out is not None:
         pet.take_item(key)
     return out
 
@@ -184,12 +184,12 @@ def use_item(pet, key):
 def _crest_egg(pet, key):
     """A crest egg -> the classic Relic item-evolution flow."""
     if pet.dead or pet.stage == "Egg" or pet.num < 0:
-        return _Refused("")
+        return Refused("")
     item_id = pet._CREST_IDS.get(key, -1)
     target = evolution.item_select(pet, item_id)
     if target is None:
         pet._set_anim("refuse", 1.0)
-        return _Refused(f"{pet.name} can't use that yet.")
+        return Refused(f"{pet.name} can't use that yet.")
     if pet.asleep:
         pet._disturbed()
     prev = pet.num
@@ -207,7 +207,7 @@ def _energy_drink(pet):
     old += max_energy left a drained pet short of full), and refuse at
     full like every care sibling instead of vanishing for nothing."""
     if pet.energy >= pet.max_energy:
-        return _Refused("Energia já está cheia.")
+        return Refused("Energia já está cheia.")
     pet._set_energy(pet.max_energy)
     return "Energia restaurada!"
 
@@ -220,7 +220,7 @@ def _snack(pet, hunger=0, energy=0, weight=0, obedience=0, powers=None,
     effort) land the authored columns of the new rows -- a pepper's +1
     power rides the chip grammar, effort clamps to its 0-4 gauge."""
     if hunger > 0 and pet.hunger >= FULL_HUNGER:
-        return _Refused("Refused - belly's full.")
+        return Refused("Refused - belly's full.")
     if hunger:
         pet.hunger = _clamp(pet.hunger + hunger, 0, FULL_HUNGER)
     if energy:
@@ -241,7 +241,7 @@ def _snack(pet, hunger=0, energy=0, weight=0, obedience=0, powers=None,
 
 def _giga_meal(pet):
     if pet.hunger >= FULL_HUNGER:
-        return _Refused("Refused - belly's full.")
+        return Refused("Refused - belly's full.")
     pet.hunger = FULL_HUNGER
     pet._set_energy(pet.energy + 4)
     pet._set_weight(pet.weight + 6)
@@ -254,7 +254,7 @@ def _vitamin(pet):
     # column) for a game-day -- so a full-effort pet still has a
     # reason to take one before a hard fight
     if pet.strength >= 4 and getattr(pet, "vitamin_lapse", 0.0) > 0:
-        return _Refused("Esforço cheio e a vitamina está agindo.")
+        return Refused("Esforço cheio e a vitamina está agindo.")
     pet.strength = 4
     # 1440 game-min == ONE GAME DAY (~24 real minutes of play).  Burns
     # down by dt in petbody._tick_life -- see THE UNIT LAW there.
@@ -268,7 +268,7 @@ def _bandage(pet):
     the pill's own grammar; the pill stays sick-only.  Two ailments,
     two meds, the device pair."""
     if not pet.injured:
-        return _Refused("Nada para curativo.")  # noqa: F405
+        return Refused("Nada para curativo.")  # noqa: F405
     pet.injured = False
     pet.inj_length = 0.0        # the wait is what the Bandage buys off
     pet._set_anim("happy", 1.4)
@@ -289,17 +289,17 @@ def _caffeine(pet):
     while yet."  Every care sibling refuses at full instead ("Energy is
     already full", "already a model pupil"); this was the outlier."""
     if pet.asleep:
-        return _Refused("Too late - it's already down.")
+        return Refused("Too late - it's already down.")
     if pet._in_sleep_window() is not None:
         bt = lines_mod.bedtime_minutes(pet)
         night = (pet.WAKE_MINUTE - bt) % DAY_MINUTES
         push = night * 0.25
         if getattr(pet, "_bed_postpone_t", 0.0) >= push:
-            return _Refused("Bedtime's already pushed back.")  # noqa: F405
+            return Refused("Bedtime's already pushed back.")  # noqa: F405
         pet._bed_postpone_t = push
     else:
         if pet.sleep_lapse <= 0:
-            return _Refused("It's nowhere near bedtime.")      # noqa: F405
+            return Refused("It's nowhere near bedtime.")      # noqa: F405
         pet.sleep_lapse = max(0.0, pet.sleep_lapse - pet.sleep_limit * 0.25)
     return "Bem acordado por um tempo ainda."
 
@@ -321,7 +321,7 @@ def _miracle_drink(pet):
     dropped: mood is a verified no-op meter and the lifespan clock
     left with DSprite mortality (2026-07-22)."""
     if pet.care_mistakes <= 0:
-        return _Refused("Nada no histórico para apagar.")   # noqa: F405
+        return Refused("Nada no histórico para apagar.")   # noqa: F405
     pet.care_mistakes -= 1
     pet._set_energy(pet.energy + MIRACLE_ENERGY_GAIN)   # noqa: F405
     left = pet.care_mistakes
@@ -339,9 +339,9 @@ def _cold_compress(pet):
     energy instead of giving it: relief you have to sleep off.
     """
     if pet.care_mistakes <= 0:
-        return _Refused("Nada no histórico para apagar.")   # noqa: F405
+        return Refused("Nada no histórico para apagar.")   # noqa: F405
     if pet.energy <= COMPRESS_ENERGY_COST:                 # noqa: F405
-        return _Refused("Sem energia para o choque.")   # noqa: F405
+        return Refused("Sem energia para o choque.")   # noqa: F405
     pet.care_mistakes -= 1
     pet._set_energy(pet.energy - COMPRESS_ENERGY_COST)    # noqa: F405
     left = pet.care_mistakes
@@ -358,7 +358,7 @@ def _textbook(pet):
     Refused at a full gauge like every other care sibling, so it
     can't be burned for nothing."""
     if pet.obedience >= MAX_OBEDIENCE:                   # noqa: F405
-        return _Refused(f"{pet.name} is already a model pupil.")  # noqa: F405
+        return Refused(f"{pet.name} is already a model pupil.")  # noqa: F405
     before = pet.obedience
     pet._set_obedience(pet.obedience + TEXTBOOK_OBEDIENCE)  # noqa: F405
     return f"Studied hard. (+{pet.obedience - before} obedience)"
@@ -378,7 +378,7 @@ def heal_bandage(pet):
     if (_g := pet._guard(asleep_blocks=False)) is not None:
         return _g
     if not pet.injured:
-        return _Refused("Nada para curativo.")            # noqa: F405
+        return Refused("Nada para curativo.")            # noqa: F405
     if pet.asleep:
         pet._disturbed()
     return pet._bandage()
@@ -414,10 +414,10 @@ def _dna_crystal(pet):
     one mash session)."""
     field = getattr(pet, "field", "") or ""
     if field in ("", "None"):
-        return _Refused("No Field to resonate with.")
+        return Refused("No Field to resonate with.")
     have = pet.dna_owned.get(field, 0)
     if have >= MAX_DNA_INVENTORY:
-        return _Refused("That Field's bank is full.")
+        return Refused("That Field's bank is full.")
     pet.dna_owned[field] = min(MAX_DNA_INVENTORY, have + 10)
     return f"+{pet.dna_owned[field] - have} {field} DNA banked!"
 
@@ -485,9 +485,9 @@ def _sleep_pill(pet):
         # every mode (the TIME LAW's one-law freeze), so a road sleep
         # never ends -- the pill froze the march FOREVER, ESC home the
         # only way out.  Refused, pill kept.
-        return _Refused("Not on the road — no bed out here.")  # noqa: F405
+        return Refused("Not on the road — no bed out here.")  # noqa: F405
     if pet.asleep:
-        return _Refused("It's already asleep.")
+        return Refused("It's already asleep.")
     pet._fall_asleep()
     # the room drops AFTER the pill's own eat show, never before (bug
     # report 2026-07-26, v0.5.287: "sleep pill is shutting off lights
@@ -511,7 +511,7 @@ def _alarm(pet):
     purpose-built alarm weaker than throwing any other item at the
     sleeper (gameplay audit 2026-07-19)."""
     if not pet.asleep:
-        return _Refused("It's already awake.")
+        return Refused("It's already awake.")
     was_nap = pet.nap
     pet.asleep = False
     pet.nap = False
@@ -549,12 +549,12 @@ def _time_gear(pet):
     game, from one 500b bottle."""
     dur = pet.STAGE_DURATION.get(pet.stage, 0)
     if not dur or dur >= 9e8 or not datacore.has_next(pet):
-        return _Refused(f"{pet.name} has nothing left to hurry.")  # noqa: F405
+        return Refused(f"{pet.name} has nothing left to hurry.")  # noqa: F405
     ceiling = dur - 1.0                       # never reaches the gate
     target = min(pet.stage_seconds + dur * GROW_CAPSULE_FRACTION,  # noqa: F405
                  ceiling)
     if target <= pet.stage_seconds:
-        return _Refused("O relógio de crescimento já está cheio.")  # noqa: F405
+        return Refused("O relógio de crescimento já está cheio.")  # noqa: F405
     moved = target - pet.stage_seconds
     pet.stage_seconds = target
     return f"Time lurches forward. (+{int(moved)}min)"
@@ -571,7 +571,7 @@ def _x_item(pet):
     from None (PhysicalState L3361) -- the X-Program's price in LIFE.  That
     burn was dead; the antibody was a free ride (Joel 2026-07-22)."""
     if pet.x_antibody != "None":
-        return _Refused("O anticorpo já está ativo.")
+        return Refused("O anticorpo já está ativo.")
     # (calcXAntibodyLifeDec left with the lifespan clock -- DSprite
     # mortality 2026-07-22.  NOTE: the unmarked-pet death roulette was
     # never THIS item's -- it belonged to the separate X-PROGRAM item,
@@ -593,7 +593,7 @@ def _training_pack(pet):
 
 def _revive_item(pet):
     if not pet.dead:
-        return _Refused("Ninguém precisa ser revivido.")
+        return Refused("Ninguém precisa ser revivido.")
     pet.save_from_death()
     return "VIVO."
 
@@ -635,7 +635,7 @@ def _inherit_memory(pet):
     mem = pet.memory or (pet.wild_memories[0]
                               if pet.wild_memories else None)
     if not mem:
-        return _Refused("O chip está silencioso.")  # noqa: F405
+        return Refused("O chip está silencioso.")  # noqa: F405
     pet.vaccine += int(mem.get("vaccine", 0) or 0)
     pet.data_power += int(mem.get("data", 0) or 0)
     pet.virus += int(mem.get("virus", 0) or 0)
@@ -648,7 +648,7 @@ def _inherit_memory(pet):
 
 def _super_carrot(pet):
     if pet.weight <= 1:
-        return _Refused("Nada mais para aparar.")
+        return Refused("Nada mais para aparar.")
     pet._set_weight(max(1, pet.weight - 10))
     return "Leve como uma pena!"
 
@@ -660,7 +660,7 @@ def _csv_snack(pet, key):
     Eating a new-table food now asks it; the meal is an extra gate,
     never a bypass."""
     out = pet._snack(**pet._SNACK_FX[key])
-    if isinstance(out, _Refused):  # noqa: F405
+    if isinstance(out, Refused):  # noqa: F405
         return out
     icon = shop.ICON_KEYS.get(key, "")
     target = evolution.food_select(pet, int(icon[2:])) \
@@ -679,7 +679,7 @@ def _med_item(pet):
     free pill's one job in pocket form -- never sold, so the free-cure
     law holds."""
     if not pet.sick:
-        return _Refused("Nenhuma doença para tratar.")  # noqa: F405
+        return Refused("Nenhuma doença para tratar.")  # noqa: F405
     pet.sick = False
     pet._set_anim("eat", 1.4)
     return "A doença passa."
@@ -689,7 +689,7 @@ def _elixir(pet):
     """The premium combo (2000b): cures sickness AND fills the tank.
     The free pill stays the cure -- this sells convenience."""
     if not pet.sick and pet.energy >= pet.max_energy:
-        return _Refused(f"{pet.name} doesn't need it.")  # noqa: F405
+        return Refused(f"{pet.name} doesn't need it.")  # noqa: F405
     pet.sick = False
     pet._set_energy(pet.max_energy)
     pet._set_anim("eat", 1.4)
@@ -702,7 +702,7 @@ def _vitamin_g(pet):
     free cure -- this is the vitamin's big sibling."""
     if not pet.injured and pet.strength >= 4 \
             and getattr(pet, "vitamin_lapse", 0.0) > 0:
-        return _Refused("Nada para remendar e a proteção está ativa.")  # noqa: F405
+        return Refused("Nada para remendar e a proteção está ativa.")  # noqa: F405
     pet.injured = False
     pet.inj_length = 0.0
     pet.strength = 4
@@ -714,7 +714,7 @@ def _vitamin_g(pet):
 def _gold_pill(pet):
     """Canon Energy +12 (the miracle drink's dose, no eraser)."""
     if pet.energy >= pet.max_energy:
-        return _Refused("Energia já está cheia.")  # noqa: F405
+        return Refused("Energia já está cheia.")  # noqa: F405
     pet._set_energy(pet.energy + 12)
     return "Vitalidade dourada!"
 
@@ -722,7 +722,7 @@ def _gold_pill(pet):
 def _supplement(pet):
     """Effort to FULL + the obedience leg (authored +5) + its weight."""
     if pet.strength >= 4 and pet.obedience >= MAX_OBEDIENCE:  # noqa: F405
-        return _Refused("Nada mais para fortalecer.")  # noqa: F405
+        return Refused("Nada mais para fortalecer.")  # noqa: F405
     pet.strength = 4
     pet._set_obedience(pet.obedience + 5)
     pet._set_weight(pet.weight + 1)
@@ -734,7 +734,7 @@ def _board_game(pet):
     plus the authored obedience.  Refused when there is no Vaccine to
     convert -- a converter with an empty tank is a dud."""
     if pet.vaccine < 15:
-        return _Refused("Poder Vacina insuficiente para troca.")  # noqa: F405
+        return Refused("Poder Vacina insuficiente para troca.")  # noqa: F405
     pet.vaccine -= 15
     pet.data_power += 15
     pet._set_obedience(pet.obedience + 5)
@@ -744,7 +744,7 @@ def _board_game(pet):
 def _computer_game(pet):
     """Virus -15 -> Data +15 (items.csv 8)."""
     if pet.virus < 15:
-        return _Refused("Poder Vírus insuficiente para troca.")  # noqa: F405
+        return Refused("Poder Vírus insuficiente para troca.")  # noqa: F405
     pet.virus -= 15
     pet.data_power += 15
     return "Recorde — o caos compila. (Vi-15 → D+15)"
@@ -753,7 +753,7 @@ def _computer_game(pet):
 def _toy_oven(pet):
     """'+Appetite': makes room for a meal (hunger -1)."""
     if pet.hunger <= 0:
-        return _Refused("A barriga já está vazia.")  # noqa: F405
+        return Refused("A barriga já está vazia.")  # noqa: F405
     pet.hunger = max(0, pet.hunger - 1)
     return "Um cheiro maravilhoso — de repente com fome."
 
@@ -763,10 +763,10 @@ def _futon(pet):
     and the doze HOLDS until the tank is FULL, not half (petbody's
     recovery-doze threshold reads futon_doze; cleared on wake)."""
     if getattr(pet, "away", False):
-        return _Refused("Not on the road — no bed out here.")  # noqa: F405
+        return Refused("Not on the road — no bed out here.")  # noqa: F405
     if pet.asleep:
         if getattr(pet, "futon_doze", False):
-            return _Refused("Já bem agasalhado.")  # noqa: F405
+            return Refused("Já bem agasalhado.")  # noqa: F405
         pet.futon_doze = True
         return "O futon desliza por baixo — sono mais profundo."
     pet._fall_asleep()
@@ -785,7 +785,7 @@ def _x_program(pet):
     death roll; the aftermath (hunger calls, red-energy stings) is
     the gamble."""
     if pet.x_antibody != "None":
-        return _Refused("O anticorpo já está ativo.")  # noqa: F405
+        return Refused("O anticorpo já está ativo.")  # noqa: F405
     pet.hunger = 0
     pet.strength = 0
     pet._set_energy(pet.energy - int(pet.max_energy * 0.8))
@@ -799,7 +799,7 @@ def _textbook_lite(pet):
     """The Book (items.csv 2): the textbook's little brother -- the
     authored +5, same full-gauge refusal."""
     if pet.obedience >= MAX_OBEDIENCE:                   # noqa: F405
-        return _Refused(f"{pet.name} is already a model pupil.")  # noqa: F405
+        return Refused(f"{pet.name} is already a model pupil.")  # noqa: F405
     before = pet.obedience
     pet._set_obedience(pet.obedience + 5)
     return f"A quiet chapter. (+{pet.obedience - before} obedience)"
@@ -824,7 +824,7 @@ def _evo_key(pet, key):
         target = evolution.item_direct(pet, pet._DIRECT_EVO_TARGET[key])
     if target is None:
         pet._set_anim("refuse", 1.0)
-        return _Refused(f"{pet.name} can't use that yet.")  # noqa: F405
+        return Refused(f"{pet.name} can't use that yet.")  # noqa: F405
     prev = pet.num
     pet.evolve_to(target)
     lines_mod.adopt_line(pet, prev=prev)
@@ -869,7 +869,7 @@ def _chocolate_egg(pet):
     """A snack with a TOY INSIDE (authored: 'Toy Inside +Mood'): the
     meal, then a common-tier surprise."""
     out = pet._snack(hunger=1, weight=1)
-    if isinstance(out, _Refused):  # noqa: F405
+    if isinstance(out, Refused):  # noqa: F405
         return out
     # a TOY, as authored -- not another food (bug: "isnt there supposed
     # to be items in chocolate eggs?", 2026-07-28).  The old pool took

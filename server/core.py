@@ -165,6 +165,16 @@ async def _handle_admin(client, m):
     else:
         await _send(client, {"t": "error", "code": "err_admin_unknown", "msg": "Unknown admin cmd."})
 
+def _consume_token(client):
+    now = time.time()
+    elapsed = now - client._msg_refill_t
+    client._msg_tokens = min(50.0, client._msg_tokens + elapsed * 10.0)
+    client._msg_refill_t = now
+    if client._msg_tokens >= 1.0:
+        client._msg_tokens -= 1.0
+        return True
+    return False
+
 async def handler(ws):
     if len(state.CLIENTS) >= state.MAX_CLIENTS:
         await ws.send(json.dumps({"t": "error", "code": "err_lobby_full", "msg": "Lobby is full."}))
@@ -181,6 +191,10 @@ async def handler(ws):
                 m = json.loads(raw)
                 t = m.get("t")
             except (ValueError, AttributeError):
+                continue
+
+            if not _consume_token(client):
+                await _send(client, {"t": "error", "code": "err_rate_limited", "msg": "Slow down."})
                 continue
 
             if t == "login":

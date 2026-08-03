@@ -30,7 +30,7 @@ import pytest
 from tuipet.core import shop
 from tuipet.utils import persistence
 from tuipet.core.pet import Pet
-from tuipet.core.petbase import _Refused
+from tuipet.core.petbase import Refused
 
 
 def _pet(**kw):
@@ -78,7 +78,7 @@ def test_capsules_hurry_the_wait_but_never_END_it():
     # and a capsule against a full clock refuses instead of vanishing
     p.add_item("grow_capsule")
     held = p.inventory.get("grow_capsule")
-    assert isinstance(p.use_item("grow_capsule"), _Refused)
+    assert isinstance(p.use_item("grow_capsule"), Refused)
     assert p.inventory.get("grow_capsule") == held        # kept, not burned
 
 
@@ -89,7 +89,7 @@ def test_a_final_form_refuses_the_capsule_instead_of_taking_the_bits():
     p.stage_seconds = 0.0
     p.add_item("grow_capsule")
     out = p.use_item("grow_capsule")
-    assert isinstance(out, _Refused) and "nothing left to hurry" in out
+    assert isinstance(out, Refused) and "nothing left to hurry" in out
     assert p.stage_seconds == 0.0 and p.inventory.get("grow_capsule") == 1
 
 
@@ -175,16 +175,16 @@ def test_the_caffeine_pill_refuses_a_dose_that_would_do_nothing():
     p.add_item("caffeine_pill")
     out = p.use_item("caffeine_pill")
     if p._in_sleep_window() is None:             # pressure pet: no pressure yet
-        assert isinstance(out, _Refused)
+        assert isinstance(out, Refused)
         assert p.inventory.get("caffeine_pill") == 1     # kept
     p2 = _pet()
     p2.sleep_lapse = 100.0
     p2.add_item("caffeine_pill", 2)
     first = p2.use_item("caffeine_pill")
-    assert not isinstance(first, _Refused)
+    assert not isinstance(first, Refused)
     # a SECOND pill on a line pet is already-held grace: refused, kept
     if p2._in_sleep_window() is not None:
-        assert isinstance(p2.use_item("caffeine_pill"), _Refused)
+        assert isinstance(p2.use_item("caffeine_pill"), Refused)
         assert p2.inventory.get("caffeine_pill") == 1
 
 
@@ -286,7 +286,7 @@ def test_declared_touches_match_what_the_handler_actually_moves(key):
     before = {f: copy.deepcopy(getattr(p, f, None)) for f in fields}
     p.add_item(key)
     out = p.use_item(key)
-    assert not isinstance(out, _Refused), f"{key} refused: {out}"
+    assert not isinstance(out, Refused), f"{key} refused: {out}"
     moved = {f for f in fields
              if f not in _BOOKKEEPING and before[f] != getattr(p, f, None)}
     declared = set(v.touches)
@@ -378,7 +378,7 @@ def test_the_shelf_text_promises_the_number_the_handler_delivers(key):
               for f in want}
     p.add_item(key)
     out = p.use_item(key)
-    assert not isinstance(out, _Refused), f"{key} refused: {out}"
+    assert not isinstance(out, Refused), f"{key} refused: {out}"
     for field, delta in want.items():
         if field == "dna_owned":
             got = p.dna_owned.get(p.field, 0) - before[field].get(p.field, 0)
@@ -400,4 +400,4 @@ def test_every_item_is_consumed_exactly_once_on_a_landing_use():
         p.add_item(key, 2)
         out = p.use_item(key)
         left = p.inventory.get(key, 0)
-        assert left == (2 if isinstance(out, _Refused) else 1), f"{key}: {out}"
+        assert left == (2 if isinstance(out, Refused) else 1), f"{key}: {out}"

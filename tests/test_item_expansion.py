@@ -9,7 +9,7 @@ import tuipet.data.loaders.data as data
 from tuipet.core import shop
 from tuipet.core import tournament
 from tuipet.core.pet import Pet
-from tuipet.core.petcare import _Refused
+from tuipet.core.petcare import Refused
 
 
 def _pet(stage="Rookie", num=100, **kw):
@@ -25,11 +25,11 @@ def _pet(stage="Rookie", num=100, **kw):
 def test_the_med_cures_sickness_and_only_sickness():
     p = _pet(sick=True)
     p.add_item("med")
-    assert not isinstance(p.use_item("med"), _Refused)
+    assert not isinstance(p.use_item("med"), Refused)
     assert not p.sick and p.inventory.get("med", 0) == 0
     p2 = _pet()
     p2.add_item("med")
-    assert isinstance(p2.use_item("med"), _Refused)     # kept on refusal
+    assert isinstance(p2.use_item("med"), Refused)     # kept on refusal
     assert p2.inventory.get("med") == 1
 
 
@@ -41,7 +41,7 @@ def test_the_bandage_stayed_cut_and_h_stays_free():
     assert shop.key_for_icon("i:80") is None
     q = _pet(injured=True, bits=0)
     q.inj_length = 400.0
-    assert not isinstance(q.heal_bandage(), _Refused)
+    assert not isinstance(q.heal_bandage(), Refused)
     assert not q.injured
 
 
@@ -81,7 +81,7 @@ def test_a_spirit_key_opens_its_authored_door_and_wakes_the_beast():
     p = _pet(stage=data.load_sprites()[1][num]["stage"], num=num)
     p.add_item("human_fire_spirit")
     out = p.use_item("human_fire_spirit")
-    assert not isinstance(out, _Refused), out
+    assert not isinstance(out, Refused), out
     assert p.num == target
     assert p.inventory.get("beast_fire_spirit") == 1
     assert p.inventory.get("human_fire_spirit", 0) == 0
@@ -90,7 +90,7 @@ def test_a_spirit_key_opens_its_authored_door_and_wakes_the_beast():
 def test_a_spirit_refusal_keeps_the_item():
     p = _pet()                                   # no spirit road from here
     p.add_item("human_dark_spirit")
-    assert isinstance(p.use_item("human_dark_spirit"), _Refused)
+    assert isinstance(p.use_item("human_dark_spirit"), Refused)
     assert p.inventory.get("human_dark_spirit") == 1
 
 
@@ -101,11 +101,11 @@ def test_a_direct_relic_evolves_only_a_graph_neighbour():
     holder = next(n for n, ts in evs.items() if 93 in ts and n in by_num)
     p = _pet(stage=by_num[holder]["stage"], num=holder)
     p.add_item("grey_claws")
-    assert not isinstance(p.use_item("grey_claws"), _Refused)
+    assert not isinstance(p.use_item("grey_claws"), Refused)
     assert p.num == 93
     q = _pet()                                   # not adjacent: refused, kept
     q.add_item("grey_claws")
-    assert isinstance(q.use_item("grey_claws"), _Refused)
+    assert isinstance(q.use_item("grey_claws"), Refused)
     assert q.inventory.get("grey_claws") == 1
 
 
@@ -127,7 +127,7 @@ def test_eating_an_orange_can_wake_citramon():
         assert p.num == target
     else:                                        # gates authored tighter: the
         p.add_item("orange")                     # meal still lands as a meal
-        assert not isinstance(p.use_item("orange"), _Refused)
+        assert not isinstance(p.use_item("orange"), Refused)
 
 
 # ---- the capsules ------------------------------------------------------------
@@ -138,7 +138,7 @@ def test_a_capsule_grants_a_real_item_and_never_a_box():
     for _ in range(40):
         p.add_item("capsule_a")
         out = p.use_item("capsule_a")
-        assert not isinstance(out, _Refused)
+        assert not isinstance(out, Refused)
     granted = {k for k in p.inventory if k != "capsule_a"}
     assert granted, "forty boxes granted nothing"
     for k in granted:
@@ -248,7 +248,7 @@ def test_the_futon_deepens_the_doze_to_a_full_tank():
     p.energy = 0
     p.add_item("futon")
     out = p.use_item("futon")
-    assert not isinstance(out, _Refused)
+    assert not isinstance(out, Refused)
     assert p.asleep and p.futon_doze
     # the recovery-doze hold now reads the flag: it holds below FULL
     assert p.energy < p.max_energy
@@ -262,7 +262,7 @@ def test_the_futon_never_disturbs_a_sleeper():
     d0 = p.disturb
     p.add_item("futon")
     out = p.use_item("futon")
-    assert not isinstance(out, _Refused)
+    assert not isinstance(out, Refused)
     assert p.disturb == d0                       # the sleep family's 4th member
     assert p.futon_doze
 

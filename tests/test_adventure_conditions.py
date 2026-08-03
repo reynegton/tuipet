@@ -121,7 +121,7 @@ def test_a_sleep_pill_cannot_freeze_the_march(monkeypatch):
     out pet.asleep, but the life sim is PAUSED in every mode (the TIME
     LAW's one-law freeze) -- a Sleep Pill used on the road put the pet
     to sleep FOREVER, march frozen, ESC home the only exit.  The pill
-    is refused on the road now (and kept -- the _Refused contract)."""
+    is refused on the road now (and kept -- the Refused contract)."""
     pan = _on_the_road(monkeypatch)
     p = pan.pet
     p.away = True          # the teleport's flag (the harness skips the landing)

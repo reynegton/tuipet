@@ -21,7 +21,7 @@ from tuipet.core import adventure as adv
 from tuipet.utils import persistence
 from tuipet.core import shop
 from tuipet.core.pet import Pet
-from tuipet.core.petbase import WILD_MEMORY_MIN, WILD_MEMORY_MAX, _Refused
+from tuipet.core.petbase import WILD_MEMORY_MIN, WILD_MEMORY_MAX, Refused
 
 
 def _pet():
@@ -79,7 +79,7 @@ def test_using_a_wild_chip_applies_its_trace_and_consumes_both():
 def test_a_bare_chip_with_no_payload_is_still_silent():
     p = _pet()
     p.add_item("memory")            # no stash: an empty item
-    assert isinstance(p.use_item("memory"), _Refused)
+    assert isinstance(p.use_item("memory"), Refused)
 
 
 def test_wild_chips_are_spent_oldest_first():
@@ -194,4 +194,4 @@ def test_finding_a_digimemory_stashes_a_payload():
     p.add_item("memory")
     p.stash_wild_memory()               # what _land_find does on a dig
     assert p.peek_memory().get("name") == "A stranger"
-    assert not isinstance(p.use_item("memory"), _Refused)
+    assert not isinstance(p.use_item("memory"), Refused)

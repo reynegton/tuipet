@@ -2,6 +2,7 @@ import asyncio
 import itertools
 import os
 from collections import deque
+import time
 
 HOST = os.environ.get("TUIPET_HOST", "0.0.0.0")
 PORT = int(os.environ.get("TUIPET_PORT", "8765"))
@@ -55,7 +56,7 @@ _ids = itertools.count(1)
 
 class Client:
     __slots__ = ("id", "ws", "name", "pet", "live", "lease", "logged", "boot",
-                 "bugs_sent", "room")
+                 "bugs_sent", "room", "_msg_tokens", "_msg_refill_t")
     def __init__(self, ws):
         self.id = next(_ids)
         self.ws = ws
@@ -67,6 +68,8 @@ class Client:
         self.boot = 0.0
         self.bugs_sent = 0
         self.room = None
+        self._msg_tokens = 50.0
+        self._msg_refill_t = time.time()
 
 CLIENTS = {}
 CHAT_BACKLOG = deque(maxlen=30)

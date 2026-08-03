@@ -164,7 +164,7 @@ def next_evolution(pet):
     return cands[0][0] if cands else None
 
 
-def _mins(s):
+def format_mins(s):
     s = int(max(0, s))
     if s < 3600:
         return f"{s // 60}m{s % 60:02d}s"
@@ -320,12 +320,12 @@ def _legacy_rows():
         return [("—", t("datacore_no_elders_1", "no elders yet — this pet")), ("", t("datacore_no_elders_2", "is writing generation one"))]
     rows = []
     for r in reversed(elders[-8:]):                 # 8 headstones + the more row = 9
-        # _mins: the book's own REAL-time formatter, same unit as the STATUS
+        # format_mins: the book's own REAL-time formatter, same unit as the STATUS
         # Age row and the memorial epitaph.  (The old //1440 mis-cited the
         # clock law -- 1440 is game-MINUTES per game-day, not seconds -- and
         # inflated every headstone 60x: a 4.5-day life read "270d";
         # datacore audit 2026-07-19.)
-        age = _mins(float(r.get("age", 0)))
+        age = format_mins(float(r.get("age", 0)))
         fate = "†" if r.get("dead") else ""         # fell vs retired to the next egg
         val = f"{str(r.get('name', '?'))[:12]} {r.get('stage', '?')} {age}{fate}"
         rows.append((f"gen {r.get('gen', '?')}", val[:30]))
@@ -347,7 +347,7 @@ def build_pages(pet):
         (t("datacore_lbl_gen", "Gen"), str(pet.generation)),
         # (the "Life Xd left" row left with the lifespan clock -- DSprite
         # mortality 2026-07-22: nothing counts down anymore, Age counts up)
-        (t("datacore_lbl_age", "Age"), _mins(pet.age_seconds)),
+        (t("datacore_lbl_age", "Age"), format_mins(pet.age_seconds)),
         (t("datacore_lbl_battles", "Battles"), f"{pet.wins}W / {pet.battles} · {pet.bits}b"),
     ]
     # the POWER page is the BATTLE ledger (framing fixed, gameplay polish

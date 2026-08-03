@@ -393,7 +393,7 @@ def test_the_honors_tab_strip_says_wear():
 
 
 def test_refusals_and_shortfalls_sound_like_refusals():
-    """A kept item (a _Refused) and "Not enough bits." both played the
+    """A kept item (a Refused) and "Not enough bits." both played the
     happy confirm chirp (round 31)."""
     p = _pet()
     pan = ShopPanel(p)

@@ -168,13 +168,13 @@ def test_the_heir_redeems_the_chip():
 
 def test_a_silent_husk_is_kept_not_eaten():
     """A chip with no payload aboard (the estate husk) refuses -- the refusal
-    law: a _Refused keeps the item ('consume on refusal' burned Rev.Floppies;
+    law: a Refused keeps the item ('consume on refusal' burned Rev.Floppies;
     clone audit 2026-07-15)."""
     p = _pet()
     p.memory = {}
     p.inventory["memory"] = 1
-    from tuipet.core.petbase import _Refused
-    assert isinstance(p.use_item("memory"), _Refused)
+    from tuipet.core.petbase import Refused
+    assert isinstance(p.use_item("memory"), Refused)
     assert p.inventory.get("memory") == 1
 
 

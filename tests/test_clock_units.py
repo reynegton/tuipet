@@ -103,6 +103,6 @@ def test_the_pet_split_holds_its_boundaries():
     # the constant bed: every petbase name resolves from pet
     # (weekend_bonus is excluded: the test sandbox patches pet.weekend_bonus
     # to pin a weekday, so identity is deliberately broken under pytest)
-    for const in ("DP_MAX", "EXP_PER_WIN", "_clamp", "_Refused",
+    for const in ("DP_MAX", "EXP_PER_WIN", "_clamp", "Refused",
                   "online_reward"):
         assert getattr(pet, const) is getattr(petbase, const)

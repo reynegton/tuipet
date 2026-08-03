@@ -170,7 +170,7 @@ def test_the_contract_names_its_quit_clause():
     via the after-the-fact quit note."""
     from tuipet.ui.screens.assistscreen import AssistPanel
     t = AssistPanel(_pet(bits=1000)).text().plain
-    assert "quits if they run dry" in t
+    assert "assistant leaves if funds run out" in t
 
 
 def test_only_an_earned_verdict_rides_home():

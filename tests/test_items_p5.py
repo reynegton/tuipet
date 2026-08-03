@@ -24,7 +24,7 @@ import csv
 
 from tuipet.core import shop
 from tuipet.core.pet import Pet
-from tuipet.core.petbase import MIRACLE_ENERGY_GAIN, TEXTBOOK_OBEDIENCE, _Refused
+from tuipet.core.petbase import MIRACLE_ENERGY_GAIN, TEXTBOOK_OBEDIENCE, Refused
 
 
 def _pet(**kw):
@@ -71,7 +71,7 @@ def test_the_eraser_is_refused_on_a_clean_slate_and_kept():
     p.care_mistakes = 0
     p.add_item("miracle_drink")
     out = p.use_item("miracle_drink")
-    assert isinstance(out, _Refused)
+    assert isinstance(out, Refused)
     assert p.inventory.get("miracle_drink") == 1, "a refusal must keep the item"
 
 
@@ -120,7 +120,7 @@ def test_the_textbook_is_refused_at_a_full_gauge_and_kept():
     p.obedience = MAX_OBEDIENCE
     p.add_item("textbook")
     out = p.use_item("textbook")
-    assert isinstance(out, _Refused)
+    assert isinstance(out, Refused)
     assert p.inventory.get("textbook") == 1
 
 
@@ -157,7 +157,7 @@ def test_the_two_ailments_take_two_free_buttons(monkeypatch):
     p.bits = 0                      # broke, and it must not matter
     p.injured = True
     p.inj_length = 400.0
-    assert not isinstance(p.heal_bandage(), _Refused)
+    assert not isinstance(p.heal_bandage(), Refused)
     assert p.injured is False and p.inj_length == 0.0
     monkeypatch.setattr(petbody.random, "random", lambda: 0.99)  # no hazard
     p2 = _pet()
@@ -168,7 +168,7 @@ def test_the_two_ailments_take_two_free_buttons(monkeypatch):
 
 def test_the_bandage_is_refused_on_a_whole_pet():
     p = _pet()
-    assert isinstance(p.heal_bandage(), _Refused)
+    assert isinstance(p.heal_bandage(), Refused)
 
 
 def test_healing_a_sleeper_disturbs_it_like_the_pill_does():

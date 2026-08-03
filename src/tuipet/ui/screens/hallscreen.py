@@ -22,7 +22,7 @@ from rich.text import Text
 import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
 import tuipet.utils.persistence as persistence
-from tuipet.core.datacore import _mins
+from tuipet.core.datacore import format_mins
 from tuipet.utils.theme import INK, INK_B, DIM, LCD_ON, LCD_BG    # noqa: F401  (theme.apply propagation)
 from tuipet.i18n.translator import t
 
@@ -95,7 +95,7 @@ class HallPanel:
     def _epitaph(self, r):
         """One elder's line: lifespan, then its fate — a fallen elder names
         what took it (when the record knows), a retired one walked on."""
-        age = _mins(float(r.get("age", 0.0)))
+        age = format_mins(float(r.get("age", 0.0)))
         if r.get("dead"):
             cause = str(r.get("cause", "") or "")
             fate = t("hall_msg_fell_cause", "fell of {c}").format(c=cause) if cause else t("hall_msg_fell", "fell")

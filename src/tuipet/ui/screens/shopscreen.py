@@ -270,8 +270,8 @@ class ShopPanel:
         if out == "":
             self._flash(f"{e['name']} não faz nada aqui.")
             return None
-        from tuipet.core.petbase import _Refused
-        refused = isinstance(out, _Refused)      # kept the item: no show plays
+        from tuipet.core.petbase import Refused
+        refused = isinstance(out, Refused)      # kept the item: no show plays
         if not refused and shop.item_is_eaten(key):
             # the bag CLOSES and the item is EATEN on the LCD through its
             # own DVPet strip -- the eat fx the feed menu rides (TUIPET

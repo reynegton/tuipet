@@ -518,7 +518,7 @@ def test_requirement_checklist_page_jumps():
 
 def test_legacy_headstones_speak_real_time(tmp_path, monkeypatch):
     """One day unit across the book (digicore audit 2026-07-19): the LEGACY
-    page formats an elder's age through _mins — the same real-time unit as
+    page formats an elder's age through format_mins — the same real-time unit as
     the STATUS Age row and the memorial epitaph.  The old //1440 mis-cited
     the clock law and inflated every headstone 60x ('270d' for a 4.5-day
     life)."""
