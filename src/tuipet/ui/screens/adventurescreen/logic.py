@@ -35,7 +35,6 @@ import tuipet.core.adventure as adventure
 import tuipet.core.shop as shop
 import tuipet.utils.strikefx as strikefx
 from tuipet.core.adventure import Adventure, MAX_LIVES, ZONES
-from tuipet.core.adventure import Adventure, MAX_LIVES, ZONES
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, POS, NEG    # noqa: F401  (theme.apply propagation)
 from tuipet.i18n.translator import t
 COLS, ROWS = 40, 12           # the ONE locked LCD arena, like every other screen

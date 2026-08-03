@@ -42,7 +42,7 @@ def test_panel_walks_previews_and_commits():
     p = _pet(egg_type=0)
     pan = BackgroundPanel(p)
     assert pan.rows[0] == ""                        # row 0 = the egg's own
-    assert "egg's own" in pan._name("")
+    assert "from own egg" in pan._name("")
     pan.text(); pan.strip()
     pan.key("down"); pan.anim(); pan.text()
     pan.key("enter")

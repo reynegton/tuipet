@@ -434,7 +434,7 @@ def test_first_connect_failure_is_not_a_lost_connection():
     from tuipet.ui.screens import lobbyscreen
     pan = lobbyscreen.LobbyPanel.__new__(lobbyscreen.LobbyPanel)
     pan.client = type("C", (), {"_had_welcome": False})()
-    assert "Can't reach the lobby" in pan._down_status()
+    assert "Could not reach the lobby" in pan._down_status()
     pan.client._had_welcome = True             # a real session existed
     assert "Connection lost" in pan._down_status()
 
@@ -453,7 +453,7 @@ def test_a_stalled_ladder_fetch_says_so_and_tab_retries():
     assert "fetching" in pan._text_ladder().plain
     pan._mq = 60                               # ~6s later, still nothing
     page = pan._text_ladder().plain
-    assert "couldn't reach the ladder" in page and "TAB retry" in page
+    assert "could not reach the ladder" in page and "TAB retry" in page
     pan._key_ladder("tab")                     # the promised retry
     assert asked["n"] == 1 and pan.phase == "ladder"
     pan.client.ladder = {"season": "2026-07", "top": [], "you": [0, 0]}

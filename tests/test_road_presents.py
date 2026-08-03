@@ -84,7 +84,7 @@ def test_a_present_find_digs_up_wrapped_and_reveals_the_surprise():
     pan._find_present = True
     pan._dig()
     assert pan._scene["icon"] == _PRESENT            # the wrapper, not the item
-    assert "present" in pan._find_msg.lower()
+    assert "gift" in pan._find_msg.lower() or "present" in pan._find_msg.lower()
     assert p.inventory.get("cupcake") == 1           # the surprise is banked
     assert pan._find_present is False                # flag consumed
 

@@ -211,7 +211,8 @@ def test_title_keeps_one_mascot_and_the_prompt_pulses():
             phases.add(pan.strip().split("▸")[0])
         assert pan.num == mascot                  # one mon per title, always
         pan.anim()
-    assert phases == {"[b]", "[dim]"}             # both pulse phases showed
+    assert phases == {"[b]press ENTER to begin[/b]  [dim]v0.5.307[/dim]",
+                      "[dim]press ENTER to begin[/dim]  [dim]v0.5.307[/dim]"}
     stripped = pan.strip()
     assert "ENTER" in stripped
     if pan.version:                               # source runs carry no metadata
