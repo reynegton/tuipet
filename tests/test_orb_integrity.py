@@ -14,7 +14,7 @@ import tuipet.data.loaders.data as data
 
 
 def _roster_attack_indices():
-    path = os.path.join(os.path.dirname(data.__file__), "data", "digimon.csv")
+    path = os.path.join(os.path.dirname(os.path.dirname(data.__file__)), "monster.csv")
     for r in csv.DictReader(open(path)):
         if not (r.get("DigimonNum") or "").strip().lstrip("-").isdigit():
             continue
@@ -102,9 +102,9 @@ def test_the_device_bank_is_complete_and_in_band():
     import csv as _csv
     dev = data.load_orbs()["device"]
     assert len(dev) == 75, len(dev)      # 6 species have no DU weapon: DVPet fallback
-    ddir = os.path.join(os.path.dirname(data.__file__), "data")
+    ddir = os.path.dirname(os.path.dirname(data.__file__))
     roster = {"".join(c for c in r["Name"].lower() if c.isalnum())
-              for r in _csv.DictReader(open(os.path.join(ddir, "digimon.csv")))}
+              for r in _csv.DictReader(open(os.path.join(ddir, "monster.csv")))}
     rows = list(_csv.DictReader(open(os.path.join(ddir, "deviceAttacks.csv"))))
     assert len(rows) == 75
     for r in rows:

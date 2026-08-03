@@ -150,7 +150,7 @@ def apply(name, propagate=True):
     vals = _derive(THEMES[name])
     globals().update(vals)
     if propagate:
-        pkg = __name__.rsplit(".", 1)[0] + "."
+        pkg = __name__.split(".", 1)[0] + "."  # tuipet.
         for mname, mod in list(sys.modules.items()):
             if (mod is None or not mname.startswith(pkg)
                     or mname == __name__

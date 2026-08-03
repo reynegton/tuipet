@@ -38,17 +38,18 @@ def test_the_neglect_pressures_run_at_the_canon_cadence():
     """Filth mood, the held-poop nag and the care-call drain were all x60 too
     slow, so neglect barely hurt.  They are literals in the tick; pin the
     source so a regression is loud."""
-    src = inspect.getsource(__import__('tuipet.petbody', fromlist=['x']))  # the tick's home (tier-5)
-    assert "self._poop_wait_t >= 1.0" in src, "PoopWaitMin=1 game-min"
+    src = inspect.getsource(__import__('tuipet.core.pet.body.sleep', fromlist=['x']))
+    assert "pet._poop_wait_t >= 1.0" in src, "PoopWaitMin=1 game-min"
     # (the sick-penalty cadence pin left with the sickness system -- 2026-07-17)
 
 
 def test_the_deliberate_exceptions_stay_deliberate():
     """These two must NOT be 'fixed' into the canon literal."""
-    src = inspect.getsource(__import__('tuipet.petbody', fromlist=['x']))  # the tick's home (tier-5)
+    src_digestion = inspect.getsource(__import__('tuipet.core.pet.body.digestion', fromlist=['x']))
+    src_petbody = inspect.getsource(__import__('tuipet.core.petbody', fromlist=['x']))
     # the care-mistake response window: a literal port = 10 real seconds
-    assert "self._hunger_call_t >= 600.0" in src
-    assert "self._str_call_t >= 600.0" in src
+    assert "pet._hunger_call_t >= 600.0" in src_digestion
+    assert "self._str_call_t >= 600.0" in src_petbody
     # (the FilthSickMin/bound pair left with the sickness system -- 2026-07-17)
 
 

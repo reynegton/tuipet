@@ -56,7 +56,7 @@ def _paint_capture(monkeypatch):
                    free=list(overlay_free or []))
         return ""
 
-    monkeypatch.setattr("tuipet.arena.render_screen", spy)
+    monkeypatch.setattr("tuipet.core.arena.render_screen", spy)
     return cap
 
 
@@ -347,7 +347,7 @@ def test_the_ambient_sulk_is_pose_only():
     LEFT -- neither the attachment nor the left-tuck was ever Joel's order.
     The tantrum POSE is the whole discouraged show."""
     import tuipet.data.loaders.data as data
-    from tuipet.app import Screen
+    from tuipet.core.arena import Screen
     from tuipet.core.pet import Pet
     s = object.__new__(Screen)
     s.frame_i = 0
@@ -360,7 +360,7 @@ def test_the_ambient_sulk_is_pose_only():
     assert smoke, "the smoke rip itself must survive -- reactions still wear it"
     # the idle painter must no longer FETCH the smoke; the reaction
     # shows in arenafx are the only place left that may
-    src = open("src/tuipet/arena.py").read()
+    src = open("src/tuipet/core/arena.py").read()
     assert '_FX.get("unhappy")' not in src, "the idle painter still draws smoke"
-    afx = open("src/tuipet/arenafx.py").read()
+    afx = open("src/tuipet/utils/arenafx.py").read()
     assert afx.count('"unhappy"') >= 2, "the REACTION smoke must survive"

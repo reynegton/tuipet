@@ -126,7 +126,10 @@ class RaidPanel(menu.SubHost):
                 # attempt races, raid round 2026-07-19).  No refetch here:
                 # the gate re-sends the view with every hit ack now, like
                 # the claim flow.
-                self.msg = hit.get("why") or t("raid_msg_refused", "O portal recusou o relatório.")
+                code = hit.get("code")
+                why = hit.get("why") or ""
+                default_refusal = t("raid_msg_refused", "O portal recusou o relatório.")
+                self.msg = t(code, why) if code else (why or default_refusal)
                 self.sfx = "error"
         reward = getattr(self.client, "raid_reward", None)
         if reward is not None:

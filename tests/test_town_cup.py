@@ -94,12 +94,12 @@ def test_an_unfit_pet_is_refused_at_the_town_gate_too():
     p.sick = True
     hub = TownPanel(p, town_id=3)
     hub._start_cup()
-    assert hub.tourney is None and "sick" in hub.msg.lower()
+    assert hub.tourney is None and "doente" in hub.msg.lower()
     q = _pet()
     q.hunger = 0
     hub2 = TownPanel(q, town_id=3)
     hub2._start_cup()
-    assert hub2.tourney is None and "hungry" in hub2.msg.lower()
+    assert hub2.tourney is None and "fome" in hub2.msg.lower()
     assert not hub._cup_done and not hub2._cup_done   # the visit's cup remains
     r = _pet()
     r.asleep = True
@@ -116,7 +116,7 @@ def test_the_trophy_room_names_town_cups():
     assert tournament.trophy_name(home["id"]) == tournament.trophy_label(home)
     assert tournament.trophy_name(tournament.TOWN_TROPHY_BASE + 11) == "Town Cup #12"
     assert tournament.trophy_name(899) == "cup 899"   # not a town, not a cup
-    from tuipet.core import digicore
+    from tuipet.core import datacore as digicore
     p = _pet()
     p.trophies_won = {tournament.TOWN_TROPHY_BASE + 3: "day 2"}
     rows = digicore._trophy_rows(p)

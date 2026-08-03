@@ -61,11 +61,11 @@ def test_sell_empty_bag():
     from tuipet.core import shop
     assert not hasattr(p, "sell")
     msg, sfx = shop.sell(p, {"key": "f:1", "name": "Meat"})
-    assert sfx == "error" and "don't have" in msg
+    assert sfx == "error" and "não tem" in msg
 
 
 def test_use_missing_item():
-    assert Pet(num=-1, stage="Rookie").use_item("i:99999") == "None left."
+    assert Pet(num=-1, stage="Rookie").use_item("i:99999") == "Nenhum sobrando."
 
 
 def test_consumable_by_key_bad_input():

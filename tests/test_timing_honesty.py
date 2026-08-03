@@ -147,14 +147,14 @@ def test_every_fight_wears_its_lock_on_the_card():
     pan = BattlePanel(_pet())
     app = _A(pan.pet, pan)
     statusbox.battle(app)
-    assert "Lock" not in app.stats_w.s          # nothing locked yet
+    assert "Trava" not in app.stats_w.s          # nothing locked yet
     pan.key("space")                            # skip the intro
     for _ in range(8):
         pan.anim()
     pan.bar = (pan.mega_lo + pan.mega_hi) // 2
     pan.key("space")                            # the lock
     statusbox.battle(app)
-    assert "Lock" in app.stats_w.s and "mega" in app.stats_w.s
+    assert "Trava" in app.stats_w.s and "mega" in app.stats_w.s
 
 
 def test_the_lock_is_pure_upside_pen20_shake():

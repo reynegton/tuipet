@@ -142,8 +142,8 @@ def test_the_attribute_TRADE_items_refuse_an_empty_bank():
     p.line_id = ""
     p.vaccine = p.virus = 14                 # one under the stake
     p.add_item("board_game"); p.add_item("computer_game")
-    assert "Not enough" in str(p.use_item("board_game"))
-    assert "Not enough" in str(p.use_item("computer_game"))
+    assert "insuficiente" in str(p.use_item("board_game"))
+    assert "insuficiente" in str(p.use_item("computer_game"))
     assert p.vaccine == 14 and p.virus == 14 and p.data_power == 0
 
 
@@ -152,7 +152,7 @@ def test_the_itemevol_relics_are_live_keys():
     spirits and relics are catalog keys now, wired to the evolution
     graph's own item gates (load_requirements carries evol_item for 33
     and 43-62; items.csv DigimonID names the direct forms)."""
-    for iid, key in ((33, "digitron"), (34, "horn_helmet"),
+    for iid, key in ((33, "datatron"), (34, "horn_helmet"),
                      (43, "human_fire_spirit"), (53, "beast_fire_spirit"),
                      (62, "beast_dark_spirit")):
         assert shop.key_for_icon("i:%d" % iid) == key
@@ -188,5 +188,5 @@ def test_the_catalog_holds_the_whole_authored_corpus():
     assert len(shop.CATALOG) == 114
     # Evolution split on the axis it serves: the DOORS stay Evolve, the
     # stat chips are POWER (they move battle meters, not destinations)
-    assert sum(1 for v in shop.CATALOG.values() if v.category == "Evolve") == 34
+    assert sum(1 for v in shop.CATALOG.values() if v.category == "Evoluir") == 34
     assert sum(1 for v in shop.CATALOG.values() if v.category == "Power") == 12

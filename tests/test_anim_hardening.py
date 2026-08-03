@@ -7,7 +7,8 @@ import asyncio
 import inspect
 
 import tuipet.data.loaders.data as data
-from tuipet.app import Screen, TuiPetApp
+from tuipet.core.arena import Screen
+from tuipet.app import TuiPetApp
 from tuipet.ui.screens.datacorescreen import silhouette
 from tuipet.core.pet import Pet
 

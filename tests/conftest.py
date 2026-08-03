@@ -6,6 +6,8 @@ leaked test save has corrupted the live game before). The `isolate_save`
 fixture is autouse, so every test in the suite gets a throwaway save dir.
 """
 import pytest
+from tuipet.i18n.translator import set_language
+set_language("pt")
 
 from tuipet.utils import persistence, persistio
 
@@ -23,6 +25,14 @@ def isolate_save(tmp_path, monkeypatch):
     from tuipet.utils.persistence import settings_io, save_io
     monkeypatch.setattr(settings_io, "SETTINGS_PATH", str(tmp_path / "settings.json"))
     monkeypatch.setattr(save_io, "SAVE_PATH", str(tmp_path / "save.json"))
+    monkeypatch.setattr(persistence, "SAVE_DIR", str(tmp_path))
+    monkeypatch.setattr(persistence, "SAVE_PATH", str(tmp_path / "save.json"))
+    monkeypatch.setattr(persistence, "SETTINGS_PATH", str(tmp_path / "settings.json"))
+    monkeypatch.setattr(settings_io, "SAVE_DIR", str(tmp_path))
+    monkeypatch.setattr(save_io, "SAVE_DIR", str(tmp_path))
+    from tuipet.utils.persistence import progress_io
+    monkeypatch.setattr(progress_io, "SAVE_DIR", str(tmp_path))
+    monkeypatch.setattr(progress_io, "SAVE_PATH", str(tmp_path / "save.json"))
     # module-level write-dedupe caches must not leak between sandboxes: a
     # num already in _ALBUM_SEEN makes album_add() a no-op on the FRESH save
     # (test_egg_guide caught it shadowing test_egg_economy, 2026-07-12)

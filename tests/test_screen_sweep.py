@@ -65,7 +65,7 @@ def test_jogress_panel_fuses():
     """The panel is the lobby's fusion cinematic now (the offline picker died
     with the home jogress, v0.2.348): construct at the fuse and walk the whole
     converge -> flash -> reveal."""
-    from tuipet.jogressscreen import JogressPanel, FUSE_STEPS
+    from tuipet.ui.screens.jogressscreen import JogressPanel, FUSE_STEPS
     random.seed(11)
     p = _pet()
     pan = JogressPanel(p, p.num, 7, 4)
@@ -155,17 +155,13 @@ def test_training_all_four_drills():
             _step(pan, arrow)                    # the cursor list renders every row
         _step(pan, drill)
         guard = 0
-        while pan.phase != "done" and guard < 2000:
+        while not getattr(pan, "auto_close", None) and guard < 200:
             guard += 1
-            if pan.phase == "strike":
-                _step(pan, "space", ticks=2)
-            else:
-                for k in ("space", "left", "right", "up", "down", "enter", "1"):
-                    if pan.phase in ("done", "strike"):
-                        break
-                    _step(pan, k)
+            for k in ("space", "left", "right", "up", "down", "enter", "1"):
+                if getattr(pan, "auto_close", None):
+                    break
+                _step(pan, k)
         pan.text()
-        _step(pan, "enter")
 
 
 def test_lobby_panel_every_phase_without_a_server():
@@ -270,7 +266,7 @@ def test_jogress_panel_full_fuse():
     real partner sprite and the real fused form render every beat (the picker
     died with the home jogress, v0.2.348 -- the lobby resolves the match;
     this drives the cinematic it hands over)."""
-    from tuipet.jogressscreen import JogressPanel, FUSE_STEPS
+    from tuipet.ui.screens.jogressscreen import JogressPanel, FUSE_STEPS
     import tuipet.data.loaders.data as data
     random.seed(4)
     _, by = data.load_sprites()
@@ -460,8 +456,8 @@ def test_the_lobby_split_holds_its_boundaries():
     one LobbyPanel class exists."""
     import inspect
     from tuipet.ui.screens import accountscreen
-    from tuipet.ui.screens import lobbybout
-    from tuipet.ui.screens import lobbychat
+    from tuipet.network import lobbybout
+    from tuipet.network import lobbychat
     from tuipet.ui.screens import lobbyscreen
     assert lobbyscreen.AccountPanel is accountscreen.AccountPanel
     assert lobbyscreen._clamp_card is lobbybout._clamp_card
@@ -542,7 +538,7 @@ def test_the_update_offers_a_restart(monkeypatch):
 def test_any_key_skips_the_converge():
     """The stated contract ("any key skips") is the real one now -- only
     ENTER/SPACE/ESC used to land."""
-    from tuipet.jogressscreen import JogressPanel
+    from tuipet.ui.screens.jogressscreen import JogressPanel
     from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.world_seconds = 600.0

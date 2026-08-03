@@ -297,7 +297,7 @@ def test_syncclient_inbox_carries_pms(server):
     """The real SyncClient surfaces PMs in .inbox -- the app's home-screen
     ✉ alert reads exactly this."""
     import asyncio
-    from tuipet import net
+    from tuipet.network import net
 
     async def go():
         sc = net.SyncClient(server, "joel", "secret")

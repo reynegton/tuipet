@@ -120,7 +120,7 @@ def _maybe_evolve(pet):
         if target is not None:
             pet.evolve_to(target)
         return
-    target = evolution.select(self)
+    target = evolution.select(pet)
     if target is not None:
         pet.evolve_to(target)
 
@@ -255,7 +255,7 @@ def mode_change(pet):
             return None, "The mode holds — it can't revert."
         pet._swap_form(prev, subtract_current=True)
     else:
-        targets = evolution.mode_targets(self)
+        targets = evolution.mode_targets(pet)
         if not targets:
             pet._set_anim("refuse", 1.0)             # Jeering
             return None, "O modo está fora de alcance."
@@ -268,6 +268,4 @@ def mode_change(pet):
 def can_mode_change(pet):
     return (pet.num != -1 and not pet.dead
             and pet.stage not in ("Egg", "Fresh")
-            and evolution.can_mode_change(self))
-
-
+            and evolution.can_mode_change(pet))

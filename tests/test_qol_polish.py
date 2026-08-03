@@ -194,7 +194,7 @@ def test_selling_the_last_of_a_stack_guards_the_next_press():
     held0 = dict(p.inventory)
     pan.key("r")                           # the mash press...
     assert p.inventory == held0            # ...sells NOTHING
-    assert "now on" in pan.msg             # and says where the cursor sits
+    assert "agora em" in pan.msg             # and says where the cursor sits
     pan.key("r")                           # a deliberate press works again
     assert p.inventory != held0
 
@@ -231,7 +231,7 @@ def test_menu_family_footers_are_gone():
     "←→ volume · ENTER hear it" -- both visible at once.  The strip is
     the single key surface now (QOL 2026-07-23)."""
     from tuipet.ui.screens.optionsscreen import OptionsPanel, SoundPanel
-    from tuipet.themescreen import ThemePanel
+    from tuipet.ui.screens.themescreen import ThemePanel
     sp = SoundPanel(lambda: True, lambda: None)
     assert "ENTER go" not in sp.text().plain
     op = OptionsPanel(_pet(), lambda: True, lambda: None)
@@ -360,12 +360,12 @@ def test_lights_off_when_exhausted_says_settling_down():
     p = _pet()
     p._set_energy(0)
     p.lights = True
-    assert "settles down to rest" in p.toggle_lights()
+    assert "se deita para descansar" in p.toggle_lights()
     p.lights = False
     p.toggle_lights()                      # back on
     p._set_energy(p.max_energy)
     p.lights = True
-    assert p.toggle_lights() == "Lights off."   # rested: the plain toggle
+    assert p.toggle_lights() == "Luzes apagadas."   # rested: the plain toggle
 
 
 # ---- C6: space rides the gift binding ---------------------------------------
@@ -390,7 +390,7 @@ def test_the_live_socket_caps_its_open_and_offers_a_hurry():
 
 def test_retry_now_cuts_the_backoff_and_resets_the_ramp():
     import asyncio
-    from tuipet import net
+    from tuipet.network import net
 
     class _Probe(net._WsClient):
         def __init__(self):

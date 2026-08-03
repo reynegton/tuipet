@@ -1,3 +1,4 @@
+from tuipet.core.shop.catalog import _AUTHORED
 """THE CATALOG RECORD — items refactor P1 (2026-07-23).
 
 Joel: "take all items, make sure theyre in catagories, and we gotta redo
@@ -38,8 +39,8 @@ def test_the_wrap_changed_no_data():
     """Every wrapped entry still carries, in its first six slots, exactly
     the tuple it was authored as -- the standing claim that the record
     work is a rename and not a behaviour change."""
-    assert set(shop._AUTHORED) == set(shop.CATALOG)
-    for key, raw in shop._AUTHORED.items():
+    assert set(_AUTHORED) == set(shop.CATALOG)
+    for key, raw in _AUTHORED.items():
         assert tuple(shop.CATALOG[key])[:6] == tuple(raw), key
         assert len(raw) == 6, f"{key}: the authored table stays 6 wide"
 

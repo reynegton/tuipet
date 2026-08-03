@@ -734,7 +734,7 @@ def _board_game(pet):
     plus the authored obedience.  Refused when there is no Vaccine to
     convert -- a converter with an empty tank is a dud."""
     if pet.vaccine < 15:
-        return _Refused("Not enough Vaccine power to trade.")  # noqa: F405
+        return _Refused("Poder Vacina insuficiente para troca.")  # noqa: F405
     pet.vaccine -= 15
     pet.data_power += 15
     pet._set_obedience(pet.obedience + 5)
@@ -744,7 +744,7 @@ def _board_game(pet):
 def _computer_game(pet):
     """Virus -15 -> Data +15 (items.csv 8)."""
     if pet.virus < 15:
-        return _Refused("Not enough Virus power to trade.")  # noqa: F405
+        return _Refused("Poder Vírus insuficiente para troca.")  # noqa: F405
     pet.virus -= 15
     pet.data_power += 15
     return "Recorde — o caos compila. (Vi-15 → D+15)"

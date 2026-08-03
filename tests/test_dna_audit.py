@@ -233,9 +233,9 @@ def test_the_hud_carries_the_standing_armed_notice():
     armed, need, gone = asyncio.run(go())
     # the HUD box clips at its width and the full line marquees -- pin the
     # head here and the full wording at its source
-    assert "DNA armed" in armed
+    assert "DNA armado" in armed
     import inspect
-    from tuipet.core import app as app_mod
-    assert "next evolution rides the" in inspect.getsource(app_mod)
-    assert "hungry" in need and "DNA armed" not in need
-    assert "DNA armed" not in gone
+    from tuipet.app_mixins import timers as timers_mod
+    assert "a próxima evolução segue o" in inspect.getsource(timers_mod)
+    assert "com fome" in need and "DNA armado" not in need
+    assert "DNA armado" not in gone

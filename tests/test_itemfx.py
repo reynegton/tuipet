@@ -4,7 +4,7 @@ Trampoline hop).  Each AnimationType now plays its own canon table (itemfx);
 this pins the tables' shapes, the routing, and the end chains."""
 import tuipet.data.loaders.data as data
 from tuipet.utils import itemfx
-from tuipet.app import Screen
+from tuipet.core.arena import Screen
 from tuipet.core.pet import Pet
 from tuipet.ui.screens.shopscreen import ShopPanel
 
@@ -174,7 +174,7 @@ def test_own_door_items_are_never_hijacked():
     canon type is Play, but it is used on a DEAD pet and the bag is
     unreachable at the grave, so that show could only ever be wrong."""
     from tuipet.core import shop
-    for k in ("digimemory", "revive_floppy", "town_transport",
+    for k in ("memory", "revive_floppy", "town_transport",
               "disaster_transport", "life_recovery"):
         assert shop.item_script(k) is None, k
 
@@ -371,10 +371,10 @@ def test_the_bandage_show_only_plays_when_it_treats_something():
     from tuipet.core.pet import Pet
     p = Pet(num=100, stage="Champion", attribute="Vaccine", obedience=500)
     p.world_seconds = 600.0
-    assert "Nothing" in str(p.heal_bandage())         # healthy: refusal
+    assert "Nada" in str(p.heal_bandage())         # healthy: refusal
     p.injured = True
     p.inj_length = 300.0
-    assert "patched" in str(p.heal_bandage())
+    assert "curado" in str(p.heal_bandage())
     assert not p.injured
 
 
@@ -452,7 +452,7 @@ def test_the_music_players_cell_is_the_note_orb():
     still cells show the natively-8x8 beamed-note orb; the SHOW still
     plays the box's real frames."""
     import tuipet.data.loaders.data as data
-    from tuipet import data_world
+    from tuipet.data.loaders import data_world
     from tuipet.core import shop
     assert shop.icon_art("music_player") == data_world.load_orbs()["special"]["42"]
     assert shop.icon_art("i:9") is not None     # by raw icon key too

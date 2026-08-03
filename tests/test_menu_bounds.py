@@ -70,7 +70,7 @@ def test_lobby_jogress_lines_fit_with_a_24_char_partner():
         lines = pan.text().plain.split("\n")
         assert max(map(len, lines)) <= LCD_COLS
     pan.jphase, pan.jresult = "result", {"num": 649, "name": LONGEST}
-    from tuipet.core import jogressscreen
+    from tuipet.ui.screens import jogressscreen
     show = jogressscreen.JogressPanel(pan.pet, 649, 286, 649)
     show.phase = "fused"
     pan.jshow = show

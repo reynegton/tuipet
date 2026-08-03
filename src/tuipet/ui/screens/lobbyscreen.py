@@ -290,7 +290,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                     self.invite_prompt = m
                     self.sfx = "menu"
                 s.inbox.remove(m)
-            elif t == "invite_resp":
+            elif msg_type == "invite_resp":
                 s.inbox.remove(m)
                 rk = (m.get("from_id"), m.get("kind"))
                 if rk not in self._sent_invites:
@@ -305,7 +305,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                     self.status = t("lob_msg_busy", "{name} is busy.").format(name=m.get('from_name', '?'))
                 else:
                     self.status = t("lob_msg_declined", "{name} declined.").format(name=m.get('from_name', '?'))
-            elif t == "relay":
+            elif msg_type == "relay":
                 s.inbox.remove(m)
                 self._on_relay(m)
         if s.login_failed:

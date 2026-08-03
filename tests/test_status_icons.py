@@ -73,7 +73,7 @@ def _referenced_keys():
     keys = set(data.load_effects())
     # theme.py never draws effect icons; its palette KEYS ("flash", 2026-07-05)
     # collide with icon names and read as false references
-    src = [f for f in glob.glob("src/tuipet/*.py") if not f.endswith("theme.py")]
+    src = [f for f in glob.glob("src/tuipet/**/*.py", recursive=True) if not f.endswith("theme.py")]
     text = "".join(open(f).read() for f in src)
     refs = set()
     for k in keys:

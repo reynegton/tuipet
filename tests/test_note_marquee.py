@@ -39,7 +39,7 @@ def test_every_panel_heartbeats_for_the_marquee():
             ("shopscreen", "ShopPanel"), ("assistscreen", None),
             ("themescreen", None),
             ("feedscreen", None), ("dnascreen", None), ("optionsscreen", None)):
-        mod = importlib.import_module(f"tuipet.{mod_name}")
+        mod = importlib.import_module(f"tuipet.ui.screens.{mod_name}")
         panels = [c for n, c in inspect.getmembers(mod, inspect.isclass)
                   if n.endswith("Panel") and c.__module__ == mod.__name__]
         assert panels, f"{mod_name}: no panel class found"

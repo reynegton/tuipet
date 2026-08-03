@@ -35,7 +35,7 @@ def _spy(monkeypatch):
                    bgimg=bgimg, xshift=xshift)
         return ""
 
-    monkeypatch.setattr("tuipet.arena.render_screen", spy)
+    monkeypatch.setattr("tuipet.core.arena.render_screen", spy)
     return cap
 
 

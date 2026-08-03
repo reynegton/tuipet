@@ -22,7 +22,7 @@ def _pet():
 
 
 def test_battle_rides_the_action_bar():
-    assert ("m", "battle", "Battle") in TuiPetApp.BINDINGS
+    assert ("m", "battle", "Batalha") in TuiPetApp.BINDINGS
     assert "battle" in keys_markup()
 
 
@@ -74,4 +74,4 @@ def test_the_gate_is_can_battle():
     the energy floor law's spend side)."""
     p = _pet()
     p._set_energy(5)
-    assert "drained" in p.can_battle()
+    assert "energia" in p.can_battle()

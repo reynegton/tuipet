@@ -108,7 +108,7 @@ def test_powers_do_not_grow_at_the_bar():
 def test_the_energy_gate_is_the_one_hard_gate():
     p = _pet()
     p.energy = TRAIN_ENERGY_COST - 1
-    assert "tired" in p.can_train().lower()
+    assert "cansado" in p.can_train().lower()
     p.energy = TRAIN_ENERGY_COST
     assert p.can_train() is None
 
@@ -204,7 +204,7 @@ def test_wall_one_stands_through_everything_but_a_mega_break():
     import json
     import os
     import tuipet.core.training as tr
-    wall = json.load(open(os.path.join(os.path.dirname(tr.__file__),
+    wall = json.load(open(os.path.join(os.path.dirname(os.path.dirname(tr.__file__)),
                                        "data", "train_wall.json")))
     pan = _panel()
     _lock_at(pan, 0 if pan.mega_lo - 5 > 0 else 24)

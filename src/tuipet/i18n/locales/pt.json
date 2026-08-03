@@ -961,5 +961,17 @@
     "app_msg_signed_in_cur": "Logado como {name} — este dispositivo está atualizado.",
     "app_msg_cant_park": "Não foi possível estacionar seu pet com {name}",
     "app_msg_signed_in_fresh": "Logado como {name} — um novo começo.",
-    "app_msg_signed_in_syncs": "Logado como {name} — seu pet sincroniza aqui agora."
+    "app_msg_signed_in_syncs": "Logado como {name} — seu pet sincroniza aqui agora.",
+    "err_lobby_full": "O lobby está lotado.",
+    "err_login_name_req": "O nome é obrigatório.",
+    "err_login_wrong_pw": "Senha incorreta para este nome.",
+    "err_login_pick_pw": "Crie uma senha para registrar este nome.",
+    "err_newer_session": "Logado em uma sessão mais recente.",
+    "err_login_first": "Faça login primeiro.",
+    "err_no_such_player": "Jogador não encontrado.",
+    "err_player_left": "Esse jogador acabou de sair.",
+    "err_admin_nope": "Acesso negado.",
+    "err_admin_unknown": "Comando desconhecido.",
+    "err_raid_not_standing": "O Boss já foi derrotado.",
+    "err_raid_no_attempts": "Nenhuma tentativa restante hoje."
 }

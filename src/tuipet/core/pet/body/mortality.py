@@ -143,7 +143,7 @@ def _tick_mortality(pet, dt):
             break
     if d > 0 and random.random() < d * dt:
         pet._die("old age" if pet.age_days >= GERIATRIC_AGE_DAYS  # noqa: F405
-                  else "negligência" if pet.care_mistakes >= 5 else "doença")
+                  else "negligence" if pet.care_mistakes >= 5 else "sickness")
         return True
     return False
 

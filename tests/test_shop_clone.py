@@ -1,3 +1,5 @@
+from tuipet.core.shop.catalog import _WAVE_TEASE
+import tuipet.utils.persistence.serializer
 """The TUIPET shop/bag (catalog authored 2026-07-18): the 29-item CATALOG
 table -- DSprite's mechanics grammar wearing DVPet art on every cell --
 plus the classic EGG shelf and HONORS board riding the last tabs."""
@@ -40,7 +42,7 @@ def test_buy_bags_it_and_sell_returns_half():
 def test_the_item_effects_apply():
     p = _pet(energy=0)
     p.add_item("energy_drink")
-    assert "Energy" in p.use_item("energy_drink")
+    assert "Energia" in p.use_item("energy_drink")
     assert p.energy == p.max_energy and not p.inventory
 
     q = _pet(hunger=1, energy=0)
@@ -106,7 +108,7 @@ def test_crest_egg_maps_to_the_classic_digimental():
 def test_shop_panel_walks_every_tab_and_the_bag():
     p = _pet()
     pan = ShopPanel(p)
-    assert pan._tabs() == ["Food", "Items", "Eggs", "Honors"]
+    assert pan._tabs() == ["Food", "Items", "Eggs", "Honras"]
     for _ in range(len(pan._tabs())):
         assert pan.text().plain
         pan.key("right")
@@ -136,9 +138,9 @@ def test_the_classic_tab_bar_is_back():
     pan = ShopPanel(_pet())
     pan.msg_t = 0
     plain = pan.text().plain
-    assert "[Food] Items  Eggs  Honors" in plain
+    assert "[Food] Items  Eggs  Honras" in plain
     pan.key("right")
-    assert " Food [Items] Eggs  Honors" in pan.text().plain
+    assert " Food [Items] Eggs  Honras" in pan.text().plain
     # the Eggs tab is the DIGIMENTAL shelf -- goods, never digitama
     pan.key("right")
     rows = pan._rows()
@@ -176,9 +178,9 @@ def test_buy_feedback_actually_renders_now():
     p = _pet()
     pan = ShopPanel(p)
     pan.key("enter")                          # buy the first Food row
-    assert "Bought" in pan.strip()
+    assert "Comprou" in pan.strip()
     pan.msg_t = 0
-    assert "Bought" not in pan.strip()        # the flash expires
+    assert "Comprou" not in pan.strip()        # the flash expires
     assert "ENTER" in pan.strip()             # ...and the keys return
 
 
@@ -217,7 +219,7 @@ def test_crest_note_is_the_live_gate():
 
 def test_wave_teases_fit_the_footer():
     """Footers never marquee: every tease must hold inside the 38-col line."""
-    for gate, text in shop._WAVE_TEASE.items():
+    for gate, text in _WAVE_TEASE.items():
         line = text.format(have=gate[1] - 1, need=gate[1])
         assert len(line) <= 38, line
 
@@ -296,7 +298,7 @@ def test_the_toys_turn_live_dials():
     q = _pet()
     q.add_item("bubble_bath")                   # a pre-refactor bag survives
     from tuipet.utils import persistence
-    persistence._heal_bag(q.inventory)
+    tuipet.utils.persistence.serializer._heal_bag(q.inventory)
     assert q.inventory.get("ball", 0) >= 1 and "bubble_bath" not in q.inventory
 
 
@@ -356,7 +358,7 @@ def test_short_icons_anchor_to_the_baseline_not_the_ceiling():
     empty -- verified against spritesFood0.png); the lie was icon_cell
     top-floating short art over a dead bottom row.  Foods sit on plates:
     short art bottom-aligns, full-height art is untouched."""
-    from tuipet.ui.components import data
+    from tuipet.data.loaders import data
     from tuipet.ui.components import menu
     icons = data.load_icons()
     giga = menu.icon_cell(icons["f:28"][0])          # 24x18: one short row
@@ -385,7 +387,7 @@ def test_the_honors_tab_strip_says_wear():
     p = _pet()
     pan = ShopPanel(p)
     pan.msg_t = 0
-    pan.tab = pan._tabs().index("Honors")
+    pan.tab = pan._tabs().index("Honras")
     s = _hud_plain(pan.strip())
     assert "ENTER wear" in s and len(s) <= 40
 
@@ -395,13 +397,13 @@ def test_refusals_and_shortfalls_sound_like_refusals():
     happy confirm chirp (round 31)."""
     p = _pet()
     pan = ShopPanel(p)
-    pan.tab = pan._tabs().index("Honors")
+    pan.tab = pan._tabs().index("Honras")
     p.bits = 0
     pan.key("enter")                              # can't afford the honor
-    assert pan.sfx == "error" and "Not enough bits" in pan.msg
+    assert pan.sfx == "error" and "Bits insuficientes." in pan.msg
     p.bits = 10**7                                # rich beyond any honor
     pan.key("enter")                              # now it buys fine
-    assert pan.sfx == "confirm" and "Earned" in pan.msg
+    assert pan.sfx == "confirm" and "Earned the honor" in pan.msg
 
 
 def test_escape_carries_a_live_verdict_home():
@@ -413,7 +415,7 @@ def test_escape_carries_a_live_verdict_home():
     pan.key("enter")                              # buy: the flash is live
     pan.sfx = None                                # ...the app consumed the sfx
     done, note = pan.key("escape")
-    assert done == "done" and "Bought" in note
+    assert done == "done" and "Comprou" in note
     pan2 = ShopPanel(p)
     pan2.msg_t = 0                                # no live flash
     assert pan2.key("escape") == ("done", None)

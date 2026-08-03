@@ -17,7 +17,7 @@ the clean->cheer chain.
 import os
 import re
 
-from tuipet.app import Screen
+from tuipet.core.arena import Screen
 from tuipet.core.pet import Pet
 
 
@@ -81,7 +81,7 @@ def test_care_actions_guard_against_retrigger():
     """Every care action that starts an fx must early-return while one is active."""
     here = os.path.dirname(__import__("tuipet").__file__)
     # the handlers live in appactions since the tier-3 split (2026-07-17)
-    src = open(os.path.join(here, "appactions.py")).read()
+    src = open(os.path.join(here, "appactions", "care_actions.py")).read()
     # find each `def action_*` body and check the feed/clean guard
     # (the play action left 2026-07-17 with the mood system)
     GUARDED = ["action_feed", "action_clean"]
@@ -100,7 +100,7 @@ def test_the_drills_three_verdicts_route_to_three_fx():
     two-way anim, so the middle grade took the full cheer.  Each verdict
     pose now routes to its own show -- Cheering / the deserved 4/6 jeer /
     the 10/9 slump."""
-    from tuipet.core import appactions
+    from tuipet import appactions
     from tuipet.core.pet import Pet
 
     class _App:
@@ -140,7 +140,7 @@ def test_eat_fx_survives_a_blank_last_food_frame():
     The golden always fed f:8 (4 real frames), so it never saw one: exercise
     the exact crashing food, every step."""
     import random
-    from tuipet.core import app as app_mod
+    from tuipet import app as app_mod
     import tuipet.data.loaders.data as data
     from tuipet.core.pet import Pet
     frames = data.load_icons()["f:7"]
@@ -172,7 +172,7 @@ def test_hatch_render_follows_the_canon_beats():
     made the rock stutter and the crack land a beat late; the beat is rounded
     now.  Pinned through the real paint path on both drive styles (direct
     timer set AND accumulated advance_hatch subtraction)."""
-    from tuipet.core import app as app_mod
+    from tuipet import app as app_mod
     from tuipet.core import arena as arena_mod   # Screen resolves render_screen here
     from tuipet.core import egg as egg_mod
     from tuipet.core.pet import Pet
@@ -374,7 +374,7 @@ def test_poop_sound_keys_the_new_piles_size():
     returns -- the SIZE of the new pile (1 small / >2 large / else normal) --
     not the pile count.  A small fourth pile used to bark largePoop."""
     import re
-    src = open("src/tuipet/app.py").read()
+    src = open("src/tuipet/app_mixins/timers.py").read()
     m = re.search(r'sz = \(p\.poop_sizes\[-1\].*\n.*poop_snd = "smallPoop" if sz == 1 '
                   r'else \("largePoop" if sz > 2 else "poop"\)', src)
     assert m, "the size-keyed mapping is gone (count-keyed again?)"
@@ -437,7 +437,7 @@ def test_the_present_rides_the_whole_return_leg():
     """Gift-anim audit 2026-07-05: canon gifting() pushes the present home in
     LOCKSTEP (meatButton.moveRight(3) beside the pet from off-screen left) --
     tuipet popped it in only at the arrival hold."""
-    from tuipet.core import app as app_mod
+    from tuipet import app as app_mod
     from tuipet.core.pet import Pet
     p = Pet(num=102, name="D", stage="Champion", attribute="Virus")
     p.world_seconds = 12 * 60.0
@@ -511,12 +511,13 @@ def _pose_pet(**kw):
 def _capture_render(monkeypatch):
     cap = {}
 
-    def fake(rows, cols, nrows, on, bg, **kw):
+    def fake(rows, cols, nrows, on="#2b2e31", bg="#c6c9cc", baseline=True, mirror=False, xshift=0, yshift=0, overlay=None, **kw):
+        kw.update({"on": on, "bg": bg, "baseline": baseline, "mirror": mirror, "xshift": xshift, "yshift": yshift, "overlay": overlay or []})
         cap.clear()
         cap.update(kw)
         return ""
 
-    monkeypatch.setattr("tuipet.arena.render_screen", fake)
+    monkeypatch.setattr("tuipet.core.arena.render_screen", fake)
     return cap
 
 

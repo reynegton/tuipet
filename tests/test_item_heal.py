@@ -1,3 +1,4 @@
+import tuipet.data.loaders.data_shop as data_shop
 """Consumable 'Recovered' (battle-HP restore) must NOT be treated as injury healing.
 
 DVPet applyConsumable: Healed -> injLength=0 (clears an injury); Recovered ->
@@ -8,7 +9,7 @@ import tuipet.data.loaders.data as data
 
 
 def test_recovered_items_do_not_cure_injuries():
-    foods, items = data._load_consumables()
+    foods, items = data_shop._load_consumables()
     healers = {e["name"] for d in (foods, items) for e in d.values() if e["healed"]}
     # Vitamin G is the only Healed=TRUE consumable in DVPet's data
     assert "Vitamin G" in healers
@@ -20,7 +21,7 @@ def test_recovered_items_do_not_cure_injuries():
 
 def test_recovered_food_does_not_clear_an_injury_on_use():
     from tuipet.core.pet import Pet
-    foods, _ = data._load_consumables()
+    foods, _ = data_shop._load_consumables()
     steak = next(k for k, e in foods.items() if e["name"] == "Steak")
     p = Pet.from_num(29); p.stage = "Rookie"
     p.injuries = 1; p.inj_length = 100.0

@@ -54,8 +54,8 @@ def test_a_hurt_pet_cannot_be_sent_to_drill_instead():
     """`battle_condition` refuses a wounded pet; this door has to agree, or
     'too hurt to fight' just means 'go train instead'."""
     p = _pet(injured=True)
-    assert "Too hurt" in (p.can_train() or "")
-    assert "Too hurt" in (p.battle_condition() or "")
+    assert "machucado" in (p.can_train() or "")
+    assert "machucado" in (p.battle_condition() or "")
     p.injured = False
     assert p.can_train() is None
 

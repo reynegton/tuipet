@@ -83,7 +83,7 @@ def _dozer(**kw):
 
 
 def test_a_drained_doze_holds_in_the_dark_until_half_the_tank(monkeypatch):
-    monkeypatch.setattr("tuipet.petbody.random.randrange", lambda n: n // 2)
+    monkeypatch.setattr("tuipet.core.petbody.random.randrange", lambda n: n // 2)
     p = _dozer()
     p._tick_asleep(1.0)
     assert p.asleep and p.nap              # the hour is up, the tank is not: HOLD
@@ -104,7 +104,7 @@ def test_a_nap_wake_leaves_the_room_dark(monkeypatch):
     its own switch on; a still-tired pet re-sleeping under it then racked a
     lights-on care mistake it never earned.  A NAP wake must leave the switch
     where the player set it -- OFF stays OFF."""
-    monkeypatch.setattr("tuipet.petbody.random.randrange", lambda n: n // 2)
+    monkeypatch.setattr("tuipet.core.petbody.random.randrange", lambda n: n // 2)
     p = _dozer()
     for _ in range(1000):
         p._tick_asleep(1.0)
@@ -126,7 +126,7 @@ def test_a_morning_wake_still_lights_the_room():
 
 
 def test_a_lit_room_never_holds_the_doze(monkeypatch):
-    monkeypatch.setattr("tuipet.petbody.random.randrange", lambda n: n // 2)
+    monkeypatch.setattr("tuipet.core.petbody.random.randrange", lambda n: n // 2)
     p = _dozer()
     p.lights = True
     p._tick_asleep(1.0)
@@ -134,7 +134,7 @@ def test_a_lit_room_never_holds_the_doze(monkeypatch):
 
 
 def test_a_rested_doze_keeps_the_fixed_hour(monkeypatch):
-    monkeypatch.setattr("tuipet.petbody.random.randrange", lambda n: n // 2)
+    monkeypatch.setattr("tuipet.core.petbody.random.randrange", lambda n: n // 2)
     p = _dozer()
     p._set_energy(p.max_energy)            # nothing to recover
     p._tick_asleep(1.0)
@@ -144,7 +144,7 @@ def test_a_rested_doze_keeps_the_fixed_hour(monkeypatch):
 def test_a_past_empty_doze_recovers_at_the_drained_cadence(monkeypatch):
     """NegativeEnergyGain's spirit reaches the doze: past empty, the nap
     accumulator runs double, so the deepest hole climbs out fastest."""
-    monkeypatch.setattr("tuipet.petbody.random.randrange", lambda n: n // 2)
+    monkeypatch.setattr("tuipet.core.petbody.random.randrange", lambda n: n // 2)
 
     def ticks_to_first_gain(p):
         e0 = p.energy

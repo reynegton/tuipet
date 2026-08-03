@@ -104,8 +104,8 @@ def test_an_old_headstone_stands_behind_the_grave():
 # ---- the door ----------------------------------------------------------------
 
 def test_the_legacy_pages_enter_opens_the_hall():
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
-    pan = DigiCorePanel(_elder(), start="LEGACY")
+    from tuipet.ui.screens.datacorescreen import datacorePanel
+    pan = datacorePanel(_elder(), start="LEGACY")
     assert pan.pages[pan.i][0] == "LEGACY"
     assert "ENTER: the hall of memory" in pan.text().plain
     assert pan.key("enter") == ("done", ("hall",))
@@ -119,14 +119,14 @@ def test_the_hall_round_trips_to_the_legacy_shelf():
     class _Stub:
         pet = _elder()
         opened = []
-        _after_digicore = TuiPetApp._after_digicore
+        _after_datacore = TuiPetApp._after_datacore
 
         def _open_mode(self, panel, cb=None):
             self.opened.append(type(panel).__name__)
             self._cb = cb
 
     stub = _Stub()
-    TuiPetApp._after_digicore(stub, ("hall",))
-    assert stub.opened == ["HallPanel"]
+    TuiPetApp._after_datacore(stub, ("hall",))
+    assert stub.opened == ["AlbumPanel"]
     stub._cb(None)                                # leaving the hall...
-    assert stub.opened[-1] == "DigiCorePanel"     # ...reopens the book
+    assert stub.opened[-1] == "datacorePanel"     # ...reopens the book

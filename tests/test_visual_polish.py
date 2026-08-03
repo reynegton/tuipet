@@ -89,7 +89,7 @@ def test_theme_picker_keys_ride_the_strip_only():
     (Superseded by the footer purge, QOL 2026-07-23: the in-LCD footer
     duplicated the strip word for word, so it's GONE — the strip is the
     single key surface, same round-35 grammar as the account panel.)"""
-    from tuipet.themescreen import ThemePanel
+    from tuipet.ui.screens.themescreen import ThemePanel
     pan = ThemePanel()
     assert "ESC" not in pan.text().plain           # keys ride the STRIP only
     assert "revert" in Text.from_markup(pan.strip()).plain

@@ -1,3 +1,4 @@
+import tuipet.core.datacore as datacore
 """THE EVOLUTION AUDIT — the pins (2026-07-25).
 
 Joel: "lets do a full blown evolution audit next."
@@ -32,7 +33,7 @@ from tuipet.core import evolution
 from tuipet.utils import grid
 from tuipet.core import lines as L
 from tuipet.core import shop
-from tuipet.ui.screens.datacorescreen import DigiCorePanel
+from tuipet.ui.screens.datacorescreen import datacorePanel
 from tuipet.core.pet import Pet
 
 R, C = grid.ROWS, grid.COLS
@@ -237,7 +238,7 @@ def test_the_album_roster_is_canonical_and_placeholder_free():
 @pytest.mark.parametrize("page", range(9))
 def test_every_digicore_page_fits_the_LCD(page):
     p = _raised(total_trainings=412, stage_trainings=42, trophies=3)
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     if page >= len(pan.pages):
         pytest.skip("fewer pages than that")
     pan.i = page
@@ -257,8 +258,8 @@ def test_the_core_countdown_never_contradicts_itself():
         p.stage_seconds = 0.0
         growth = p.STAGE_DURATION.get(p.stage)
         pending = (growth is not None and growth < 9e8
-                   and digicore.has_next(p))
+                   and datacore.has_next(p))
         n = digicore.core_number(p)
         assert n >= 1
         if pending:
-            assert n <= digicore.DIGICORE_BASE_RATE
+            assert n <= digicore.DATACORE_BASE_RATE

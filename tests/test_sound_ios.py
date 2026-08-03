@@ -71,7 +71,7 @@ def test_the_bell_still_carries_milestones_without_a_player(monkeypatch):
     app.sound = True
     rung = []
     app.bell = lambda: rung.append(1)
-    monkeypatch.setattr(appmod.sound, "play", lambda name: False)
+    import tuipet.utils.sound as core_sound; monkeypatch.setattr(core_sound, "play", lambda name: False)
     appmod.TuiPetApp.beep(app, "hatch")            # a milestone
     assert rung == [1], "a milestone must ring the bell when there is no player"
     appmod.TuiPetApp.beep(app, "eat", bell=False)  # a routine sound stays quiet

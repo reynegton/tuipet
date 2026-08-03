@@ -1,3 +1,4 @@
+import tuipet.utils.persistio
 """Regression guards for the 2026-07-12 hardening + polish pass.
 
 Crash-hardening:
@@ -41,7 +42,7 @@ def test_atomic_write_survives_a_disk_error(tmp_path, monkeypatch):
         raise OSError("No space left on device")
     monkeypatch.setattr(persistence.os, "makedirs", boom)
     # must NOT propagate out of the (timer-driven) caller
-    persistence._atomic_write_json(str(tmp_path / "save.json"), {"x": 1})
+    tuipet.utils.persistio._atomic_write_json(str(tmp_path / "save.json"), {"x": 1})
 
 
 def test_atomic_write_still_raises_on_a_real_bug(tmp_path):
@@ -49,19 +50,20 @@ def test_atomic_write_still_raises_on_a_real_bug(tmp_path):
     # only OSError is best-effort; this must still surface
     import pytest
     with pytest.raises(TypeError):
-        persistence._atomic_write_json(str(tmp_path / "s.json"), {"bad": {1, 2}})
+        tuipet.utils.persistio._atomic_write_json(str(tmp_path / "s.json"), {"bad": {1, 2}})
 
 
 # --- C2: a from_name-less invite frame must not crash the drain --------------
 def test_invite_resp_without_from_name_does_not_crash():
     s = LobbyState()
+    s.state = "connected"
     pan = _panel(s)
     # a relayed / malformed busy-decline with no from_name (protocol drift);
     # ledgered first -- an UNSOLICITED resp is dropped outright (C5 2026-07-19)
     pan._sent_invites.add((9, "battle"))
     s.inbox.append({"t": "invite_resp", "from_id": 9, "kind": "battle", "busy": True})
     pan.anim()                                       # drains the inbox
-    assert "busy" in pan.status and "?" in pan.status  # rendered via the fallback
+    assert "is busy" in pan.status and "?" in pan.status  # rendered via the fallback
 
 
 # --- C3: a failed send requeues the dequeued frame instead of losing it ------

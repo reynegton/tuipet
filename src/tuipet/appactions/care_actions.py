@@ -4,11 +4,24 @@ import tuipet.ui.screens.feedscreen as feedscreen
 import tuipet.ui.screens.disciplinescreen as disciplinescreen
 
 import tuipet.data.loaders.data as data
+import tuipet.core.training as training
 import tuipet.utils.persistence as persistence
 from tuipet.i18n.translator import t
 from tuipet.core.pet import Pet
 import tuipet.ui.screens.lobbyscreen as lobbyscreen
 class CareActionsMixin:
+    def action_sleep(self):
+            self._do(self.pet.toggle_lights())
+
+    def action_assist(self):
+            import tuipet.ui.screens.assistscreen as assistscreen
+            self._open_mode(assistscreen.AssistPanel(self.pet), self._after_assist)
+
+    def _after_assist(self, msg=None):
+            if msg:
+                self.flash(msg)
+            self.repaint()
+
     def action_feed(self):
             if self.screen_w.fx is not None:        # let the current care animation finish before acting again
                 return
@@ -101,7 +114,7 @@ class CareActionsMixin:
             if self.screen_w.fx is not None:        # let the current care animation finish before acting again
                 return
             msg = self.pet.heal_bandage()
-            if "patched" in str(msg):
+            if "curado" in str(msg):
                 self.screen_w.start_fx("item", icon="i:80", script="Bandaging")
             self._do(str(msg))
 
@@ -117,3 +130,15 @@ class CareActionsMixin:
                 self.beep("wash", bell=False)
             self._do(msg)
 
+
+    def action_gift(self):
+        if self.mode is not None or self.screen_w.fx is not None or not self.pet.gift:
+            return
+        key = self.pet.gift
+        msg = self.pet.claim_gift()
+        if msg:
+            self.screen_w.start_fx("gift", icon=key)   # gifting() amble, chains to cheer (giftEnd)
+            # the SURPRISE: hold the reveal until the present is opened at the
+            # end of the amble (2026-07-24) -- a tease now, the contents then.
+            self._pending_gift_reveal = msg
+            self._do("A present! Let's see what it is…")

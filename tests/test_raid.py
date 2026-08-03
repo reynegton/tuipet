@@ -1,3 +1,4 @@
+import pytest
 """The DSprite raid conversion (BASIC VPET 2026-07-16): adventure's slot on
 the keymap became the community boss fight, ported from the v0.4.x clone.
 
@@ -262,7 +263,7 @@ def test_space_needs_a_standing_boss_and_attempts():
     assert pan.sub is None
     pan.client.raid = _view(_mega(), attempts=0)
     pan.key("space")
-    assert pan.sub is None and "attempts" in pan.msg.lower()
+    assert pan.sub is None and "tentativa" in pan.msg.lower()
     pan.client.raid = _view(_mega(), hp=0)
     pan.key("space")
     assert pan.sub is None                                  # a fallen boss takes no hits
@@ -488,7 +489,7 @@ def test_the_panel_reports_honestly_and_stays_live():
     # a refused ack surfaces instead of leaving "reported!" standing
     client.last_hit = {}
     pan.anim()
-    assert "refused" in pan.msg
+    assert "recusou" in pan.msg
     # exit speaks the gate's number
     done, note = pan.key("escape")
     assert done == "done" and "1,200,000" in note
@@ -517,7 +518,7 @@ def test_the_boss_stands_unclipped(monkeypatch):
     """The reduced 8-row scene must NOT wear the 24px-window clip — it
     chopped the top 6px off every boss (Joel 2026-07-19: 'raid monster
     sprites are getting cut off')."""
-    import tuipet.raidscreen as rs
+    import tuipet.ui.screens.raidscreen as rs
     seen = {}
     real = rs.render_scene
 
@@ -624,7 +625,7 @@ def test_unranked_shows_a_dash_not_rank_zero():
 
     pan.client.raid = v
     statusbox.raid(_A())
-    assert "not on the board" in _A.stats_w.txt
+    assert "não classificado" in _A.stats_w.txt
     assert "#0" not in _A.stats_w.txt
     v["you"] = [2, 150000]                              # ranked: the number
     statusbox.raid(_A())
@@ -714,7 +715,7 @@ def test_the_volley_card_shows_the_pool_never_the_stub():
 def test_the_boss_scene_backdrop_is_floor_anchored():
     """The reduced 16px scene painted the TOP of the 24px arena art — sky
     band, floor gone, the boss floating.  The crop anchors to the floor."""
-    from tuipet import raidscreen
+    from tuipet.ui.screens import raidscreen
     seen = {}
     real = raidscreen.render_scene
 
@@ -762,7 +763,7 @@ def test_the_board_pre_warns_what_the_volley_would_refuse():
     pan.pet.energy = 1                                  # under BATTLE_MIN_ENERGY
     pan.client.raid = _view(_mega())
     pan.anim()
-    assert "Too drained" in pan.msg and "boss stands" in pan.msg
+    assert "energia" in pan.msg and "boss stands" in pan.msg
     # the sleeper's warning is read-only: no wake, no disturb billed
     pan2 = _panel()
     pan2._no_account = False

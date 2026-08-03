@@ -27,11 +27,11 @@ def save_from_death(pet):
     # 2026-07-22.  The rescued pet simply lives on under the same
     # hazard roll, starving and a bonus point poorer.)
     old = pet.num
-    targets = evolution.death_targets(self)
+    targets = evolution.death_targets(pet)
     if targets:
         pet.evolve_to(targets[0])               # evol(dying=true): the dark rebirth
         # the dark rebirth is a special evolution like jogress: re-anchor
-        lines_mod.adopt_line(self, prev=old)
+        lines_mod.adopt_line(pet, prev=old)
     else:
         # no Death form takes it: it lives on -- the continuous death checks
         # need the fatal counters off the trigger line (a mechanical floor;

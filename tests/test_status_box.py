@@ -124,7 +124,7 @@ def test_options_card_wraps_every_desc_and_the_update_msg():
         statusbox.options(app)
         _fits(app.stats_w, f"options[{row}]")
         shown = re.sub(r"\[/?[^\[\]]*\]", "", app.stats_w.txt)
-        for word in re.findall(r"[A-Za-z]+", _opts._DESC.get(row, "") + " " + longest):
+        for word in re.findall(r"[^\W_]+", _opts._get_desc().get(row, "") + " " + longest):
             assert word in shown, f"{row}: lost the word {word!r}"
 
 
@@ -172,13 +172,13 @@ def test_shop_card_wraps_the_longest_effect_line():
     _no_words_lost(app.stats_w, "shop", eff)
 
 
-def test_digicore_card_wraps_its_note():
+def test_datacore_card_wraps_its_note():
     from tuipet.ui.components import statusbox
     class _M:
         pages, i = [("EvolutionState",), ("DATA",)], 0
         note = "It rests now — press N for a new egg."      # 37 chars
     app = _RenderApp(_M(), _pet())
-    statusbox.digicore(app)
+    statusbox.datacore(app)
     _fits(app.stats_w, "digicore")
     _no_words_lost(app.stats_w, "digicore", _M.note)
 

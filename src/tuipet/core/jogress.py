@@ -120,7 +120,7 @@ def can_jogress(pet, remote=False):
         # drives the lobby invite auto-decline (dead sweep 2026-07-06)
         return "Descansando agora — aperte N para um novo ovo."
     if pet.stage in ("Egg", "Fresh", "InTraining"):
-        return "Too young to jogress."
+        return "Muito jovem para a jogress."
     if pet.asleep:
         # a PLAYER poke disturbs the sleeper like every other care key (feed/
         # train/battle/dna all grumble-wake; Joel 2026-07-06).  The lobby's

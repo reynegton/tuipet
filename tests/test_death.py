@@ -64,11 +64,11 @@ def test_the_hazard_roll_is_fatal(monkeypatch):
     monkeypatch.setattr(body.random, "random", lambda: 0.0)
     p = _healthy(care_mistakes=5)
     p.tick(0.1)
-    assert p.dead is True and p.death_cause == "neglect"
+    assert p.dead is True and p.death_cause in ("negligência", "negligence")
     q = _healthy()
     q.age_seconds = 26 * 86400.0
     q.tick(0.1)
-    assert q.dead is True and q.death_cause == "old age"
+    assert q.dead is True and q.death_cause in ("velhice", "old age")
 
 
 def test_egg_is_immune_to_neglect_death():

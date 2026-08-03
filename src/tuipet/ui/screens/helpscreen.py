@@ -112,6 +112,7 @@ def get_help():
         (t("help_txt_tips_3", "fell raids, link with tamers, play a"), 0),
         (t("help_txt_tips_4", "festival - every egg is earned."), 0),
     ]
+    return res
 
 class HelpPanel:
     def __init__(self, pet):
@@ -169,4 +170,4 @@ class HelpPanel:
         return out
 
 # module-level alias so tests can 'from helpscreen import HELP'
-HELP = get_help
+HELP = get_help()

@@ -113,17 +113,17 @@ def _menu_panels():
     from tuipet.ui.screens.backgroundscreen import BackgroundPanel
     from tuipet.ui.screens.bugscreen import BugReportPanel
     from tuipet.ui.screens.deathscreen import DeathPanel
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
     from tuipet.ui.screens.albumscreen import AlbumPanel
     from tuipet.ui.screens.dnascreen import DNAPanel
     from tuipet.ui.screens.eggguidescreen import EggGuidePanel
     from tuipet.ui.screens.eggselectscreen import EggSelectPanel
     from tuipet.ui.screens.feedscreen import FeedPanel
     from tuipet.ui.screens.helpscreen import HelpPanel
-    from tuipet.jogressscreen import JogressPanel
+    from tuipet.ui.screens.jogressscreen import JogressPanel
     from tuipet.ui.screens.optionsscreen import KeysPanel, OptionsPanel, SoundPanel
     from tuipet.ui.screens.raidscreen import RaidPanel
-    from tuipet.themescreen import ThemePanel
+    from tuipet.ui.screens.themescreen import ThemePanel
     from tuipet.ui.screens.titlescreen import TitlePanel
     from tuipet.ui.screens.towneggscreen import TownEggPanel
     stub = types.SimpleNamespace(state=types.SimpleNamespace(me_id=None),
@@ -139,7 +139,7 @@ def _menu_panels():
         ("themes", ThemePanel()),
         ("scenes", BackgroundPanel(p)),
         ("feed", FeedPanel(p)),
-        ("digicore", DigiCorePanel(p)),
+        ("digicore", datacorePanel(p)),
         ("dna", DNAPanel(p)),
         ("jogress", JogressPanel(p, 29, 45, 60)),
         ("eggselect", EggSelectPanel(p)),

@@ -36,7 +36,7 @@ def test_opening_a_mode_clears_the_message_strip():
             await pilot.pause()
             app.flash("STALE-MESSAGE")
             assert "STALE-MESSAGE" in str(app.msg_w.render())
-            app.action_digicore()                 # open a sub-screen
+            app.action_datacore()                 # open a sub-screen
             await pilot.pause()
             return str(app.msg_w.render())
 

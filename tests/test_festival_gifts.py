@@ -18,7 +18,7 @@ from tuipet.core import shop
 from tuipet.core.pet import Pet
 from tuipet.core.petbase import GIFT_FESTIVAL_MULT
 
-BANNED = {"poison_mushroom", "digimemory", "revive_floppy",
+BANNED = {"poison_mushroom", "memory", "revive_floppy",
           "town_transport", "disaster_transport", "life_recovery"}
 
 
@@ -147,7 +147,7 @@ def test_the_reveal_is_deferred_to_the_end_of_the_amble():
     a = inspect.getsource(appactions.ActionsMixin.action_gift)
     assert "_pending_gift_reveal" in a
     assert "Let's see" in a or "see what" in a          # the tease
-    assert "_pending_gift_reveal" in inspect.getsource(app)
+    import tuipet.app_mixins.timers as timers; assert "_pending_gift_reveal" in inspect.getsource(timers)
 
 
 def test_claiming_still_banks_the_item_and_clears_the_gift():

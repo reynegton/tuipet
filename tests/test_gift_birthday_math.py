@@ -34,7 +34,7 @@ def test_gift_roll_narrows_with_care(monkeypatch):
     # isolate the ROLL: the pool's own per-item GiftChance rolls (canonical)
     # otherwise add empty-pool noise
     monkeypatch.setattr(Pet, "_pick_gift", lambda self, festival=False: "f:8")
-    monkeypatch.setattr("tuipet.tournament.holiday", lambda today=None: None)
+    monkeypatch.setattr("tuipet.core.tournament.holiday", lambda today=None: None)
     spoiled = _pet(mood=300, obedience=90)     # chance = 100-90+0+70 = 80
     neglected = _pet(mood=150, obedience=0)    # chance = 100-0+75+70 = 245
     def gifts(p, seed):
@@ -67,7 +67,7 @@ def test_gift_needs_a_genuinely_happy_grown_pet():
 
 def test_good_birthday_needs_happy_majority_and_zero_slips():
     p = _pet()
-    p.daily_mood = {"Happy": 10, "Neutral": 2, "Unhappy": 0, "Depressed": 0}
+    p.daily_mood = {"Feliz": 10, "Neutro": 2, "Triste": 0, "Depressivo": 0}
     p.mistake_day = 0
     b0 = p.evol_bonus
     p._birthday()
@@ -78,7 +78,7 @@ def test_good_birthday_needs_happy_majority_and_zero_slips():
 
 def test_one_slip_spoils_the_good_day():
     p = _pet()
-    p.daily_mood = {"Happy": 10, "Neutral": 0, "Unhappy": 0, "Depressed": 0}
+    p.daily_mood = {"Feliz": 10, "Neutro": 0, "Triste": 0, "Depressivo": 0}
     p.mistake_day = 1                          # MaxMissedDayForBonusInc = 0
     b0 = p.evol_bonus
     p._birthday()
@@ -88,7 +88,7 @@ def test_one_slip_spoils_the_good_day():
 
 def test_bad_birthday_and_the_bonus_floor():
     p = _pet(evol_bonus=0)
-    p.daily_mood = {"Happy": 0, "Neutral": 1, "Unhappy": 8, "Depressed": 0}
+    p.daily_mood = {"Feliz": 0, "Neutro": 1, "Triste": 8, "Depressivo": 0}
     p.mistake_day = 3
     p._birthday()
     assert p.evol_bonus == 0                   # the floor: never negative
@@ -97,7 +97,7 @@ def test_bad_birthday_and_the_bonus_floor():
 
 def test_a_mood_tie_is_a_normal_birthday():
     p = _pet()
-    p.daily_mood = {"Happy": 5, "Neutral": 0, "Unhappy": 5, "Depressed": 0}
+    p.daily_mood = {"Feliz": 5, "Neutro": 0, "Triste": 5, "Depressivo": 0}
     p.mistake_day = 0
     b0 = p.evol_bonus
     p._birthday()
@@ -117,7 +117,7 @@ def test_gifts_are_found_at_home_only(monkeypatch):
     """checkGiftCall gates on _isHome (play/gift audit 2026-07-06): on the
     road there are no presents -- and the roll resumes at homecoming."""
     monkeypatch.setattr(Pet, "_pick_gift", lambda self, festival=False: "f:8")
-    monkeypatch.setattr("tuipet.tournament.holiday", lambda today=None: None)
+    monkeypatch.setattr("tuipet.core.tournament.holiday", lambda today=None: None)
     monkeypatch.setattr(random, "randrange", lambda n: 0)   # the roll always hits
     p = _pet(mood=300, obedience=90)
     p.away = True

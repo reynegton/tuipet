@@ -1,3 +1,5 @@
+import tuipet.core.shop.store as shop_store
+import tuipet.core.shop.catalog as shop_catalog
 """The TOWN ECONOMY (shops arc, 2026-07-21: Joel — "shops, town shops,
 deals").
 
@@ -102,7 +104,7 @@ def test_the_daily_stock_cap_stops_the_money_printer():
     assert p.inventory.get("steak") == shop.tier_stock("steak")
     assert e["left"] == 0                              # the shelf is bare
     msg, sfx = shop.town_buy(p, e, today=D)
-    assert sfx == "error" and "Sold out" in msg
+    assert sfx == "error" and "Esgotado" in msg
     # a new day restocks; the ledger survives a save round trip
     d = persistence.to_save_dict(p)
     q, _msg = persistence.pet_from_save(d)
@@ -153,7 +155,7 @@ def test_every_town_keeps_one_standing_guest_good():
     map-gated Adventure shelf, at flat catalog price (no printer)."""
     guests = {}
     for tid in data.load_towns():
-        rows = shop._town_rows(tid)
+        rows = shop_store._town_rows(tid)
         g = [(sid, k, o, local) for sid, k, o, local in rows
              if str(sid).startswith("guest:")]
         assert len(g) == 1, tid
@@ -164,7 +166,7 @@ def test_every_town_keeps_one_standing_guest_good():
         # stable across calls (this read `[-1]` until the item sweep
         # 2026-07-24 appended the gated ROAD SHELF after the guest row --
         # the guest's IDENTITY is what must not move, not its index)
-        assert [k2 for s2, k2, _o2, _p2 in shop._town_rows(tid)
+        assert [k2 for s2, k2, _o2, _p2 in shop_store._town_rows(tid)
                 if str(s2).startswith("guest:")] == [k]
         guests[tid] = k
     # the collision-free deal (item diversity audit 2026-07-23): the old
@@ -184,11 +186,11 @@ def test_the_regional_specialty_marks_every_map():
     tm = shop._town_maps()
     for tid in data.load_towns():
         want = shop._MAP_SPECIALTY[tm[tid]]
-        keys = [k for _sid, k, _o, _p in shop._town_rows(tid)]
+        keys = [k for _sid, k, _o, _p in shop_store._town_rows(tid)]
         assert want in keys, (tid, want)
         # ...and the guest is never a duplicate of anything on the shelf
         assert len(keys) == len(set(keys)), tid
-    assert shop._MAP_SPECIALTY[4] == "digitron"
+    assert shop._MAP_SPECIALTY[4] == "datatron"
     assert len(set(shop._MAP_SPECIALTY.values())) == 5   # five distinct
 
 
@@ -206,8 +208,8 @@ def test_the_regional_row_buys_like_any_town_good():
 def test_former_twin_towns_read_differently():
     """Towns 11 and 12 shared the same authored shelf AND the same guest
     good -- two byte-identical shops (audit finding F5)."""
-    r11 = [k for _s, k, _o, _p in shop._town_rows(11)]
-    r12 = [k for _s, k, _o, _p in shop._town_rows(12)]
+    r11 = [k for _s, k, _o, _p in shop_store._town_rows(11)]
+    r12 = [k for _s, k, _o, _p in shop_store._town_rows(12)]
     assert r11 != r12
 
 
@@ -227,7 +229,7 @@ def test_no_town_deal_repeats_two_days_running():
     Now the picks walk forward off each other -- no shelf shows the same
     deal two days in a row."""
     for t in range(26):
-        if len(shop._town_rows(t)) <= 1:
+        if len(shop_store._town_rows(t)) <= 1:
             continue
         seq = [shop.town_deal_sid(t, D + datetime.timedelta(days=i))
                for i in range(45)]

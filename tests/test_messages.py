@@ -44,7 +44,7 @@ def test_long_note_with_a_tick_marquees_the_tail_into_view():
 
 def test_evolution_flash_names_the_species_not_just_the_stage():
     """'X! evolved to InTraining!' read as if the STAGE were the pet's name;
-    the flash now says who evolved into whom, stage in parentheses."""
+    the flash now says who evoluiu para whom, stage in parentheses."""
     from tuipet.app import TuiPetApp
     from tuipet.core.pet import Pet
     app = TuiPetApp.__new__(TuiPetApp)             # no Textual mount needed
@@ -56,6 +56,6 @@ def test_evolution_flash_names_the_species_not_just_the_stage():
     msg = app._evolve_msg(old_num)
     import tuipet.data.loaders.data as data
     _, by = data.load_sprites()
-    assert f"evolved into [b]{app.pet.name}[/]" in msg
+    assert f"evoluiu para [b]{app.pet.name}[/]" in msg
     assert f"({app.pet.stage})" in msg             # the stage reads as a CLASS, not a name
     assert by[old_num]["name"] in msg              # who it used to be

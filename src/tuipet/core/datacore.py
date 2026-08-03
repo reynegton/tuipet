@@ -19,11 +19,11 @@ from tuipet.i18n.translator import t
 
 DATACORE_BASE_RATE = 14            # DatacoreBaseRate (config.csv col 1)
 # ViewUtil.getDatacoreBackground field -> backdrop file suffix
-_CORE_BG = {"": "datacoreN", "None": "datacoreN", "DragonsRoar": "datacoreDr",
-            "DeepSaver": "datacoreDs", "JungleTrooper": "datacoreJt",
-            "MetalEmpire": "datacoreMe", "NatureSpirit": "datacoreNsp",
-            "WindGuardian": "datacoreWg", "NightmareSoldier": "datacoreNs",
-            "DarkArea": "datacoreDa", "VirusBuster": "datacoreVb"}
+_CORE_BG = {"": "digicoreN", "None": "digicoreN", "DragonsRoar": "digicoreDr",
+            "DeepSaver": "digicoreDs", "JungleTrooper": "digicoreJt",
+            "MetalEmpire": "digicoreMe", "NatureSpirit": "digicoreNsp",
+            "WindGuardian": "digicoreWg", "NightmareSoldier": "digicoreNs",
+            "DarkArea": "digicoreDa", "VirusBuster": "digicoreVb"}
 
 
 def has_next(pet):

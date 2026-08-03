@@ -1,8 +1,9 @@
+import tuipet.core.datacore as datacore
 """Digicore vs DVPet setupDigicore / getDigicoreBackground / EvolSilhouette."""
 from tuipet.core.pet import Pet
 import tuipet.data.loaders.data as data
-from tuipet.ui.screens.datacorescreen import (DigiCorePanel, core_number, core_badge_key,
-                                   core_background, silhouette, DIGICORE_BASE_RATE)
+from tuipet.ui.screens.datacorescreen import (datacorePanel, core_number, core_badge_key,
+                                   core_background, silhouette, DATACORE_BASE_RATE)
 
 
 def _pet(**kw):
@@ -14,7 +15,7 @@ def _pet(**kw):
 
 def test_core_number_counts_down_to_evolution():
     p = _pet(stage_seconds=0.0)
-    assert core_number(p) == DIGICORE_BASE_RATE == 14
+    assert core_number(p) == DATACORE_BASE_RATE == 14
     p.stage_seconds = p.STAGE_DURATION["Rookie"] * 0.99
     assert core_number(p) == 1
 
@@ -37,13 +38,13 @@ def test_badge_follows_x_antibody_state():
 
 
 def test_special_core_and_null_hiding(monkeypatch):
-    cfg = data.load_digicore_config()
+    cfg = data.load_datacore_config()
     burst = next(n for n, c in cfg.items() if c["icon"] == "core_burst")
     assert core_badge_key(_pet(num=burst)) == "core_burst"
     # a literal "null" icon hides the badge (setupDigicore setVisible(false));
     # in the shipped csv every null row is superseded by a later real row
     # (getDigicoreConfig keeps the LAST match), so synthesize one
-    monkeypatch.setattr(data, "load_digicore_config",
+    monkeypatch.setattr(data, "load_datacore_config",
                         lambda: {4: {"label": None, "icon": "hidden", "icon_x": None}})
     assert core_badge_key(_pet(num=4)) is None
 
@@ -68,7 +69,7 @@ def test_silhouette_blacks_out_the_body():
 
 def test_panel_core_page_and_teaser_flow():
     p = _pet()
-    panel = DigiCorePanel(p)
+    panel = datacorePanel(p)
     assert panel.pages[0][0] == "CORE"
     panel.text()                                    # core page renders
     panel.key("space")
@@ -170,7 +171,7 @@ def test_requirement_report_skips_unconstrained_gates():
 
 def test_evolves_page_selects_and_opens_the_checklist():
     p = _champ()
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     while pan.pages[pan.i][0] != "EVOLVES":
         pan.key("right")
     t = pan.text().plain
@@ -192,7 +193,7 @@ def test_evolves_page_edges():
     # the old "(too young)" stonewall was a tuipet invention)
     egg = Pet(num=-1, stage="Egg", attribute="None")
     egg.world_seconds = 600.0
-    pan = DigiCorePanel(egg)
+    pan = datacorePanel(egg)
     while pan.pages[pan.i][0] != "EVOLVES":
         pan.key("right")
     assert "(too young)" not in pan.text().plain
@@ -206,7 +207,7 @@ def test_teaser_zooms_in_then_holds_a_still_silhouette():
     way back is the evolSilhouetteBack dark blink."""
     from tuipet.ui.screens.datacorescreen import EXPAND_T, MON_T
     p = _pet()
-    panel = DigiCorePanel(p)
+    panel = datacorePanel(p)
     panel.key("space")
     for _ in range(MON_T):                           # beat one: the mon itself
         panel.anim()
@@ -238,7 +239,7 @@ def test_core_page_keeps_native_pixels_and_separates_the_badge():
     the LEFT cell, badge in the RIGHT."""
     from tuipet.utils import grid
     p = _pet(num=102, stage="Champion")          # Devimon: a full 16px sprite
-    panel = DigiCorePanel(p)
+    panel = datacorePanel(p)
     rows, x, _mirror = panel._core_place(panel._pet_rows(102, idx=0), cell=0)
     assert len(rows) == 16                       # NOT shrunk to 14
     assert x + grid.width(rows) <= grid.X0 + grid.CELL   # stays in the left cell
@@ -268,15 +269,15 @@ def test_every_digicore_page_speaks_the_menu_language():
     speaks the hint language; the gaze teaser still owns the box."""
     import random
     from tuipet.core.pet import Pet
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
     random.seed(2)
     p = Pet(num=102, name="Devimon", stage="Champion", attribute="Virus", obedience=500)
     p.world_seconds = 12 * 60.0
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     strip = pan.strip()                 # idle strip = hints (Joel 2026-07-11)
     assert "SPACE" in strip and "ESC" in strip
     first = pan.text().plain
-    assert "DIGICORE  CORE" in first and chr(0x25CF) in first    # title + dots
+    assert "DATACORE  CORE" in first and chr(0x25CF) in first    # title + dots
     assert "SPACE gaze" in first                                 # in-page footer
     lines = first.split("\n")
     assert len(lines) <= 12 and all(len(l) <= 40 for l in lines)
@@ -294,11 +295,11 @@ def test_the_core_gaze_looms_over_the_core_background():
     with no key hints anywhere."""
     import random
     from tuipet.core.pet import Pet
-    from tuipet import digicorescreen as dc
+    from tuipet.ui.screens import datacorescreen as dc
     random.seed(2)
     p = Pet(num=102, name="Devimon", stage="Champion", attribute="Virus", obedience=500)
     p.world_seconds = 12 * 60.0
-    pan = dc.DigiCorePanel(p)
+    pan = dc.datacorePanel(p)
     cap = []
     real = dc.render_scene
 
@@ -331,7 +332,7 @@ def test_evolves_page_windows_instead_of_overflowing():
     EVOLVES loop drew EVERY row -- 9+ candidates overflowed the physical LCD;
     the shared window scrolls with the cursor instead."""
     p = _champ()
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     while pan.pages[pan.i][0] != "EVOLVES":
         pan.key("right")
     fake = [(100 + j, f"Cand{j}", False, j + 1) for j in range(11)]
@@ -353,7 +354,7 @@ def test_egg_gaze_shows_the_egg_and_teases_the_hatchling():
     egg.world_seconds = 600.0
     nxt = next_evolution(egg)
     assert isinstance(nxt, int) and nxt >= 0          # the hatch target, never None
-    pan = DigiCorePanel(egg)
+    pan = datacorePanel(egg)
     pan.key("space")
     pan.teaser_t = 0                                   # beat one: the egg itself
     assert pan._pet_rows(-1), "the egg sprite must render (not an empty core)"
@@ -369,7 +370,7 @@ def test_egg_data_pages_leak_no_sentinels_and_labels_never_collide():
     (that one hit EVERY stage).  A real egg is named Digitama; No. is a dash
     until it hatches."""
     egg = Pet.new_egg()
-    pan = DigiCorePanel(egg)
+    pan = datacorePanel(egg)
     for i, (title, _rows) in enumerate(pan.pages):
         pan.i = i
         plain = pan.text().plain
@@ -377,7 +378,7 @@ def test_egg_data_pages_leak_no_sentinels_and_labels_never_collide():
         assert "lifenone" not in plain, f"{title} label/value collision"
     pan.i = next(i for i, (t, _r) in enumerate(pan.pages) if t == "STATUS")
     t = pan.text().plain
-    assert "Digitama" in t and "—" in t
+    assert egg.name in t and "—" in t
     pan.i = next(i for i, (t2, _r) in enumerate(pan.pages) if t2 == "TROPHIES")
     assert "This pet  none yet" in pan.text().plain or "This pet none yet" in pan.text().plain
 
@@ -387,7 +388,7 @@ def test_hidden_evolutions_mask_until_first_reached():
     canon's tree until reached; the album (Evolution.setUnlocked) reveals."""
     import tuipet.data.loaders.data as data
     from tuipet.utils import persistence
-    from tuipet import digicorescreen
+    from tuipet.ui.screens import datacorescreen as digicorescreen
     from tuipet.core.pet import Pet
     reqs = data.load_requirements()
     evo = data.load_evolutions()
@@ -445,8 +446,8 @@ def test_the_data_model_is_modular_and_live():
     """Modularize 2026-07-17: digicore.py owns every page/row computation;
     digicorescreen only renders (old names stay as aliases).  The liveness
     law holds: no dead-system rows (Spirit label, injury fragment, Nutri)."""
-    from tuipet import digicore
-    from tuipet import digicorescreen
+    from tuipet.core import datacore as digicore
+    from tuipet.ui.screens import datacorescreen as digicorescreen
     assert digicorescreen.build_pages is digicore.build_pages
     assert digicorescreen._evo_rows is digicore._evo_rows
     assert digicorescreen.next_evolution is digicore.next_evolution
@@ -474,7 +475,7 @@ def test_the_meter_and_the_core_page_agree_on_line_pets():
     so line parents whose onward roads are line-only (the jogress/X Megas)
     showed the life meter while the Meter row said an evolution neared.
     One predicate (has_next) drives both now."""
-    from tuipet.core import digicore
+    from tuipet.core import datacore as digicore
     from tuipet.core import lines
     # Aegisdramon (ver4): its onward row (RustTyrannomon) is line-only
     p = Pet(num=396, name="Aegisdramon", stage="Mega", attribute="Vaccine")
@@ -483,10 +484,10 @@ def test_the_meter_and_the_core_page_agree_on_line_pets():
     p.stage_seconds = 10.0
     assert not data.load_evolutions().get(396)      # the corpus is silent...
     assert lines.evo_rows(p)                        # ...the line is not
-    assert digicore.has_next(p)
+    assert datacore.has_next(p)
     growth = p.STAGE_DURATION.get(p.stage)
     if growth:                                      # a Mega with growth: countdown
-        assert digicore.core_number(p) <= digicore.DIGICORE_BASE_RATE
+        assert digicore.core_number(p) <= digicore.DATACORE_BASE_RATE
 
 
 def test_the_none_dna_field_is_load_bearing():
@@ -505,7 +506,7 @@ def test_requirement_checklist_page_jumps():
     """PageUp/PageDown page the requirement scroll, lobby-chat style
     (grammar sweep 2026-07-18); pageup clamps at the head."""
     from tuipet.ui.screens.datacorescreen import DET_VIS
-    pan = DigiCorePanel(_pet())
+    pan = datacorePanel(_pet())
     pan.detail = (100, "X")
     pan.key("pagedown")
     assert pan.det_off == DET_VIS - 1
@@ -521,7 +522,7 @@ def test_legacy_headstones_speak_real_time(tmp_path, monkeypatch):
     the STATUS Age row and the memorial epitaph.  The old //1440 mis-cited
     the clock law and inflated every headstone 60x ('270d' for a 4.5-day
     life)."""
-    from tuipet.utils import digicore
+    from tuipet.core import datacore as digicore
     from tuipet.utils import persistence
     p = _pet(name="Vetmon", stage="Champion")
     p.age_seconds = 388800.0                    # 4.5 real days of ticks
@@ -536,7 +537,7 @@ def test_mega_core_number_is_the_lifespan_meter(monkeypatch):
     read as a pending evolution for any Mega with onward (jogress/X) rows,
     freezing the meter at 14 forever -- the lifespan count-up the docstring
     promises a final form never appeared."""
-    from tuipet import digicore
+    from tuipet.core import datacore as digicore
     p = _pet(stage="Mega")
     monkeypatch.setattr(digicore, "has_next", lambda pet: True)
     p.age_seconds = 7.5 * 86400.0
@@ -549,7 +550,7 @@ def test_book_sorts_closest_first(monkeypatch):
     """M10 (gameplay audit 2026-07-19): the corpus book sorted ASCENDING by
     fulfilled score -- the top 'closest' row was the form the engine was
     LEAST likely to pick, disagreeing with the silhouette beside it."""
-    from tuipet.core import digicore
+    from tuipet.core import datacore as digicore
     from tuipet.core import evolution
     p = _pet()
     monkeypatch.setattr(evolution, "candidates",
@@ -582,8 +583,8 @@ def test_core_page_teaches_the_gaze_in_bold():
     """The gaze door wears its key in the note slot (menu polish 2026-07-21:
     dim prose alone was easy to look over) — the EVOLVES/TROPHIES teaching
     pattern.  A pending gaze verdict still owns the slot."""
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
-    pan = DigiCorePanel(_pet())
+    from tuipet.ui.screens.datacorescreen import datacorePanel
+    pan = datacorePanel(_pet())
     assert "SPACE: gaze into the core" in pan.text().plain
     pan.note = "Nothing stirs — this is its final form."
     plain = pan.text().plain
@@ -608,7 +609,7 @@ def _armed_pet():
 
 
 def test_the_gaze_teases_the_armed_steer_not_the_line():
-    from tuipet.core import digicore
+    from tuipet.core import datacore as digicore
     from tuipet.core import lines
     p = _armed_pet()
     line_next = [r[0] for r in lines.evo_rows(p)]
@@ -619,7 +620,7 @@ def test_the_gaze_teases_the_armed_steer_not_the_line():
 
 
 def test_the_evolves_chart_tops_with_the_armed_row():
-    from tuipet import digicore
+    from tuipet.core import datacore as digicore
     p = _armed_pet()
     rows = digicore._evo_rows(p)
     num, name, ready, unmet = rows[0]
@@ -630,9 +631,9 @@ def test_the_evolves_chart_tops_with_the_armed_row():
 
 
 def test_the_armed_row_wears_its_own_tag_and_sheet():
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
     p = _armed_pet()
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     while pan.pages[pan.i][0] != "EVOLVES":    # page over to the chart
         pan.key("right")
     plain = pan.text().plain
@@ -647,14 +648,14 @@ def test_the_core_number_wears_its_own_unit():
     """Gameplay polish #16: a bare '◆ 7' was a countdown on a growing pet
     and an age-count on a final form — the value now says which."""
     p = _pet(stage_seconds=0.0)                    # growing: a countdown
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     assert "to evolve" in pan.text().plain
     p2 = _pet()                                    # past growth: the age count
     p2.stage_seconds = p2.STAGE_DURATION["Rookie"] + 1
     p2.age_seconds = 5 * 86400.0
-    assert "to elder" in DigiCorePanel(p2).text().plain
+    assert "to elder" in datacorePanel(p2).text().plain
     p2.age_seconds = 16 * 86400.0                  # over the line
-    assert "elder" in DigiCorePanel(p2).text().plain
+    assert "elder" in datacorePanel(p2).text().plain
 
 
 def test_the_drills_row_shows_both_training_terms():
@@ -667,7 +668,7 @@ def test_the_drills_row_shows_both_training_terms():
     Renamed from "Drills" 2026-07-25, when a BOUT started feeding both
     counters (+2): a row named for one of its two sources is a row that
     lies about the other (the liveness law)."""
-    from tuipet import digicore
+    from tuipet.core import datacore as digicore
     p = Pet(num=100, stage="Champion", attribute="Vaccine")
     p.total_trainings = 150
     p.stage_trainings = 42
@@ -681,7 +682,7 @@ def test_the_ailing_row_learned_the_injury_door():
     returned with the canon restoration (2026-07-23) but the data book kept
     the removal-era sick-only read -- it could never say "hurt".  Sick
     outranks hurt, the feed cursor's own precedence."""
-    from tuipet.digicore import build_pages
+    from tuipet.core.datacore import build_pages
 
     def ailing(p):
         cond = dict(dict(build_pages(p))["CONDITION"])

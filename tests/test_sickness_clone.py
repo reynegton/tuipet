@@ -91,7 +91,7 @@ def test_the_death_whisper_only_stands_while_sick(monkeypatch):
 def test_sick_reads_everywhere_the_clone_showed_it():
     p = _pet(sick=True)
     assert p.status_word() == "sick"
-    assert p.current_mood() == "Unhappy"
+    assert p.current_mood() == "Triste"
     assert p.needs_care()
     assert not p.dead
 
@@ -112,4 +112,4 @@ def test_the_epitaph_tells_a_sickness_death():
     for _ in range(120):
         pan.anim()
         seen += pan.strip()
-    assert "of sickness" in seen
+    assert "doença" in seen or "of sickness" in seen

@@ -29,7 +29,7 @@ class _StubPet:
     """LIVE-signal stub (idle-pose audit 2026-07-18: mood/enthusiasm were
     frozen meters; the pose reads energy + the derived word + condition)."""
 
-    def __init__(self, energy=10, word="Neutral", cond=1):
+    def __init__(self, energy=10, word="Neutro", cond=1):
         self.energy, self._word, self._cond = energy, word, cond
 
     def current_mood(self):

@@ -76,13 +76,13 @@ def test_too_young_and_asleep_gates(monkeypatch):
     _patch(monkeypatch, [_trophy()])
     # an Egg refuses with the shared _guard line (tidy audit 2026-07-18:
     # the cup's gate single-sources dead/egg instead of hand-rolling them)
-    assert "egg" in tournament.can_enter(Pet(num=-1, stage="Egg")).lower()
+    assert "ovo" in tournament.can_enter(Pet(num=-1, stage="Egg")).lower()
     for st in ("Fresh", "InTraining"):
-        assert "young" in tournament.can_enter(Pet(num=-1, stage=st)).lower()
+        assert "jovem" in tournament.can_enter(Pet(num=-1, stage=st)).lower()
     p = _pet("Rookie")
     p.asleep = True
     # a player poke DISTURBS the sleeper like every care key (Joel 2026-07-06)
-    assert "grumbles" in tournament.can_enter(p)
+    assert "resmungando" in tournament.can_enter(p)
     assert not p.asleep and p.disturb == 1
 
 
@@ -316,7 +316,7 @@ def test_mid_bracket_contracts():
     CANON (Tourney_Registration gates only checkTourneyClosed + isEligible --
     no entered flag; the hour window is the throttle)."""
     import random
-    from tuipet.ui.screens import data
+    from tuipet.data.loaders import data
     from tuipet.ui.screens.tournamentscreen import TournamentPanel
 
     def champ():
@@ -354,7 +354,7 @@ def test_mid_bracket_contracts():
     pan2.cursor = tournament._hour(p)
     pan2.key("enter")
     assert pan2.tourney is None, "a spent cup-hour must not re-run"
-    assert "has run" in pan2.msg
+    assert "terminou" in pan2.msg
 
     random.seed(11)
     p3 = champ()
@@ -408,7 +408,7 @@ def test_champion_wins_the_cup_prizes():
     assert tm.champion
     assert p.inventory.get("ball", 0) >= 1        # the heir arrives
     assert p.inventory.get("vegetable", 0) >= 2
-    assert "Ball" in tm.last and "Vegetable" in tm.last   # the banner names the heir
+    assert "Ball" in tm.last and "Vegetal" in tm.last   # the banner names the heir
 
 
 def test_the_purse_truncates_per_entrant():
@@ -645,10 +645,10 @@ def test_cup_entry_honors_the_battle_condition_gates():
     tr = _trophy()
     assert tournament.eligibility(p, tr) is None       # healthy: fine
     p.hunger = 0
-    assert "hungry" in tournament.eligibility(p, tr)
+    assert "fome" in tournament.eligibility(p, tr)
     p.hunger = 4
     p.poop = 2
-    assert "Clean up" in tournament.eligibility_featured(p, tr)
+    assert "Limpe" in tournament.eligibility_featured(p, tr)
 
 
 def test_cup_rows_wear_one_whole_tag(monkeypatch):

@@ -209,15 +209,15 @@ class TournamentPanel(menu.SubHost):
         if (self._ceremony is not None or self._advance is not None
                 or self._intro is not None):
             return None                        # the show plays out (no skips)
-        t = self.tourney
+        tourn = self.tourney
         if k == "b":
             # while the cup runs, B always shows the TREE -- flipping the
             # other way landed on the empty faceoff arena, a dead page that
             # read as a freeze (Joel 2026-07-25 "i thought the thing froze,
             # there was nothing on screen")
-            self.tree_view = (not self.tree_view) if t.over else True
+            self.tree_view = (not self.tree_view) if tourn.over else True
             return None
-        if k in ("space", "enter") and self.tree_view and not t.over:
+        if k in ("space", "enter") and self.tree_view and not tourn.over:
             # ONE press: "fight on" starts the walk-in THERE AND THEN.  The
             # old flow parked on the empty faceoff arena until a SECOND
             # space -- the same frozen-blank complaint as B above.
@@ -225,26 +225,26 @@ class TournamentPanel(menu.SubHost):
             self._intro = {"t": 0}
             self.sfx = "menu"
             return None
-        if k in ("space", "enter") and t.over and self.tree_view:
+        if k in ("space", "enter") and tourn.over and self.tree_view:
             self.tree_view = False             # from the final tree to the result
             return None
-        if k in ("space", "enter") and not (t.over or self.sub):
+        if k in ("space", "enter") and not (tourn.over or self.sub):
             self._intro = {"t": 0}             # the introductions, then the bell
             self.sfx = "menu"
         elif k in ("escape", "u"):          # u (the opening key) also closes
-            if not t.over:
-                t.record(False)             # walking out forfeits: the elimination is real
+            if not tourn.over:
+                tourn.record(False)             # walking out forfeits: the elimination is real
             # carry the VERDICT home: the winner's cheer / loser's sulk plays
             # on the house screen, like the devices (anim hardening 2026-07-14)
-            return ("done", (t.last, t.champion))
+            return ("done", (tourn.last, tourn.champion))
         return None
 
     def _render_tree(self):
         """The bracket page: the field of eight and the tree filling in round
         by round (the entrants always existed in the engine; the player just
         never SAW the tournament)."""
-        t = self.tourney
-        tree = t.tree
+        tourn = self.tourney
+        tree = tourn.tree
 
         def nm(e, w):
             if e == "YOU":
@@ -253,7 +253,7 @@ class TournamentPanel(menu.SubHost):
                 s = ("!" if e.get("rival") else "") + e["name"]
             return s[:w]
 
-        out = menu.bar(t.name, t("cup_bracket_title", "BRACKET"))
+        out = menu.bar(tourn.name, t("cup_bracket_title", "BRACKET"))
         champ = tree[3][0] if len(tree) > 3 else None
         for i in range(8):
             c1 = nm(tree[0][i], 10)
@@ -269,14 +269,14 @@ class TournamentPanel(menu.SubHost):
             style = INK_B if you else INK
             out.append(" %-11s%-11s%s\n" % (c1, c2, c3),
                        style=style if you else (INK if c1 else DIM))
-        out.append_text(menu.note(t.last, tick=self.frame_i))
-        if t.over:
+        out.append_text(menu.note(tourn.last, tick=self.frame_i))
+        if tourn.over:
             out.append_text(menu.footer(t("cup_hint_result", "SPACE result   ESC leave")))
         else:
             # two-space gap: "quarterfinal" runs the line to exactly 38 --
             # three spaces clipped "ESC forfeit" to "ESC forfei" (menu audit
             # 2026-07-21; menu.footer hard-cuts at W)
-            out.append_text(menu.footer(t("cup_hint_next", "SPACE to the {round}  ESC forfeit").format(round=t.round_name.lower())))
+            out.append_text(menu.footer(t("cup_hint_next", "SPACE to the {round}  ESC forfeit").format(round=tourn.round_name.lower())))
         return out
 
     def _frames(self, num, role="idle"):
@@ -290,10 +290,10 @@ class TournamentPanel(menu.SubHost):
         arena light pulses bright (the zoneChange idiom) -- the podium beat
         the crown never had.  Mirrors the result page's shape exactly (one
         layout language per screen family)."""
-        from tuipet.ui.screens.adventurescreen import _brighten
-        t = self._ceremony["t"]
+        from tuipet.ui.screens.adventurescreen.panel import _brighten
+        frame_t = self._ceremony["t"]
         bgimg = self.pet.background(file="tourneyBack")
-        if bgimg and any(a <= t % 20 < b for a, b in ((3, 8), (12, 17))):
+        if bgimg and any(a <= frame_t % 20 < b for a, b in ((3, 8), (12, 17))):
             bgimg = _brighten(bgimg, 0.5)      # the podium light, on the beat
         on = menu.scene_ink(bgimg)
         # pure scene (cup audit 2026-07-25): the crown, the trophy count and
@@ -309,9 +309,9 @@ class TournamentPanel(menu.SubHost):
         lands -- the tournament happening AROUND you, visible at last."""
         a = self._advance
         i = min(a["t"] // NPC_T, len(a["nums"]) - 1)
-        t = a["t"] % NPC_T
+        frame_t = a["t"] % NPC_T
         fr = data.frames_for(a["nums"][i])
-        wi = data.ROLES["walk"][(t // 3) % 2]
+        wi = data.ROLES["walk"][(frame_t // 3) % 2]
         rows = grid.prep((fr[wi] if wi < len(fr) else None) or fr[0],
                          ph=FIGHT_ROWS * 2)
         # walk the winner clean ACROSS: in from off-screen right (X1) and out
@@ -321,7 +321,7 @@ class TournamentPanel(menu.SubHost):
         # off (parade fix 2026-07-24, Joel "just appears to the right, and
         # disappears when it hits the left").  Mirrors the intro's own walk-in.
         w = grid.width(rows)
-        x = round(grid.X1 + (grid.X0 - w - grid.X1) * (t / max(1, NPC_T - 1)))
+        x = round(grid.X1 + (grid.X0 - w - grid.X1) * (frame_t / max(1, NPC_T - 1)))
         bgimg = self.pet.background(file="tourneyBack")
         scene = render_scene([(rows, x, False)], COLS, FIGHT_ROWS,
                              menu.scene_ink(bgimg), LCD_BG, bgimg=bgimg,
@@ -338,22 +338,22 @@ class TournamentPanel(menu.SubHost):
         stare-down -- then the bell (anim opens the fight).  The corners are
         grid.faceoff's own, so the entrance lands exactly where the fight
         stands."""
-        t = self._intro["t"]
+        frame_t = self._intro["t"]
         opp = self.tourney.current_opponent()
-        pet_rows = self._frames(self.pet.num, "walk" if t >= INTRO_OPP_T else "idle")
-        opp_rows = self._frames(opp["num"], "walk" if t < INTRO_OPP_T else "idle")
+        pet_rows = self._frames(self.pet.num, "walk" if frame_t >= INTRO_OPP_T else "idle")
+        opp_rows = self._frames(opp["num"], "walk" if frame_t < INTRO_OPP_T else "idle")
         left, right = grid.faceoff(pet_rows, opp_rows, left_mirror=True,
                                    right_mirror=False, ph=FIGHT_ROWS * 2)
         lrows, lx, lm = left
         rrows, rx, rm = right
         placements = []
-        if t < INTRO_OPP_T:                    # the challenger walks in
-            p = t / max(1, INTRO_OPP_T - 1)
+        if frame_t < INTRO_OPP_T:                    # the challenger walks in
+            p = frame_t / max(1, INTRO_OPP_T - 1)
             placements = [(rrows, round(grid.X1 + (rx - grid.X1) * p), rm)]
             note = (t("cup_rival_enters", "{name} — your RIVAL!").replace("{name}", opp["name"]) if opp.get("rival") else
                     t("cup_foe_enters", "{name} [{attr}] enters!").replace("{name}", opp["name"]).replace("{attr}", opp["attribute"][:2]))
-        elif t < INTRO_OPP_T + INTRO_PET_T:    # your mon answers
-            p = (t - INTRO_OPP_T) / max(1, INTRO_PET_T - 1)
+        elif frame_t < INTRO_OPP_T + INTRO_PET_T:    # your mon answers
+            p = (frame_t - INTRO_OPP_T) / max(1, INTRO_PET_T - 1)
             lw = grid.width(lrows)
             placements = [(lrows, round((grid.X0 - lw) + (lx - (grid.X0 - lw)) * p), lm),
                           (rrows, rx, rm)]
@@ -457,15 +457,15 @@ class TournamentPanel(menu.SubHost):
             # clipped it anyway.  The strip is the one true key line.)
             return out
         # bracket
-        t = self.tourney
+        tourn = self.tourney
         if self.tree_view:
             return self._render_tree()
         # BackgroundAnim checkBack: while the tournament is active every scene
         # plays in the ARENA (tourneyBack.png), not the home habitat
         bgimg = self.pet.background(file="tourneyBack")
         on = menu.scene_ink(bgimg)
-        if t.over:
-            pose = "happy" if t.champion else "tired"
+        if tourn.over:
+            pose = "happy" if tourn.champion else "tired"
             # pure scene (see below): the verdict, the trophy count and the
             # purse all live on the CARD already, and ESC rides the strip
             return render_scene(

@@ -126,7 +126,7 @@ def test_the_raid_board_still_asks_the_body():
     panel = RaidPanel(p, connect=False, client=_FakeRelay())
     panel.key("space")
     assert panel.sub is None
-    assert panel.msg == "Too hurt to fight."
+    assert panel.msg == "Muito machucado para lutar."
 
 
 # ---- the door parity table ----------------------------------------------
@@ -361,8 +361,8 @@ def test_sleep_only_runs_on_the_main_view():
     can neither fall asleep nor wake behind a panel."""
     import inspect
 
-    from tuipet.core import app
-    src = inspect.getsource(app)
+    from tuipet.app_mixins import timers
+    src = inspect.getsource(timers)
     assert src.count("self.pet.tick(") == 1, "a second tick site appeared"
     body = src.split("self.pet.tick(")[0]
     assert "if self.mode is not None:" in body

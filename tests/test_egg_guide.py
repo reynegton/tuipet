@@ -60,7 +60,7 @@ def test_detail_locked_countable_shows_goal():
     idx = _rule("Dodomon")["idx"]                # Mega-kill gate
     rows = dict((l, v) for l, v in pan._detail_rows(idx) if l)
     assert rows["State"] == "locked"
-    assert rows["Unlock"].startswith("Fell")     # csv desc (may wrap; first line)
+    assert rows["Desbloq."].startswith("Fell")     # csv desc (may wrap; first line)
     assert rows["Goal"] == "Mega-class felled 0/5"
     assert rows["Keeps"] == "forever"
 
@@ -183,23 +183,29 @@ def test_the_card_reveals_and_speaks_the_phase():
     import tuipet.core.egg as egg_mod
 
     class _App:                                    # the card protocol shim
-        def __init__(self, m): self.mode, self.lines = m, []
+        def __init__(self, m):
+            self.mode, self.lines = m, []
+            class DummyW:
+                border_subtitle = ""
+                def update(self, text): pass
+            self.stats_w = DummyW()
     pan = EggGuidePanel()
     pan.i = locked
     seen = {}
     def _card(app, title, rows): seen["rows"] = rows
-    real = statusbox.card
-    statusbox.card = _card
+    from tuipet.ui.components.statusbox import egg_screen
+    real = egg_screen.card
+    egg_screen.card = _card
     try:
         statusbox.eggguide(_App(pan))
         assert egg_mod.hatch_name(locked)[:16] in "".join(seen["rows"])
         assert "???" not in "".join(seen["rows"])
-        assert any("ENTER story" in r for r in seen["rows"])
+        assert any("ENTER história" in r for r in seen["rows"])
         pan.detail = True
         statusbox.eggguide(_App(pan))
-        assert any("next egg" in r for r in seen["rows"])
+        assert any("próx. ovo" in r for r in seen["rows"])
     finally:
-        statusbox.card = real
+        egg_screen.card = real
 
 
 def test_a_map_egg_tells_one_wrapped_story_everywhere():
@@ -210,7 +216,7 @@ def test_a_map_egg_tells_one_wrapped_story_everywhere():
     One shared sentence now (data_meta.map_goal), wrapped on word
     boundaries in both panels, never sliced."""
     import tuipet.data.loaders.data as data
-    from tuipet.ui.screens import data_meta
+    from tuipet.data.loaders import data_meta
     from tuipet.ui.components import statusbox
     from tuipet.ui.screens.eggguidescreen import EggGuidePanel
     from tuipet.core.pet import Pet
@@ -238,12 +244,13 @@ def test_a_map_egg_tells_one_wrapped_story_everywhere():
     app = _App()
     app.pet, app.mode = p, pan
     got = []
-    real_card = statusbox.card
-    statusbox.card = lambda a, t, ls, subtitle=None: got.extend(ls)
+    from tuipet.ui.components.statusbox import egg_screen
+    real_card = egg_screen.card
+    egg_screen.card = lambda a, t, ls, subtitle=None: got.extend(ls)
     try:
         statusbox.eggguide(app)
     finally:
-        statusbox.card = real_card
+        egg_screen.card = real_card
     joined = " ".join(got)
     assert "raid boss)" in joined, "the card lost the goal's tail"
     assert all(len(ln) <= 60 for ln in got)      # markup-inclusive sanity

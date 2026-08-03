@@ -12,6 +12,12 @@ from tuipet.i18n.translator import t
 from tuipet.core.pet import Pet
 import tuipet.ui.screens.lobbyscreen as lobbyscreen
 class SystemActionsMixin:
+    def action_new(self):
+            import tuipet.ui.screens.eggselectscreen as eggselectscreen
+            gen = self.pet.generation + 1
+            self._open_mode(eggselectscreen.EggSelectPanel(self.pet),
+                            lambda et: self._hatch_new(et, gen))
+
     def action_help(self):
             self._open_mode(helpscreen.HelpPanel(self.pet), lambda _=None: self.repaint())
 

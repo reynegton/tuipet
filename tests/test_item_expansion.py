@@ -338,7 +338,7 @@ def test_the_home_capsule_shelf_is_rationed(isolate_save):
         msg, sfx = shop.town_buy(p, row)
         assert sfx == "confirm", (i, msg)
     msg, sfx = shop.town_buy(p, row)
-    assert sfx == "error" and "Sold out" in msg
+    assert sfx == "error" and "Esgotado" in msg
     plain = next(e for e in shop.home_stock(pet=p) if e["key"] == "fish")
     assert plain.get("left") is None             # the reliable shelf, untouched
 

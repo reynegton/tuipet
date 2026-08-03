@@ -39,7 +39,7 @@ def test_the_app_warns_once_when_the_cloud_refuses_us(monkeypatch):
     appmod.TuiPetApp._warn_if_cloud_dropped(app)
     appmod.TuiPetApp._warn_if_cloud_dropped(app)      # ...only once
     assert len(flashes) == 1
-    assert "Cloud sync off" in flashes[0]
+    assert "Sincronização desligada" in flashes[0]
 
 
 def test_a_bug_report_never_promises_a_send_it_cannot_make(monkeypatch):
@@ -54,6 +54,8 @@ def test_a_bug_report_never_promises_a_send_it_cannot_make(monkeypatch):
             monkeypatch.delenv(k, raising=False)
         from tuipet.utils import persistio
         importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
+        from tuipet.utils.persistence import progress_io
+        importlib.reload(progress_io)
         importlib.reload(persistence)
         assert persistence.add_pending_bug({"text": "x"}) is False, \
             "an unstashable report must say so"
@@ -66,13 +68,16 @@ def test_a_bug_report_never_promises_a_send_it_cannot_make(monkeypatch):
 
 def test_a_stashable_bug_reports_success():
     d = tempfile.mkdtemp()
-    old = persistence.SAVE_DIR
+    from tuipet.utils.persistence import progress_io
+    old_pio = progress_io.SAVE_DIR
     try:
         persistence.SAVE_DIR = d
+        progress_io.SAVE_DIR = d
         assert persistence.add_pending_bug({"text": "x"}) is True
         assert os.path.exists(os.path.join(d, "pending_bugs.jsonl"))
     finally:
-        persistence.SAVE_DIR = old
+        persistence.SAVE_DIR = old_pio
+        progress_io.SAVE_DIR = old_pio
 
 
 def test_quarantine_notice_survives_the_new_game_flow(tmp_path, monkeypatch):
@@ -104,4 +109,4 @@ def test_quarantine_notice_survives_the_new_game_flow(tmp_path, monkeypatch):
             return hud
 
     hud = asyncio.run(go())
-    assert "couldn" in hud or "kept as" in hud, hud
+    assert "couldn't be read" in hud, hud

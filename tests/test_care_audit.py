@@ -52,7 +52,7 @@ def test_a_pet_held_at_an_empty_belly_actually_starves():
             died_at = i
             break
     assert died_at is not None, "the starvation death still cannot fire"
-    assert p.death_cause == "starvation"
+    assert p.death_cause == "inanição"
     assert abs(died_at - STARVE_DEATH_MIN) <= 60  # ~12 game-hours
 
 
@@ -112,7 +112,7 @@ def test_a_pet_nobody_feeds_now_starves_as_it_should():
             emptied_at = i / DAY_LENGTH
         if p.dead:
             break
-    assert p.dead and p.death_cause == "starvation"
+    assert p.dead and p.death_cause == "inanição"
     assert emptied_at is not None and emptied_at < 2.0
     assert p.care_mistakes < 20, "the ladder should NOT be what got there first"
 
@@ -228,11 +228,11 @@ def test_the_death_ladder_holds_at_both_ends():
     assert not p.dead
     p.care_mistakes = 20
     p.tick(1.0)
-    assert p.dead and p.death_cause == "neglect"
+    assert p.dead and p.death_cause == "negligência"
     q = _pet(stage="Ultimate", care_mistakes=5)
     q.stage_seconds = q.LATE_STAGE_WINDOW + 1
     q.tick(1.0)
-    assert q.dead and q.death_cause == "frailty"
+    assert q.dead and q.death_cause == "fragilidade"
 
 
 # ---- the sibling clocks, ruled 2026-07-25 ("retune the poop and effort

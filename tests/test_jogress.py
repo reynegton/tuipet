@@ -70,6 +70,7 @@ def test_dp_refusal_names_only_the_refill_that_exists():
     from tuipet.core import petbody
     from tuipet.core import petcare
     from tuipet.core import shop
-    assert "dp += 1" in inspect.getsource(petbody)
+    from tuipet.core.pet.body import sleep
+    assert "dp += 1" in inspect.getsource(sleep)
     for mod in (petcare, shop):
         assert "dp +=" not in inspect.getsource(mod)

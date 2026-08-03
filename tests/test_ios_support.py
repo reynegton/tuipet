@@ -1,3 +1,4 @@
+import tuipet.utils.persistio
 """iOS support (a-Shell is the official iPhone/iPad target, 2026-07-13).
 
 iOS CANNOT write to ~ -- only ~/Documents, ~/Library and ~/tmp.  tuipet saved
@@ -19,7 +20,11 @@ def _reload(**env):
         os.environ.pop(k, None)
     os.environ.update(env)
     from tuipet.utils import persistio
+    from tuipet.utils.persistence import save_io, settings_io, progress_io
     importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
+    importlib.reload(save_io)
+    importlib.reload(settings_io)
+    importlib.reload(progress_io)
     importlib.reload(persistence)
     return persistence
 
@@ -37,12 +42,10 @@ def test_ios_read_only_home_falls_back_to_documents(monkeypatch):
         pet.world_seconds = 600.0
         p.save(pet)
         assert os.path.exists(p.SAVE_PATH), 'the pet must actually persist on iOS'
-        assert not p.save_failed
+        assert not tuipet.utils.persistio.save_failed
     finally:
         os.chmod(home, 0o755)
-        from tuipet.utils import persistio
-        importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
-        importlib.reload(persistence)
+        _reload()
 
 
 def test_an_unwritable_disk_is_reported_not_swallowed(monkeypatch):
@@ -55,12 +58,10 @@ def test_an_unwritable_disk_is_reported_not_swallowed(monkeypatch):
         pet = Pet(num=100, stage='Champion', attribute='Vaccine', obedience=500)
         pet.world_seconds = 600.0
         p.save(pet)
-        assert p.save_failed, 'a silently unsaveable install used to eat the pet'
+        assert tuipet.utils.persistio.save_failed, 'a silently unsaveable install used to eat the pet'
     finally:
         os.chmod(home, 0o755)
-        from tuipet.utils import persistio
-        importlib.reload(persistio)   # SAVE_DIR's owner (tier-4 split)
-        importlib.reload(persistence)
+        _reload()
 
 
 def test_save_dir_override_wins(monkeypatch):
@@ -118,12 +119,12 @@ def test_save_failed_clears_when_the_same_file_recovers(monkeypatch, tmp_path):
     target = str(blocked / 'save.json')
     os.chmod(blocked, 0o555)
     try:
-        persistio._atomic_write_json(target, {"x": 1})
+        tuipet.utils.persistio._atomic_write_json(target, {"x": 1})
         assert pers.save_failed                    # the refusal is recorded...
-        persistio._atomic_write_json(str(tmp_path / 'settings.json'), {})
+        tuipet.utils.persistio._atomic_write_json(str(tmp_path / 'settings.json'), {})
         assert pers.save_failed                    # ...another file can't mute it...
     finally:
         os.chmod(blocked, 0o755)
-    persistio._atomic_write_json(target, {"x": 1})
+    tuipet.utils.persistio._atomic_write_json(target, {"x": 1})
     assert not pers.save_failed                    # ...its own clean write clears it
     assert persistio.save_failed == ""

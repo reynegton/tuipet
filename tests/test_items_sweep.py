@@ -159,7 +159,7 @@ def test_a_spent_deal_warns_before_it_charges_full_price(monkeypatch):
     pan.text()                                  # and the panel walks
     bits = p.bits
     pan.key("enter")
-    assert p.bits == bits and "deal's gone" in pan.msg   # ate the press
+    assert p.bits == bits and "oferta sumiu" in pan.msg   # ate the press
     pan.key("enter")
     assert p.bits == bits - row["price"]                 # the second one buys
 
@@ -245,7 +245,7 @@ _EXPANSION_OWN_DOORS = frozenset(
     {"med", "futon"}
     | {k for k in shop.CATALOG
        if k.startswith(("human_", "beast_")) or k in
-       ("digitron", "horn_helmet", "grey_claws", "water_bottle",
+       ("datatron", "horn_helmet", "grey_claws", "water_bottle",
         "torn_tatter", "white_wings", "black_wings", "metal_armor",
         "flaming_wings")})
 
@@ -260,7 +260,7 @@ def test_declared_touches_match_what_the_handler_actually_moves(key):
     v = shop.CATALOG[key]
     if v.where == "road" or key in _EXPANSION_OWN_DOORS \
             or key in ("poison_mushroom", "revive_floppy",
-                       "digimemory", "sleeping_pill",
+                       "memory", "sleeping_pill",
                        "music_player", "cold_shower"):
         # own doors and the sleep family need a pet in a state this fixture
         # cannot hold at the same time (asleep AND awake); they carry their

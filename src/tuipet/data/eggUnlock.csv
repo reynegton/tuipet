@@ -45,3 +45,5 @@ Virus Busters Ver. 20th Egg,FALSE,0,-1,None,FALSE,-1,-1,5,VirusBuster,None,None,
 Wind Guardians Egg,FALSE,0,-1,None,FALSE,-1,-1,-1,WindGuardian,None,None,-1,-1,-1,-1,-1,-1,-1,-1,-1,End a generation in Wind Guardians,TRUE,-1,-1,-1,-1,,-1
 Zuba Egg,FALSE,0,-1,None,FALSE,-1,-1,-1,None,None,None,-1,-1,-1,-1,-1,-1,-1,-1,-1,Win 60 battles,TRUE,60,-1,-1,-1,,-1
 Nature Spirits Egg,FALSE,0,-1,None,FALSE,-1,-1,-1,NatureSpirit,None,None,-1,-1,-1,-1,-1,-1,-1,-1,-1,End a generation in Nature Spirits,TRUE,-1,-1,-1,-1,,-1
+Digitama X3,FALSE,0,-1,None,TRUE,-1,-1,-1,None,None,None,-1,-1,-1,-1,-1,-1,-1,-1,-1,Raise an X-Antibody Digimon and defeat 10 Megas,TRUE,-1,-1,10,-1,,-1
+Kera Digitama,FALSE,0,-1,Champion,FALSE,-1,-1,-1,None,None,None,-1,-1,-1,-1,-1,-1,-1,-1,-1,Reach Champion stage,TRUE,-1,-1,-1,-1,,-1

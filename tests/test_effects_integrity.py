@@ -29,7 +29,8 @@ def test_hit_explosion_is_the_full_burst_not_the_center_crop():
     import json
     import os
     import tuipet.data.loaders.data as data
-    ov = json.load(open(os.path.join(os.path.dirname(_d.__file__), "data", "battle_overlays.json")))
+    import tuipet
+    ov = json.load(open(os.path.join(os.path.dirname(tuipet.__file__), "data", "battle_overlays.json")))
     expl = ov["hit_explosion"]
     assert len(expl) == 2, "explosion strobes between 2 frames (outline + filled)"
     assert len(expl[0][0]) >= 30, "explosion must fill the LCD width (full burst, not a crop)"

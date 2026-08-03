@@ -18,7 +18,7 @@ def _pet(**kw):
     p.hunger = 0
     p.add_item("f:54")          # a bag item -> the shop bag icon path runs
     p.add_item("i:32")
-    p.digimemory = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 60.0}
+    p.memory = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 60.0}
     for k, v in kw.items():
         setattr(p, k, v)
     return p
@@ -83,16 +83,16 @@ def test_shop_panel_renders_shop_and_bag():
 
 
 def test_the_simple_panels_all_draw():
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
     from tuipet.ui.screens.assistscreen import AssistPanel
     from tuipet.ui.screens.dnascreen import DNAPanel
-    from tuipet.jogressscreen import JogressPanel
+    from tuipet.ui.screens.jogressscreen import JogressPanel
     from tuipet.ui.screens.eggselectscreen import EggSelectPanel
-    from tuipet.themescreen import ThemePanel
+    from tuipet.ui.screens.themescreen import ThemePanel
     from tuipet.ui.screens.deathscreen import DeathPanel
     from tuipet.ui.screens.feedscreen import FeedPanel
     p = _pet()
-    _walk(DigiCorePanel(p), ["space", "space", "right", "right", "right",
+    _walk(datacorePanel(p), ["space", "space", "right", "right", "right",
                              "right", "right", "right", "down", "enter", "down"])
     _walk(AssistPanel(p), ["enter", "enter"])
     _walk(DNAPanel(p), ["down", "right"])
@@ -140,7 +140,7 @@ def test_jogress_states_fit_the_lcd_with_real_options():
     15-16 lines and clipped.  Scene-only now (the offline picker died with the
     home jogress, v0.2.348); the LOBBY strip carries the prompts, pinned in
     test_menu_bounds."""
-    from tuipet.jogressscreen import JogressPanel, FUSE_STEPS
+    from tuipet.ui.screens.jogressscreen import JogressPanel, FUSE_STEPS
     p = _pet()
     pan = JogressPanel(p, 100, 7, 4)
     for s in range(FUSE_STEPS):
@@ -242,7 +242,7 @@ def test_assist_card_prices_match_canon_and_toggle_names_a_helper():
     assert "on duty" in pan.text().plain
     pan.key("enter")                              # dismiss
     assert not p.auto_care
-    assert "dismissed" in pan.msg
+    assert "dispensado" in pan.msg
 
 
 # (test_every_drill_completes... (test_training_clone covers the one drill) left with the classic training system -- 0.5 TRAINING 2026-07-17)

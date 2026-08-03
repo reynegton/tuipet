@@ -671,7 +671,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                 self._start_sync()
                 self._verdict(t("app_msg_signed_in_fresh", "Signed in as {name} — a fresh start.").format(name=_hud_esc(name)))
                 self._open_mode(eggselectscreen.EggSelectPanel(self.pet),
-                                self._after_egg_pick)
+                                lambda et: self._hatch_new(et, 1))
             else:
                 # no old account: the local pet was never parked ANYWHERE, and
                 # deleting it here destroyed its only copies.  Adopt it into the

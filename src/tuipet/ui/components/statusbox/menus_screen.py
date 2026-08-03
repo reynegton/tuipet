@@ -91,16 +91,15 @@ def options(app):
     import tuipet.ui.screens.optionsscreen as _opts
     m = app.mode
     row = _opts._ROWS[min(m.cursor, len(_opts._ROWS) - 1)]
-    desc = _opts._DESC.get(row, "")
+    desc = _opts._get_desc().get(row, "")
     # word-wrap (card audit 2026-07-24): desc runs to 53 chars and the update
     # msg to ~49; the old [:26]/[26:52]/[:26] slices cut words mid-glyph and
     # dropped the msg's action hint.  Body budget = 14 rows (16 - title/DIV);
     # desc<=3 + msg<=4 + 5 fixed leaves headroom.
-    lines = [f"[b]{_opts._LABEL.get(row, row.title())}[/]", ""]
+    lines = [f"[b]{_opts._get_label().get(row, row.title())}[/]", ""]
     lines += [f"[dim]{ln}[/]" for ln in wrap(desc, 3)]
-    lines.append("")
     if m.msg:
-        lines += wrap(m.msg, 4)
+        lines += [""] + [f"[yellow]{ln}[/]" for ln in wrap(m.msg, 4)]
         lines.append("")
     lines.append("[dim]ENTER alterna[/]")
     card(app, "Options", lines)

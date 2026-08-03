@@ -8,7 +8,7 @@ import tuipet.data.loaders.data as data
 from tuipet.ui.screens import datacorescreen as digicore
 from tuipet.utils import persistence
 from tuipet.ui.screens.albumscreen import AlbumPanel
-from tuipet.ui.screens.datacorescreen import DigiCorePanel
+from tuipet.ui.screens.datacorescreen import datacorePanel
 from tuipet.core.pet import Pet
 
 
@@ -91,15 +91,15 @@ def test_key_walk_clamps_and_exits():
 def test_trophies_page_opens_the_album_and_space_still_pages():
     """ENTER on TROPHIES = the album sentinel; SPACE keeps paging (the
     EVOLVES enter-picks/space-pages split).  The page teaches its door."""
-    dc = DigiCorePanel(_pet(), start="TROPHIES")
+    dc = datacorePanel(_pet(), start="TROPHIES")
     assert dc.pages[dc.i][0] == "TROPHIES"
     assert "ENTER: the album" in dc.text().plain
     assert dc.key("enter") == ("done", ("album",))
-    dc2 = DigiCorePanel(_pet(), start="TROPHIES")
+    dc2 = datacorePanel(_pet(), start="TROPHIES")
     assert dc2.key("space") is None                 # paged, no sentinel
     assert dc2.pages[dc2.i][0] != "TROPHIES"
     # unknown start titles fall to the cover, and ENTER there stays inert
-    cover = DigiCorePanel(_pet(), start="NO-SUCH-PAGE")
+    cover = datacorePanel(_pet(), start="NO-SUCH-PAGE")
     assert cover.i == 0
 
 

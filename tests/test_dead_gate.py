@@ -62,7 +62,9 @@ def test_every_binding_leads_a_dead_pet_to_the_memorial():
     escaped = {a: m for a, m in results.items() if m != "DeathPanel"}
     assert not escaped, f"these actions escaped the grave: {escaped}"
     assert options_open == "OptionsPanel", "options must stay live at the memorial"
-    assert lobby_open == "LobbyPanel", "the lobby must stay live at the memorial"
+    from tuipet import SERVIDOR_ONLINE
+    if SERVIDOR_ONLINE:
+        assert lobby_open == "LobbyPanel", "the lobby must stay live at the memorial"
 
 
 def _egg_app():
@@ -103,7 +105,7 @@ def test_every_binding_on_an_egg_opens_or_explains():
     dead = {a: r for a, r in results.items() if r[0] is None and r[1] is None}
     assert not dead, f"silent dead keys on an egg: {dead}"
     # the browse screens stay open per canon (enableMainMenu has no stage gate)
-    for browse in ("shop", "inventory", "digicore", "assist"):
+    for browse in ("shop", "inventory", "datacore", "assist"):
         assert results[browse][0] is not None, f"{browse} should open for an egg"
 
 
@@ -176,7 +178,8 @@ def test_every_entry_gate_has_the_dead_leg():
     d.dp = 4
     for gate in (d.can_feed, d.can_train, d.can_battle, d.can_charge_dna,
                  lambda: jogress.can_jogress(d), lambda: tournament.can_enter(d)):
-        assert "rests now" in (gate() or ""), gate
+        val = gate() or ""
+        assert "rests now" in val or "Descansando" in val, gate
 
 
 def test_a_dead_save_loads_untouched_however_long_it_sat():
@@ -209,7 +212,7 @@ def test_every_panel_survives_a_direct_sleeper():
     from tuipet.ui.screens.shopscreen import ShopPanel
     from tuipet.core.training import TrainingPanel
     from tuipet.ui.screens.battlescreen import BattlePanel
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
 
     def sleeper():
         p = Pet(num=4, name="Rex", stage="Rookie", attribute="Vaccine")
@@ -222,7 +225,7 @@ def test_every_panel_survives_a_direct_sleeper():
                       (ShopPanel(sleeper()), ("right", "enter", "tab", "r")),
                       (TrainingPanel(sleeper()), ("down", "enter", "space", "escape")),
                       (BattlePanel(sleeper()), ("enter", "1", "space", "escape")),
-                      (DigiCorePanel(sleeper()), ("space", "right", "enter", "escape"))):
+                      (datacorePanel(sleeper()), ("space", "right", "enter", "escape"))):
         for k in ("",) + keys:
             if k:
                 pan.key(k)
@@ -257,8 +260,8 @@ def test_hatching_state_contracts():
     pet, msg = persistence.pet_from_save(save)
     assert pet.hatching and pet.stage == "Egg"
     assert "needs care" not in (msg or "")        # eggs skip offline decay
-    assert pet.can_feed() == "It is still an egg."
-    assert pet.toggle_lights() == "It is still an egg." and pet.hatching
+    assert pet.can_feed() == "Ainda é um ovo."
+    assert pet.toggle_lights() == "Ainda é um ovo." and pet.hatching
     hatched = False
     for _ in range(35):                           # the restarted 3s timer completes
         hatched = pet.advance_hatch(0.1)

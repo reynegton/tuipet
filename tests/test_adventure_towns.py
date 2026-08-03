@@ -94,7 +94,7 @@ def test_the_town_hub_opens_the_shop_and_leaves():
     layout as home) rides as a child; Leave / ESC returns to the road."""
     from tuipet.ui.screens.townscreen import TownPanel
     t = TownPanel(_pet(), town_id=0)
-    assert "TOWN" in t.text().plain and "Shop" in t.text().plain
+    assert "TOWN" in t.text().plain and "Loja" in t.text().plain
     # ENTER on Shop opens the REAL home ShopPanel (reused, not a rebuild)
     t.key("enter")
     assert type(t.sub).__name__ == "ShopPanel"

@@ -185,7 +185,7 @@ def test_the_rival_reseeds_marked_and_announced():
 def test_a_mismatched_tier_keeps_the_rival_out():
     p = _pet()
     trophy = tournament.trophy_by_id(tournament.schedule(p)[tournament._hour(p)])
-    from tuipet.data import load_sprites
+    from tuipet.data.loaders.data_core import load_sprites
     _, by_num = load_sprites()
     probe = tournament.Tournament(p, trophy)
     tier_stage = data.record_for(probe.entrants[0]["num"])["stage"]

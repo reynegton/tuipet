@@ -1,3 +1,5 @@
+import tuipet.core.eggmigrate as eggmigrate
+import tuipet.utils.persistio
 """The humulos dot-matrix egg pull + the frames-or-cut pass (Joel 2026-07-10),
 the connection unlock signal, and the cross-bank save migration.  Frameless
 eggs and frameless digimon were CUT; the provenance audit (2026-07-17) then
@@ -160,29 +162,29 @@ def test_save_migration_across_bank_versions():
     translate by (name, occurrence); still-cut eggs fall back ONLY for
     incubation; live Bubbmon pets stay Bubbmon."""
     by = _by_name()
-    assert persistence._migrate_egg_index(1) == by["Botamon"]
-    assert persistence._migrate_egg_index(34) == by["Sakumon"]  # classic shifts -5
-    assert persistence._migrate_egg_index(50) == by["Corona Egg"]
-    assert persistence._migrate_egg_index(83) == by["Zuba Egg"]
-    assert persistence._migrate_egg_index(67) == by["Nature Spirits Egg"]
+    assert eggmigrate._migrate_egg_index(1) == by["Botamon"]
+    assert eggmigrate._migrate_egg_index(34) == by["Sakumon"]  # classic shifts -5
+    assert eggmigrate._migrate_egg_index(50) == by["Corona Egg"]
+    assert eggmigrate._migrate_egg_index(83) == by["Zuba Egg"]
+    assert eggmigrate._migrate_egg_index(67) == by["Nature Spirits Egg"]
     # the twin ??? eggs were cut (2026-07-17): both fall back to Botamon
     # for incubation only
-    assert persistence._migrate_egg_index(46) == by["Botamon"]
-    assert persistence._migrate_egg_index(47) == by["Botamon"]
+    assert eggmigrate._migrate_egg_index(46) == by["Botamon"]
+    assert eggmigrate._migrate_egg_index(47) == by["Botamon"]
     # incubation fallbacks: cut eggs -> the surviving egg of the same baby
-    assert persistence._migrate_egg_index(56) == by["Nightmare Soldiers Egg"]  # Vorvomon
-    assert persistence._migrate_egg_index(79) == by["Nature Spirits Egg"]      # Version 6
-    assert persistence._migrate_egg_index(7) == by["Deep Savers Egg"]          # Pichimon lic.
+    assert eggmigrate._migrate_egg_index(56) == by["Nightmare Soldiers Egg"]  # Vorvomon
+    assert eggmigrate._migrate_egg_index(79) == by["Nature Spirits Egg"]      # Version 6
+    assert eggmigrate._migrate_egg_index(7) == by["Deep Savers Egg"]          # Pichimon lic.
     # a .403 save (v3): Ludo at 71 falls back to Cotsucomon's egg
-    assert persistence._migrate_egg_index(71, persistence._V403_FULL) \
+    assert eggmigrate._migrate_egg_index(71, eggmigrate._V403_FULL) \
         == by["Cotsucomon"]
     save = {"num": 1574, "line_id": "ver6", "egg_type": 74, "stage": "Fresh",
             "egg_order_v": None}
-    persistence._migrate_v401_save(save)
+    eggmigrate._migrate_v401_save(save)
     assert save["num"] == 1574 and save["line_id"] == "ver6"   # Bubbmon lives
     assert save["egg_type"] == by["Botamon"]                   # Version 1 fallback
     again = dict(save)
-    persistence._migrate_v401_save(again)                      # no re-translation
+    eggmigrate._migrate_v401_save(again)                      # no re-translation
     assert again["egg_type"] == save["egg_type"]
 
 
@@ -193,11 +195,11 @@ def test_owned_eggs_never_gain_cut_or_temp_eggs():
     by = _by_name()
     d = {"egg_order_v": None,
          "progress": {"eggs_owned": [1, 53, 54]}}   # Botamon + X + X2 on .401
-    assert persistence._migrate_v401_settings(d)
+    assert eggmigrate._migrate_v401_settings(d)
     assert d["progress"]["eggs_owned"] == [by["Botamon"]]   # cut eggs DROP
     d3 = {"egg_order_v": 3,
           "progress": {"eggs_owned": [17, 11, 6]}}  # v3 leak: Puttimon/Kuramon temp
-    assert persistence._migrate_v401_settings(d3)
+    assert eggmigrate._migrate_v401_settings(d3)
     # Babumon's licence DROPS with the fake-egg cut (ownership never falls
     # back), and the temp leaks purge -- a fully cleaned set
     assert d3["progress"]["eggs_owned"] == []

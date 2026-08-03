@@ -10,6 +10,12 @@ from tuipet.core.pet import Pet
 import tuipet.core.egg as egg_mod
 
 class LifecycleMixin:
+    def _after_death(self, result):
+            if result == "new":
+                self.action_new()
+            else:
+                self.repaint()
+
     def _whats_new(self):
             """One 'WHAT'S NEW' line in the msg box, on the FIRST launch of a new
             build only (Joel 2026-07-07: release news belongs on the title
@@ -33,7 +39,7 @@ class LifecycleMixin:
 
     def _post_title(self):
             if self._new_game:
-                self._open_mode(eggselectscreen.EggSelectPanel(self.pet), self._after_egg_pick)
+                self._open_mode(eggselectscreen.EggSelectPanel(self.pet), lambda et: self._hatch_new(et, 1))
             else:
                 self._hud(self._welcome)
                 self.repaint()
@@ -199,5 +205,9 @@ class LifecycleMixin:
                     if self.pet.inventory.get("memory", 0) <= 0:
                         self.pet.add_item("memory")
             persistence.save(self.pet)
-            self._do(f"Um novo ovo apareceu! (geração {gen})")
+            msg = f"Um novo ovo apareceu! (geração {gen}) (? = ajuda)"
+            if getattr(self, "_boot_notice", ""):
+                msg = f"{self._boot_notice}  {msg}"
+                self._boot_notice = ""
+            self._do(msg)
 

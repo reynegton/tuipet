@@ -1,3 +1,4 @@
+import tuipet.utils.persistence.serializer
 """Inheritance / DigiMemory — DVPet PhysicalState.setNewDigimemory / getDigimemory
 (item 32, anim Inherit), ClockTic.onDie's UnlockInheritance gate, applyItem's
 full-strength Inherit route; config.csv DigimemoryAttributeCoefficient=0.01,
@@ -18,7 +19,7 @@ def _pet(**kw):
 
 def test_the_departed_etches_powers_scaled_by_its_bonus():
     p = _pet(vaccine=500, data_power=300, virus=100, evol_bonus=10)
-    mem = p.make_digimemory()
+    mem = p.make_memory()
     assert mem["vaccine"] == 50 and mem["data"] == 30 and mem["virus"] == 10   # power*bonus*0.01
     assert "seconds" not in mem       # the lifespan hour left with the clock (2026-07-22)
     assert mem["name"] == "Gatomon" and mem["num"] == 100
@@ -27,23 +28,23 @@ def test_the_departed_etches_powers_scaled_by_its_bonus():
 
 def test_no_bonus_means_no_inheritance():
     p = _pet(vaccine=500, evol_bonus=0)
-    assert p.make_digimemory() is None       # onDie only unlocks inheritance with _bonus > 0
+    assert p.make_memory() is None       # onDie only unlocks inheritance with _bonus > 0
 
 
 def test_the_bank_holds_exactly_one_memory():
-    persistence.bank_digimemory({"name": "A", "num": 1, "vaccine": 1, "data": 0, "virus": 0, "seconds": 60.0})
-    persistence.bank_digimemory({"name": "B", "num": 2, "vaccine": 2, "data": 0, "virus": 0, "seconds": 60.0})
-    assert persistence.peek_digimemory()["name"] == "B"       # overwrite, never a stack
-    assert persistence.take_digimemory()["name"] == "B"
-    assert persistence.peek_digimemory() is None              # taken -> gone
+    persistence.bank_memory({"name": "A", "num": 1, "vaccine": 1, "data": 0, "virus": 0, "seconds": 60.0})
+    persistence.bank_memory({"name": "B", "num": 2, "vaccine": 2, "data": 0, "virus": 0, "seconds": 60.0})
+    assert persistence.peek_memory()["name"] == "B"       # overwrite, never a stack
+    assert persistence.take_memory()["name"] == "B"
+    assert persistence.peek_memory() is None              # taken -> gone
 
 
 def test_the_held_payload_survives_the_save_round_trip():
     p = _pet()
-    p.digimemory = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 60.0}
+    p.memory = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 60.0}
     d = json.loads(json.dumps(persistence.to_save_dict(p)))
     p2, _ = persistence.pet_from_save(d)
-    assert p2.digimemory == p.digimemory
+    assert p2.memory == p.memory
 
 
 def test_memorial_conflict_asks_and_resolves():
@@ -53,7 +54,7 @@ def test_memorial_conflict_asks_and_resolves():
     from tuipet.ui.screens.deathscreen import DeathPanel
     old = {"name": "Elder", "num": 29, "vaccine": 5, "data": 0, "virus": 0, "seconds": 60.0}
     new = {"name": "Gatomon", "num": 100, "vaccine": 50, "data": 30, "virus": 10, "seconds": 600.0}
-    persistence.bank_digimemory(old)
+    persistence.bank_memory(old)
     p = _pet(dead=True)
     pan = DeathPanel(p, new_mem=new, old_mem=old, grade_kept=4)
     assert "etch" in pan.strip() and "bonus" in pan.strip()   # prompt 1: the Validation
@@ -62,14 +63,14 @@ def test_memorial_conflict_asks_and_resolves():
     # box-clip repin 2026-07-04: the memorial prompt rides the strip
     assert "Only one" in pan.strip()                          # prompt 2: only one survives
     pan.key("e")                                              # ...the new data over the old
-    assert persistence.peek_digimemory()["name"] == "Gatomon"
+    assert persistence.peek_memory()["name"] == "Gatomon"
     assert pan.key("n") == ("done", "new")
     # ... and the keep-the-elder branch
-    persistence.bank_digimemory(old)
+    persistence.bank_memory(old)
     pan2 = DeathPanel(p, new_mem=dict(new), old_mem=old, grade_kept=4)
     pan2.key("e")
     pan2.key("k")
-    assert persistence.peek_digimemory()["name"] == "Elder"
+    assert persistence.peek_memory()["name"] == "Elder"
 
 
 def test_every_death_records_its_cause_and_the_memorial_tells_it():
@@ -87,18 +88,18 @@ def test_every_death_records_its_cause_and_the_memorial_tells_it():
     p = dead_pet(hunger=0)
     p._starve_t = 12 * 3600
     p._tick_mortality(1.0)
-    assert p.dead and p.death_cause == "starvation"
+    assert p.dead and p.death_cause == "inanição"
 
     p = dead_pet(care_mistakes=20)
     p._tick_mortality(1.0)
-    assert p.death_cause == "neglect"
+    assert p.death_cause == "negligência"
 
     # (the injuries death cap left with the injury system)
 
     p = dead_pet(stage="Mega", care_mistakes=5)
     p.stage_seconds = p.LATE_STAGE_WINDOW
     p._tick_mortality(1.0)
-    assert p.death_cause == "frailty"
+    assert p.death_cause == "fragilidade"
 
     # (the old-age clock death left with the lifespan clock -- the DSprite
     # hazard roll's causes are pinned in test_mortality_math; 2026-07-22)
@@ -112,7 +113,7 @@ def test_every_death_records_its_cause_and_the_memorial_tells_it():
     for _ in range(120):
         pan.anim()
         seen += pan.strip()
-    assert "of frailty" in seen                   # the epitaph tells it
+    assert "fragilidade" in seen or "of frailty" in seen   # the epitaph tells it
 
 
 def test_declining_the_etch_carries_the_bonus():
@@ -121,12 +122,12 @@ def test_declining_the_etch_carries_the_bonus():
     heir's seed and the default-banked memory is withdrawn."""
     from tuipet.ui.screens.deathscreen import DeathPanel
     new = {"name": "Gatomon", "num": 100, "vaccine": 50, "data": 30, "virus": 10, "seconds": 600.0}
-    persistence.bank_digimemory(new)                 # the app's etch default
+    persistence.bank_memory(new)                 # the app's etch default
     persistence.bank_bonus_seed(2)                   # ...and its spent-grade default
     p = _pet(dead=True)
     pan = DeathPanel(p, new_mem=new, old_mem=None, grade_kept=9, banked_new=True)
     pan.key("b")                                     # No: the bonus carries instead
-    assert persistence.peek_digimemory() is None     # the memory was withdrawn
+    assert persistence.peek_memory() is None     # the memory was withdrawn
     assert persistence.take_bonus_seed() == 9        # the kept grade replaced the spent one
     assert pan.new_mem is None and "R.I.P." in pan.strip()
 
@@ -137,17 +138,17 @@ def test_a_held_unused_payload_is_device_lifetime(monkeypatch):
     the heir never gets a second husk for one payload."""
     from tuipet import app as app_mod
     held = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 60.0}
-    persistence.bank_digimemory(held)
+    persistence.bank_memory(held)
     heir = Pet.new_egg(generation=3)
-    heir.inventory["digimemory"] = 1                 # the estate bag carried the husk
+    heir.inventory["memory"] = 1                 # the estate bag carried the husk
     app = app_mod.TuiPetApp.__new__(app_mod.TuiPetApp)
-    app._grant_digimemory(heir)
-    assert heir.digimemory == held
-    assert heir.inventory.get("digimemory") == 1     # one payload, ONE chip
+    app._grant_memory(heir)
+    assert heir.memory == held
+    assert heir.inventory.get("memory") == 1     # one payload, ONE chip
     fresh = Pet.new_egg(generation=1)                # no husk in the bag ->
-    persistence.bank_digimemory(held)
-    app._grant_digimemory(fresh)
-    assert fresh.inventory.get("digimemory") == 1    # ...the grant supplies it
+    persistence.bank_memory(held)
+    app._grant_memory(fresh)
+    assert fresh.inventory.get("memory") == 1    # ...the grant supplies it
 
 
 def test_the_heir_redeems_the_chip():
@@ -156,13 +157,13 @@ def test_the_heir_redeems_the_chip():
     etched Va/D/Vi, clears the payload and consumes the chip.  An OLD chip's
     "seconds" payload loads fine and is simply not applied (2026-07-22)."""
     p = _pet(vaccine=10, data_power=10, virus=10)
-    p.digimemory = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 120.0}
-    p.inventory["digimemory"] = 1
-    out = p.use_item("digimemory")
+    p.memory = {"name": "Elder", "num": 29, "vaccine": 5, "data": 3, "virus": 1, "seconds": 120.0}
+    p.inventory["memory"] = 1
+    out = p.use_item("memory")
     assert "Elder" in out
     assert (p.vaccine, p.data_power, p.virus) == (15, 13, 11)
-    assert p.digimemory == {}                        # spent, never re-banks at death
-    assert p.inventory.get("digimemory", 0) == 0     # the chip is consumed
+    assert p.memory == {}                        # spent, never re-banks at death
+    assert p.inventory.get("memory", 0) == 0     # the chip is consumed
 
 
 def test_a_silent_husk_is_kept_not_eaten():
@@ -170,27 +171,28 @@ def test_a_silent_husk_is_kept_not_eaten():
     law: a _Refused keeps the item ('consume on refusal' burned Rev.Floppies;
     clone audit 2026-07-15)."""
     p = _pet()
-    p.digimemory = {}
-    p.inventory["digimemory"] = 1
+    p.memory = {}
+    p.inventory["memory"] = 1
     from tuipet.core.petbase import _Refused
-    assert isinstance(p.use_item("digimemory"), _Refused)
-    assert p.inventory.get("digimemory") == 1
+    assert isinstance(p.use_item("memory"), _Refused)
+    assert p.inventory.get("memory") == 1
 
 
 def test_the_raw_icon_key_heals_to_the_named_chip():
     """Chips circulated under the raw 'i:32' icon key -- a key the bag could
     neither show nor use.  The bag heal maps them home (shop.LEGACY_KEYS)."""
-    healed = persistence._heal_bag({"i:32": 1})
-    assert healed.get("digimemory") == 1 and "i:32" not in healed
+    from tuipet.utils.persistence import serializer
+    healed = tuipet.utils.persistence.serializer._heal_bag({"i:32": 1})
+    assert healed.get("memory") == 1 and "i:32" not in healed
 
 
 def test_the_chip_renders_in_the_bag():
     """The bag shows only keys shop.entry() resolves -- the chip must be one
     of them (and stay OFF the shop shelf: price None is never sold)."""
     from tuipet.core import shop
-    e = shop.entry("digimemory")
-    assert e and e["category"] == "Evolve"  # Legacy dissolved 2026-07-27
-    assert all(row["key"] != "digimemory" for row in shop.catalog())
+    e = shop.entry("memory")
+    assert e and e["category"] in ("Evolve", "Evoluir")  # Legacy dissolved 2026-07-27
+    assert all(row["key"] != "memory" for row in shop.catalog())
 
 
 def test_a_death_noticed_at_relaunch_still_banks_the_inheritance():
@@ -198,8 +200,8 @@ def test_a_death_noticed_at_relaunch_still_banks_the_inheritance():
     banked ONLY in the dying-fx completion branch -- a quit/crash during the
     ~2s beat relaunched into a bare memorial that banked nothing.  The one
     ceremony now runs wherever the death is noticed, exactly once."""
-    from tuipet.utils import app as app_mod
-    persistence.take_digimemory()
+    from tuipet import app as app_mod
+    persistence.take_memory()
     persistence.take_bonus_seed()
     p = _pet(vaccine=500, data_power=300, virus=100, evol_bonus=10, dead=True)
     assert not p.death_banked
@@ -209,15 +211,16 @@ def test_a_death_noticed_at_relaunch_still_banks_the_inheritance():
     app._open_mode = lambda panel, cb=None: opened.append(panel)
     app._death_ceremony()
     assert p.death_banked and p.evol_bonus == 0
-    assert persistence.peek_digimemory()["name"] == "Gatomon"   # the etch banked
+    assert persistence.peek_memory()["name"] == "Gatomon"   # the etch banked
     assert opened and opened[0].new_mem is not None             # the FULL panel
-    seed = persistence._prog().get("bonus_seed")
+    from tuipet.utils.persistence import progress_io
+    seed = progress_io._prog().get("bonus_seed")
     assert seed is not None                                     # the seed banked
     # a second notice (any later care key) is the bare memorial -- no re-bank
     app._death_ceremony()
     assert opened[1].new_mem is None
-    assert persistence._prog().get("bonus_seed") == seed
-    persistence.take_digimemory()
+    assert progress_io._prog().get("bonus_seed") == seed
+    persistence.take_memory()
     persistence.take_bonus_seed()
 
 
@@ -235,7 +238,7 @@ def test_a_live_retire_banks_the_full_grade():
     offer -- the full adjusted bonus seeds the heir (this seed used to be
     silently lost).  Since the M11 fix (gameplay audit 2026-07-19) the bank
     rides _hatch_new, not the menu open."""
-    from tuipet.utils import app as app_mod
+    from tuipet import app as app_mod
     persistence.take_bonus_seed()                    # start the slot empty
     p = _pet(care_mistakes=0, mood=200, obedience=100, evol_bonus=3)
     assert not p.dead
@@ -243,7 +246,7 @@ def test_a_live_retire_banks_the_full_grade():
     app = app_mod.TuiPetApp.__new__(app_mod.TuiPetApp)
     app.pet = p
     app._do = lambda *a, **k: None
-    app._grant_digimemory = lambda pet: None
+    app._grant_memory = lambda pet: None
     app_mod.TuiPetApp._hatch_new(app, 0, p.generation + 1)
     assert persistence.take_bonus_seed() == grade
 
@@ -253,7 +256,7 @@ def test_a_cancelled_retire_leaves_no_headstone():
     generation BEFORE the egg carousel -- every N->ESC appended a duplicate
     headstone for the same life and recorded a still-LIVE pet as last_gen.
     The generational commit rides the actual pick now."""
-    from tuipet.core import app as app_mod
+    from tuipet import app as app_mod
     p = _pet(evol_bonus=3)
     app = app_mod.TuiPetApp.__new__(app_mod.TuiPetApp)
     app.pet = p

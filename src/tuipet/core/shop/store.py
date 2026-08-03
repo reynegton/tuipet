@@ -40,6 +40,9 @@ def _today_ordinal(today=None):
     return d.toordinal()
 
 
+from functools import lru_cache
+
+@lru_cache()
 def _town_maps():
     """town_id -> the MAP whose zone hosts the town (the road's own
     geography; item diversity audit 2026-07-23)."""
@@ -61,6 +64,7 @@ def _econ_stub(key):
             "consumable_id": -1}
 
 
+@lru_cache()
 def _base_rows(town_id):
     """The town's authored shelf + its map's regional specialty:
     [(sid, catalog_key, econ_row, local_price)] in list order (items shelf
@@ -107,6 +111,7 @@ def _base_rows(town_id):
     return rows
 
 
+@lru_cache()
 def _guest_deal():
     """town_id -> its standing guest good, dealt WITHOUT replacement
     across ALL towns (item diversity audit 2026-07-23: the old per-town
@@ -165,7 +170,7 @@ def _town_rows(town_id):
 
     These rows are the shelf's IDENTITY, gate or no gate.  What a tamer
     may actually buy today is `_open_rows`."""
-    rows = _base_rows(town_id)
+    rows = list(_base_rows(town_id))
     gk = _guest_deal().get(town_id)
     if gk:
         rows.append((f"guest:{town_id}", gk, _econ_stub(gk),

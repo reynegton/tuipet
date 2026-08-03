@@ -111,7 +111,7 @@ def test_becoming_an_x_form_makes_the_state_permanent():
     p.world_seconds = 600.0
     assert p.x_antibody == "None"
     p.evolve_to(natural)
-    assert p.x_antibody == "Permanent"            # Evolution.digivolve's grant
+    assert p.x_antibody == "Permanente"            # Evolution.digivolve's grant
 
 
 def test_stat_gates_left_with_the_dvpet_truth(monkeypatch, pet):

@@ -1,4 +1,5 @@
 import math
+import math
 import tuipet.data.loaders.data as data
 import tuipet.core.egg as egg_mod
 from tuipet.i18n.translator import t
@@ -34,7 +35,7 @@ def town_egg_stock(town_id, count=EGG_STOCK_PER_TOWN):
     # the moment the width divided the pool (egg audit 2026-07-25: cutting
     # the 5 lineage eggs left a 36-egg pool, and 26 towns fell into 6 bands)
     stride = count
-    while len(pool) > 1 and _gcd(stride, len(pool)) != 1:
+    while len(pool) > 1 and math.gcd(stride, len(pool)) != 1:
         stride += 1
     start = (int(town_id) * stride) % len(pool)
     return [pool[(start + i) % len(pool)] for i in range(count)]

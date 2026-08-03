@@ -12,6 +12,7 @@ import asyncio
 import json
 
 import websockets
+from tuipet.i18n.translator import t
 
 CHAT_CAP = 200
 ANNOUNCE = "📢"          # the dev's speaker: never a peer, never blockable
@@ -228,7 +229,9 @@ class SyncClient(_WsClient):
         elif t == "error":
             # e.g. "Lobby is full." -- silently ignoring it meant an unending
             # blind reconnect loop (audit 2026-07-18); the app warns once
-            self.last_error = m.get("msg") or ""
+            code = m.get("code")
+            msg = m.get("msg") or ""
+            self.last_error = t(code, msg) if code else msg
 
 
 class LobbyClient(_WsClient):
@@ -413,10 +416,14 @@ class LobbyClient(_WsClient):
                 # the player to the login screen
                 pass
             else:
-                s.login_failed = msg
+                code = m.get("code")
+                msg = m.get("msg") or ""
+                s.login_failed = t(code, msg) if code else msg
                 self._stop = True
         elif t == "error":
-            s.error = m.get("msg")
+            code = m.get("code")
+            msg = m.get("msg") or ""
+            s.error = t(code, msg) if code else msg
 
     def _replayed(self, m, nm):
         """True for a server-marked backlog `replay` line the pane already

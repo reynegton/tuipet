@@ -31,7 +31,7 @@ def test_every_screen_strip_fits_and_speaks():
     from tuipet.ui.screens.optionsscreen import KeysPanel
     from tuipet.ui.screens.feedscreen import FeedPanel
     from tuipet.ui.screens.assistscreen import AssistPanel
-    from tuipet.themescreen import ThemePanel
+    from tuipet.ui.screens.themescreen import ThemePanel
     from tuipet.ui.screens.bugscreen import BugReportPanel
     from tuipet.ui.screens.helpscreen import HelpPanel
     from tuipet.ui.screens.dnascreen import DNAPanel
@@ -66,7 +66,7 @@ def test_the_remaining_screens_strips_fit_too():
     """The 8 panels the sweep above missed (tidy sweep 2026-07-18) — every
     strip in the app now holds the 40-col never-marquee budget."""
     from tuipet.core.training import TrainingPanel
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
     from tuipet.ui.screens.eggguidescreen import EggGuidePanel
     from tuipet.ui.screens.backgroundscreen import BackgroundPanel
     from tuipet.ui.screens.raidscreen import RaidPanel
@@ -76,7 +76,7 @@ def test_the_remaining_screens_strips_fit_too():
 
     p = _pet()
     assert "strike" in _ok(TrainingPanel(p).strip(), "training")
-    assert "gaze" in _ok(DigiCorePanel(p).strip(), "digicore")
+    assert "gaze" in _ok(datacorePanel(p).strip(), "digicore")
     guide = EggGuidePanel(p)
     assert "browse" in _ok(guide.strip(), "eggguide:list")
     guide.detail = True
@@ -97,7 +97,7 @@ def test_the_egg_tease_rides_the_strip_whole():
     2026-07-19) -- the strip's OWN hud marquee carries over-wide lines,
     so the widest eggUnlock desc still reads through whole (the 0.5.63
     law: the tease never clips)."""
-    from tuipet.ui.screens import data
+    from tuipet.data.loaders import data
     from tuipet.ui.screens.eggselectscreen import EggSelectPanel, TEASE_BEAT
     descs = [r["desc"] for r in data.load_egg_unlock().values() if r.get("desc")]
     worst = max(descs, key=len)

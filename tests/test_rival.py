@@ -111,7 +111,7 @@ def test_the_ledger_rides_the_save():
 # ---- the surfacing -----------------------------------------------------------
 
 def test_the_person_page_speaks_the_score():
-    from tuipet.core import digicore
+    from tuipet.core import datacore as digicore
     p = _pet()
     rival.ensure(p)
     p.rival_wins, p.rival_losses = 3, 2

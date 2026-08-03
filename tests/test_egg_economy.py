@@ -119,12 +119,12 @@ def test_no_user_facing_name_leaks_html_tags():
     loader must strip them (2026-07-04: the food loader showed the tag raw in
     the shop; the shared consumable parser already stripped it)."""
     import tuipet.data.loaders.data as data
-    for f in d.load_foods():
+    for f in data.load_foods():
         assert "<br>" not in f["name"] + str(f.get("desc", "")), f["name"]
-    for key in list(getattr(d, "_consumables", lambda: {})() or {}) or []:
+    for key in list(getattr(data, "_consumables", lambda: {})() or {}) or []:
         pass  # items ride the shared parser, verified below via a sample
     for k in ("i:14", "i:32", "i:80", "f:20", "f:21", "f:33"):
-        e = d.consumable_by_key(k)
+        e = data.consumable_by_key(k)
         if e:
             assert "<br>" not in e.get("name", "") + e.get("desc", ""), k
 
@@ -195,7 +195,7 @@ def test_carousel_polish_scene_mystery_and_new_badge():
     pan = _panel()
     # scene: the browsed egg's own backdrop, not a flat void
     idx0 = pan.carousel[0]
-    want = _d.load_backgrounds()[backgrounds.scene_for_egg(idx0)][0]
+    want = data.load_backgrounds()[backgrounds.scene_for_egg(idx0)][0]
     assert pan._scene_bg(idx0) == want
     # ★new on a fresh profile; gone once the species is raised
     note = pan._note(idx0)
@@ -225,7 +225,7 @@ def test_the_guide_sentinel_never_reaches_new_egg():
     app._hatch_new("guide", gen=5)
     assert opened == ["EggGuidePanel"]            # the guide opens, nothing hatches
     app._hatch_new(None, gen=5)
-    assert opened[-1] == ("msg", "Kept your current partner.")
+    assert opened[-1] == ("msg", "Manteve seu parceiro atual.")
 
 
 def test_the_carousel_is_pure_scene_with_neighbour_peeks():

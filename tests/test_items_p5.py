@@ -1,3 +1,4 @@
+import tuipet.utils.persistence.serializer
 """THE EFFECT PASS — items refactor P5 (2026-07-23).
 
 Three rulings land here:
@@ -186,7 +187,7 @@ def test_a_held_bandage_is_healed_out_of_an_old_bag():
     expansion's one-hour revival): a bandage bought in ANY brief shelf
     era must not linger as an unusable row."""
     from tuipet.utils import persistence
-    healed = persistence._heal_bag({"bandage": 2, "fish": 1,
+    healed = tuipet.utils.persistence.serializer._heal_bag({"bandage": 2, "fish": 1,
                                     "i:80": 3, "i:82": 1})
     assert healed == {"fish": 1}
 

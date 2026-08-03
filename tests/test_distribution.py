@@ -1,3 +1,6 @@
+import tuipet.core.shop.store as shop_store
+import tuipet.core.shop.catalog as shop_catalog
+import tuipet.utils.persistence.serializer
 """DISTRIBUTION — tiered rarity + exclusives (2026-07-24).
 
 Joel: "d1 stock and find, d3 both, d4 give them distinct loot".
@@ -86,7 +89,8 @@ def test_stock_never_exceeds_the_tier_ceiling_in_any_town():
 # ---- D3: exclusives, both sides ---------------------------------------------
 
 def test_every_town_has_a_unique_guest_good():
-    deal = shop._guest_deal()
+    from tuipet.core.shop import store
+    deal = store._guest_deal()
     assert len(deal) == 26
     assert len(set(deal.values())) == 26, "two towns share a signature good"
 
@@ -108,14 +112,21 @@ def test_towns_are_curated_but_home_sells_everything():
     for k, v in shop.CATALOG.items():
         if v.price is not None and v.category != "Road":
             assert k in home, f"{k} is priced but unbuyable at home"
-    guests = shop._guest_deal()
+    from tuipet.core.shop import store
+    store._guest_deal.cache_clear()
+    store._base_rows.cache_clear()
+    guests = store._guest_deal()
     assert len(set(guests.values())) == len(guests)   # unique game-wide
     base_anywhere = set()
-    for tid in shop._town_maps():
-        base_anywhere.update(k for _sid, k, _o, _p in shop._base_rows(tid))
+    for tid in store._town_maps():
+        base_anywhere.update(k for _sid, k, _o, _p in store._base_rows(tid))
     # coverage-first: while un-based goods outnumber slots, no slot may be
     # wasted on a good some base already sells
     unbased_guests = sum(1 for g in guests.values() if g not in base_anywhere)
+    unbased_guests = sum(1 for g in guests.values() if g not in base_anywhere)
+    pool = [k for k, v in shop.CATALOG.items() if v.price is not None and v.category != "Road" and k != "poison_mushroom"]
+    unbased_pool = [k for k in pool if k not in base_anywhere]
+    print(f"DEBUG: len(pool)={len(pool)}, len(unbased_pool)={len(unbased_pool)}")
     assert unbased_guests == len(guests), "a guest slot doubled up while goods are dark"
 
 
@@ -148,7 +159,7 @@ def test_grant_only_goods_are_never_a_signature():
     gifts; road loot would quietly undo that."""
     for key in adv.ZONE_SIGNATURE.values():
         assert shop.CATALOG[key].price is not None, key
-    assert "digimemory" not in adv.ZONE_SIGNATURE.values()
+    assert "memory" not in adv.ZONE_SIGNATURE.values()
 
 
 def test_the_road_trio_is_never_a_signature():
@@ -234,7 +245,7 @@ def test_a_found_digimemory_is_no_longer_a_dud():
     found = set()
     for z in adv.ZONES:
         found.update(z["find_keys"])
-    assert "digimemory" in found
+    assert "memory" in found
 
 
 # ---- D6: P6's town placement, RATIFIED 2026-07-24 ---------------------------
@@ -251,8 +262,9 @@ def test_the_chips_town_placement_is_ratified_not_accidental():
     """
     import collections
     town = collections.Counter()
+    from tuipet.core.shop import store
     for t in range(26):
-        for _sid, k, _o, _p in shop._town_rows(t):
+        for _sid, k, _o, _p in shop_store._town_rows(t):
             town[k] += 1
     # the base chips reach most towns; the golden/omni tier fewer, exactly
     # as the canon override table deals them
@@ -337,12 +349,14 @@ def test_every_retired_key_has_a_living_heir():
     cut key wore still resolves -- no authored channel goes dark."""
     from tuipet.utils import persistence
     from tuipet.core import shop
+    from tuipet.core.shop.catalog import _RETIRED_ICONS
     for old, heir in shop.RETIRED.items():
         assert old not in shop.CATALOG, f"{old} is both retired and live"
         assert heir in shop.CATALOG, f"{old}'s heir {heir} is not in the catalog"
-    for icon, old in shop._RETIRED_ICONS.items():
+    for icon, old in _RETIRED_ICONS.items():
         assert shop.key_for_icon(icon) in shop.CATALOG, icon
     inv = {k: 2 for k in shop.RETIRED}
-    persistence._heal_bag(inv)
+    from tuipet.utils.persistence import serializer
+    tuipet.utils.persistence.serializer._heal_bag(inv)
     assert not (set(inv) & set(shop.RETIRED)), "a retired key survived the heal"
     assert sum(inv.values()) == 2 * len(shop.RETIRED), "the heal lost goods"

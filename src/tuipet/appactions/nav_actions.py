@@ -5,8 +5,10 @@ import tuipet.ui.screens.backgroundscreen as backgroundscreen
 import tuipet.ui.screens.battlescreen as battlescreen
 import tuipet.ui.screens.dnascreen as dnascreen
 import tuipet.ui.screens.lobbyscreen as lobbyscreen
+import tuipet.core.rival as rival
 import tuipet.ui.screens.shopscreen as shopscreen
 import tuipet.ui.screens.tournamentscreen as tournamentscreen
+import tuipet.core.tournament as tournament
 
 import tuipet.data.loaders.data as data
 import tuipet.utils.persistence as persistence
@@ -14,6 +16,26 @@ from tuipet.i18n.translator import t
 from tuipet.core.pet import Pet
 import tuipet.ui.screens.lobbyscreen as lobbyscreen
 class NavActionsMixin:
+    def action_inventory(self):
+            self._open_mode(shopscreen.ShopPanel(self.pet, start_mode="bag"), self._after_shop)
+
+    def action_eggguide(self):
+            import tuipet.ui.screens.eggguidescreen as eggguidescreen
+            self._open_mode(eggguidescreen.EggGuidePanel(self.pet), lambda _=None: self.repaint())
+
+    def action_datacore(self):
+            import tuipet.ui.screens.datacorescreen as datacorescreen
+            self._open_mode(datacorescreen.datacorePanel(self.pet), self._after_datacore)
+
+    def _after_datacore(self, msg):
+            import tuipet.ui.screens.datacorescreen as datacorescreen
+            import tuipet.ui.screens.albumscreen as albumscreen
+            if isinstance(msg, tuple) and msg and msg[0] == "hall":
+                self._open_mode(albumscreen.AlbumPanel(self.pet),
+                                lambda _=None: self._open_mode(
+                                    datacorescreen.datacorePanel(self.pet, start="TROPHIES"),
+                                    self._after_datacore))
+
     def _after_title(self, _=None):
             # The account wall used to stand HERE: name + password demanded on
             # first launch, before the player had seen a single pet (sweep
@@ -39,6 +61,7 @@ class NavActionsMixin:
             # card rides the ordinary Battle engine — same bracket, ideal
             # condition, no purse — only the NAME changes.  A rival bout wears
             # the arena backdrop (enemy != None flips it; presentation only).
+            import tuipet.core.rival as rival
             foe = rival.maybe_challenge(self.pet)
             if foe is not None:
                 self.flash(f"[b]{foe['tamer']}[/] te desafia — "
@@ -157,3 +180,51 @@ class NavActionsMixin:
             self.autosave()
             self.repaint()
 
+
+    def action_raid(self):
+        import tuipet.ui.screens.raidscreen as raidscreen
+        reason = self.pet.can_adventure()
+        if reason:
+            self._do(reason); return
+        self._open_mode(raidscreen.RaidPanel(self.pet, self._sync), self._after_raid)
+
+    def _after_raid(self, msg):
+        if self.pet:
+            self.pet.away = False
+            self.pet.away_where = ""
+        if self._lobby_worker:
+            self._lobby_worker.cancel()
+            self._lobby_worker = None
+        if getattr(self, "_sync", None):
+            self._sync.lobby_disconnect()
+        self.autosave()
+
+    def action_lobby(self):
+        import tuipet.ui.screens.lobbyscreen as lobbyscreen
+        from tuipet.network.net import LobbyClient
+        if not self._sync:
+            self.flash("Lobby indisponível")
+            return
+        reason = self.pet.can_adventure()
+        if reason and "jovem" not in reason.lower() and "ovo" not in reason.lower():
+            self._do(reason); return
+        self.pet.away = True
+        self.pet.away_where = "no lobby"
+        host = lobbyscreen.LobbyPanel(self.pet, LobbyClient)
+        self._open_mode(host, self._after_lobby)
+
+    def _after_lobby(self, msg):
+        if self.pet:
+            self.pet.away = False
+            self.pet.away_where = ""
+        if self._lobby_worker:
+            self._lobby_worker.cancel()
+            self._lobby_worker = None
+        if getattr(self, "_sync", None):
+            self._sync.lobby_disconnect()
+        self.autosave()
+
+    def _after_zone_pick(self, zone):
+        if zone:
+            import tuipet.ui.screens.adventurescreen as adventurescreen
+            self._open_mode(adventurescreen.AdventurePanel(self.pet, zone), self._after_adventure)

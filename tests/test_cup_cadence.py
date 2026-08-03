@@ -109,7 +109,7 @@ def test_festival_opens_every_slot_once(on_date):
     assert tournament.eligibility_at(p, tr, slot) is None       # festival: open
     tournament.Tournament(p, tr, slot=slot)
     assert slot in p.fought_hours
-    assert "run" in tournament.eligibility_at(p, tr, slot)      # once, ever
+    assert "terminou" in tournament.eligibility_at(p, tr, slot)      # once, ever
 
 
 def test_ordinary_day_still_locks_to_the_hour(on_date):
@@ -163,11 +163,11 @@ def test_a_drained_pet_is_refused_at_every_cup_door(on_date):
     on_date(WED)
     p = _pet(energy=5)                            # under the 10 gate
     t = tournament.featured_now(p)
-    assert "drained" in tournament.eligibility_featured(p, t)
+    assert "energia" in tournament.eligibility_featured(p, t)
     on_date(ODAIBA)                               # festival: every slot open
     sched = tournament.schedule(p)
     slot = next(i for i, tid in enumerate(sched)
                 if tid >= 0
                 and tournament._eligibility_rest(p, tournament.trophy_by_id(tid)) is None)
     tr = tournament.trophy_by_id(sched[slot])
-    assert "drained" in tournament.eligibility_at(p, tr, slot)
+    assert "energia" in tournament.eligibility_at(p, tr, slot)

@@ -19,7 +19,7 @@ def test_the_menu_is_meat_or_pill():
 def test_meat_fills_a_heart_and_weighs():
     p = _pet(hunger=1, weight=20)
     msg = p.feed_meat()
-    assert p.hunger == 2 and p.weight == 21 and "Meat" in msg
+    assert p.hunger == 2 and p.weight == 21 and "carne" in msg
 
 
 def test_meat_refused_at_a_full_belly_counts_the_overeat():
@@ -32,7 +32,7 @@ def test_meat_refused_at_a_full_belly_counts_the_overeat():
     p = _pet(hunger=FULL_HUNGER, weight=20)
     of0, cm0 = p.overeat, p.care_mistakes
     msg = p.feed_meat()
-    assert "full" in msg and p.overeat == of0 + 1     # the OF gate still reads it
+    assert "cheio" in msg and p.overeat == of0 + 1     # the OF gate still reads it
     assert p.weight == 21                             # ...and it costs
     assert p.care_mistakes == cm0 + 1
     assert p.hunger == FULL_HUNGER
@@ -93,7 +93,7 @@ def test_the_pill_is_eaten_through_its_own_menu_glyph():
     the DVPet f:41 capsule that never matched the picker (Joel: "those are not
     the same sprites").  Pin the whole road: panel verdict -> eat anim -> the
     sym:pill key -> the PILL/HALF_PILL strip -> the heal fx kind stays gone."""
-    from tuipet.app import Screen
+    from tuipet.core.arena import Screen
     from tuipet.utils.arenafx import FxMixin
     from tuipet.ui.screens.feedscreen import FeedPanel, PILL, HALF_PILL, PILL_FRAMES
     from tuipet.core.pet import Pet
@@ -132,19 +132,19 @@ def test_the_source_refusal_gates_hold():
     refuses starving/sick/filthy; the fight refuses starving/drained/sick/
     filthy.  Every refusal wears the head-shake pose."""
     p = _pet(hunger=1, sick=True)
-    assert "sick" in p.feed_meat().lower() and p.anim == "refuse"
+    assert "doente" in p.feed_meat().lower() and p.anim == "refuse"
     p = _pet(hunger=1)
     p.poop, p.poop_sizes = 2, [1, 2]
-    assert "clean" in p.feed_meat().lower()
-    assert "clean" in p.feed_pill().lower()
-    assert "clean" in p.can_train().lower()
-    assert "clean" in p.can_battle().lower()
+    assert "limp" in p.feed_meat().lower()
+    assert "limp" in p.feed_pill().lower()
+    assert "limp" in p.can_train().lower()
+    assert "limp" in p.can_battle().lower()
     p = _pet(hunger=0)
-    assert "hungry" in p.can_train().lower()
-    assert "hungry" in p.can_battle().lower()
+    assert "fome" in p.can_train().lower()
+    assert "fome" in p.can_battle().lower()
     p = _pet(sick=True)
-    assert "sick" in p.can_train().lower()
-    assert "sick" in p.can_battle().lower()
+    assert "doente" in p.can_train().lower()
+    assert "doente" in p.can_battle().lower()
 
 
 def test_the_feed_card_discloses_weight_on_both_rows():

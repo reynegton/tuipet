@@ -29,9 +29,9 @@ def test_evolve_msg_names_a_double_first():
     app = TuiPetApp.__new__(TuiPetApp)                 # no Textual mount needed
     app.pet = Pet(num=100, name="Greymon", stage="Champion")
     msg = app._evolve_msg(37)
-    assert "evolved into" in msg
-    assert "your first Champion ever" in msg           # fresh progress: max_stage 0
-    assert "NEW species for the album" in msg
+    assert "evoluiu para" in msg
+    assert "seu primeiro Champion da história" in msg           # fresh progress: max_stage 0
+    assert "uma espécie NOVA para o álbum" in msg
 
 
 def test_evolve_msg_stays_plain_once_seen():

@@ -91,7 +91,7 @@ def test_roll_causes_read_the_dominant_reason(monkeypatch):
     assert old.dead and old.death_cause == "old age"
     slob = _pet(care_mistakes=8)
     slob._tick_mortality(1.0)
-    assert slob.dead and slob.death_cause == "neglect"
+    assert slob.dead and slob.death_cause == "negligence"
     ill = _pet(sick=True)
     ill._tick_mortality(1.0)
     assert ill.dead and ill.death_cause == "sickness"
@@ -101,10 +101,10 @@ def test_the_discrete_nets_still_stand():
     """20 mistakes and Pen20 frailty (LINES_SPEC §5) are contract, not clock
     -- they survived the lifespan removal."""
     p = _pet(care_mistakes=20)
-    assert p._tick_mortality(1.0) is True and p.death_cause == "neglect"
+    assert p._tick_mortality(1.0) is True and p.death_cause == "negligência"
     q = _pet(stage="Mega", care_mistakes=5)
     q.stage_seconds = q.LATE_STAGE_WINDOW
-    assert q._tick_mortality(1.0) is True and q.death_cause == "frailty"
+    assert q._tick_mortality(1.0) is True and q.death_cause == "fragilidade"
 
 
 def test_the_elder_line_is_age_alone():

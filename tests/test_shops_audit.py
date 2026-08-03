@@ -1,3 +1,5 @@
+import tuipet.core.shop.store as shop_store
+import tuipet.core.shop.catalog as shop_catalog
 """THE SHOPS AUDIT — the pins (2026-07-25).
 
 Joel: "lets do a full blown shops audit next."
@@ -270,8 +272,8 @@ def test_the_adventure_gate_opens_exactly_on_its_threshold(monkeypatch, maps,
 
 def test_a_sealed_digimental_reaches_no_shelf(monkeypatch):
     monkeypatch.setattr(persistence, "get_progress", lambda: dict(BLANK))
-    sealed = {k for k in shop.DIGIMENTAL_GATES
-              if not shop.digimental_open(k, BLANK)}
+    sealed = {k for k in shop.RELIC_GATES
+              if not shop.relic_open(k, BLANK)}
     assert sealed
     assert not sealed & {e["key"] for e in shop.catalog()}
     # ...but the bag can still render one you already own

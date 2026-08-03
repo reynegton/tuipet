@@ -108,7 +108,7 @@ def test_the_belt_catches_a_future_gate_slip(monkeypatch):
 
     def boom(_d):
         raise RuntimeError("a future migration bug")
-    monkeypatch.setattr(persistence, "pet_from_save", boom)
+    monkeypatch.setattr("tuipet.utils.persistence.save_io.pet_from_save", boom)
     pet, msg = persistence.load()
     assert pet is None and "couldn't be read" in msg
 
@@ -145,7 +145,7 @@ def test_the_filth_roll_scales_with_the_pile_count(monkeypatch):
     """One pile rolls at a third of the flat rate; three piles match it.
     (On the old code one pile already rolled the full 0.015 -- this pin
     fails there.)"""
-    monkeypatch.setattr("tuipet.petbody.random.random", lambda: 0.010)
+    monkeypatch.setattr("tuipet.core.petbody.random.random", lambda: 0.010)
     lone = _filth_pet(piles=1)
     lone._filth_effects(1.0)
     assert not lone.sick, "one pile rolled the flat 0.015 rate"
@@ -157,7 +157,7 @@ def test_the_filth_roll_scales_with_the_pile_count(monkeypatch):
 def test_the_filth_roll_reads_the_species_multiplier(monkeypatch):
     """The 232 species' PoopSickChanceBoundMultiplier is finally read: a
     resistant (mult 2.0) species shrugs at half the rate."""
-    monkeypatch.setattr("tuipet.petbody.random.random", lambda: 0.0075)
+    monkeypatch.setattr("tuipet.core.petbody.random.random", lambda: 0.0075)
     normal = _filth_pet(num=29, piles=2)          # mult 1.0 -> p 0.010
     normal._filth_effects(1.0)
     assert normal.sick
@@ -168,7 +168,7 @@ def test_the_filth_roll_reads_the_species_multiplier(monkeypatch):
 
 def test_the_road_still_shields_the_home_mess(monkeypatch):
     """countFilth reads 0 away -- the canon shield survives the rewire."""
-    monkeypatch.setattr("tuipet.petbody.random.random", lambda: 0.0)
+    monkeypatch.setattr("tuipet.core.petbody.random.random", lambda: 0.0)
     p = _filth_pet(piles=4)
     p.away = True
     for _ in range(100):
@@ -178,7 +178,7 @@ def test_the_road_still_shields_the_home_mess(monkeypatch):
 
 def test_the_overweight_roll_still_lives_in_mortality(monkeypatch):
     """Only the FILTH half moved: the overweight sickness stays."""
-    monkeypatch.setattr("tuipet.petbody.random.random", lambda: 0.0)
+    monkeypatch.setattr("tuipet.core.petbody.random.random", lambda: 0.0)
     p = _filth_pet(piles=0)
     p.weight = p._base_weight() * 2
     p._tick_mortality(1.0)
@@ -206,7 +206,7 @@ def _cup_pet(hour=10):
 
 
 def test_the_town_cup_honors_the_shared_cup_hour():
-    import tuipet.townscreen as ts
+    import tuipet.ui.screens.townscreen as ts
     p = _cup_pet()
     t1 = ts.TownPanel(p, town_id=0)
     t1._start_cup()
@@ -225,7 +225,7 @@ def test_a_town_cup_entry_spends_the_home_boards_hour_too():
     """The other direction of the same slot, now symmetric: burned AND
     checked on both boards."""
     from tuipet.core import tournament
-    import tuipet.townscreen as ts
+    import tuipet.ui.screens.townscreen as ts
     p = _cup_pet()
     t1 = ts.TownPanel(p, town_id=0)
     t1._start_cup()

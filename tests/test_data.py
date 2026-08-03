@@ -12,9 +12,9 @@ from tuipet.core import egg
 # strict-DSprite items, 2026-07-17)
 
 
-def test_digicore_icons_load():
-    icons = data.load_digicore_icons()
-    assert isinstance(icons, dict) and icons, "digicoreMenuConfig.csv produced no badges"
+def test_datacore_icons_load():
+    icons = data.load_datacore_icons()
+    assert isinstance(icons, dict) and icons, "datacoreMenuConfig.csv produced no badges"
     assert set(icons.values()) <= {"Burst", "Twelve", "Two", "Dark"}
     assert all(isinstance(k, int) for k in icons)
 

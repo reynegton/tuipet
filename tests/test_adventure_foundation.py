@@ -16,7 +16,7 @@ def _champ():
 def test_the_adventure_action_is_wired_into_the_explore_group():
     from tuipet.app import TuiPetApp
     keys = {b[0]: (b[1], b[2]) for b in TuiPetApp.BINDINGS}
-    assert keys["a"] == ("adventure", "Adventure")     # the historic key, free again
+    assert keys["a"] == ("adventure", "Aventura")     # the historic key, free again
     # sits in EXPLORE, ahead of Raid (flagship PvE feature leads the group)
     order = [b[1] for b in TuiPetApp.BINDINGS]
     assert order.index("adventure") < order.index("tournament")

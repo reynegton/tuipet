@@ -104,18 +104,18 @@ def test_a_perfectly_kept_pet_finally_reads_happy():
     condition tier 3 with nothing else wrong, the bright-walk-pose bar."""
     kept = _pet()                       # defaults: full hunger/effort/energy
     assert kept.status_word() == "ok" and kept.condition() == 3
-    assert kept.current_mood() == "Happy"
+    assert kept.current_mood() == "Feliz"
     tired = _pet(energy=0)
-    assert tired.current_mood() == "Neutral"     # tier drops, no free Happy
+    assert tired.current_mood() == "Neutro"     # tier drops, no free Happy
     sick = _pet(sick=True)
-    assert sick.current_mood() == "Unhappy"      # unwell still trumps gauges
+    assert sick.current_mood() == "Triste"      # unwell still trumps gauges
 
 
 def test_the_happy_leg_pays_the_grade():
     base = _pet(age_seconds=_pet()._growth_period(), energy=0)   # Neutral
     kept = _pet(age_seconds=base.age_seconds)                    # Happy
-    if kept.current_mood() == "Happy":           # geriatric ages read elderly
+    if kept.current_mood() == "Feliz":           # geriatric ages read elderly
         assert kept.final_care_grade() == base.final_care_grade() + 1
     else:
         young = _pet()
-        assert young.current_mood() == "Happy"
+        assert young.current_mood() == "Feliz"

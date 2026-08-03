@@ -65,7 +65,7 @@ def test_new_egg_confirm_esc_keeps_the_pet():
     _to(pan, "new")
     pan.key("enter")
     assert pan.key("escape") is None
-    assert not pan.confirm_new and "kept Agumon" in pan.msg
+    assert not pan.confirm_new and "mantido" in pan.msg
 
 
 def test_dead_pet_and_egg_hand_off_without_ceremony():
@@ -91,5 +91,6 @@ def test_egg_picker_offers_the_guide():
 
 def test_fresh_egg_flash_points_at_help():
     import inspect
-    src = inspect.getsource(TuiPetApp._after_egg_pick)
-    assert "? = help" in src                       # the one-time nudge on a new egg
+    from tuipet.app import TuiPetApp
+    src = inspect.getsource(TuiPetApp._hatch_new)
+    assert "? = ajuda" in src                       # the one-time nudge on a new egg

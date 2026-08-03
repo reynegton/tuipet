@@ -30,12 +30,13 @@ def test_the_later_waves_ride_wins_raids_and_generation():
     persistence.raid_add(); persistence.raid_add()
     assert "egg_of_miracles" in _shelf_keys()
     assert "egg_of_destiny" not in _shelf_keys()
-    persistence._note_max("max_gen", 5)
+    from tuipet.utils.persistence import progress_io
+    progress_io._note_max("max_gen", 5)
     assert "egg_of_destiny" in _shelf_keys()
 
 
 def test_every_wave_key_is_a_real_crest():
-    assert set(shop.DIGIMENTAL_GATES) == set(Pet._CREST_IDS)
+    assert set(shop.RELIC_GATES) == set(Pet._CREST_IDS)
 
 
 def test_a_sealed_digimental_still_renders_in_the_bag():

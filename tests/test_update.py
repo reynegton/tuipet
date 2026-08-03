@@ -69,7 +69,7 @@ def test_worker_sets_hud_message_when_newer(monkeypatch):
     s._update_msg = None
     asyncio.run(s._check_update())
     assert s._update_msg and "0.9.9" in s._update_msg
-    assert "restart" in s._update_msg             # Python imported the old code
+    assert "reinicie" in s._update_msg             # Python imported the old code
 
 
 def test_worker_stays_silent_when_current(monkeypatch):

@@ -362,7 +362,7 @@ def test_dead_ends_are_annotated():
     import csv
     import os
     notes = {}
-    path = os.path.join(os.path.dirname(lines.__file__), "data", "lines.csv")
+    path = os.path.join(lines._DATA, "lines.csv")
     with open(path, newline="") as fh:
         for r in csv.DictReader(fh):
             notes.setdefault((r["LineID"], int(r["DexNum"])), []).append(r["Notes"])
@@ -383,7 +383,7 @@ def test_no_onward_edge_claims_are_truthful():
     import csv
     import os
     evo = data.load_evolutions()
-    path = os.path.join(os.path.dirname(lines.__file__), "data", "lines.csv")
+    path = os.path.join(lines._DATA, "lines.csv")
     with open(path, newline="") as fh:
         for r in csv.DictReader(fh):
             if "no onward corpus edge" in r["Notes"]:

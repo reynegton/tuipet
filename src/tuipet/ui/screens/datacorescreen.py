@@ -314,10 +314,10 @@ class datacorePanel:
             # it's the charge overriding the chart (gameplay audit B3)
             tag = (chr(0x2713) + t("datacore_armed", " armed") if num == div
                    else chr(0x2713) + t("datacore_ready", " ready") if ready else t("datacore_to_go", "{unmet} to go").format(unmet=unmet))
-            t = Text()
-            t.append(("▸" if cur else " ") + f" {name[:20]:<21}", style=INK_B if cur else INK)
-            t.append(f"{tag:>10}\n", style=INK_B if ready else DIM)
-            return t
+            tx = Text()
+            tx.append(("▸" if cur else " ") + f" {name[:20]:<21}", style=INK_B if cur else INK)
+            tx.append(f"{tag:>10}\n", style=INK_B if ready else DIM)
+            return tx
 
         self.evo_sel = menu.list_window(out, rows, self.evo_sel, 8, fmt)
         out.append_text(menu.note(t("datacore_hint_what_it_takes", "ENTER: what it takes")))

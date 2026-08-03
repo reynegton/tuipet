@@ -1,3 +1,4 @@
+import glob
 """Theme propagation across screens (Workstream C).
 
 theme.apply() pushes the active palette into every module that imported colour
@@ -22,12 +23,10 @@ _COLOR_NAMES = set(theme._NAMES)
 def _modules_binding_theme_names():
     here = os.path.dirname(importlib.import_module("tuipet").__file__)
     out = {}
-    for fn in sorted(os.listdir(here)):
-        if not fn.endswith(".py"):
-            continue
-        mod = fn[:-3]
-        s = open(os.path.join(here, fn)).read()
-        for m in re.finditer(r"from \.theme import ([^\n]+(?:\n[^\n)]+)*)", s):
+    for fpath in glob.glob(os.path.join(here, "**", "*.py"), recursive=True):
+        mod = os.path.relpath(fpath, here)[:-3].replace(os.path.sep, ".")
+        s = open(fpath).read()
+        for m in re.finditer(r"from [.\w]+theme import ([^\n]+(?:\n[^\n)]+)*)", s):
             names = {x.strip() for x in re.split(r"[,\s()]+", m.group(1)) if x.strip()}
             hit = names & _COLOR_NAMES
             if hit:
@@ -116,7 +115,7 @@ def test_every_theme_derives_and_applies_cleanly():
 
 
 def test_the_picker_fits_the_lcd_with_every_theme():
-    from tuipet.themescreen import ThemePanel
+    from tuipet.ui.screens.themescreen import ThemePanel
     pan = ThemePanel()
     assert pan.text().plain.count("\n") <= 12   # the #lcd box is 12 content rows
     for name in theme.names():                  # walking previews never crashes

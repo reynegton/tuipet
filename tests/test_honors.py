@@ -14,7 +14,7 @@ from tuipet.ui.screens.shopscreen import ShopPanel
 def _panel(bits=500_000):
     p = Pet(num=-1, stage="Rookie", bits=bits)
     pan = ShopPanel(p)
-    pan.tab = pan._tabs().index("Honors")
+    pan.tab = pan._tabs().index("Honras")
     return p, pan
 
 
@@ -57,7 +57,7 @@ def test_enter_toggles_wearing_an_owned_honor():
 def test_a_broke_tamer_is_refused_and_owns_nothing():
     p, pan = _panel(bits=5)
     pan.key("enter")
-    assert "Not enough" in pan.msg
+    assert "insuficientes" in pan.msg
     assert p.bits == 5 and not persistence.get_titles_owned()
     assert persistence.get_title_worn() == -1
 
@@ -99,7 +99,7 @@ def test_the_lobby_card_carries_the_worn_title_only():
 def test_the_honors_tab_renders():
     _, pan = _panel()
     t = pan.text().plain
-    assert "Honors" in t and "Bit Collector" in t and "10000b" in t
+    assert "Honras" in t and "Bit Collector" in t and "10000b" in t
     assert data.load_titles()[0]["desc"].split()[0] in t   # the inscription shows
     pan.key("enter")
     t = pan.text().plain

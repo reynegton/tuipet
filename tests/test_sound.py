@@ -63,8 +63,8 @@ def test_play_dispatches_when_everything_exists(monkeypatch):
 def _referenced_names():
     """Every sound name the code asks for by string literal."""
     names = set()
-    src = os.path.join(os.path.dirname(sound.__file__))
-    for f in glob.glob(os.path.join(src, "*.py")):
+    src = os.path.dirname(os.path.dirname(sound.__file__))  # src/tuipet
+    for f in glob.glob(os.path.join(src, "**", "*.py"), recursive=True):
         s = open(f).read()
         names.update(re.findall(r'\bbeep\(\s*"([a-zA-Z][a-zA-Z0-9]*)"', s))
         names.update(re.findall(r'sound\.play\(\s*"([a-zA-Z][a-zA-Z0-9]*)"', s))

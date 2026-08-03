@@ -55,7 +55,7 @@ def test_care_shelf_matches_its_blurbs():
     p = _pet()
     _use(p, "energy_drink")
     assert p.energy == p.max_energy                           # "energy to FULL"
-    assert "already full" in _use(p, "energy_drink")          # refuse, keep item
+    assert "já está cheia" in _use(p, "energy_drink")          # refuse, keep item
     p = _pet(weight=30)
     _use(p, "slim_drink")
     assert p.weight == 20                                     # "weight -10"

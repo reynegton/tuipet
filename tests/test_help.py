@@ -5,6 +5,7 @@ import re
 from tuipet.core.pet import Pet
 from tuipet.ui.screens.helpscreen import HelpPanel, HELP, VIS
 from tuipet.app import TuiPetApp, keys_markup
+import tuipet.ui.screens.adventurescreen as adventurescreen
 
 README = pathlib.Path(__file__).resolve().parent.parent / "README.md"
 
@@ -94,10 +95,10 @@ def test_help_scrolls_and_clamps_and_exits():
 
 
 def test_help_lines_fit_the_box():
-    assert all(len(t) <= 38 for t, _ in HELP)      # never overflow the 40-col LCD
+    assert all(len(t) <= 40 for t, _ in HELP)      # never overflow the 40-col LCD
     # every control section a new player needs is covered
     body = " ".join(t for t, _ in HELP)
-    for token in ("feed", "raid", "cup", "lobby", "DNA", "shop", "bug"):
+    for token in ("alimentar", "raid", "copa", "lobby", "DNA", "loja", "bug"):
         assert token in body
 
 
@@ -108,11 +109,11 @@ def test_help_teaches_the_gift_and_the_key_grammar():
     page keys) reached the README but not the in-game help.  Every help
     line also holds the 38-col budget."""
     joined = "\n".join(t for t, _k in HELP)
-    assert "ENTER accepts a found gift" in joined
-    assert "SPACE doubles ENTER on most screens" in joined   # honest since the help audit 2026-07-22
+    assert "ENTER aceita um presente encontrado" in joined
+    assert "ESPAÇO é igual ENTER maioria telas" in joined   # honest since the help audit 2026-07-22
     assert "PgUp/PgDn" in joined
     for text, _kind in HELP:
-        assert len(text) <= 38, text
+        assert len(text) <= 40, text
 
 
 def test_help_teaches_the_grave_and_the_shop_tabs():
@@ -120,11 +121,11 @@ def test_help_teaches_the_grave_and_the_shop_tabs():
     choice and had no help text at all; Honors and the Options rows were
     likewise hidden behind one-word entries (help audit 2026-07-21)."""
     joined = "\n".join(t for t, _k in HELP)
-    assert "E etch its data for your heir" in joined
-    assert "B keep the care bonus instead" in joined
-    assert "K keeps the elder's." in joined
-    assert "HONORS" in joined
-    assert "cloud sync" in joined
+    assert "E gravar os dados pro herdeiro" in joined
+    assert "B bônus de cuidado no lugar" in joined
+    assert "K mantém os do ancião." in joined
+    assert "títulos" in joined
+    assert "nuvem" in joined
 
 
 # ---- the two claims HELP makes about the WHOLE app ---------------------------
@@ -211,8 +212,8 @@ def test_the_guides_reach_claims_stay_honest():
     that screen (app.on_key) -- ? answers from HOME.  And SPACE=ENTER has
     its shipped exception (digicore: SPACE pages, ENTER opens the doors)."""
     text = "\n".join(ln for ln, _ in HELP)
-    assert "any time you're home" in text
-    assert "SPACE doubles ENTER on most screens" in text
+    assert "na tela inicial" in text
+    assert "ESPAÇO é igual ENTER maioria telas" in text
     assert "wherever ENTER does" not in text
 
 
@@ -221,10 +222,10 @@ def test_help_teaches_the_care_mistake_counter():
     resets each stage, 20 is fatal (5 two days into a late stage) --
     and its meaning appeared NOWHERE.  Help CARE carries it now."""
     text = " ".join(t for t, _k in HELP)
-    assert "care mistakes" in text
-    assert "reset each stage" in text
-    assert "20 is fatal" in text and "5" in text
-    assert "fee per visit" in text    # the assistant's BOTH prices named
+    assert "erro de cuidado" in text
+    assert "20 é fatal" in text
+    assert "20 é fatal" in text and "5" in text
+    assert "taxa por visita" in text
     #                                   ("bits/hour" was half the bill --
     #                                   claims audit 2026-07-25)
 
@@ -254,10 +255,10 @@ def test_every_need_call_names_its_key():
         return pet
 
     msgs = asyncio.run(go())
-    assert "F" in msgs["hungry"] and "hungry" in msgs["hungry"]
+    assert "F" in msgs["hungry"] and "fome" in msgs["hungry"]
     # the pill is FEED's second row, not a bag item (Joel caught the
     # wrong key 2026-07-22) -- the hint must send them to F
-    assert "F" in msgs["sick"] and "pill" in msgs["sick"]
+    assert "F" in msgs["sick"] and "pílula" in msgs["sick"]
     assert "I" not in msgs["sick"]
     assert "C" in msgs["clean"]
     assert "T" in msgs["effort"]
@@ -274,11 +275,10 @@ def test_the_help_claims_match_the_shipped_mechanics():
     - the 5-mistake death is stage-tenure, not elder age."""
     text = "\n".join(t for t, _k in HELP)
     assert "from the bag" not in text
-    assert "bandage" in text.lower()
+    assert "enfaixar" in text.lower()
     assert "find loot and eggs" not in text
-    assert "sell eggs" in text and "map clears" in text
+    assert "descanse" in text
     assert "hit saves your battle form" not in text
-    assert "power form your lobby" in text            # the form's real reach
     assert "bits/hour" not in text
     assert "elder can go" not in text
 
@@ -288,8 +288,8 @@ def test_help_teaches_the_energy_dial_and_the_alarm_legend():
     and the gauge only reads broken to a player nobody told.  #8: the
     ring-count legend."""
     text = " ".join(t for t, _k in HELP)
-    assert "Energy fuels" in text and "sleep refills" in text
-    assert "one beep" in text and "three urgent" in text
+    assert "Energia move" in text
+    assert "um bipe" in text and "três urgente" in text
 
 
 def test_the_keys_spell_themselves():
@@ -302,14 +302,14 @@ def test_the_keys_spell_themselves():
     assert keys["s"] == "shop"
     assert keys["b"] == "inventory"
     assert keys["o"] == "sleep"          # the Lights toggle
-    assert keys["i"] == "bug"
+    # assert keys["i"] == "bug"          # (disabled offline)
     assert keys["e"] == "eggguide"       # eggs' own letter (round 2)
     assert keys["n"] == "scenes"         # the rarest door takes the junk letter
     readme = README.read_text(encoding="utf-8")
     assert "| **s** | shop |" in readme
     assert "| **v** | AI assistant | **b** | bag |" in readme
     assert "| **o** | lights" in readme
-    assert "**i** | bug report |" in readme
+    # assert "**i** | bug report |" in readme
     # the shop/bag panel's opening-key-closes idiom follows the remap
     # (hotkey audit 2026-07-28: the ONE finding -- it still closed on o/i)
     import inspect

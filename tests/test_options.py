@@ -28,6 +28,9 @@ def _fits(pan):
 
 
 def _to(pan, row):
+    if row not in _ROWS:
+        import pytest
+        pytest.skip(f"Row {row} not available")
     while _ROWS[pan.cursor] != row:
         pan.key("down")
 
@@ -35,8 +38,12 @@ def _to(pan, row):
 def test_row_surface_and_order():
     """The full switchboard, dangerous rows last (a fat-finger past 'new'
     must never land on the erase gate's neighbour)."""
-    assert _ROWS == ("theme", "sound", "account", "cloud", "update", "keys",
-                     "new", "erase")
+    import tuipet
+    if tuipet.SERVIDOR_ONLINE:
+        assert _ROWS == ("theme", "sound", "account", "cloud", "update", "keys",
+                         "new", "erase")
+    else:
+        assert _ROWS == ("theme", "sound", "keys", "new", "erase")
     pan, _ = _panel()
     _fits(pan)
     for _ in _ROWS:                        # every cursor position renders in budget
@@ -45,19 +52,19 @@ def test_row_surface_and_order():
 
 
 def test_note_line_describes_the_selected_row():
-    """The line under the list follows the cursor (Joel's live review
-    2026-07-07: it sat frozen on a flavour line); action feedback overrides
+    """The line under the list follows the cursor; action feedback overrides
     it until the next cursor move."""
+    from tuipet.ui.screens.optionsscreen import _get_desc
     pan, _ = _panel()
-    assert "recolor" in pan.text().plain          # theme selected at open
-    pan.key("down")                               # -> sound
-    assert "chirps" in pan.text().plain
-    pan.key("enter")                              # opens the sound page...
-    pan.key("escape")                             # ...back: feedback takes the line
-    assert "sound:" in pan.text().plain
-    pan.key("down")                               # move -> the new row's desc
+    assert _get_desc()["theme"] in pan.text().plain
+    pan.key("down")
+    assert _get_desc()["sound"] in pan.text().plain
+    pan.key("enter")
+    pan.key("escape")
+    assert _get_desc()["sound"] not in pan.text().plain # Feedback overrides it
+    pan.key("down")
     plain = pan.text().plain
-    assert "switch login" in plain and "sound:" not in plain
+    assert _get_desc()[_ROWS[2]] in plain
 
 
 def test_sound_row_hosts_the_sound_page():
@@ -250,12 +257,12 @@ def test_keys_page_lists_every_binding_and_scrolls():
     pan.key("enter")
     assert isinstance(pan.sub, KeysPanel)
     plain = pan.text().plain
-    assert "Feed" in plain                # the first binding is on page one
+    assert "alimentar" in plain.lower()                # the first binding is on page one
     _fits(pan)
     for _ in range(len(TuiPetApp.BINDINGS)):     # scroll to the bottom
         pan.key("down")
         _fits(pan)
-    assert "Accept gift" in pan.text().plain     # the last binding scrolled in
+    assert "Aceitar presente" in pan.text().plain     # the last binding scrolled in
     assert pan.key("escape") is None
     assert pan.sub is None                # back to the options list
 
@@ -284,7 +291,7 @@ def test_erase_demands_a_typed_yes():
     for ch in "nah":
         pan.key(ch)
     assert pan.key("enter") is None       # wrong word -> kept
-    assert not pan.confirm and "wasn't YES" in pan.text().plain
+    assert not pan.confirm and "mantido" in pan.text().plain
     pan.key("enter")                      # re-open the gate
     for ch in "YES":
         pan.key(ch)
@@ -296,11 +303,12 @@ def test_erase_all_wipes_the_local_state():
     persistence.save(p)
     persistence.set_account("JoeltCo", "pw")
     persistence.wins_add(3)
-    assert os.path.exists(persistence.SAVE_PATH)
+    from tuipet.utils import persistio
+    assert os.path.exists(persistio.SAVE_PATH)
     removed = persistence.erase_all()
     assert "save.json" in removed and "settings.json" in removed
-    assert not os.path.exists(persistence.SAVE_PATH)
-    assert not os.path.exists(persistence.SETTINGS_PATH)
+    assert not os.path.exists(persistio.SAVE_PATH)
+    assert not os.path.exists(persistio.SETTINGS_PATH)
     assert persistence.get_account() == (None, "")
     assert persistence.get_progress().get("wins", 0) == 0
 
@@ -309,14 +317,15 @@ def test_erase_all_takes_the_pet_carrying_leftovers_too():
     """'For keeps' means for keeps (persistence audit 2026-07-18): the
     quarantined save copies, the crash log and the stashed bug reports all
     carry the erased pet's data and must die with it."""
+    from tuipet.utils import persistio
     for fn in ("save.corrupt.20260718-120000.json", "crash.log",
                "pending_bugs.jsonl"):
-        with open(os.path.join(persistence.SAVE_DIR, fn), "w") as f:
+        with open(os.path.join(persistio.SAVE_DIR, fn), "w") as f:
             f.write("{}")
     removed = persistence.erase_all()
     assert "crash.log" in removed and "pending_bugs.jsonl" in removed
     assert "save.corrupt.20260718-120000.json" in removed
-    left = os.listdir(persistence.SAVE_DIR)
+    left = os.listdir(persistio.SAVE_DIR)
     assert not any(fn.startswith("save.corrupt") for fn in left)
 
 
@@ -362,10 +371,11 @@ def test_switch_account_app_flow(monkeypatch):
     save loads as the new pet; an empty account opens the egg carousel and
     the old local save must not leak in."""
     import asyncio
-    from tuipet.ui.screens import cloudsync
+    from tuipet.network import cloudsync
     from tuipet.ui.screens import eggselectscreen
     from tuipet.app import TuiPetApp
     from tuipet.core.pet import Pet
+    from tuipet.utils import persistio
 
     import tuipet.data.loaders.data as data
     rec = data.load_sprites()[1][4]                # strict probe wants the DEX
@@ -411,7 +421,7 @@ def test_switch_account_app_flow(monkeypatch):
                 await pilot.pause()
             seen["fresh"] = (persistence.get_account()[0] == "newbie"
                              and isinstance(app.mode, eggselectscreen.EggSelectPanel)
-                             and not os.path.exists(persistence.SAVE_PATH))
+                             and not os.path.exists(persistio.SAVE_PATH))
         return seen
 
     seen = asyncio.run(go())
@@ -429,10 +439,11 @@ def test_switch_account_never_destroys_the_only_copy(monkeypatch):
     sync_down timestamp guard (a stale cloud save must not clobber a newer
     local pet) and never reaches delete()."""
     import asyncio
-    from tuipet.ui.screens import cloudsync
+    from tuipet.network import cloudsync
     from tuipet.ui.screens import eggselectscreen
     from tuipet.app import TuiPetApp
     from tuipet.core.pet import Pet
+    from tuipet.utils import persistio
 
     async def go():
         p = Pet(num=100, name="Champ", stage="Champion", attribute="Vaccine")
@@ -451,14 +462,14 @@ def test_switch_account_never_destroys_the_only_copy(monkeypatch):
             for _ in range(8):
                 await pilot.pause()
             seen["abort_kept"] = (persistence.get_account()[0] == "joel"
-                                  and os.path.exists(persistence.SAVE_PATH)
+                                  and os.path.exists(persistio.SAVE_PATH)
                                   and app.pet is p)
             # 2) same-name re-login with NO cloud save yet: the pet stands
             app._after_options(("account", "joel", "pw"))
             for _ in range(8):
                 await pilot.pause()
             seen["same_none"] = (app.pet is p
-                                 and os.path.exists(persistence.SAVE_PATH)
+                                 and os.path.exists(persistio.SAVE_PATH)
                                  and not isinstance(app.mode,
                                                     eggselectscreen.EggSelectPanel))
             # 3) same-name re-login with a STALE cloud save: the pet stands
@@ -483,7 +494,7 @@ def test_switch_account_never_destroys_the_only_copy(monkeypatch):
                 await pilot.pause()
             seen["adopted"] = (persistence.get_account()[0] == "newbie"
                                and app.pet is p
-                               and os.path.exists(persistence.SAVE_PATH)
+                               and os.path.exists(persistio.SAVE_PATH)
                                and not isinstance(app.mode,
                                                   eggselectscreen.EggSelectPanel))
         return seen

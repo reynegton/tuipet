@@ -41,10 +41,10 @@ def _today():
     return _dt.date.today()
 
 
-SEASON_OF_MONTH = {3: "Primavera", 4: "Primavera", 5: "Primavera",
-                   6: "Verão", 7: "Verão", 8: "Verão",
+SEASON_OF_MONTH = {3: "Spring", 4: "Spring", 5: "Spring",
+                   6: "Summer", 7: "Summer", 8: "Summer",
                    9: "Fall", 10: "Fall", 11: "Fall",
-                   12: "Inverno", 1: "Inverno", 2: "Inverno"}
+                   12: "Winter", 1: "Winter", 2: "Winter"}
 
 # festival days: the whole day's board is enterable at any hour (each slot
 # still runs once -- no purse farming).  Aug 1 is Odaiba Memorial Day, the

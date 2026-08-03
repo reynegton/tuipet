@@ -86,7 +86,7 @@ def test_pathological_save_stays_far_under_the_wire_cap():
     p.habitat_record = {i: 9999.0 for i in range(8)}
     p.tourney_schedule = list(range(24))
     p.fought_today = list(range(40))
-    p.digimemory = {"name": "X" * 24, "num": 1500, "vaccine": 999, "data": 999,
+    p.memory = {"name": "X" * 24, "num": 1500, "vaccine": 999, "data": 999,
                     "virus": 999, "seconds": 99999.0}
     size = len(json.dumps(persistence.to_save_dict(p)))
     assert size < 32 * 1024, f"save grew to {size}b — approaching the 64KB drop cap"

@@ -368,14 +368,14 @@ def test_line_fields_survive_the_save_round_trip():
 # ---- digicore chart UI (panel smoke: does it draw) ----------------------------
 
 def test_digicore_pages_render_the_line_chart():
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel, next_evolution
+    from tuipet.ui.screens.datacorescreen import datacorePanel, next_evolution
     p = _line_pet()
     for _ in range(2):                           # walk to Agumon (the 5-row chart)
         p.stage_seconds = 9e8
         p._maybe_evolve()
     p.care_mistakes, p.stage_trainings = 1, 16
     assert next_evolution(p) == 93               # silhouette: the closest row
-    pan = DigiCorePanel(p)
+    pan = datacorePanel(p)
     pan.text()
     for k in (["space", "space"] + ["right"] * 7 +
               ["enter", "down", "down", "up", "escape", "down", "enter", "escape"]):

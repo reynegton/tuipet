@@ -35,7 +35,7 @@ def test_crossing_a_wins_gate_sets_the_announcement():
     for _ in range(49):
         persistence.wins_add(1)
     p.record_battle(True, dict(_ENEMY))              # win 50: Sakumon's gate
-    assert "egg" in getattr(p, "egg_unlock_note", "")
+    assert "ovo" in getattr(p, "egg_unlock_note", "")
     p.egg_unlock_note = ""
     p.record_battle(True, dict(_ENEMY))              # win 51: no gate, no note
     assert getattr(p, "egg_unlock_note", "") == ""

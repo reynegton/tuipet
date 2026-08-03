@@ -127,7 +127,7 @@ def test_reading_ownership_never_writes_the_save():
 # ---- E2/E3: the egg re-roll is a re-pick, not a generation ---------------
 
 class _Shim:
-    """Just enough app state to run the REAL _hatch_new/_grant_digimemory."""
+    """Just enough app state to run the REAL _hatch_new/_grant_memory."""
     def __init__(self, pet):
         self.pet = pet
     def _do(self, m):
@@ -139,7 +139,7 @@ def _app(pet):
     import tuipet.app as appmod
     shim = _Shim(pet)
     shim._hatch_new = appmod.TuiPetApp._hatch_new.__get__(shim)
-    shim._grant_digimemory = appmod.TuiPetApp._grant_digimemory.__get__(shim)
+    shim._grant_memory = appmod.TuiPetApp._grant_memory.__get__(shim)
     return shim
 
 
@@ -149,10 +149,11 @@ def _heir_egg():
     elder = Pet(num=1455, stage="Mega", attribute="Virus", generation=1)
     elder.dead = True
     persistence.bank_bonus_seed(9)
-    persistence._note_put("digimemory", {"species": 1455})
+    from tuipet.utils.persistence import progress_io
+    progress_io._note_put("memory", {"species": 1455})
     persistence.snapshot_prev_gen(elder)
     app = _app(Pet.new_egg(generation=2, egg_type=1))
-    app._grant_digimemory(app.pet)
+    app._grant_memory(app.pet)
     return app
 
 
@@ -174,11 +175,11 @@ def test_an_egg_reroll_never_grades_the_egg_over_the_elders_seed():
 
 def test_an_egg_reroll_carries_the_etched_digimemory():
     app = _heir_egg()
-    assert app.pet.digimemory == {"species": 1455}
+    assert app.pet.memory == {"species": 1455}
     app._hatch_new(2, app.pet.generation + 1)
-    assert app.pet.digimemory == {"species": 1455}, \
+    assert app.pet.memory == {"species": 1455}, \
         "the etched memory died with the discarded shell"
-    assert app.pet.inventory.get("digimemory") == 1, "one chip, exactly"
+    assert app.pet.inventory.get("memory") == 1, "one chip, exactly"
 
 
 def test_an_egg_reroll_carries_the_wallet_and_bag():

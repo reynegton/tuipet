@@ -202,5 +202,5 @@ def test_a_poisoned_egg_type_heals_at_load():
     assert healed.egg_type == 0                   # a Botamon egg, not a crash
     # belt AND suspenders: the renderer can never die over it again
     assert egg.frames("guide")
-    assert egg.record("guide")["name"] == "Digitama"
+    assert egg.record("guide")["name"] == "Egg"
     assert egg.hatch_name(None) != ""

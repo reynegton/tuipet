@@ -49,7 +49,7 @@ def _key(v):
 def latest_if_newer(timeout=4.0):
     """Return the PyPI version string if it is newer than the installed one,
     else None.  Suppresses all errors (offline, missing package, etc)."""
-    return None
+
     cur = current_version()
     if not cur:
         return None                      # dev/source run: nothing to compare against

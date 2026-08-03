@@ -273,9 +273,9 @@ def _eggguide():
 
 @state("digicore")
 def _digicore():
-    from tuipet.ui.screens.datacorescreen import DigiCorePanel
+    from tuipet.ui.screens.datacorescreen import datacorePanel
     p = _worst_pet()
-    return DigiCorePanel(p), p
+    return datacorePanel(p), p
 
 
 @state("scenes")

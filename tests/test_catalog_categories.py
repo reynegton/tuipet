@@ -20,8 +20,8 @@ from tuipet.ui.screens import shopscreen
 from tuipet.core.pet import Pet
 from tuipet.ui.screens.shopscreen import ShopPanel
 
-ITEM_CATEGORIES = ("Feed", "Rest", "Cure", "Drill", "Manners", "Power",
-                   "Treasure", "Evolve", "Road")  # the eight ACTS (+Treasure),
+ITEM_CATEGORIES = ("Feed", "Rest", "Cure", "Drill", "Modos", "Power",
+                   "Tesouro", "Evoluir", "Road")  # the eight ACTS (+Treasure),
                    # refactor 2026-07-27: tabs name what the player WANTS
 
 
@@ -59,7 +59,7 @@ def test_medicine_holds_the_ailment_cures_and_legacy_holds_the_dead():
     assert shop.CATALOG["miracle_drink"].category == "Cure"
     assert shop.CATALOG["vitamin"].category == "Cure"
     assert shop.CATALOG["revive_floppy"].category == "Cure"
-    assert shop.CATALOG["digimemory"].category == "Evolve"  # Legacy dissolved: inheritance is an Evolve door
+    assert shop.CATALOG["memory"].category == "Evoluir"  # Legacy dissolved: inheritance is an Evolve door
 
 
 def test_training_holds_the_body_items():

@@ -1,3 +1,4 @@
+import tuipet.utils.persistence.serializer
 """WILD DIGIMEMORY CHIPS — a found chip carries a random payload (2026-07-24).
 
 Joel: "make wild chips carry a random payload".
@@ -54,40 +55,40 @@ def test_a_wild_trace_is_weaker_than_the_base_chip():
 
 def test_a_find_adds_an_item_and_a_payload_together():
     p = _pet()
-    p.add_item("digimemory")
+    p.add_item("memory")
     p.stash_wild_memory()
-    assert p.inventory["digimemory"] == 1
+    assert p.inventory["memory"] == 1
     assert len(p.wild_memories) == 1
 
 
 def test_using_a_wild_chip_applies_its_trace_and_consumes_both():
     p = _pet()
-    p.add_item("digimemory")
+    p.add_item("memory")
     mem = p.stash_wild_memory()
     field = next(f for f in ("vaccine", "data", "virus") if mem[f])
     pet_field = {"vaccine": "vaccine", "data": "data_power",
                  "virus": "virus"}[field]
     before = getattr(p, pet_field)
-    out = p.use_item("digimemory")
+    out = p.use_item("memory")
     assert "lives on" in out
     assert getattr(p, pet_field) == before + mem[field]
-    assert p.inventory.get("digimemory", 0) == 0
+    assert p.inventory.get("memory", 0) == 0
     assert p.wild_memories == []
 
 
 def test_a_bare_chip_with_no_payload_is_still_silent():
     p = _pet()
-    p.add_item("digimemory")            # no stash: an empty item
-    assert isinstance(p.use_item("digimemory"), _Refused)
+    p.add_item("memory")            # no stash: an empty item
+    assert isinstance(p.use_item("memory"), _Refused)
 
 
 def test_wild_chips_are_spent_oldest_first():
     p = _pet()
     for _ in range(3):
-        p.add_item("digimemory")
+        p.add_item("memory")
         p.stash_wild_memory()
     first = dict(p.wild_memories[0])
-    p.use_item("digimemory")
+    p.use_item("memory")
     assert p.wild_memories[0] != first or len(p.wild_memories) == 2
     assert len(p.wild_memories) == 2
 
@@ -96,13 +97,13 @@ def test_wild_chips_are_spent_oldest_first():
 
 def test_an_inherited_chip_is_spent_before_any_wild_one():
     p = _pet()
-    p.digimemory = {"name": "Agumon", "vaccine": 50, "data": 0, "virus": 0}
-    p.add_item("digimemory")            # the inherited item
-    p.add_item("digimemory")
+    p.memory = {"name": "Agumon", "vaccine": 50, "data": 0, "virus": 0}
+    p.add_item("memory")            # the inherited item
+    p.add_item("memory")
     p.stash_wild_memory()               # ...and a wild one
-    out = p.use_item("digimemory")
+    out = p.use_item("memory")
     assert "Agumon" in out              # the ancestor went first
-    assert p.digimemory == {}           # inherited slot cleared
+    assert p.memory == {}           # inherited slot cleared
     assert len(p.wild_memories) == 1    # the wild trace untouched
     assert p.vaccine == 50
 
@@ -111,8 +112,8 @@ def test_peek_reports_what_the_next_use_will_spend():
     p = _pet()
     p.stash_wild_memory()
     assert p.peek_memory() == p.wild_memories[0]
-    p.digimemory = {"name": "Agumon", "vaccine": 9, "data": 0, "virus": 0}
-    assert p.peek_memory() == p.digimemory   # inherited peeked first
+    p.memory = {"name": "Agumon", "vaccine": 9, "data": 0, "virus": 0}
+    assert p.peek_memory() == p.memory   # inherited peeked first
 
 
 # ---- the invariant: item count == payload count -----------------------------
@@ -120,17 +121,17 @@ def test_peek_reports_what_the_next_use_will_spend():
 def test_item_and_payload_counts_stay_equal_through_a_mixed_life():
     p = _pet()
     def payloads():
-        return (1 if p.digimemory else 0) + len(p.wild_memories)
-    p.digimemory = {"name": "A", "vaccine": 3, "data": 0, "virus": 0}
-    p.add_item("digimemory")
+        return (1 if p.memory else 0) + len(p.wild_memories)
+    p.memory = {"name": "A", "vaccine": 3, "data": 0, "virus": 0}
+    p.add_item("memory")
     for _ in range(4):
-        p.add_item("digimemory")
+        p.add_item("memory")
         p.stash_wild_memory()
-    assert p.inventory["digimemory"] == payloads() == 5
+    assert p.inventory["memory"] == payloads() == 5
     for _ in range(5):
-        p.use_item("digimemory")
-        assert p.inventory.get("digimemory", 0) == payloads()
-    assert p.inventory.get("digimemory", 0) == 0
+        p.use_item("memory")
+        assert p.inventory.get("memory", 0) == payloads()
+    assert p.inventory.get("memory", 0) == 0
 
 
 # ---- cross-generation -------------------------------------------------------
@@ -138,18 +139,18 @@ def test_item_and_payload_counts_stay_equal_through_a_mixed_life():
 def test_the_estate_carries_no_digimemory_item():
     """The payload channel is authoritative across a reset; a chip item in
     the bag would arrive without its payload and be a dud."""
-    inv = persistence._heal_bag({"digimemory": 3, "fish": 2})
-    assert inv == {"digimemory": 3, "fish": 2}       # a LIVING pet keeps them
+    inv = tuipet.utils.persistence.serializer._heal_bag({"memory": 3, "fish": 2})
+    assert inv == {"memory": 3, "fish": 2}       # a LIVING pet keeps them
 
     d = {"progress": {"last_gen": {"bits": 0,
-         "inventory": {"digimemory": 3, "fish": 2}}}}
+         "inventory": {"memory": 3, "fish": 2}}}}
     orig = persistence.load_settings
     persistence.load_settings = lambda: d
     try:
         est = persistence.prev_gen_estate()
     finally:
         persistence.load_settings = orig
-    assert "digimemory" not in est["inventory"]      # ...the estate does not
+    assert "memory" not in est["inventory"]      # ...the estate does not
 
 
 def test_wild_memories_survive_a_save_round_trip():
@@ -167,7 +168,7 @@ def test_digimemory_is_now_findable():
     found = set()
     for z in adv.ZONES:
         found.update(z["find_keys"])
-    assert "digimemory" in found
+    assert "memory" in found
 
 
 def test_the_road_digs_a_broad_slice_of_the_catalog():
@@ -183,14 +184,14 @@ def test_the_road_digs_a_broad_slice_of_the_catalog():
     for k in found:
         assert k in shop.CATALOG, k
     assert len(found) >= 55, len(found)
-    assert "digimemory" in found
+    assert "memory" in found
 
 
 def test_finding_a_digimemory_stashes_a_payload():
     """The find hook, not just the handler: digging one up must leave a
     usable trace, not a silent husk."""
     p = _pet()
-    p.add_item("digimemory")
+    p.add_item("memory")
     p.stash_wild_memory()               # what _land_find does on a dig
     assert p.peek_memory().get("name") == "A stranger"
-    assert not isinstance(p.use_item("digimemory"), _Refused)
+    assert not isinstance(p.use_item("memory"), _Refused)
