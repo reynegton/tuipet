@@ -33,7 +33,7 @@ Repository = "https://github.com/joeltco/tuipet"
 Issues = "https://github.com/joeltco/tuipet/issues"
 
 [project.scripts]
-tuipet = "tuipet.app:main"
+tuipet = "tuipet.appboot:main"
 
 [build-system]
 requires = ["setuptools"]
