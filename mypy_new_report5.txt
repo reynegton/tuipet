@@ -1,8 +1,0 @@
-src/tuipet/core/petbody.py:75: error: Cannot determine type of "tourney_alarm"  [has-type]
-src/tuipet/core/petbody.py:75: error: "BodyMixin" has no attribute "tourney_schedule"  [attr-defined]
-src/tuipet/ui/screens/adventurescreen/renderer.py:128: error: "AdventureRendererMixin" has no attribute "adv"  [attr-defined]
-src/tuipet/network/lobbybout.py:124: error: Cannot determine type of "battle"  [has-type]
-src/tuipet/network/lobbybout.py:124: error: "BoutMixin" has no attribute "bt_peer_nonce"  [attr-defined]
-src/tuipet/app_mixins/timers.py:120: error: "TimersMixin" has no attribute "pet"  [attr-defined]
-src/tuipet/app_mixins/hud.py:69: error: "HudMixin" has no attribute "pet"  [attr-defined]
-Found 7 errors in 5 files (checked 141 source files)

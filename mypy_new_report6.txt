@@ -1,2 +1,0 @@
-src/tuipet/app_mixins/hud.py:69: error: Unexpected character after line continuation character  [syntax]
-Found 1 error in 1 file (errors prevented further checking)

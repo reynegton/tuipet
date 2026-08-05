@@ -33,6 +33,7 @@ community references. Regular updates ship as the game grows.
 - **Online play** tuipet adds on top: accounts with cloud saves that follow
   you across devices, and a live lobby with chat, PvP battles, and two-player
   jogress fusion.
+- **Global Localization**: The game auto-detects your system language and ships fully translated in 9 languages (English, Portuguese, Spanish, French, German, Italian, Russian, Japanese, and Simplified Chinese), with full dynamic double-width CJK font rendering support.
 - A `rich`/`textual` UI: a fixed LCD arena with the animated pet, a live
   status card, and a one-line control strip — every screen lives in the box.
 
