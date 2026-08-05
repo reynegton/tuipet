@@ -8,10 +8,13 @@ from tuipet.utils.theme import INK, INK_B, DIM, SEL
 from wcwidth import wcswidth
 
 def display_len(s: str) -> int:
+    """Calculates the physical rendering width of a string in the terminal.
+    Uses wcwidth to account for double-width characters (e.g. CJK)."""
     w = wcswidth(s)
     return len(s) if w < 0 else w
 
 def slice_by_width(s: str, max_w: int) -> str:
+    """Slices a string such that its rendered width does not exceed max_w."""
     w = 0
     for i, c in enumerate(s):
         cw = wcswidth(c)
@@ -21,6 +24,8 @@ def slice_by_width(s: str, max_w: int) -> str:
     return s
 
 def ljust_width(s: str, max_w: int, fillchar: str = " ") -> str:
+    """Left-justifies a string based on its physical rendering width, padding
+    with fillchar until it reaches max_w."""
     w = display_len(s)
     if w >= max_w:
         return s

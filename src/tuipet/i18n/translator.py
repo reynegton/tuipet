@@ -1,3 +1,8 @@
+"""
+Localization engine for TuiPet.
+Handles dynamic loading of translation dictionaries (JSON) and provides
+string translation functions (t, t_col) with fallback support.
+"""
 from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
