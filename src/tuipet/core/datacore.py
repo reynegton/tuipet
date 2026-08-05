@@ -8,6 +8,7 @@ wears its own name now) and the Ailing row's injury fragment (the injury
 system left 2026-07-16; is_injured() is hard False).
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.core.petbase as _petbase
 import tuipet.utils.backgrounds as _bgs
@@ -15,6 +16,10 @@ import tuipet.core.egg as _egg
 from tuipet.core import evolution
 from tuipet.core import lines
 from tuipet.i18n.translator import t
+from typing import TYPE_CHECKING, Any, List, Optional
+
+if TYPE_CHECKING:
+    from tuipet.core.pet import Pet
 
 
 DATACORE_BASE_RATE = 14            # DatacoreBaseRate (config.csv col 1)
@@ -26,7 +31,7 @@ _CORE_BG = {"": "digicoreN", "None": "digicoreN", "DragonsRoar": "digicoreDr",
             "DarkArea": "digicoreDa", "VirusBuster": "digicoreVb"}
 
 
-def has_next(pet):
+def has_next(pet: Any) -> bool:
     """Is ANY onward evolution waiting?  Line pets read their line chart;
     corpus/legacy pets read the corpus graph.  (Datacore audit 2026-07-18:
     core_number checked the corpus alone, so 22 line parents whose onward
@@ -37,7 +42,7 @@ def has_next(pet):
     return bool(data.load_evolutions().get(pet.num))
 
 
-def core_number(pet):
+def core_number(pet: Any) -> int:
     """setupDatacore's meter: an evolution countdown while a normal evolution is
     pending, otherwise an AGE meter counting up toward the elder line (the
     lifespan denominator left with the clock -- DSprite mortality 2026-07-22:
@@ -60,7 +65,7 @@ def core_number(pet):
     return max(1, n)
 
 
-def core_badge_key(pet):
+def core_badge_key(pet: Any) -> Optional[str]:
     """setupDatacore's badge: the per-Monster special core (datacoreMenuConfig,
     IconX while X-antibody; "null" hides it), else the X-state badges."""
     cfg = data.load_datacore_config().get(pet.num, {})
@@ -75,7 +80,7 @@ def core_badge_key(pet):
     return "core_xnone"
 
 
-def core_background(pet):
+def core_background(pet: Any) -> Optional[str]:
     """The core swirl backdrop by the highest CHARGED DNA field (DNA.getHighestDNA:
     strict max over the charged array, ties yield none) -- else the pet's own field."""
     field = pet.highest_dna() or pet.field
@@ -83,7 +88,7 @@ def core_background(pet):
     return frames[0] if frames else None
 
 
-def silhouette(rows):
+def silhouette(rows: List[str]) -> List[str]:
     """ViewUtil.getSilhouetteImage on 1-bit art: black the sprite's OPAQUE
     MASK.  Canon blackens every non-transparent pixel; our 1-bit equivalent is
     an exterior flood fill -- any '0' NOT reachable from outside the sprite is
@@ -109,7 +114,7 @@ def silhouette(rows):
             for y in range(h)]
 
 
-def ghost(mask, phase=0):
+def ghost(mask: List[str], phase: int = 0) -> List[str]:
     """The teaser's unresolved-data look: the mask's CONTOUR stays crisp while
     the interior renders as a 50% dither (the evolve strobe's own idiom),
     shimmering with `phase`.  A solid 16px mask carries no shape information
@@ -135,7 +140,7 @@ def ghost(mask, phase=0):
     return out
 
 
-def next_evolution(pet):
+def next_evolution(pet: Any) -> Any:
     """The silhouette's subject (getCurrentNaturalEvol first entry): the ready
     candidate first, else the closest one; None past growth / at a final form."""
     if pet.num == -1:
@@ -164,7 +169,7 @@ def next_evolution(pet):
     return cands[0][0] if cands else None
 
 
-def format_mins(s):
+def format_mins(s: float) -> str:
     s = int(max(0, s))
     if s < 3600:
         return f"{s // 60}m{s % 60:02d}s"
@@ -173,7 +178,7 @@ def format_mins(s):
     return f"{s // 86400}d{(s % 86400) // 3600:02d}h"
 
 
-def _divergence_row(pet):
+def _divergence_row(pet: Any) -> Any:
     """The armed DNA steer as a chart row -- (num, name, True, 0) -- or
     None while unarmed.  The hidden-evo mask is honored like any corpus
     row: the steer names its destination only once the album has seen it."""
@@ -189,7 +194,7 @@ def _divergence_row(pet):
     return (div, name, True, 0)
 
 
-def divergence_report(pet):
+def divergence_report(pet: Any) -> List[Any]:
     """The armed steer's checklist (met, text) rows -- the EVOLVES detail
     for the divergence row.  lines.requirement_report would answer "not in
     this line" (true, and exactly the point): what fires this jump is the
@@ -202,7 +207,7 @@ def divergence_report(pet):
             (None, t("datacore_charges_clear", "charges clear at every evolution"))]
 
 
-def _evo_rows(pet):
+def _evo_rows(pet: Any) -> Any:
     """The evolution line for the data book: (num, name, ready, unmet) per
     candidate, closest-first -- with an ARMED DNA divergence riding the top
     row, because that is what actually fires next (gameplay audit B3,
@@ -261,7 +266,7 @@ def _evo_rows(pet):
     return rows
 
 
-def _trophy_rows(pet):
+def _trophy_rows(pet: Any) -> List[Any]:
     """The trophy room: this life's cups (label + the day they fell) topped
     by the career totals -- lifetime cups persist across generations."""
     import tuipet.core.tournament as _t
@@ -307,7 +312,7 @@ def _trophy_rows(pet):
     return rows
 
 
-def _legacy_rows():
+def _legacy_rows() -> List[Any]:
     """The LEGACY page: every retired generation's headstone, newest first --
     they were banked by snapshot_prev_gen and never shown (sweep 2026-07-14).
     Value budget is 30 cols (40 - the 9-char label gutter)."""
@@ -334,7 +339,7 @@ def _legacy_rows():
     return rows
 
 
-def build_pages(pet):
+def build_pages(pet: Any) -> List[Any]:
     appetite = [t("datacore_glutton_picky", "picky"), t("datacore_glutton_normal", "normal"), t("datacore_glutton_greedy", "greedy")][pet._glutton() + 1]
     temperament = [t("datacore_temp_mellow", "mellow"), t("datacore_temp_steady", "steady"), t("datacore_temp_restless", "restless")][pet._restless() + 1]
     disp = [t("datacore_disp_sour", "sour"), t("datacore_disp_even", "even"), t("datacore_disp_sunny", "sunny")][pet._disposition() + 1]

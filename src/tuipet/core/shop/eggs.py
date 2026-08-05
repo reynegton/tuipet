@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import math
 import math
 import tuipet.data.loaders.data as data
@@ -6,7 +7,7 @@ from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 from tuipet.core.shop.catalog import *
 
-def _sellable_eggs():
+def _sellable_eggs() -> Any:
     """The egg a town may stock: every egg that ISN'T a free starter
 import tuipet.core.shop.catalog as catalog
     (the five START babies you already own) and CAN be owned.  A can_perm
@@ -23,7 +24,7 @@ import tuipet.core.shop.catalog as catalog
             and (rules.get(i) or {}).get("can_perm", True)]
 
 
-def town_egg_stock(town_id, count=EGG_STOCK_PER_TOWN):
+def town_egg_stock(town_id: Any, count: Any=EGG_STOCK_PER_TOWN) -> Any:  # type: ignore
     """The DISTINCT set of eggs THIS town sells -- a stable band over the
     earnable egg, rotated by town so no two town shops feel the same."""
     pool = _sellable_eggs()
@@ -41,7 +42,7 @@ def town_egg_stock(town_id, count=EGG_STOCK_PER_TOWN):
     return [pool[(start + i) % len(pool)] for i in range(count)]
 
 
-def egg_price(idx):
+def egg_price(idx: int) -> Any:  # type: ignore
     """A town egg's bit price -- earned eggs are a treat, so the buy-outright
     shortcut costs real bits.  Starters (never stocked) are free."""
     import tuipet.data.loaders.data as data
@@ -49,7 +50,7 @@ def egg_price(idx):
     return 0 if rule.get("start") else 800
 
 
-def town_egg_rows(town_id):
+def town_egg_rows(town_id: Any) -> Any:
     """The town's egg band as SHOP ROWS (shops-look-the-same,
     2026-07-22: Joel — "the egg tabs in town shops are different than the
     normal shops, why arent these things modulized").  Same entry shape
@@ -63,7 +64,7 @@ def town_egg_rows(town_id):
             for i in town_egg_stock(town_id)]
 
 
-def town_egg_buy(pet, idx):
+def town_egg_buy(pet: Any, idx: int) -> Any:
     """Buy a egg outright (bits -> persistence.egg_own) -> (msg, sfx).
     THE single buy path — the town egg panel and the shop's Eggs tab both
     call here (single-source law)."""

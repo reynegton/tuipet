@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -7,7 +8,7 @@ import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines_mod
 from tuipet.core.petbase import *
 
-def _check_death_caps(pet):
+def _check_death_caps(pet: Any) -> Any:
     """The discrete mistake/injury caps + the Pen20 elder-frailty rule:
     ONE copy for both tick paths -- these gates were duplicated between the
     sleep tick and _tick_mortality and had to be edited in lockstep
@@ -24,7 +25,7 @@ def _check_death_caps(pet):
     return False
 
 
-def _tick_mortality(pet, dt):
+def _tick_mortality(pet: Any, dt: Any) -> Any:
     """The DSprite mortality (ported back from the clone, Joel 2026-07-22:
     "we gotta do it how dsprite does. life bar must be a dvpet forgotten
     relic"): NO lifespan clock, no burns -- death is ONE per-minute hazard
@@ -148,7 +149,7 @@ def _tick_mortality(pet, dt):
     return False
 
 
-def _die(pet, cause=""):
+def _die(pet: Any, cause: str="") -> None:
     pet.dead = True
     pet.death_cause = cause or pet.death_cause   # first cause wins
     pet.asleep = False

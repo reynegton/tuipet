@@ -5,6 +5,7 @@ pet.py itself) can star-import one leaf module and resolve every name in
 their own namespace.  `from .pet import ANYTHING` still works: pet.py
 star-imports this module back under the __all__ below."""
 from __future__ import annotations
+from typing import Any, Dict, Optional
 
 
 class Refused(str):
@@ -14,14 +15,14 @@ class Refused(str):
     item)."""
 
 
-def _clamp(v, lo, hi):
+def _clamp(v: Any, lo: Any, hi: Any) -> Any:
     return max(lo, min(hi, v))
 
 
 WEEKEND_BIT_MULT = 1.5   # weekend COMBAT income bonus (DSprite study 2026-07-14)
 
 
-def _weekend_mult(now=None):
+def _weekend_mult(now: Optional[float] = None) -> float:
     """The real Sat/Sun check (the player's local clock); `now` is an epoch
     override for tests."""
     import time as _time
@@ -29,7 +30,7 @@ def _weekend_mult(now=None):
     return WEEKEND_BIT_MULT if t.tm_wday >= 5 else 1.0
 
 
-def weekend_bonus(now=None):
+def weekend_bonus(now: Optional[float] = None) -> float:
     """x1.5 bit multiplier on real-world Sat/Sun.
 
     Applies to COMBAT/COMPETITION income only — battle-win bits and tournament
@@ -41,7 +42,7 @@ def weekend_bonus(now=None):
     return _weekend_mult(now)
 
 
-def _enemy_level(enemy):
+def _enemy_level(enemy: Dict[str, Any]) -> int:
     """The foe's battle level.  DVPet's getLevel read power sums off the old
     enemy cards; 0.5 cards carry none (0.5 BATTLE 2026-07-17), so the STAGE
     rank is the level now -- the same 1..6 scale the corpus level_fought
@@ -378,7 +379,7 @@ DNA_STABILIZER_BET = 500
 DNA_RESONANT_BET = 2500
 
 
-def dna_field_for_rate(rate):
+def dna_field_for_rate(rate: int) -> str:
     """DVPet getDNARate: the Field a mini-game rate yields (None if over/under-mashed)."""
     for hi, field in DNA_RATE_BANDS:
         if rate <= hi:
@@ -948,7 +949,7 @@ DAY_LENGTH = 1440.0           # 24 min per day/night cycle
 ONLINE_BITS = {"win": 200, "draw": 150, "loss": 100}
 
 
-def online_reward(won, draw=False, now=None):
+def online_reward(won: bool, draw: bool = False, now: Optional[float] = None) -> int:
     """The online purse (0.5 BATTLE 2026-07-17): win 200 / draw 150 /
     loss 100, weekend x1.5 -- PvP pays bits, never training."""
     base = ONLINE_BITS["draw" if draw else ("win" if won else "loss")]

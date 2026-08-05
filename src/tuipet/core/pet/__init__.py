@@ -4,6 +4,7 @@ Tier-5 split (2026-07-17): the constants + pure helpers live in petbase
 (star-imported back, so `from .pet import X` never moved).
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import datetime
 import os
 import random
@@ -259,7 +260,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     anim: str = "idle"
     anim_ttl: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.num is not None and self.num >= 0:
             _, by_num = data.load_sprites()
             rec = by_num.get(self.num)
@@ -284,25 +285,25 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     #                              5-mistake death rule (Ultimate's own duration)
 
     @classmethod
-    def new_egg(cls, generation=1, egg_type=None):
+    def new_egg(cls, generation: int=1, egg_type: Optional[Any]=None) -> Any:
         return evolution_state.new_egg(cls, generation, egg_type)
 
-    def _hatch_into_fresh(self):
+    def _hatch_into_fresh(self) -> Any:
         return evolution_state._hatch_into_fresh(self)
         # (the X-Antibody birth roll is retired -- LINES_SPEC §4: X-forms are
         # reached by hatching X eggs, not won in a lottery at birth)
 
-    def advance_hatch(self, dt):
+    def advance_hatch(self, dt: Any) -> Any:
         return evolution_state.advance_hatch(self, dt)
 
-    def _rand_personality_traits(self):
+    def _rand_personality_traits(self) -> Any:
         return traits._rand_personality_traits(self)
 
-    def _rand_on_champion(self):
+    def _rand_on_champion(self) -> Any:
         return traits._rand_on_champion(self)
 
     @classmethod
-    def from_num(cls, num):
+    def from_num(cls, num: int) -> Any:
         return evolution_state.from_num(cls, num)
 
 
@@ -332,11 +333,11 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
 
 
     @property
-    def age_days(self):
+    def age_days(self) -> Any:
         return conditions.age_days(self)
 
     @property
-    def is_geriatric(self):
+    def is_geriatric(self) -> Any:
         # the clone's elder line (v0.4.12 L926): AGE alone makes an elder --
         # there is no lifespan clock to be near the end of (DSprite mortality
         # 2026-07-22).  The stage gate stays: the +9 aged-shuffle frames the
@@ -345,7 +346,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
                 and self.stage in ("Rookie", "Champion", "Ultimate", "Mega")
                 and self.age_days >= GERIATRIC_AGE_DAYS)
 
-    def stomach_capacity(self):
+    def stomach_capacity(self) -> Any:
         return stats.stomach_capacity(self)
 
     # (day_phase/is_daytime and the season calendar left with the day/night
@@ -354,26 +355,26 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
 
 
     @property
-    def ideal_temp(self):
+    def ideal_temp(self) -> Any:
         return conditions.ideal_temp(self)
 
-    def background(self, file=None):
+    def background(self, file: Optional[Any]=None) -> Any:
         return misc.background(self, file)
 
-    def pick_background(self, key):
+    def pick_background(self, key: str) -> Any:
         return misc.pick_background(self, key)
 
-    def _disposition(self):
+    def _disposition(self) -> Any:
         return traits._disposition(self)
 
 
-    def _glutton(self):
+    def _glutton(self) -> Any:
         return traits._glutton(self)
 
-    def _restless(self):
+    def _restless(self) -> Any:
         return traits._restless(self)
 
-    def personality(self):
+    def personality(self) -> Any:
         return traits.personality(self)
 
     # (the timeRanks system -- time_pref/seed_time_pref/favorite_time/
@@ -383,7 +384,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     # temperature pin, the sick fever/chill swings -- was removed whole with
     # the weather system; BASIC VPET 2026-07-16)
 
-    def _set_xantibody(self, state):
+    def _set_xantibody(self, state: Any) -> Any:
         return evolution_state._set_xantibody(self, state)
 
     # (buy_habitat/move_to -- the habitat buy/move economy -- left with the
@@ -399,26 +400,26 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     # with the weather system; the habitat-compat affinity followed with the
     # habitat system itself -- BASIC VPET 2026-07-16.)
 
-    def save_from_death(self):
+    def save_from_death(self) -> Any:
         return memory_state.save_from_death(self)
 
-    def needs_care(self):
+    def needs_care(self) -> Any:
         return conditions.needs_care(self)
 
-    def needs_attention(self):
+    def needs_attention(self) -> Any:
         return conditions.needs_attention(self)
 
-    def near_bedtime(self):
+    def near_bedtime(self) -> Any:
         return conditions.near_bedtime(self)
 
-    def _guard(self, asleep_blocks=True):
+    def _guard(self, asleep_blocks: bool=True) -> Any:
         return misc._guard(self, asleep_blocks)
 
 
-    def _base_weight(self):
+    def _base_weight(self) -> Any:
         return stats._base_weight(self)
 
-    def _maybe_evolve(self):
+    def _maybe_evolve(self) -> Any:
         return evolution_state._maybe_evolve(self)
 
     # (_apply_egg_habitat/_apply_natural_habitat/go_home_habitat left with
@@ -427,86 +428,86 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
 
 
     # ---- per-species physiology (DVPet calcNeedDecay coefficients) -------
-    def _phys(self):
+    def _phys(self) -> Any:
         return misc._phys(self)
 
     @property
-    def _hunger_interval(self):
+    def _hunger_interval(self) -> Any:
         return intervals._hunger_interval(self)
 
     @property
-    def _poop_interval(self):
+    def _poop_interval(self) -> Any:
         return intervals._poop_interval(self)
 
     @property
-    def _strength_interval(self):
+    def _strength_interval(self) -> Any:
         return intervals._strength_interval(self)
 
     # ---- nutrition (DVPet GoodNutrition: protein/mineral/vitamin macros) --
-    def good_nutrition(self):
+    def good_nutrition(self) -> Any:
         return misc.good_nutrition(self)
 
 
-    def _species_food(self):
+    def _species_food(self) -> Any:
         return misc._species_food(self)
 
 
     _ATTR3 = ("Vaccine", "Data", "Virus")
 
 
-    def _become(self, num):
+    def _become(self, num: int) -> Any:
         return evolution_state._become(self, num)
 
-    def evolve_to(self, num):
+    def evolve_to(self, num: int) -> Any:
         return evolution_state.evolve_to(self, num)
 
-    def _swap_form(self, num, subtract_current=False):
+    def _swap_form(self, num: int, subtract_current: bool=False) -> Any:
         return evolution_state._swap_form(self, num, subtract_current)
 
-    def mode_change(self):
+    def mode_change(self) -> Any:
         return evolution_state.mode_change(self)
 
-    def can_mode_change(self):
+    def can_mode_change(self) -> Any:
         return evolution_state.can_mode_change(self)
 
     # ---- care actions --------------------------------------------------------
-    def _set_anim(self, name, ttl):
+    def _set_anim(self, name: str, ttl: Any) -> Any:
         return misc._set_anim(self, name, ttl)
 
-    def _set_weight(self, value):
+    def _set_weight(self, value: Any) -> Any:
         return stats._set_weight(self, value)
 
-    def _weight_limit_penalty(self):
+    def _weight_limit_penalty(self) -> Any:
         return stats._weight_limit_penalty(self)
 
-    def _set_calories(self, value):
+    def _set_calories(self, value: Any) -> Any:
         return stats._set_calories(self, value)
 
-    def _set_obedience(self, value):
+    def _set_obedience(self, value: Any) -> Any:
         return stats._set_obedience(self, value)
 
 
 
-    def condition(self):
+    def condition(self) -> Any:
         return conditions.condition(self)
 
-    def current_mood(self):
+    def current_mood(self) -> Any:
         return conditions.current_mood(self)
 
-    def _set_enthusiasm(self, value):
+    def _set_enthusiasm(self, value: Any) -> Any:
         return stats._set_enthusiasm(self, value)
 
-    def _set_energy(self, value):
+    def _set_energy(self, value: Any) -> Any:
         return stats._set_energy(self, value)
 
     # (_energy_bonus_save -- checkEnergyIncFromPerfectConditions -- left
     # with the day/night system: its trigger WAS the favourite time of day.
     # BASIC VPET 2026-07-17)
 
-    def energy_pct(self):
+    def energy_pct(self) -> Any:
         return stats.energy_pct(self)
 
-    def _poop_size(self):
+    def _poop_size(self) -> Any:
         return misc._poop_size(self)
 
 
@@ -519,19 +520,19 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     # falls through to the species seed.)
 
 
-    def is_fatigued(self):
+    def is_fatigued(self) -> Any:
         return conditions.is_fatigued(self)
 
-    def is_injured(self):
+    def is_injured(self) -> Any:
         return conditions.is_injured(self)
 
-    def is_frail(self):
+    def is_frail(self) -> Any:
         return conditions.is_frail(self)
 
-    def is_freezing(self):
+    def is_freezing(self) -> Any:
         return conditions.is_freezing(self)
 
-    def is_overheating(self):
+    def is_overheating(self) -> Any:
         return conditions.is_overheating(self)
 
     # (_sicken/_worsen_sick/_check_sick/_check_worse_sick -- the whole
@@ -540,16 +541,16 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     # and nothing is contagious.)
 
 
-    def _growth_period(self):
+    def _growth_period(self) -> Any:
         return intervals._growth_period(self)
 
-    def _is_failed_form(self):
+    def _is_failed_form(self) -> Any:
         return conditions._is_failed_form(self)
 
-    def final_care_grade(self):
+    def final_care_grade(self) -> Any:
         return memory_state.final_care_grade(self)
 
-    def make_memory(self):
+    def make_memory(self) -> Any:
         return memory_state.make_memory(self)
 
 
@@ -559,7 +560,7 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
     # toy items (itemfx Play/Bounce scripts).)
 
 
-    def _personality_mood(self, e):
+    def _personality_mood(self, e: Any) -> Any:
         return traits._personality_mood(self, e)
 
 
@@ -577,5 +578,5 @@ class Pet(CareMixin, DnaMixin, BattleMixin, BodyMixin):
                   "egg_of_destiny": 25}
 
 
-    def status_word(self):
+    def status_word(self) -> Any:
         return conditions.status_word(self)

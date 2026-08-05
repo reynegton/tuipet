@@ -17,7 +17,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: Android",
 ]
-dependencies = ["textual>=0.50", "rich>=13", "websockets>=12"]
+dependencies = ["textual>=0.50", "rich>=13", "websockets>=12", "wcwidth>=0.2.13"]
 
 [project.optional-dependencies]
 # PINNED (2026-07-21): unpinned dev tools meant CI and a local .venv-dev could

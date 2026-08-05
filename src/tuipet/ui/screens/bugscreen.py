@@ -2,6 +2,7 @@
 can read it and fix it (Joel 2026-07-09).  A one-shot submit that needs no lobby
 login; if the network's down the app stashes it and retries next launch."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import INK, INK_B, DIM    # noqa: F401  (palette names bound for theme.apply propagation)
 from tuipet.i18n.translator import t
@@ -11,7 +12,7 @@ BODY_W = 38            # the LCD box's writable width
 VIEW_ROWS = 6          # wrapped lines shown (the box is ~12 rows total)
 
 
-def wrap(s, w):
+def wrap(s: Any, w: Any) -> Any:
     """Word-wrap into <=w-wide lines, hard-splitting any over-long token."""
     out, line = [], ""
     for word in s.split(" "):
@@ -28,7 +29,7 @@ def wrap(s, w):
 
 
 class BugReportPanel(menu.SubHost):
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.buf = ""
         self.frame_i = 0
@@ -36,23 +37,23 @@ class BugReportPanel(menu.SubHost):
         self.msg = t("bug_msg_intro", "What went wrong? It goes to the dev.")
         self.sub = None
 
-    def anim(self):
+    def anim(self) -> None:
         if self.sub_anim():
             return
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         return t("bug_msg_strip_prefix", "[dim]to the dev —[/] ") + \
             menu.hints(("ENTER", t("bug_hint_send", "send")), ("ESC", t("bug_hint_cancel", "cancel")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k == "escape":
             return ("done", None)
         if k == "enter":
             text = self.buf.strip()
             if not text:
                 self.msg = t("bug_msg_empty_error", "Type the bug first — or ESC to cancel.")
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
                 return None
             return ("done", ("bug", text))
         if k == "backspace":
@@ -64,7 +65,7 @@ class BugReportPanel(menu.SubHost):
         self.buf = self.buf[:MAXLEN]
         return None
 
-    def text(self):
+    def text(self) -> Any:
         out = menu.header(t("bug_hdr_report", "REPORT A BUG"), "%d/%d" % (len(self.buf), MAXLEN))
         lines = wrap(self.buf, BODY_W) if self.buf else [""]
         caret = "_" if (self.frame_i // 5) % 2 == 0 else " "

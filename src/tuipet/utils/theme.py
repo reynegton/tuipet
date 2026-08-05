@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 """Central UI palette + runtime theme switching.
 
 One source of truth for every colour in the app. Screens import the derived
@@ -109,7 +110,7 @@ BEZEL = SHELL = LABEL = KEY = ""
 FLASH: tuple = ("", "", "")
 
 
-def _derive(t):
+def _derive(t: Any) -> Any:
     on, bg, mid = t["on"], t["bg"], t["mid"]
     return {
         "LCD_ON": on, "LCD_BG": bg, "MID": mid,
@@ -135,7 +136,7 @@ def _derive(t):
     }
 
 
-def apply(name, propagate=True):
+def apply(name: str, propagate: bool=True) -> Any:
     """Make `name` the live theme. Rewrites this module's colour names and (when
     propagate) pushes them into every already-loaded screen module.
 
@@ -162,15 +163,15 @@ def apply(name, propagate=True):
     return name
 
 
-def current():
+def current() -> Any:
     return _current
 
 
-def names():
+def names() -> Any:
     return list(_ORDER)
 
 
-def blend_frames(fa, fb, a):
+def blend_frames(fa: Any, fb: Any, a: Any) -> Any:
     """Cell-wise lerp between two equal-shaped frames (rows of 6-hex-char
     cells) -- the interpolant for the background cross-fade."""
     if a <= 0:
@@ -194,7 +195,7 @@ def blend_frames(fa, fb, a):
 # longer tracks the clock.  BASIC VPET 2026-07-17)
 
 # --- persistence of the chosen theme ---
-def _conf_path():
+def _conf_path() -> Any:
     """theme.txt under the LIVE save dir, resolved at call time (the
     injectable-paths law).  The old hardcoded ~/.local/share/tuipet path
     ignored TUIPET_SAVE_DIR and the iOS dir pick: the choice silently
@@ -205,7 +206,7 @@ def _conf_path():
     return os.path.join(persistence.SAVE_DIR, "theme.txt")
 
 
-def save_choice(name):
+def save_choice(name: str) -> None:
     try:
         p = _conf_path()
         os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -215,7 +216,7 @@ def save_choice(name):
         pass
 
 
-def load_choice():
+def load_choice() -> Any:
     try:
         n = open(_conf_path()).read().strip()
         return n if n in THEMES else _DEFAULT

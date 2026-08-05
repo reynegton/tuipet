@@ -26,6 +26,7 @@ mid-march to spend a town/danger warp item (skip ahead, rest or get ambushed).
 Nothing here is faked.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.cells import cell_len
 from rich.text import Text
 import tuipet.data.loaders.data as data
@@ -58,7 +59,7 @@ TRAVEL_TICKS = 8              # auto-march pace: ticks per travel step (~0.8s a 
 TOWN_HOLD = 14                # ticks the pet rests at a town before marching on
 NOTE_HOLD = 30                # ticks a road-item verdict rides the strip
 _cells = cell_len             # budgets are CELLS, not chars (bug-#32 law)
-def _fit(name, budget):
+def _fit(name: str, budget: Any) -> Any:
     """Ellipsis-trim a name to a cell budget: a strip's REQUIRED keys never
     ride the marquee for a long boss name (audit 2026-07-25)."""
     if _cells(name) <= budget:
@@ -74,7 +75,7 @@ TELE_LEAVE_SNDS = {3: "strongHit", 15: "strongHit", 21: "strongHit",
                    26: "attackHit", 44: "attack"}
 TELE_ARRIVE_SNDS = {1: "attack", 5: "attackHit",
                     24: "strongHit", 28: "strongHit", 37: "strongHit"}
-def _brighten(bg, f):
+def _brighten(bg: Any, f: Any) -> Any:
     """Lerp a backdrop toward white -- the LCD's zonePulse flash."""
     out = []
     for r in bg:
@@ -86,7 +87,7 @@ def _brighten(bg, f):
                 for c in ((v >> 16) & 255, (v >> 8) & 255, v & 255)))
         out.append("".join(row))
     return out
-def _curtain_pts(x, y, w, h):
+def _curtain_pts(x: Any, y: Any, w: Any, h: Any) -> Any:
     """The evol curtain as overlay pixels: the canon stripe pattern (each 3-px
     band = 1 clear + 2 filled) over an LCD rect.  Rides paint()'s overlay so it
     covers the PET too, like canon's room-effect layer.  Window-law: the ink is
@@ -97,10 +98,10 @@ def _curtain_pts(x, y, w, h):
             and grid.X0 <= px < grid.X1 and grid.TOP <= py < grid.FLOOR]
 
 class AdventureLogicMixin:
-    def _advance(self):
+    def _advance(self) -> None:
             """One leg of the march.  A wild encounter opens a battle; the zone's
             end opens the BOSS gate; a bossless crossing rides the teleport home."""
-            r = self.adv.travel()
+            r = self.adv.travel()  # type: ignore
             if isinstance(r, tuple) and r[0] == "encounter":
                 self._start_battle(r[1])
             elif isinstance(r, tuple) and r[0] == "boss":
@@ -117,18 +118,18 @@ class AdventureLogicMixin:
                 self.sfx = "refuse"
             elif r == "town":
                 self._town_prompt = True          # rested on arrival; now visit or walk on
-            elif self.adv.boss_felled and not self._summary_shown:
-                self._home_msg = f"{t('msg_adv_conquered', '{name} conquered!').replace('{name}', self.adv.name)}{self._bits_tail()}"
+            elif self.adv.boss_felled and not self._summary_shown:  # type: ignore
+                self._home_msg = f"{t('msg_adv_conquered', '{name} conquered!').replace('{name}', self.adv.name)}{self._bits_tail()}"  # type: ignore
                 self._summary_shown = True
             elif r == "arrived":
-                self._home_msg = f"{self.adv.name} conquered!{self._bits_tail()}"
+                self._home_msg = f"{self.adv.name} conquered!{self._bits_tail()}"  # type: ignore
                 self._go_home()
 
-    def _use_transport(self, key):
+    def _use_transport(self, key: str) -> None:
             """Spend the chosen road item: a town warp rests (and opens the
             town's doors once the beat ends -- see anim), a danger warp
             ambushes, a life recovery refills the hearts in place."""
-            r = self.adv.use_transport(key)
+            r = self.adv.use_transport(key)  # type: ignore
             self._transport = None
             if r == "town-warp":
                 self._rest_t = TOWN_HOLD          # the warp-in rest beat
@@ -140,26 +141,26 @@ class AdventureLogicMixin:
                 # the v0.5.164 heal was nothing but the heart glyphs ticking --
                 # a happy beat + the verdict on the strip, the rest-beat grammar
                 self._heal_t = TOWN_HOLD
-                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD
+                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD  # type: ignore
                 self.sfx = "confirm"
             elif r == "danger-warp":
                 # empty wild pool: the dash still happened -- say so instead of
                 # silently eating the ticket (anim audit A12)
-                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD
+                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD  # type: ignore
             elif r == "skip-lift":
                 # the safe Birdramon lift (expansion 2026-07-26): the road
                 # slides by -- the verdict on the strip, the march resumes
-                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD
+                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD  # type: ignore
                 self._refused = False             # lifted = willing to walk on
                 self.sfx = "confirm"
             elif r == "camp-rest":
                 # the Whamon camp: the heal beat, like the life recovery
                 self._heal_t = TOWN_HOLD
-                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD
+                self._note, self._note_t = "⚡ " + self.adv.last, NOTE_HOLD  # type: ignore
                 self._refused = False             # rested = willing to walk on
                 self.sfx = "confirm"
 
-    def _dig(self):
+    def _dig(self) -> None:
             """ENTER on a glint: the OUTCOME lands now -- the bag gets the loot,
             the tally counts it -- then the investigateLeft playbook plays (the
             discover sequence, restored from the old build): walk out LEFT,
@@ -170,10 +171,10 @@ class AdventureLogicMixin:
             from tuipet.ui.screens.battlescreen import mega_window
             key, self._find = self._find, None
             present, self._find_present = self._find_present, False
-            self.pet.add_item(key)                # a CATALOG key: real, usable loot
+            self.pet.add_item(key)                # type: ignore
             if key == "memory":               # a WILD chip carries a random
-                self.pet.stash_wild_memory()      # trace (2026-07-24) -- one per item
-            self.adv.finds += 1
+                self.pet.stash_wild_memory()      # type: ignore
+            self.adv.finds += 1  # type: ignore
             name = (shop.entry(key) or {}).get("name", "loot")
             # a festival present is dug up WRAPPED (the present box) and the
             # contents revealed like a home gift; a plain find shows its own icon
@@ -185,13 +186,13 @@ class AdventureLogicMixin:
             else:
                 self._find_msg = t("msg_adv_dug", "Dug up {name}!").replace("{name}", name)
                 icon = self._find_icon(key)
-            lo, hi = mega_window(self.pet)        # the SHARED care-widened window
+            lo, hi = mega_window(self.pet)        # type: ignore
             self._scene = {"t": 0, "icon": icon, "key": key,
                            "name": name, "grade": None,
                            "meter": {"bar": 0, "dir": 1, "left": DIG_METER_T,
                                      "lo": lo, "hi": hi, "hist": []}}
 
-    def _find_icon(self, key):
+    def _find_icon(self, key: str) -> Any:
             """The find at HAND size, ~8px beside the 16px mon (old-build rule:
             scale by ceil(dim/8) so every icon reads held -- never crushed to a
             speck, never drawn as big as the pet)."""
@@ -207,7 +208,7 @@ class AdventureLogicMixin:
                     icon = downsample(icon, -(-dim // 8))
             return icon
 
-    def _scene_tick(self):
+    def _scene_tick(self) -> None:
             """Advance the playbook.  At the dig spot the TIMED-DIG meter holds
             the clock (the bar sweeps, the countdown burns, timeout locks the
             spade wherever the marker stands); after the lock, the dots and the
@@ -230,9 +231,9 @@ class AdventureLogicMixin:
             if s["t"] == INV_REVEAL_T:
                 self.sfx = "reward"               # _discoverConsumable
             if s["t"] >= INV_END_T:               # carried home -> back on the road
-                self._scene = None
+                self._scene = None  # type: ignore
 
-    def _hazard_tick(self):
+    def _hazard_tick(self) -> None:
             """Advance the ambush.  Impact settles it: a duck already banked
             rings clean, an unducked pounce lands -- the ENGINE takes the toll
             -- and the verdict beat plays either way before the march resumes."""
@@ -243,13 +244,13 @@ class AdventureLogicMixin:
                     self.sfx = "confirm"              # a clean duck-under
                 else:
                     h["hit"] = True
-                    self.adv.hazard_hit()             # the small energy toll
+                    self.adv.hazard_hit()             # type: ignore
                     self.sfx = "attackHit"
             if h["t"] >= HZ_TELE_T + HZ_LUNGE_T + HZ_END_T:
-                self._hazard = None                   # back to the march
+                self._hazard = None                   # type: ignore
                 self._wx = float(grid.X0)             # ...from the wall the
 
-    def _lock_dig(self):
+    def _lock_dig(self) -> None:
             """The spade falls: grade through the ONE lock source
             (strikefx.grade_lock -- the latency grace, the 2px marker, the
             verbatim battles >= 999 never-whiff rule; this was the THIRD
@@ -260,16 +261,16 @@ class AdventureLogicMixin:
             s = self._scene
             m = s.pop("meter")
             g = strikefx.grade_lock(m["hist"] + [m["bar"]], m["lo"], m["hi"],
-                                    veteran=self.pet.battles >= 999)
+                                    veteran=self.pet.battles >= 999)  # type: ignore
             s["grade"] = g
             if g == "mega":
-                self.pet.add_item(s["key"])       # the bonus copy, banked at the lock
+                self.pet.add_item(s["key"])       # type: ignore
                 self._find_msg = t("msg_adv_dug_x2", "Dug up {name} ×2!").replace("{name}", s["name"])
             elif g == "miss":
                 self._find_msg = t("msg_adv_scraped", "Scraped out {name}...").replace("{name}", s["name"])
             self.sfx = "confirm" if g != "miss" else "cancel"
 
-    def _start_battle(self, enemy):
+    def _start_battle(self, enemy: Any) -> None:
             """A wild fight rides BattlePanel as a child (SubHost): the road's biome
             is the fight's scene, wild=True gives the pre-bell flee.
     
@@ -278,8 +279,8 @@ class AdventureLogicMixin:
             did, so a sick or hurt walker could grind recorded bouts the home
             key refuses.  It slips away instead: no bout, no life, a grace leg
             -- the pilgrimage to the town's sickbed stays walkable."""
-            if (cond := self.pet.battle_condition(check_energy=False)) is not None:
-                self.adv.resolve(False, fled=True)
+            if (cond := self.pet.battle_condition(check_energy=False)) is not None:  # type: ignore
+                self.adv.resolve(False, fled=True)  # type: ignore
                 self._note = f"{cond.rstrip('.!')} — slipped away."
                 self._note_t = NOTE_HOLD
                 self.travelling = True
@@ -287,9 +288,9 @@ class AdventureLogicMixin:
             from tuipet.ui.screens.battlescreen import BattlePanel
             self.travelling = False               # the march pauses during the fight
             self._fighting_enemy = enemy
-            self.sub = BattlePanel(self.pet, enemy=enemy, wild=True, scene=self.adv.scene)
+            self.sub = BattlePanel(self.pet, enemy=enemy, wild=True, scene=self.adv.scene)  # type: ignore
 
-    def _start_boss(self, boss):
+    def _start_boss(self, boss: Any) -> None:
             """The gate boss fight -- same road biome, flagged so _battle_done knows
             to settle it as the zone's end, not a wayside wild.
     
@@ -308,7 +309,7 @@ class AdventureLogicMixin:
             # adventure energy audit) -- a march ARRIVES drained by design, so
             # asking the home door's energy clause here shut the gate on every
             # honest run.  The body states still hold; see battle_condition.
-            if (cond := self.pet.battle_condition(check_energy=False)) is not None:
+            if (cond := self.pet.battle_condition(check_energy=False)) is not None:  # type: ignore
                 self.travelling = False
                 self._at_gate = True
                 self._fighting_enemy = boss
@@ -321,43 +322,43 @@ class AdventureLogicMixin:
             self._gate_refusal = None
             self._fighting_boss = True
             self._fighting_enemy = boss
-            self.sub = BattlePanel(self.pet, enemy=boss, wild=True, scene=self.adv.scene)
+            self.sub = BattlePanel(self.pet, enemy=boss, wild=True, scene=self.adv.scene)  # type: ignore
 
-    def _battle_done(self, result):
+    def _battle_done(self, result: Any) -> None:
             """Settle a finished fight.  result is the battle object (has .won) or
             None if the pet fled before the bell."""
             won = bool(getattr(result, "won", False)) if result is not None else False
             fled = result is None
             enemy, self._fighting_enemy = self._fighting_enemy, None
             if not fled:                          # a fought bout (not a pre-bell flee)
-                self.adv.fights += 1
+                self.adv.fights += 1  # type: ignore
                 if won:
-                    self.adv.wins += 1
-            self.adv.chain(won)                   # the streak: BEFORE the bounty, so
+                    self.adv.wins += 1  # type: ignore
+            self.adv.chain(won)                   # type: ignore
             #                                       this win's own chain pays it
             drop = None
             if won and enemy is not None:
-                self.adv.award_bits(enemy)        # the bounty into the purse + run tally
-                drop = self.adv.award_drop(enemy)  # the AUTHORED battle drop (2026-07-26)
+                self.adv.award_bits(enemy)        # type: ignore
+                drop = self.adv.award_drop(enemy)  # type: ignore
             if self._fighting_boss:
                 self._fighting_boss = False
-                out = self.adv.resolve_boss(won, fled=fled)
+                out = self.adv.resolve_boss(won, fled=fled)  # type: ignore
                 if out == "won":
-                    unlocked = adventure.record_win(self.pet, self.adv.zone)   # progression
+                    unlocked = adventure.record_win(self.pet, self.adv.zone)   # type: ignore
                     import tuipet.utils.persistence as persistence    # profile signals: unlocks
-                    m = self.adv.zone.get("map")
+                    m = self.adv.zone.get("map")  # type: ignore
                     map_done = (m is not None
-                                and adventure.is_map_cleared(self.pet, m))
+                                and adventure.is_map_cleared(self.pet, m))  # type: ignore
                     if map_done:
                         persistence.map_complete_add(m - 1)  # shop shelf + eggs (0-based)
-                    if self.adv.holiday:                   # conquered on a festival day
-                        persistence.festival_add(self.adv.holiday)  # gates the festival egg
+                    if self.adv.holiday:                   # type: ignore
+                        persistence.festival_add(self.adv.holiday)  # type: ignore
                     tail = t("msg_adv_new_ground", " New ground opens!") if unlocked else ""
                     if drop:
                         e = shop.entry(drop) or {}
                         tail = f"{t('msg_adv_drops', ' It drops {name}!').replace('{name}', e.get('name', 'something'))}{tail}"
-                    self._home_msg = (f"{t('msg_adv_boss_felled', '{boss} felled — ').replace('{boss}', self.adv.boss_name)}"
-                                      f"{t('msg_adv_conquered', '{name} conquered!').replace('{name}', self.adv.name)}{self._bits_tail()}{tail}")
+                    self._home_msg = (f"{t('msg_adv_boss_felled', '{boss} felled — ').replace('{boss}', self.adv.boss_name)}"  # type: ignore
+                                      f"{t('msg_adv_conquered', '{name} conquered!').replace('{name}', self.adv.name)}{self._bits_tail()}{tail}")  # type: ignore
                     # the zoneChange CELEBRATION plays before the homecoming
                     # (restored from the old build): the pulse first; the map-
                     # conquered BossParade -- canon shows three.  ⚠ Keyed to the
@@ -387,24 +388,24 @@ class AdventureLogicMixin:
                                    # to 71 cells, cut mid-scroll on the biggest
                                    # wins (audit 2026-07-25).  The homecoming
                                    # verdict keeps the full sentence.
-                                   "line": t("msg_adv_boss_conquered", "{boss} — conquered!").replace("{boss}", self.adv.boss_name)}
+                                   "line": t("msg_adv_boss_conquered", "{boss} — conquered!").replace("{boss}", self.adv.boss_name)}  # type: ignore
                 elif out == "fled":
-                    self._home_msg = f"{t('msg_adv_turned_boss', 'Turned back from {boss}.').replace('{boss}', self.adv.boss_name)}{self._bits_tail()}"
+                    self._home_msg = f"{t('msg_adv_turned_boss', 'Turned back from {boss}.').replace('{boss}', self.adv.boss_name)}{self._bits_tail()}"  # type: ignore
                     self._go_home()
                 elif out == "failed":
-                    self._home_msg = f"{t('msg_adv_defeated', 'Defeated by {boss}.').replace('{boss}', self.adv.boss_name)}{self._bits_tail()}"
+                    self._home_msg = f"{t('msg_adv_defeated', 'Defeated by {boss}.').replace('{boss}', self.adv.boss_name)}{self._bits_tail()}"  # type: ignore
                     self._go_home()
                 else:                             # 'retry' -- stand at the gate, choose
                     self._at_gate = True
                 return
             # a wayside wild
-            out = self.adv.resolve(won, fled=fled)
+            out = self.adv.resolve(won, fled=fled)  # type: ignore
             if out == "won" and drop:
                 e = shop.entry(drop) or {}
                 # the strip speaks the drop over the plain "road clears" line
-                self.adv.last = t("msg_adv_drop_bagged", "It drops {name} — bagged!").replace("{name}", e.get('name', 'loot'))
+                self.adv.last = t("msg_adv_drop_bagged", "It drops {name} — bagged!").replace("{name}", e.get('name', 'loot'))  # type: ignore
             if out == "failed":
-                self._home_msg = f"{t('msg_adv_driven_back', 'Driven back from {name}.').replace('{name}', self.adv.name)}{self._bits_tail()}"
+                self._home_msg = f"{t('msg_adv_driven_back', 'Driven back from {name}.').replace('{name}', self.adv.name)}{self._bits_tail()}"  # type: ignore
                 self._go_home()
             else:
                 # (defensive: a wayside settle never belongs to the gate -- the
@@ -412,24 +413,24 @@ class AdventureLogicMixin:
                 self._at_gate, self._gate_refusal = False, None
                 self.travelling = True            # resume the march (a grace leg follows)
 
-    def _bits_tail(self):
+    def _bits_tail(self) -> Any:
             """The run's purse for the homecoming verdict (empty if nothing won)."""
-            return f" +{self.adv.bits_earned}b" if self.adv.bits_earned else ""
+            return f" +{self.adv.bits_earned}b" if self.adv.bits_earned else ""  # type: ignore
 
-    def _town_done(self, _result):
+    def _town_done(self, _result: Any) -> None:
             """Left the town hub -- back onto the road, the march resumes."""
             self._town_sub = False
             self._town_prompt = False
-            if self.pet.dead:                     # a lethal town-bag item: the run
+            if self.pet.dead:                     # type: ignore
                 self._summary_shown = True        # ends at the door, not 20 legs on
                 self._go_home()
 
-    def _go_home(self):
+    def _go_home(self) -> None:
             """Conclude the run: show the results card first (a key rides the
             teleport home), unless there's nothing to summarise -- a bare turn-back
             goes straight to the canon teleport."""
             self.travelling = False
-            a = self.adv
+            a = self.adv  # type: ignore
             if not self._summary_shown and (a.bits_earned or a.fights or a.finds or a.done):
                 # a run of substance gets SCORED against the zone's standing
                 # best (bare turn-backs skip the card AND the books)
@@ -441,10 +442,10 @@ class AdventureLogicMixin:
                 return
             self._trans = {"dir": "out", "phase": "leave", "t": 0}
 
-    def _outcome_word(self):
-            if self.adv.done:
+    def _outcome_word(self) -> Any:
+            if self.adv.done:  # type: ignore
                 return t("msg_adv_conquered_short", "Conquistado!")
-            if self.adv.failed:
+            if self.adv.failed:  # type: ignore
                 return t("msg_adv_defeated_short", "Derrotado")
             return t("msg_adv_turned_back", "Recuado")
 

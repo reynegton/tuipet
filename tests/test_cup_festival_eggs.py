@@ -76,9 +76,9 @@ def test_conquering_on_a_holiday_celebrates_the_festival(tmp_path, monkeypatch):
     """The adventure conquer hook: felling a zone boss on a festival day stamps
     the festival (next to the map-clear signal)."""
     monkeypatch.setenv("HOME", str(tmp_path))
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(Pet(num=100, stage="Champion", attribute="Vaccine",
                              obedience=500), zone=ZONES[0])
     pan.adv.holiday = "Odaiba Memorial Day"                # pretend it's the festival

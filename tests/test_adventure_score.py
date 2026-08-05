@@ -39,9 +39,9 @@ def test_the_best_book_keeps_only_the_high_water_mark():
 
 
 def test_a_run_of_substance_records_and_brags_a_new_best(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(_pet(), zone=ZONES[0])
     pan._trans = None
     pan._landed = True
@@ -59,9 +59,9 @@ def test_a_run_of_substance_records_and_brags_a_new_best(monkeypatch):
 
 
 def test_a_bare_turn_back_stays_out_of_the_books(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(_pet(), zone=ZONES[0])
     pan._trans = None
     pan._landed = True

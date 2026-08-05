@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -5,14 +6,14 @@ import tuipet.data.loaders.data as data
 import tuipet.utils.sound as sound
 from tuipet.core.petbase import FULL_HUNGER, _clamp, PILL_ENERGY_GAIN, PILL_WEIGHT_GAIN
 
-def can_feed(pet):
+def can_feed(pet: Any) -> Any:
     """Guard for opening the feed menu (mirrors feed()'s own gates)."""
     if (_g := pet._guard()) is not None:
         return _g
     return None
 
 
-def feed(pet, food=None, assisted=False):
+def feed(pet: Any, food: Optional[Any]=None, assisted: bool=False) -> Any:
     """The DSprite feed (BASIC VPET 2026-07-16, cloned from v0.4.x): the
     F menu picks MEAT or PILL; the whole DVPet food catalog -- taste
     tiers, nutrition macros, calories, food evolutions -- left with it.
@@ -20,7 +21,7 @@ def feed(pet, food=None, assisted=False):
     return pet.feed_meat()
 
 
-def feed_meat(pet, assisted=False):
+def feed_meat(pet: Any, assisted: bool=False) -> Any:
     """Meat: hunger +1, weight +1.  The source's refusal gates (canon
     gates 2026-07-18, decompile L11676): a sick pet, a pet beside its
     own filth, or a full belly gets the head-shake and NOTHING else --
@@ -76,7 +77,7 @@ def feed_meat(pet, assisted=False):
     return "Alimentado com carne."
 
 
-def feed_pill(pet):
+def feed_pill(pet: Any) -> Any:
     """The pill (clone rules): cures the sickness, strength +1, energy
     +7, weight +5.  Refused when there is nothing to cure or top up.
     Healing a sleeper DISTURBS it first.  (The classic spell machine

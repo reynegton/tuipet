@@ -18,6 +18,7 @@ Rule grammar (LINES_SPEC §2) — comma = AND, `|` = OR, first matching row wins
     TIME                no requirement — the stage timer alone
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import csv
 import os
 from functools import lru_cache
@@ -30,7 +31,7 @@ _DATA = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 _KO6_MIN_STAGE = "Ultimate"
 
 
-def _bracket(arg):
+def _bracket(arg: Any) -> Any:
     """'0-2' -> (0, 2); '3+' -> (3, None); '7' -> (7, 7)."""
     arg = arg.strip()
     if arg.endswith("+"):
@@ -42,7 +43,7 @@ def _bracket(arg):
     return v, v
 
 
-def parse_rule(text):
+def parse_rule(text: str) -> Any:
     """Rule text -> list of OR-alternatives, each a list of (kind, a, b) atoms.
     'TIME' (or blank) parses to one unconstrained alternative."""
     text = (text or "").strip()
@@ -64,17 +65,17 @@ def parse_rule(text):
                 # partner with a listed attribute resonates (pen20 manual).
                 # Never fires on the stage timer -- the lobby fusion opens it.
                 if arg.isdigit():
-                    atoms.append(("jogress", int(arg), None))
+                    atoms.append(("jogress", int(arg), None))  # type: ignore
                 else:
                     attrs = tuple(a.strip() for a in arg.split("/") if a.strip())
                     if not attrs or any(a not in ("Vaccine", "Data", "Virus",
                                                   "None") for a in attrs):
                         raise ValueError(f"bad JOGRESS partner: {part!r}")
-                    atoms.append(("jogress", attrs, None))
+                    atoms.append(("jogress", attrs, None))  # type: ignore
             elif kind == "AREA":
                 if not arg:
                     raise ValueError(f"AREA atom needs a map: {part!r}")
-                atoms.append(("area", arg, None))
+                atoms.append(("area", arg, None))  # type: ignore
             elif kind in ("CM", "TR", "OF", "BTL", "LV", "KO6"):
                 lo, hi = _bracket(arg)
                 atoms.append((kind.lower(), lo, hi))
@@ -85,11 +86,11 @@ def parse_rule(text):
 
 
 @lru_cache(maxsize=1)
-def load_lines():
+def load_lines() -> Any:
     """lines.csv -> {line_id: {"root": dex, "members": {dex: row},
     "children": {parent_dex: [row, ...] in CSV (first-match) order}}}.
     A row is {"num", "stage", "parents", "rule" (parsed), "rule_text", "bedtime"}."""
-    out = {}
+    out = {}  # type: ignore
     with open(os.path.join(_DATA, "lines.csv"), newline="") as fh:
         for raw in csv.DictReader(fh):
             lid = raw["LineID"].strip()
@@ -121,7 +122,7 @@ def load_lines():
     return out
 
 
-def line_for_hatch(dex):
+def line_for_hatch(dex: Any) -> Any:
     """The line whose root Fresh form is `dex` ('' = no line: corpus engine)."""
     for lid, line in load_lines().items():
         if line["root"] == dex:
@@ -129,7 +130,7 @@ def line_for_hatch(dex):
     return ""
 
 
-def canonical_root(dex):
+def canonical_root(dex: Any) -> Any:
     """(root_dex, line_id) a hatching `dex` should become.  A dex that IS a
     root maps to itself; a duplicate twin (the corpus keeps 2-3 dexes per Baby
     name; the mystery-egg pools hatch the sub-1410 twins) maps to the root
@@ -153,7 +154,7 @@ def canonical_root(dex):
     return None, ""
 
 
-def active(pet):
+def active(pet: Any) -> Any:
     """This pet evolves by line rules: hatched from a line egg AND still inside
     the line (a jogress/fusion that leaves the subtree falls back to the corpus
     engine — defensive until arc 4 formalizes specials for lines)."""
@@ -161,14 +162,14 @@ def active(pet):
     return bool(line) and pet.num in line["members"]
 
 
-def bedtime(pet):
+def bedtime(pet: Any) -> Any:
     """The form's fixed bedtime 'HH:MM' ('' if not a line form)."""
     line = load_lines().get(getattr(pet, "line_id", ""))
     row = line["members"].get(pet.num) if line else None
     return row["bedtime"] if row else ""
 
 
-def bedtime_minutes(pet):
+def bedtime_minutes(pet: Any) -> Any:
     """The bedtime as a minute-of-day (0..1439), or None for non-line forms.
     '24:00' wraps to 0 (a midnight sleeper like Devimon)."""
     bt = bedtime(pet)
@@ -187,7 +188,7 @@ DMX_LEVEL_CAP = {"Fresh": 1, "InTraining": 2, "Rookie": 4,
                  "Champion": 6, "Ultimate": 8, "Mega": 10}
 
 
-def _pet_level(pet):
+def _pet_level(pet: Any) -> Any:
     """The DMX level: battle experience vs the canon thresholds, capped by
     the CURRENT stage (Rookie 4 / Champion 6 / Ultimate 8 / Mega 10) -- a
     Mega-target row gating LV 8 reads the Ultimate PARENT's cap, and the
@@ -197,13 +198,13 @@ def _pet_level(pet):
     return min(lvl, DMX_LEVEL_CAP.get(getattr(pet, "stage", "Mega"), 10))
 
 
-def _actual(pet, kind):
+def _actual(pet: Any, kind: Any) -> Any:
     return {"cm": pet.care_mistakes, "tr": pet.stage_trainings,
             "of": pet.overeat, "btl": pet.stage_battles,
             "lv": _pet_level(pet), "ko6": pet.mega_kills}[kind]
 
 
-def _felled_raids():
+def _felled_raids() -> Any:
     import tuipet.utils.persistence as persistence    # late: persistence imports pet at module top
     try:
         return int(persistence.get_progress().get("raids", 0) or 0)
@@ -211,7 +212,7 @@ def _felled_raids():
         return 0
 
 
-def _atom_met(pet, atom):
+def _atom_met(pet: Any, atom: Any) -> Any:
     kind, a, b = atom
     if kind == "jogress":
         return False       # a door, not a timer rule: only the lobby fusion opens it
@@ -245,13 +246,13 @@ def _atom_met(pet, atom):
     return v >= a and (b is None or v <= b)
 
 
-def check_rule(pet, rule):
+def check_rule(pet: Any, rule: Any) -> Any:
     """True if ANY alternative has every atom met (an empty alternative — the
     TIME rule — is always met)."""
     return any(all(_atom_met(pet, atom) for atom in alt) for alt in rule)
 
 
-def jogress_declared(pet):
+def jogress_declared(pet: Any) -> Any:
     """Line-declared jogress doors from the pet's current form:
     [(target_num, partner_dex)] — the DM20 capstones (Omnimon Alter-S,
     RustTyrannomon).  The partner is EXACT; jogress.options feeds these into
@@ -264,7 +265,7 @@ def jogress_declared(pet):
             if row["jogress"] is not None]
 
 
-def companion_wanted(num):
+def companion_wanted(num: int) -> Any:
     """True when some line's exact-partner jogress door names `num` as the
     REQUIRED companion (canon one-sided doors -- Jesmon GX needs a Jesmon X
     that never evolves itself; jogress canon audit 2026-07-17)."""
@@ -276,7 +277,7 @@ def companion_wanted(num):
     return False
 
 
-def select_line(pet):
+def select_line(pet: Any) -> Any:
     """First-match evolution: the ordered child rows of the pet's current form,
     first row whose rule passes. None = stay (keep re-checking: counters can
     still earn a later row — the DM20 Perfect battle gate works exactly so)."""
@@ -290,7 +291,7 @@ def select_line(pet):
 
 
 @lru_cache(maxsize=1)
-def hatchable_roots():
+def hatchable_roots() -> Any:
     """Every root dex some egg can hatch today.  The dormant legacy charts
     (the classic 141x lines the family eggs used to borrow, and ver6) still
     LOAD -- a pet mid-journey keeps its tree -- but they aren't hatched
@@ -301,7 +302,7 @@ def hatchable_roots():
     return {t for i in range(egg_mod.count()) for t in egg_mod.hatch_targets(i)}
 
 
-def adopt_line(pet, prev=None):
+def adopt_line(pet: Any, prev: Optional[Any]=None) -> Any:
     """Re-anchor the pet to a line whose chart contains its CURRENT form -- a
     jogress/mode fusion keeps the pet in the line system whenever ANY line
     claims the target (its own line preferred).  Shared nodes sit in several
@@ -333,7 +334,7 @@ def adopt_line(pet, prev=None):
     return ""
 
 
-def win_gate_progress(pet):
+def win_gate_progress(pet: Any) -> Any:
     """(now, need, window) for the pet's nearest WIN gate, or None -- the cup
     screen shows how tournament fights feed the evolution window."""
     line = load_lines().get(getattr(pet, "line_id", ""))
@@ -359,7 +360,7 @@ _TXT = {"cm": "care slips", "tr": "trainings", "of": "overfeeds",
 WIN_FEED_NOTE = "fed by cup & road, not pvp/raids"
 
 
-def straight_needed(pet, a, b):
+def straight_needed(pet: Any, a: Any, b: Any) -> Any:
     """How many CONSECUTIVE wins from here reach `a` of the last `b`.
 
     THE WINDOW ROLLS, and that is the whole point of this number (Joel
@@ -380,7 +381,7 @@ def straight_needed(pet, a, b):
     return b
 
 
-def _atom_row(pet, atom):
+def _atom_row(pet: Any, atom: Any) -> Any:
     kind, a, b = atom
     if kind == "win":
         now = sum(pet.battle_log[-b:])
@@ -414,7 +415,7 @@ def _atom_row(pet, atom):
     return _atom_met(pet, atom), f"{_TXT[kind]} {span}  (now {_actual(pet, kind)})"
 
 
-def requirement_report(pet, num):
+def requirement_report(pet: Any, num: int) -> Any:
     """The bracket checklist for one line target, same row shape as
     evolution.requirement_report: (met, text). With OR alternatives, shows the
     closest one (fewest unmet atoms)."""
@@ -431,7 +432,7 @@ def requirement_report(pet, num):
     for alt in row["rule"]:
         rows = [_atom_row(pet, atom) for atom in alt]
         unmet = sum(1 for met, _ in rows if not met)
-        if best is None or unmet < best_unmet:
+        if best is None or unmet < best_unmet:  # type: ignore
             best, best_alt, best_unmet = rows, alt, unmet
     win_atom = next((at for at in best_alt if at[0] == "win"), None) if best_alt else None
     if best and win_atom:
@@ -457,7 +458,7 @@ def requirement_report(pet, num):
     return best or [(True, "time alone — the clock decides")]
 
 
-def evo_rows(pet):
+def evo_rows(pet: Any) -> Any:
     """(num, name, ready, unmet) per child of the current form, in chart
     (first-match) order — the line data book page."""
     line = load_lines().get(pet.line_id)

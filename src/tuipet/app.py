@@ -1,5 +1,6 @@
 """tuipet — a terminal Monster V-Pet rendered with halfblock sprites."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import os as _os
 import random
 if not _os.environ.get("COLORTERM"):
@@ -44,20 +45,20 @@ HUD_GAP = "      "      # blank run between marquee wraps so the looped text rea
 HUD_STEP = 2            # advance the marquee every N frames (10 Hz clock -> ~0.2 s/char)
 HUD_HOLD = 8            # marquee steps to hold on the message head before scrolling (~1.6 s)
 _HUD_MARKUP = _re.compile(r"\[/?[^\]]*\]")
-def _hud_plain(t):
+def _hud_plain(t: Any) -> Any:
     """Visible text of a Rich-markup string (tags stripped) for width measurement."""
     return _HUD_MARKUP.sub("", t)
-def _hud_esc(t):
+def _hud_esc(t: Any) -> Any:
     """Escape '[' so a plain marquee window is never parsed as Rich markup."""
     return t.replace("[", "\\[")
-def _hud_fits(markup):
+def _hud_fits(markup: Any) -> Any:
     """True when a message renders inside the box -- measured in CELLS, never
     chars (bug report #32, Joel v0.5.264 "what is space t?": '⚡' is TWO
     terminal cells, so a 40-char road strip measured 41 cells, slipped past
     the char check, and Textual wrapped 'ESC' onto the box's invisible
     second row)."""
     return cell_len(_hud_plain(markup)) <= HUD_W
-def keys_markup():
+def keys_markup() -> Any:
     """The action bar, rebuilt per theme: the shortcut letters wear the
     theme's KEY colour -- cyan on EVERY theme today (the per-theme key
     colours died with the putty-shell revert, Joel 2026-07-05 "this looks
@@ -110,7 +111,7 @@ class Stats(Static):
     """The right-hand card widget.  Every card body lives in statusbox --
     this widget only chooses home/egg/grave and writes the lines."""
 
-    def paint(self, pet: Pet):
+    def paint(self, pet: Pet) -> Any:
         if pet.dead:
             return self._paint_grave(pet)
         if pet.num == -1 or pet.stage == "Egg":
@@ -118,63 +119,16 @@ class Stats(Static):
         self.border_subtitle = _gen_subtitle(pet)
         self.update("\n".join(statusbox.home_lines(pet)))
 
-    def _paint_egg(self, pet):
+    def _paint_egg(self, pet: Any) -> None:
         self.border_subtitle = _gen_subtitle(pet)
         self.update("\n".join(statusbox.egg_lines(pet)))
 
-    def _paint_grave(self, pet):
+    def _paint_grave(self, pet: Any) -> None:
         self.border_subtitle = _gen_subtitle(pet)
         self.update("\n".join(statusbox.grave_lines(pet)))
-def main():
-    from tuipet.i18n.translator import set_language
-    set_language("pt")
-    _preflight()
-    other = persistence.acquire_instance_lock()
-    if other and not _os.environ.get("TUIPET_FORCE"):
-        print(f"tuipet is already running (pid {other}) — two copies would fight "
-              f"over one save.\nClose the other one first, or set TUIPET_FORCE=1 "
-              f"to override.")
-        raise SystemExit(1)
-    # Cross-device: pull a newer cloud save down BEFORE the app loads the pet, so
-    # the normal load path picks it up (no mid-session swapping). Fail-soft.
-    if persistence.sync_enabled():
-        try:
-            name, pw = persistence.get_account()
-            if name:
-                # the pull BLOCKS the launch up to its timeout -- offline,
-                # that read as a silent ~3s hang (QOL sweep 2026-07-23);
-                # same pre-UI print style as _preflight's warnings
-                print("checking cloud save…", flush=True)
-            cloudsync.sync_down_at_startup(_lobby_uri(), name, pw)
-        except Exception:
-            pass
-    app = TuiPetApp()
-    try:
-        app.run()
-    finally:
-        persistence.release_instance_lock()
-    if getattr(app, "_restart_after_exit", False):
-        # the update's restart offer: the terminal is back to normal here,
-        # so exec the NEW install in place.  The console script re-execs
-        # itself; a `python -m tuipet` launch falls back to the interpreter.
-        import sys as _sys
-        argv0 = _sys.argv[0]
-        if argv0 and _os.access(argv0, _os.X_OK) and not argv0.endswith(".py"):
-            _os.execv(argv0, _sys.argv)
-        _os.execv(_sys.executable, [_sys.executable, "-m", "tuipet"])
-    if getattr(app, "_crash_note", None):
-        print(app._crash_note)          # after Textual restores the terminal
-    elif persistence.save_failed:
-        # never print "Saved" over a disk that refused (silent-failure law)
-        print("⚠ tuipet couldn't save — set TUIPET_SAVE_DIR to a writable folder.")
-    elif getattr(app, "pet", None) is not None:
-        nm = getattr(app.pet, "name", "") or "your pet"
-        print(f"Saved ✓ — {nm} will be waiting.")
-if __name__ == "__main__":
-    main()
 from tuipet.app_mixins import *
 
-class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, LifecycleMixin, App):
+class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, LifecycleMixin, ErrorsMixin, AccountMixin, App):  # type: ignore
     CSS = """
         Screen { align: center middle; }
         #wrap { width: auto; height: auto; }
@@ -235,7 +189,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
     if not SERVIDOR_ONLINE:
             BINDINGS = [b for b in BINDINGS if (b[1] if isinstance(b, tuple) else getattr(b, 'action', '')) not in ('raid', 'lobby', 'bug')]
 
-    def __init__(self, pet: Pet | None = None):
+    def __init__(self, pet: Pet | None = None) -> None:
             super().__init__()
             try:                       # the version THIS process runs (see _bug_meta)
                 from importlib.metadata import version as _v
@@ -262,17 +216,17 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                         self._boot_notice = msg
             self.pet = pet or Pet.new_egg()
             self.mode = None            # active in-display panel (no pop-up screens)
-            self._dying_fx = False      # playing the death animation before the memorial
+            self._dying_fx = False      # type: ignore
             self._mode_close = None
             self.sound = _load_sound()
-            self._needs = False
+            self._needs = False  # type: ignore
             self._flash_t = 0           # ticks an action flash holds before a care-need re-asserts
-            self._showing_need = False
+            self._showing_need = False  # type: ignore
             self._update_msg = None     # set by the background PyPI check when a newer release exists
-            self._showing_update = False
-            self._showing_armed = False  # the standing DNA-divergence notice (set once: marquee)
-            self._showing_tidy = False   # the sub-alarm tidy-up nudge (1-2 piles)
-            self._showing_eggwait = False   # the egg-stage standing pointer (set once: marquee)
+            self._showing_update = False  # type: ignore
+            self._showing_armed = False  # type: ignore
+            self._showing_tidy = False   # type: ignore
+            self._showing_eggwait = False   # type: ignore
             self._sync = None           # background cloud-save push client (net.SyncClient), or None
             self._hud_scroll = None     # plain text being marquee-scrolled, or None when it fits
             self._hud_off = 0           # marquee window offset
@@ -288,7 +242,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                     yield Stats(id="stats")
                 yield Static(keys_markup(), id="keys")
 
-    def on_mount(self):
+    def on_mount(self) -> None:
             self.screen_w = self.query_one("#lcd", Screen)
             self.stats_w = self.query_one("#stats", Stats)
             self.msg_w = self.query_one("#msg", Static)
@@ -316,7 +270,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                 self.run_worker(self._flush_bugs(), name="bugflush", exclusive=False)
                 self._start_sync()
 
-    async def _check_update(self):
+    async def _check_update(self) -> None:
             """Background, once per launch: ask PyPI for a newer tuipet and INSTALL
             it (Joel 2026-07-14: "make it so the game automatically checks and
             updates itself... then they have to restart for it to be the new one").
@@ -336,30 +290,30 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
             if not latest:
                 return
             if not persistence.get_auto_update():          # the player opted out
-                self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"
+                self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"  # type: ignore
                 return
             if update_check.upgrade_argv() is None:        # iOS / source: cannot self-install
-                self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"
+                self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"  # type: ignore
                 return
-            self._update_msg = f"⬆ instalando tuipet {latest}…"
+            self._update_msg = f"⬆ instalando tuipet {latest}…"  # type: ignore
             ok, _msg = await asyncio.to_thread(update_check.run_upgrade)
             if ok:
                 self._updated_to = latest
-                self._update_msg = f"✔ tuipet {latest} instalado — reinicie para jogar"
+                self._update_msg = f"✔ tuipet {latest} instalado — reinicie para jogar"  # type: ignore
             else:
-                self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"
+                self._update_msg = f"⬆ tuipet {latest} disponível — {update_check.manual_command()}"  # type: ignore
 
-    def on_unmount(self):
+    def on_unmount(self) -> None:
             persistence.save(self.pet)
             self._flush_dms_on_quit()       # a lobby quit must not drop PMs from this session
             self._flush_cloud_on_quit()     # capture the final state cloud-side on any exit
 
-    def on_key(self, event):
+    def on_key(self, event: Any) -> None:
             fx = getattr(getattr(self, "screen_w", None), "fx", None)
             if fx is not None and fx.get("kind") == "dying":
                 # dying(): the pet is a BUTTON -- frantic taps can save it
                 # (numHits > HitsToSave x (savedFromDeath + 1))
-                self._revive_hits = getattr(self, "_revive_hits", 0) + 1
+                self._revive_hits = getattr(self, "_revive_hits", 0) + 1  # type: ignore
                 self.beep("click", bell=False)
                 event.stop()
                 event.prevent_default()
@@ -443,18 +397,18 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                 else:
                     self.repaint()
 
-    def _mode_strip(self):
+    def _mode_strip(self) -> None:
             """A scene panel's one-line strip (note + key hints) rides the #msg box
             under the LCD -- the box sat BLANK during every sub-screen while the
             panels stacked that chrome inside the LCD and overflowed its 12 rows
             (the 2026-07-04 box-clip audit).  _hud gives long strips the marquee."""
             m = self.mode
             while getattr(m, "sub", None) is not None:   # the DEEPEST panel owns the strip
-                m = m.sub                                # (town inside adventure, battle inside town)
+                m = m.sub                                # type: ignore
             strip = getattr(m, "strip", None)
             self._hud(strip() if strip is not None else "")
 
-    def _open_mode(self, panel, on_close=None):
+    def _open_mode(self, panel: Any, on_close: Optional[Any]=None) -> None:
             self.mode = panel
             self._mode_close = on_close
             # clear the message strip so a screen never shows the PREVIOUS screen's
@@ -464,7 +418,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                 self._mode_strip()
             self.repaint()
 
-    def _close_mode(self, result):
+    def _close_mode(self, result: Any) -> None:
             cb = self._mode_close
             self.mode = None
             self._mode_close = None
@@ -480,7 +434,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
             else:
                 self.repaint()
 
-    def _verdict(self, msg):
+    def _verdict(self, msg: str) -> None:
             """Deliver an ASYNC WORKER's outcome so it actually REACHES the
             player (the swallow class -- rounds 19/21/22): a worker can finish
             while any screen is open, whose strip overwrites the hud every
@@ -492,83 +446,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
             else:
                 self._verdict_note = msg
 
-    async def _send_bug(self, text, meta, name):
-            ok = await net.submit_bug(_lobby_uri(), text, meta, name=name)
-            if ok:
-                self._verdict(t("app_msg_bug_sent", "Bug report sent \u2014 thank you!"))
-            elif persistence.add_pending_bug(dict(meta, text=text, name=name)):
-                self._verdict(t("app_msg_bug_offline", "Offline \u2014 saved; it will send next time you are online."))
-            else:
-                # the stash failed too (a read-only save dir): do not promise a
-                # send we cannot make (swallowed-failure sweep 2026-07-13)
-                self._verdict(f"[{theme.NEG}]Couldn't send or save that report \u2014 sorry.[/]")
-
-    async def _flush_bugs(self):
-            """Best-effort resend of stashed bugs.  READ-then-rewrite (bug audit
-            2026-07-19): the old take-then-send deleted the stash up front, so
-            a quit mid-flush lost every unsent report (the round-5 PM lesson).
-            A crash now leaves the original file -- a bounded duplicate send
-            beats a lost report (the server's per-connection cap absorbs it)."""
-            pending = persistence.peek_pending_bugs()
-            if not pending:
-                return
-            left, outage = [], False
-            for rec in pending:
-                text, name = rec.get("text", ""), rec.get("name", "")
-                if not text:
-                    continue          # a damaged line: drop it, never re-stash forever
-                if outage:            # already hit an outage: keep the rest, in order
-                    left.append(rec)
-                    continue
-                meta = {kk: vv for kk, vv in rec.items() if kk not in ("text", "name")}
-                if not await net.submit_bug(_lobby_uri(), text, meta, name=name):
-                    left.append(rec)
-                    outage = True
-            persistence.write_pending_bugs(left)
-
-    def _bug_meta(self):
-            import platform as _pf
-            # the RUNNING build's version, captured at boot (audit 2026-07-25):
-            # the in-session updater pip-installs the NEW release into this
-            # environment, so a send-time metadata read attributed a bug to a
-            # build that never touched the player's screen
-            ver = self._boot_version
-            p = self.pet
-            return {"version": ver,
-                    "platform": "%s py%s" % (host_platform(), _pf.python_version()),
-                    "pet": {"num": getattr(p, "num", 0), "name": getattr(p, "name", ""),
-                            "stage": getattr(p, "stage", ""),
-                            "gen": getattr(p, "generation", 0)}}
-
-    def _handle_exception(self, error: Exception) -> None:
-            # Last-chance honesty (sweep 2026-07-14): save the pet, keep the
-            # traceback, queue a bug report -- THEN let Textual show its crash
-            # screen.  A raw panic used to be the whole story, with the last ~10s
-            # of play lost and the reporter never offered.
-            try:
-                persistence.save(self.pet)
-            except Exception:
-                pass
-            log = None
-            try:
-                log = persistence.write_crash_log(error)
-            except Exception:
-                pass
-            try:
-                import traceback
-                tail = "".join(traceback.format_exception(
-                    type(error), error, error.__traceback__))[-1500:]
-                persistence.add_pending_bug(dict(
-                    self._bug_meta(), name=persistence.get_account()[0],
-                    text=f"[auto] crash: {error!r}\n{tail}"))
-            except Exception:
-                pass
-            self._crash_note = ("tuipet crashed — your pet was saved."
-                                + (f"  Details: {log}" if log else "")
-                                + "  A report goes out next launch.")
-            super()._handle_exception(error)
-
-    def _restyle(self):
+    def _restyle(self) -> None:
             # the DMG-shell reading (2026-07-05): the LCD's thick frame is the
             # screen BEZEL, the round boxes are the SHELL body, the titles/key
             # hints are printed LABEL text -- plain themes fall back to border/mid
@@ -585,113 +463,17 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
             except Exception:
                 pass
 
-    async def _switch_account(self, name, pw):
-            """Sign in as another account (OPTIONS → Account).  The current pet is
-            parked with the OLD account's cloud first (switch back any time), then
-            the new account's cloud save replaces the local one — or the egg
-            carousel opens when it has none.  A wrong password or an unreachable
-            lobby aborts WITHOUT switching (probe distinguishes the two — pull_save
-            can't, and a typo'd password must not strand the player on a fresh
-            start).  Device-lifetime progress (album, lifetime wins, owned eggs)
-            stays local, like canon's device-scoped Shared file."""
-            import asyncio
-            old_name, old_pw = persistence.get_account()
-            self._verdict(t("app_msg_switch_acc", "Switching account…"))
-            verdict, save = await asyncio.to_thread(
-                cloudsync.probe, _lobby_uri(), name, pw)
-            if verdict == "badpw":
-                self._verdict(t("app_msg_wrong_pw", "Wrong password for that name."))
-                self.beep("error", bell=False)
-                return
-            if verdict != "ok":
-                self._verdict(t("app_msg_lobby_fail", "Can't reach the lobby — try again online."))
-                self.beep("error", bell=False)
-                return
-            if save is not None:
-                # validate BEFORE committing to the switch: an unreadable cloud
-                # blob must not cost the player their current login (the same
-                # strict probe sync_down_at_startup runs)
-                pet_probe, _ = persistence.pet_from_save(dict(save),
-                                                         strict=True)
-                if pet_probe is None:
-                    self._verdict(t("app_msg_cloud_bad", "That cloud save is unreadable — kept your account."))
-                    self.beep("error", bell=False)
-                    return
-            persistence.save(self.pet)                   # park the pet with the OLD account
-            if old_name == name:
-                # re-login to the SAME account: never park, never delete -- only
-                # refresh from a STRICTLY newer cloud copy.  This path used to
-                # skip the sync_down_at_startup timestamp guard, so a day-old
-                # cloud save could overwrite a newer local pet -- and a cloud
-                # with NO save yet fell through to delete() and destroyed the
-                # local pet's only copies (gameplay audit 2026-07-19).
-                if save is not None and (float(save.get("_saved_at") or 0)
-                                         > persistence.local_saved_at()):
-                    persistence.write_save_dict(save)
-                    loaded, msg = persistence.load()
-                    self.pet = loaded or Pet.new_egg()
-                    self._verdict(t("app_msg_signed_in", "Signed in as {name} — {msg}").format(name=_hud_esc(name), msg=msg or t('app_msg_welcome_back', 'welcome back!')))
-                    self.repaint()
-                else:
-                    self._verdict(t("app_msg_signed_in_cur", "Signed in as {name} — this device is current.").format(name=_hud_esc(name)))
-                return
-            if old_name:
-                parked = await asyncio.to_thread(        # last-write-wins guarded upload
-                    cloudsync.push_save, _lobby_uri(), old_name, old_pw,
-                    persistence.to_save_dict(self.pet))
-                if not parked:
-                    # push_save also answers False when the OLD cloud is already
-                    # newer (another device carries this pet) -- that counts as
-                    # parked.  Distinguish it from a real failed send.
-                    cloud = await asyncio.to_thread(
-                        cloudsync.pull_save, _lobby_uri(), old_name, old_pw)
-                    parked = bool(cloud) and (float(cloud.get("_saved_at") or 0)
-                                              >= persistence.local_saved_at())
-                if not parked:
-                    # the switch may not proceed until the pet has a durable copy
-                    # somewhere -- the ignored push + delete() pair destroyed
-                    # save.json AND .bak (gameplay audit 2026-07-19)
-                    self._verdict(f"Couldn't park your pet with {_hud_esc(old_name)}"
-                                  " — kept your account.")
-                    self.beep("error", bell=False)
-                    return
-            self._stop_sync()                            # the old pusher must stop first
-            #                                              (cancelled, not just flagged)
-            persistence.set_account(name, pw)
-            if save is not None:
-                persistence.write_save_dict(save)
-                loaded, msg = persistence.load()
-                self.pet = loaded or Pet.new_egg()
-                self._start_sync()
-                self._verdict(t("app_msg_signed_in", "Signed in as {name} — {msg}").format(name=_hud_esc(name), msg=msg or t('app_msg_welcome_back', 'welcome back!')))
-                self.repaint()
-            elif old_name:
-                persistence.delete()                     # parked above: the old pet must not leak in
-                self.pet = Pet.new_egg()                 # placeholder until the carousel picks
-                self._start_sync()
-                self._verdict(t("app_msg_signed_in_fresh", "Signed in as {name} — a fresh start.").format(name=_hud_esc(name)))
-                self._open_mode(eggselectscreen.EggSelectPanel(self.pet),
-                                lambda et: self._hatch_new(et, 1))
-            else:
-                # no old account: the local pet was never parked ANYWHERE, and
-                # deleting it here destroyed its only copies.  Adopt it into the
-                # new account instead -- exactly what the first lobby login does:
-                # the pet stays local and the sync pushes it up.
-                self._start_sync()
-                self._verdict(t("app_msg_signed_in_syncs", "Signed in as {name} — your pet syncs here now.").format(name=_hud_esc(name)))
-                self.repaint()
-
-    def _center(self, text):
+    def _center(self, text: str) -> Any:
             from rich.text import Text
-            n = text.plain.count("\n") + 1
+            n = text.plain.count("\n") + 1  # type: ignore
             pad = max(0, (SCREEN_ROWS - n) // 2)
             if not pad:
                 return text
             out = Text("\n" * pad)
-            out.append_text(text)
+            out.append_text(text)  # type: ignore
             return out
 
-    def repaint(self):
+    def repaint(self) -> None:
             if self.mode is not None:
                 self.screen_w.update(self._center(self.mode.text()))
                 self._mode_strip()
@@ -706,7 +488,7 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                 # data/datacore browses in the LCD; keep live vitals on the right
                 self.stats_w.paint(self.pet)
 
-    def _status_painter(self):
+    def _status_painter(self) -> Any:
             """The mode's card painter, dispatched from statusbox's registry
             (one module owns every card -- Joel 2026-07-17: "MODULIZE THE
             STATUS BOX")."""
@@ -715,13 +497,13 @@ class TuiPetApp(ActionsMixin, HudMixin, TimersMixin, CloudMixin, SoundMixin, Lif
                 return None
             return lambda: fn(self)
 
-    def _status_eggselect(self):
+    def _status_eggselect(self) -> None:
             statusbox.eggselect(self)
 
-    def _status_eat(self):
+    def _status_eat(self) -> None:
             statusbox.eat(self)
 
-    def _status_card(self, title, lines):
+    def _status_card(self, title: Any, lines: Any) -> None:
             statusbox.card(self, title, lines)
 
     FLASH_HOLD = 4                  # seconds an action result holds before the care-need shows

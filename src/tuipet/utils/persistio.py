@@ -3,13 +3,14 @@ tmp+replace JSON writer, the instance lock and the crash log.  Owns the
 mutable `save_failed` flag; persistence delegates reads of it via module
 __getattr__ so `persistence.save_failed` stays truthful."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import json
 import os
 import time  # noqa: F401
 
 
-def _can_use(d):
+def _can_use(d: Any) -> Any:
     """True if we could actually WRITE here -- without creating anything yet
     (an import-time mkdir would litter every dev box and test run)."""
     if os.path.isdir(d):
@@ -19,7 +20,7 @@ def _can_use(d):
         parent = os.path.dirname(parent)
     return bool(parent) and os.access(parent, os.W_OK)
 
-def _pick_save_dir():
+def _pick_save_dir() -> Any:
     """Where the pet lives.  iOS (a-Shell, our official iPhone/iPad target)
     CANNOT write to `~` -- only ~/Documents, ~/Library and ~/tmp are writable.
     tuipet wrote to ~/.local/share/tuipet and _atomic_write_json swallows
@@ -52,7 +53,7 @@ SETTINGS_PATH = os.path.join(SAVE_DIR, "settings.json")
 save_failed = ""
 _failed_path = ""    # WHICH file refused: only its own later success clears the flag
 
-def _atomic_write_json(path, data, keep_bak=False):
+def _atomic_write_json(path: str, data: Any, keep_bak: bool=False) -> None:
     """Atomic JSON write (tmp + os.replace); keep_bak rotates one generation
     back first.  This dance lived in three hand-rolled copies (settings, save,
     cloud-pull; refactor 2026-07-05)."""
@@ -88,7 +89,7 @@ def _atomic_write_json(path, data, keep_bak=False):
 
 _LOCK_NAME = "running.pid"
 
-def _live_save_dir():
+def _live_save_dir() -> Any:
     """SAVE_DIR through the persistence module, AT CALL TIME -- the
     test sandbox (conftest) patches persistence.SAVE_DIR, and the
     injectable-paths law says every path resolves when used."""
@@ -96,7 +97,7 @@ def _live_save_dir():
     return _p.SAVE_DIR
 
 
-def acquire_instance_lock():
+def acquire_instance_lock() -> Any:
     """Claim the save dir for this process.  Returns the OTHER live pid when a
     second copy already runs (two instances autosave over one file,
     last-write-wins -- sweep 2026-07-14), else records our pid and returns
@@ -123,7 +124,7 @@ def acquire_instance_lock():
         pass                         # unwritable dir: nothing to fight over either
     return None
 
-def release_instance_lock():
+def release_instance_lock() -> None:
     """Drop the pid file, but only if it is ours (best-effort)."""
     p = os.path.join(_live_save_dir(), _LOCK_NAME)
     try:
@@ -132,7 +133,7 @@ def release_instance_lock():
     except (OSError, ValueError):
         pass
 
-def write_crash_log(exc):
+def write_crash_log(exc: Any) -> Any:
     """Write the full traceback to crash.log in the save dir (one file, newest
     crash wins).  Returns the path, or None when the disk refused."""
     import traceback

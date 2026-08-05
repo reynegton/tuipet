@@ -6,6 +6,7 @@ so hatching plays a real carved crack before the baby. The side-to-side shake is
 xshift at render time, not baked into extra frames. No drawn art.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import gzip
 import random
 import json
@@ -16,7 +17,7 @@ _DATA = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 
 
 @lru_cache(maxsize=1)
-def _real_eggs():
+def _real_eggs() -> Any:
     path = os.path.join(_DATA, "eggs.json.gz")
     if not os.path.exists(path):
         return None
@@ -27,7 +28,7 @@ def _real_eggs():
         return None
 
 
-def frames(egg_type=0):
+def frames(egg_type: int=0) -> Any:
     """Real Egg egg (spritesEgg0.png, the Egg-stage creature sheet): the 3 real
     DVPet frames -- [0] idle egg, [1] settle/bulge, [2] cracked-open (shell breaks,
     baby emerges). The hatch role (ROLES["hatch"]=[0,1,2]) plays all three; the
@@ -45,7 +46,7 @@ def frames(egg_type=0):
 ROLES = {"idle": [0, 1], "egg_idle": [0, 1], "hatch": [0, 1, 2]}  # frames: egg -> crack -> baby
 
 
-def _idx(egg_type, n):
+def _idx(egg_type: Any, n: Any) -> Any:
     """A SAFE bank index whatever the caller holds -- the 'guide' incident
     (2026-07-18) proved a sentinel string can reach the renderer through a
     poisoned save; the display must never crash over it."""
@@ -55,7 +56,7 @@ def _idx(egg_type, n):
         return 0
 
 
-def hatch_target(egg_type=0):
+def hatch_target(egg_type: int=0) -> Any:
     """A Fresh creature (MonsterNum) this egg hatches into -- chosen at random among
     the egg's targets, so generic "mystery" eggs surprise you (DVPet behaviour)."""
     eggs = _real_eggs()
@@ -64,18 +65,18 @@ def hatch_target(egg_type=0):
     return random.choice(eggs[_idx(egg_type, len(eggs))]["hatch"])
 
 
-def hatch_targets(egg_type=0):
+def hatch_targets(egg_type: int=0) -> Any:
     """All MonsterNums this egg can hatch into (the hatch preview)."""
     eggs = _real_eggs()
     return list(eggs[_idx(egg_type, len(eggs))]["hatch"]) if eggs else []
 
 
-def hatch_name(egg_type=0):
+def hatch_name(egg_type: int=0) -> Any:
     eggs = _real_eggs()
     return eggs[_idx(egg_type, len(eggs))]["hatch_name"] if eggs else "?"
 
 
-def destined_name(egg_type=0):
+def destined_name(egg_type: int=0) -> Any:
     """The BABY a single-target egg hatches ('' for a multi-target pool --
     the mystery is the caller's to keep).  The roster name of the hatch
     target, NOT hatch_name: for the named banks (Kera Egg, the field
@@ -91,12 +92,12 @@ def destined_name(egg_type=0):
     return (rec or {}).get("name") or hatch_name(egg_type)
 
 
-def count():
+def count() -> Any:
     eggs = _real_eggs()
     return len(eggs) if eggs else 1
 
 
-def record(egg_type=0):
+def record(egg_type: int=0) -> Any:
     fr = frames(egg_type)
     w = max(len(r) for r in fr[0])
     return {"num": -1, "name": "Egg", "stage": "Egg",
@@ -116,7 +117,7 @@ def record(egg_type=0):
 # only hatchable (owned/temp) eggs. persistence.get_progress() supplies the state.
 
 
-def _conditions_met(rule, prog):
+def _conditions_met(rule: Any, prog: Any) -> Any:
     import tuipet.data.loaders.data as data
     if rule["gen"] is not None and prog["max_gen"] < rule["gen"]:
         return False
@@ -181,7 +182,7 @@ def _conditions_met(rule, prog):
     return True
 
 
-def egg_state(idx, prog, owned):
+def egg_state(idx: int, prog: Any, owned: Any) -> Any:
     """'owned' | 'temp' | 'locked' for one egg index."""
     import tuipet.data.loaders.data as data
     rule = data.load_egg_unlock().get(idx)
@@ -194,11 +195,11 @@ def egg_state(idx, prog, owned):
     return "owned" if rule["can_perm"] else "temp"
 
 
-def egg_states(prog, owned):
+def egg_states(prog: Any, owned: Any) -> Any:
     return {i: egg_state(i, prog, owned) for i in range(count())}
 
 
-def auto_owned(prog, owned):
+def auto_owned(prog: Any, owned: Any) -> Any:
     """Eggs that just became permanent (condition met, can_perm) -> caller
     persists them (the device behaviour: an earned egg is earned forever)."""
     import tuipet.data.loaders.data as data
@@ -214,7 +215,7 @@ def auto_owned(prog, owned):
     return out
 
 
-def owned_now():
+def owned_now() -> Any:
     """Every egg the player HAS right now: the persisted set PLUS the ones
     whose permanent condition is already met but that no egg-select visit
     has banked yet.
@@ -232,13 +233,13 @@ def owned_now():
     return owned | set(auto_owned(persistence.get_progress(), owned))
 
 
-def hatchable_eggs(prog, owned):
+def hatchable_eggs(prog: Any, owned: Any) -> Any:
     """Eggs ready to hatch right now (owned + temp) -- what the egg select shows."""
     st = egg_states(prog, owned)
     return sorted(i for i, s in st.items() if s in ("owned", "temp"))
 
 
-def wins_thresholds():
+def wins_thresholds() -> Any:
     """Every lifetime-wins gate in the table ({wins_needed}) -- record_battle
     flashes the nursery note the moment a total crosses one."""
     import tuipet.data.loaders.data as data
@@ -246,7 +247,7 @@ def wins_thresholds():
             if r.get("wins") is not None}
 
 
-def unlock_progress(idx, prog):
+def unlock_progress(idx: int, prog: Any) -> Any:
     """A live 'how close am I' line for one LOCKED egg (LINES_SPEC §7) --
     countable gates show numbers ('lifetime wins 37/50'); the rest fall back
     to the rule's description.  '' when there is nothing useful to say."""
@@ -276,7 +277,7 @@ def unlock_progress(idx, prog):
     return rule.get("desc", "")
 
 
-def unlock_ratio(idx, prog):
+def unlock_ratio(idx: int, prog: Any) -> Any:
     """0..1 progress toward a COUNTABLE gate (wins/album/mega/generation), or
     None when the egg's gate isn't a counter.  Drives the 'next goals' picks."""
     import tuipet.data.loaders.data as data
@@ -300,7 +301,7 @@ def unlock_ratio(idx, prog):
     return None
 
 
-def locked_hint(prog, owned):
+def locked_hint(prog: Any, owned: Any) -> Any:
     """Shortest 'what unlocks next' hint among locked eggs ('' if none) --
     prefers the gate the player is CLOSEST to (unlock_ratio), so the tease
     is always the next achievable egg, not csv order."""

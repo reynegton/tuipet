@@ -2,6 +2,7 @@
 act -- feeding, cleaning, items and the shop verbs, gifts, discipline and
 the refusal rolls."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from .pet.care import hygiene, feeding, discipline, gifts, inventory
 import math  # noqa: F401
 import random  # noqa: F401
@@ -24,37 +25,37 @@ class CareMixin:
     # props: strict-DSprite items, 2026-07-17.  Poop lands on the floor and
     # the clean action washes it, full classic.)
 
-    def check_refused(self, food=None, attr=None, energy_change=0.0, item=None):
+    def check_refused(self, food: Optional[Any]=None, attr: Optional[Any]=None, energy_change: float=0.0, item: Optional[Any]=None) -> Any:
         return discipline.check_refused(self, food, attr, energy_change, item)
 
-    def manners_refusal(self, kind):
+    def manners_refusal(self, kind: Any) -> Any:
         return discipline.manners_refusal(self, kind)
 
-    def refuse_attack(self, my_hp, enemy_hp):
+    def refuse_attack(self, my_hp: Any, enemy_hp: Any) -> Any:
         return discipline.refuse_attack(self, my_hp, enemy_hp)
 
-    def stop_travel_prob(self):
+    def stop_travel_prob(self) -> Any:
         return discipline.stop_travel_prob(self)
 
-    def stop_travel_effects(self):
+    def stop_travel_effects(self) -> Any:
         return discipline.stop_travel_effects(self)
 
-    def check_stop_travel(self):
+    def check_stop_travel(self) -> Any:
         return discipline.check_stop_travel(self)
 
-    def check_compliant(self):
+    def check_compliant(self) -> Any:
         return discipline.check_compliant(self)
 
-    def can_feed(self):
+    def can_feed(self) -> Any:
         return feeding.can_feed(self)
 
-    def feed(self, food=None, assisted=False):
+    def feed(self, food: Optional[Any]=None, assisted: bool=False) -> Any:
         return feeding.feed(self, food, assisted)
 
-    def feed_meat(self, assisted=False):
+    def feed_meat(self, assisted: bool=False) -> Any:
         return feeding.feed_meat(self, assisted)
 
-    def feed_pill(self):
+    def feed_pill(self) -> Any:
         return feeding.feed_pill(self)
 
     # ---- discipline: praise / scold, RESTORED (canon restoration B,
@@ -63,31 +64,31 @@ class CareMixin:
     # PRAISE answers a proud moment (a battle win, a mega drill).  The
     # gauge is `obedience` (0..100).  Refusals stay SOFT (standing rule);
     # discipline is the tantrum economy, not a leash. -----------------------
-    def _open_praise(self):
+    def _open_praise(self) -> Any:
         return discipline._open_praise(self)
 
-    def _open_scold(self):
+    def _open_scold(self) -> Any:
         return discipline._open_scold(self)
 
-    def _calm_discipline_call(self):
+    def _calm_discipline_call(self) -> Any:
         return discipline._calm_discipline_call(self)
 
-    def praise(self):
+    def praise(self) -> Any:
         return discipline.praise(self)
 
-    def scold(self):
+    def scold(self) -> Any:
         return discipline.scold(self)
 
-    def clean(self):
+    def clean(self) -> Any:
         return hygiene.clean(self)
 
-    def heal(self):
+    def heal(self) -> Any:
         return hygiene.heal(self)
 
-    def set_auto_care(self, on):
+    def set_auto_care(self, on: Any) -> Any:
         return hygiene.set_auto_care(self, on)
 
-    def toggle_lights(self):
+    def toggle_lights(self) -> Any:
         return hygiene.toggle_lights(self)
 
     # ---- shop / items --------------------------------------------------------
@@ -124,116 +125,116 @@ class CareMixin:
                               "beast_water_spirit", "beast_wood_spirit",
                               "beast_metal_spirit", "beast_dark_spirit"})
 
-    def _pick_gift(self, festival=False):
+    def _pick_gift(self, festival: bool=False) -> Any:
         return gifts._pick_gift(self, festival)
 
-    def claim_gift(self):
+    def claim_gift(self) -> Any:
         return gifts.claim_gift(self)
 
-    def add_item(self, key, n=1):
+    def add_item(self, key: str, n: int=1) -> Any:
         return inventory.add_item(self, key, n)
 
-    def take_item(self, key, n=1):
+    def take_item(self, key: str, n: int=1) -> Any:
         return inventory.take_item(self, key, n)
 
-    def spend_bits(self, price):
+    def spend_bits(self, price: Any) -> Any:
         return inventory.spend_bits(self, price)
 
-    def _compensate_attrs(self):
+    def _compensate_attrs(self) -> Any:
         return inventory._compensate_attrs(self)
 
-    def use_item(self, key):
+    def use_item(self, key: str) -> Any:
         return inventory.use_item(self, key)
 
-    def _crest_egg(self, key):
+    def _crest_egg(self, key: str) -> Any:
         return inventory._crest_egg(self, key)
 
-    def _energy_drink(self):
+    def _energy_drink(self) -> Any:
         return inventory._energy_drink(self)
 
-    def _snack(self, hunger=0, energy=0, weight=0, obedience=0, powers=None,
-               strength=0):
+    def _snack(self, hunger: int=0, energy: int=0, weight: int=0, obedience: int=0, powers: Optional[Any]=None,
+               strength: int=0) -> Any:
         return inventory._snack(self, hunger, energy, weight, obedience, powers, strength)
 
-    def _giga_meal(self):
+    def _giga_meal(self) -> Any:
         return inventory._giga_meal(self)
 
-    def _vitamin(self):
+    def _vitamin(self) -> Any:
         return inventory._vitamin(self)
 
-    def _bandage(self):
+    def _bandage(self) -> Any:
         return inventory._bandage(self)
 
-    def _caffeine(self):
+    def _caffeine(self) -> Any:
         return inventory._caffeine(self)
 
-    def _miracle_drink(self):
+    def _miracle_drink(self) -> Any:
         return inventory._miracle_drink(self)
 
-    def _cold_compress(self):
+    def _cold_compress(self) -> Any:
         return inventory._cold_compress(self)
 
-    def _textbook(self):
+    def _textbook(self) -> Any:
         return inventory._textbook(self)
 
-    def heal_bandage(self):
+    def heal_bandage(self) -> Any:
         return inventory.heal_bandage(self)
 
     _ATTR_FIELDS = ("vaccine", "data_power", "virus")
     _ATTR_WORD = {"vaccine": "Vaccine", "data_power": "Data", "virus": "Virus"}
 
-    def _attr_chip(self, field, amount):
+    def _attr_chip(self, field: Any, amount: Any) -> Any:
         return inventory._attr_chip(self, field, amount)
 
-    def _dna_crystal(self):
+    def _dna_crystal(self) -> Any:
         return inventory._dna_crystal(self)
 
-    def _toy(self, weight=0, energy=0, msg="Fun!", obedience=0, strength=0):
+    def _toy(self, weight: int=0, energy: int=0, msg: str="Fun!", obedience: int=0, strength: int=0) -> Any:
         return inventory._toy(self, weight, energy, msg, obedience, strength)
 
-    def _deadly(self):
+    def _deadly(self) -> Any:
         return inventory._deadly(self)
 
-    def _junk(self):
+    def _junk(self) -> Any:
         return inventory._junk(self)
 
-    def _premium_meat(self):
+    def _premium_meat(self) -> Any:
         return inventory._premium_meat(self)
 
-    def _smart_potty(self):
+    def _smart_potty(self) -> Any:
         return inventory._smart_potty(self)
 
-    def _sleep_pill(self):
+    def _sleep_pill(self) -> Any:
         return inventory._sleep_pill(self)
 
-    def _alarm(self):
+    def _alarm(self) -> Any:
         return inventory._alarm(self)
 
-    def _time_gear(self):
+    def _time_gear(self) -> Any:
         return inventory._time_gear(self)
 
-    def _anti_evo(self):
+    def _anti_evo(self) -> Any:
         return inventory._anti_evo(self)
 
-    def _x_item(self):
+    def _x_item(self) -> Any:
         return inventory._x_item(self)
 
-    def _training_pack(self):
+    def _training_pack(self) -> Any:
         return inventory._training_pack(self)
 
-    def _revive_item(self):
+    def _revive_item(self) -> Any:
         return inventory._revive_item(self)
 
-    def stash_wild_memory(self):
+    def stash_wild_memory(self) -> Any:
         return inventory.stash_wild_memory(self)
 
-    def peek_memory(self):
+    def peek_memory(self) -> Any:
         return inventory.peek_memory(self)
 
-    def _inherit_memory(self):
+    def _inherit_memory(self) -> Any:
         return inventory._inherit_memory(self)
 
-    def _super_carrot(self):
+    def _super_carrot(self) -> Any:
         return inventory._super_carrot(self)
 
     # ======================= THE EXPANSION (2026-07-26) =====================
@@ -262,43 +263,43 @@ class CareMixin:
         "burnt_food": dict(hunger=1, strength=-1, obedience=5),
     }
 
-    def _csv_snack(self, key):
+    def _csv_snack(self, key: str) -> Any:
         return inventory._csv_snack(self, key)
 
-    def _med_item(self):
+    def _med_item(self) -> Any:
         return inventory._med_item(self)
 
-    def _elixir(self):
+    def _elixir(self) -> Any:
         return inventory._elixir(self)
 
-    def _vitamin_g(self):
+    def _vitamin_g(self) -> Any:
         return inventory._vitamin_g(self)
 
-    def _gold_pill(self):
+    def _gold_pill(self) -> Any:
         return inventory._gold_pill(self)
 
-    def _supplement(self):
+    def _supplement(self) -> Any:
         return inventory._supplement(self)
 
-    def _board_game(self):
+    def _board_game(self) -> Any:
         return inventory._board_game(self)
 
-    def _computer_game(self):
+    def _computer_game(self) -> Any:
         return inventory._computer_game(self)
 
-    def _toy_oven(self):
+    def _toy_oven(self) -> Any:
         return inventory._toy_oven(self)
 
-    def _futon(self):
+    def _futon(self) -> Any:
         return inventory._futon(self)
 
-    def _x_program(self):
+    def _x_program(self) -> Any:
         return inventory._x_program(self)
 
-    def _textbook_lite(self):
+    def _textbook_lite(self) -> Any:
         return inventory._textbook_lite(self)
 
-    def _hedonism(self):
+    def _hedonism(self) -> Any:
         return inventory._hedonism(self)
 
     # the evolution KEYS (Joel: "wire fully").  item_select forms answer to
@@ -323,7 +324,7 @@ class CareMixin:
         "metal_armor": 213, "flaming_wings": 97,
     }
 
-    def _evo_key(self, key):
+    def _evo_key(self, key: str) -> Any:
         return inventory._evo_key(self, key)
 
     # the CAPSULES (Joel: "roll the existing find tool"): the gift roller
@@ -335,9 +336,9 @@ class CareMixin:
     _PRANK_CAPSULES = frozenset({"prank_capsule_a", "prank_capsule_b"})
     _PRANK_POOL = ("burnt_food", "fruit", "cheese_burger", "ai_food_pill")
 
-    def _capsule(self, key):
+    def _capsule(self, key: str) -> Any:
         return inventory._capsule(self, key)
 
-    def _chocolate_egg(self):
+    def _chocolate_egg(self) -> Any:
         return inventory._chocolate_egg(self)
 

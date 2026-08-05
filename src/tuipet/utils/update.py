@@ -5,6 +5,7 @@ offline, PyPI down, source/dev install with no package metadata — returns None
 so the game never blocks or crashes on the check.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import subprocess  # nosec B404 - fixed argv from our own detection, no shell, no user input
@@ -24,7 +25,7 @@ PYPI_JSON = "https://pypi.org/pypi/tuipet/json"
 _RUN = subprocess.run
 
 
-def current_version():
+def current_version() -> Any:
     """Installed tuipet version, or None when running from source (no metadata)."""
     try:
         return version("tuipet")
@@ -32,7 +33,7 @@ def current_version():
         return None
 
 
-def _key(v):
+def _key(v: Any) -> Any:
     """Loose version tuple: numeric lead of each dotted part ('0.2.0' -> (0,2,0))."""
     out = []
     for part in v.split("."):
@@ -46,7 +47,7 @@ def _key(v):
     return tuple(out)
 
 
-def latest_if_newer(timeout=4.0):
+def latest_if_newer(timeout: float=4.0) -> Any:
     """Return the PyPI version string if it is newer than the installed one,
     else None.  Suppresses all errors (offline, missing package, etc)."""
 
@@ -71,7 +72,7 @@ def latest_if_newer(timeout=4.0):
 # either does nothing or upgrades the wrong environment.  We detect rather than
 # guess, and refuse honestly when we cannot do it.
 
-def install_method():
+def install_method() -> Any:
     """('pipx' | 'uv' | 'pip' | 'source' | 'blocked'), plus why.
 
     * source  -- running from a checkout: there is no release to install over.
@@ -92,7 +93,7 @@ def install_method():
     return "pip"
 
 
-def upgrade_argv():
+def upgrade_argv() -> Any:
     """The exact command to run, or None when we must not run one."""
     how = install_method()
     if how in ("source", "blocked"):
@@ -103,7 +104,7 @@ def upgrade_argv():
     return [sys.executable, "-m", "pip", "install", "-U", "--no-input", "tuipet"]
 
 
-def manual_command():
+def manual_command() -> Any:
     """What to tell the player to type when we cannot do it for them."""
     how = install_method()
     if how == "source":
@@ -120,11 +121,11 @@ _UPGRADING = False    # module-level: a fresh OptionsPanel must SEE a pip run
 #                       per-panel flag let a close/reopen race a second pip)
 
 
-def upgrade_in_flight():
+def upgrade_in_flight() -> Any:
     return _UPGRADING
 
 
-def run_upgrade(timeout=180.0):
+def run_upgrade(timeout: float=180.0) -> Any:
     """Install the newest tuipet into the environment we are running in.
 
     Returns (ok, message).  Never raises.  The running process keeps executing
@@ -141,7 +142,7 @@ def run_upgrade(timeout=180.0):
         _UPGRADING = False
 
 
-def _run_upgrade_inner(timeout=180.0):
+def _run_upgrade_inner(timeout: float=180.0) -> Any:
     argv = upgrade_argv()
     if argv is None:
         return False, "Update by hand: " + manual_command()

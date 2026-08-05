@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -7,7 +8,7 @@ import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines_mod
 from tuipet.core.petbase import *
 
-def _tick_growth(pet, dt):
+def _tick_growth(pet: Any, dt: Any) -> None:
     """Aging + the ambient systems: X-decay, shop restock, toy interest,
     the gift call, the mood record / birthday, the anim clock."""
     # (the Temporary protoform decay left with the X slim)
@@ -44,7 +45,7 @@ def _tick_growth(pet, dt):
             pet.anim = "sleep" if pet.asleep else "idle"
 
 
-def _tick_egg(pet):
+def _tick_egg(pet: Any) -> None:
     """Egg stage: only the hatch trigger (the 3s crack runs at frame cadence
     via advance_hatch; a 1 Hz countdown here would skip the crack frames)."""
     if not pet.hatching and pet.stage_seconds >= pet.EGG_DURATION:
@@ -53,7 +54,7 @@ def _tick_egg(pet):
         pet._set_anim("hatch", 3.0)
 
 
-def _birthday(pet):
+def _birthday(pet: Any) -> None:
     """setTimeToAge's age-up: a mostly-Happy, zero-slip day earns a GOOD
     birthday (+bonus, a Cupcake); a mostly-Unhappy day with slips
     is a BAD one (-bonus, a consolation Candy); anything else is

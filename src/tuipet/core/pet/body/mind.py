@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -7,7 +8,7 @@ import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines_mod
 from tuipet.core.petbase import *
 
-def _inc_mistake(pet):
+def _inc_mistake(pet: Any) -> None:
     """PhysicalState.incMistake: EVERY care mistake stings the mood first --
     a Happy pet is knocked DOWN TO 100 (MistakeHappyMoodChange, absolute),
     anyone else loses 50 -- then the counters tick (care-mistake audit
@@ -16,7 +17,7 @@ def _inc_mistake(pet):
     pet.mistake_day += 1                        # MistakeIncMissedDayChange
 
 
-def _tick_mood_discipline(pet, dt):
+def _tick_mood_discipline(pet: Any, dt: Any) -> None:
     """The filth nag + sickness risk, and the childhood personality
     tracker.  (The mood lapse left with the mood system; the obedience
     lapse, refusal expiry, tantrum clock and praise/scold window aging
@@ -43,7 +44,7 @@ def _tick_mood_discipline(pet, dt):
                 pet.weight_rank -= 1
 
 
-def _special_idle(pet):
+def _special_idle(pet: Any) -> None:
     """The special-idle families, canon shape (SpriteAnim's 1/1500 rolls;
     personality audit 2026-07-06): the visible TANTRUM while the
     discipline call stands (canon rolls it at 3x the family odds), then
@@ -90,11 +91,11 @@ def _special_idle(pet):
         pet._set_anim(random.choice(("play", "happy")), 2.0)
 
 
-def _check_discipline_call(pet):
+def _check_discipline_call(pet: Any) -> None:
     """A NO-OP: the spontaneous tantrum left with the discipline system."""
 
 
-def _check_gift_call(pet, dt):
+def _check_gift_call(pet: Any, dt: Any) -> None:
     """PhysicalState.checkGiftCall + checkGift: every GiftChanceMin game-min,
     a grown, awake, HAPPY pet rolls nextInt(cap - obedience +
     (maxMood - mood) * 0.5 + 70) -- a 0 means it found you a present (the

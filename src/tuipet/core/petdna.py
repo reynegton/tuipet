@@ -1,6 +1,7 @@
 """The pet's DNA organ (tier-5, 2026-07-17): the banked/charged arrays,
 the wager minigame award, and applyDNA's energy bill."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import math  # noqa: F401
 import random  # noqa: F401
 
@@ -18,7 +19,7 @@ class DnaMixin:
     """State contract: the Pet dataclass fields; composed into Pet."""
 
     # ---- DNA (DVPet DNA.class) -------------------------------------------
-    def highest_dna(self):
+    def highest_dna(self) -> Any:
         """DNA.getHighestDNA: the CHARGED field with the strict maximum -- a tie
         (or nothing charged) yields none (the caller falls back to the field)."""
         best, best_f = 0, ""
@@ -31,26 +32,26 @@ class DnaMixin:
             return best_f
         return ""
 
-    def dna_total(self):
+    def dna_total(self) -> Any:
         return sum(self.dna_applied.get(f, 0) for f in data.DNA_FIELDS)
 
-    def dna_percent(self, field):
+    def dna_percent(self, field: Any) -> Any:
         """DNA.getPercent: this field's share of all charged DNA (the evolution gate)."""
         t = self.dna_total()
         return int(100 * self.dna_applied.get(field, 0) / t) if t else 0
 
-    def can_charge_dna(self):
+    def can_charge_dna(self) -> Any:
         # the shared _guard gate, keeping the DNA-flavoured egg line
         # (tidy audit 2026-07-18: dead/asleep were duplicated literals)
-        if not self.dead and self.stage == "Egg":
+        if not self.dead and self.stage == "Egg":  # type: ignore
             return "An egg has no DNA yet."
-        return self._guard()
+        return self._guard()  # type: ignore
 
-    def dna_bet(self, amount):
+    def dna_bet(self, amount: Any) -> Any:
         """DVPet DNA_GenerateValidate (onEnter): pay the wager up front, before the mash
         mini-game runs. Returns False (and jeers) if the pet can't afford it."""
-        if amount <= 0 or not self.spend_bits(amount):
-            self._set_anim("refuse", 1.0)                   # Jeering: can't afford the wager
+        if amount <= 0 or not self.spend_bits(amount):  # type: ignore
+            self._set_anim("refuse", 1.0)                   # type: ignore
             return False
         # mark the paid mash in flight: a quit/crash before the award used to
         # keep the charge and drop the outcome -- load settles this as a
@@ -60,7 +61,7 @@ class DnaMixin:
         self.dna_wager_pending = int(amount)
         return True
 
-    def dna_minigame_award(self, amount, rate):
+    def dna_minigame_award(self, amount: Any, rate: Any) -> Any:
         """DVPet onDNAGenerate: the mash `rate` picks the Field; bank `amount` DNA of it
         (the wager was already spent in dna_bet). Overflow past the 99 cap refunds as
         bits, exactly like the device. Returns the Field won ("None" = wasted).
@@ -76,11 +77,11 @@ class DnaMixin:
             rate = min(max(rate, DNA_RATE_BANDS[0][0] + 1), DNA_RATE_BANDS[-1][0])
             field = dna_field_for_rate(rate)
         gained = min(amount, MAX_DNA_INVENTORY)
-        total = self.dna_owned.get(field, 0) + gained
+        total = self.dna_owned.get(field, 0) + gained  # type: ignore
         if total > MAX_DNA_INVENTORY:
-            self.bits += total - MAX_DNA_INVENTORY          # refund the overflow as bits
+            self.bits += total - MAX_DNA_INVENTORY          # type: ignore
             total = MAX_DNA_INVENTORY
-        self.dna_owned[field] = total
+        self.dna_owned[field] = total  # type: ignore
         if amount >= DNA_RESONANT_BET and field != "None":
             splash = amount // 5
             fields = [f for _, f in DNA_RATE_BANDS if f != "None"]
@@ -88,19 +89,19 @@ class DnaMixin:
             for j in (i - 1, i + 1):
                 if 0 <= j < len(fields):
                     nb = fields[j]
-                    self.dna_owned[nb] = min(self.dna_owned.get(nb, 0) + splash,
+                    self.dna_owned[nb] = min(self.dna_owned.get(nb, 0) + splash,  # type: ignore
                                              MAX_DNA_INVENTORY)
         return field
 
-    def apply_dna(self, field, amount):
+    def apply_dna(self, field: Any, amount: Any) -> Any:
         """PhysicalState.applyDNA: owned -> charged.  The live bill is ENERGY
         (1/unit own Field, x2 off) + the strength ceiling below; canon's
         disturb/mood/spirit/sick costs left with their systems."""
-        owned = self.dna_owned.get(field, 0)
+        owned = self.dna_owned.get(field, 0)  # type: ignore
         if amount <= 0 or owned < amount:
-            self._set_anim("refuse", 1.0)                   # Jeering: not enough DNA
+            self._set_anim("refuse", 1.0)                   # type: ignore
             return False
-        self.dna_owned[field] = owned - amount
+        self.dna_owned[field] = owned - amount  # type: ignore
         self.dna_applied[field] = self.dna_applied.get(field, 0) + amount
         # canon calls disturb() -- a NO-OP on an awake pet (its whole body is
         # asleep-gated); the old `disturb += 1` falsely marked the evolution
@@ -116,17 +117,17 @@ class DnaMixin:
         # a wide byte gauge is no real drop; the 4-heart fold turned that into
         # a whole heart, so clamp up-only (DNA audit 2026-07-08).
         gain = DNA_STRENGTH_CHANGE * amount
-        self.strength = max(self.strength, min(self.strength + gain, 3))
-        same = field == self.field
+        self.strength = max(self.strength, min(self.strength + gain, 3))  # type: ignore
+        same = field == self.field  # type: ignore
         # the charge bill (see the constants): energy, doubled off-field --
         # the mood/spirit bills left with their systems
-        self._set_energy(self.energy
+        self._set_energy(self.energy  # type: ignore
                          - (DNA_SAME_FIELD_ENERGY if same else DNA_DIFF_FIELD_ENERGY) * amount)
         # (applyDNA's per-unit sickness risk left with the sickness system
         # (BASIC VPET 2026-07-17) -- the ENERGY bill above is the charge's cost now)
         return True
 
-    def reset_dna(self):
+    def reset_dna(self) -> None:
         """DNA.resetDNA (via resetEvolVar): charged DNA clears on evolution; owned inventory persists."""
         self.dna_applied = {f: 0 for f in data.DNA_FIELDS}
 

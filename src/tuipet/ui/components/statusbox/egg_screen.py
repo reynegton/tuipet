@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 import tuipet.utils.backgrounds as backgrounds
 import tuipet.data.loaders.data as data
@@ -14,7 +15,7 @@ DIV = "[dim]" + "─" * CARD_W + "[/]"
 
 from .helpers import *
 
-def egg_lines(pet):
+def egg_lines(pet: Any) -> Any:
     mins, secs = divmod(int(pet.age_seconds), 60)
     return [
         f"[b]{t('egg_title', 'Egg')}[/] [dim]· {t('egg_subtitle', 'egg')}[/]",
@@ -38,14 +39,14 @@ def egg_lines(pet):
     ]
 
 
-def _hatch_line(pet):
+def _hatch_line(pet: Any) -> Any:
     left = max(0, int(pet.EGG_DURATION - pet.stage_seconds))
     if left <= 0:
         return f"{t('egg_hatch', 'Hatch').ljust(8)}[b]{t('egg_hatch_now', 'any moment now…')}[/]"
     return f"{t('egg_hatch', 'Hatch').ljust(8)}{t('egg_hatch_time', 'in ~{left}s').format(left=left)}"
 
 
-def grave_lines(pet):
+def grave_lines(pet: Any) -> Any:
     return [
         f"[b]{pet.name[:16]}[/] [dim]· {t('grave_subtitle', 'rest')}[/]",
         DIV,
@@ -66,7 +67,7 @@ def grave_lines(pet):
     ]
 
 
-def eggselect(app):
+def eggselect(app: Any) -> None:
     m = app.mode
     # carousel = hatchable eggs ONLY (Joel 2026-07-12: no silhouettes,
     # no goals); the badge/shown branches below stay defensive in case a
@@ -102,7 +103,7 @@ def eggselect(app):
                           "[dim]←→ browse  ENTER pick[/]"])
 
 
-def eggguide(app):
+def eggguide(app: Any) -> None:
     """EGG GUIDE: the browsed egg's dossier."""
     m = app.mode
     state = m.states.get(m.i, "locked")
@@ -129,7 +130,7 @@ def eggguide(app):
         + [f"[dim]{hints}[/]"])
 
 
-def death(app):
+def death(app: Any) -> None:
     p = app.pet
     days = int(getattr(p, "age_seconds", 0) // 86400)
     cause = getattr(p, "death_cause", "") or "old age"

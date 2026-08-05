@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 import tuipet.utils.backgrounds as backgrounds
 import tuipet.data.loaders.data as data
@@ -14,13 +15,13 @@ DIV = "[dim]" + "─" * CARD_W + "[/]"
 
 from .helpers import *
 
-def title(app):
+def title(app: Any) -> None:
     card(app, "TUIPET", [f"[dim]{t('title_terminal_vpet')}[/]", "", "",
                          f"[dim]{t('title_creature_awaits')}[/]", "",
                          f"[dim]{t('title_press_enter')}[/]", f"[dim]{t('title_to_begin')}[/]"])
 
 
-def scenes(app):
+def scenes(app: Any) -> None:
     """The browsed scene's dossier: the LCD shows the SCENE, this card
     carries the words (picker restore 2026-07-17)."""
     m = app.mode
@@ -39,7 +40,7 @@ def scenes(app):
     card(app, "Scenes", sc_lines)
 
 
-def datacore(app):
+def datacore(app: Any) -> None:
     """DATACORE: which data page is up, and whose core it is."""
     p, m = app.pet, app.mode
     page = m.pages[min(m.i, len(m.pages) - 1)][0]
@@ -53,7 +54,7 @@ def datacore(app):
     card(app, "datacore", dc_lines, subtitle=gen_subtitle(p))
 
 
-def lobby(app):
+def lobby(app: Any) -> None:
     """LOBBY: your card and the room."""
     m = app.mode
     st = m.state
@@ -71,7 +72,7 @@ def lobby(app):
         "[dim]↑↓ escolha um domador[/]"])
 
 
-def help_(app):
+def help_(app: Any) -> None:
     import tuipet.utils.update as update
     try:
         ver = update.current_version()
@@ -87,7 +88,7 @@ def help_(app):
         "[dim]↑↓ rolar  ESC sair[/]"])
 
 
-def options(app):
+def options(app: Any) -> None:
     import tuipet.ui.screens.optionsscreen as _opts
     m = app.mode
     row = _opts._ROWS[min(m.cursor, len(_opts._ROWS) - 1)]
@@ -105,7 +106,7 @@ def options(app):
     card(app, "Options", lines)
 
 
-def bug(app):
+def bug(app: Any) -> None:
     m = app.mode
     n = len(getattr(m, "buf", ""))
     card(app, "Bug Report", [
@@ -116,7 +117,7 @@ def bug(app):
         "[dim]ENTER enviar  ESC sair[/]"])
 
 
-def assist(app):
+def assist(app: Any) -> None:
     from tuipet.core.pet import AUTO_CARE_VISIT_PRICE
     p = app.pet
     on = getattr(p, "auto_care", False)
@@ -130,7 +131,7 @@ def assist(app):
         "[dim]ENTER contratar/dispensar[/]"])
 
 
-def discipline(app):
+def discipline(app: Any) -> None:
     from tuipet.core.petbase import MAX_OBEDIENCE as _MAXOBED
     """The praise/scold picker's card (canon restoration B): the gauge,
     the open moment, and what each verb would land."""
@@ -154,7 +155,7 @@ def discipline(app):
     app.stats_w.update("\n".join(lines))
 
 
-def training(app):
+def training(app: Any) -> None:
     """The 0.5 drill's card (2026-07-17): one timing bar, so one card --
     the four-drill readouts left with the classic training system."""
     p, tp, T = app.pet, app.mode, theme
@@ -178,7 +179,7 @@ def training(app):
     app.stats_w.update("\n".join(lines))
 
 
-def dna(app):
+def dna(app: Any) -> None:
     p, m, T = app.pet, app.mode, theme
     app.stats_w.border_subtitle = gen_subtitle(p)
     f = m.field

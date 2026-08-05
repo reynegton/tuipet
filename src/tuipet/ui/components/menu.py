@@ -2,18 +2,39 @@
 bar, selectable rows with a cursor, and a footer hint. Keeps every menu
 looking the same and themed (colours come from theme via the INK/SEL names)."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.text import Text
 from tuipet.utils.theme import INK, INK_B, DIM, SEL
+from wcwidth import wcswidth
+
+def display_len(s: str) -> int:
+    w = wcswidth(s)
+    return len(s) if w < 0 else w
+
+def slice_by_width(s: str, max_w: int) -> str:
+    w = 0
+    for i, c in enumerate(s):
+        cw = wcswidth(c)
+        w += 1 if cw < 0 else cw
+        if w > max_w:
+            return s[:i]
+    return s
+
+def ljust_width(s: str, max_w: int, fillchar: str = " ") -> str:
+    w = display_len(s)
+    if w >= max_w:
+        return s
+    return s + fillchar * (max_w - w)
 
 W = 38  # content width inside the 40-wide LCD
 
 
-def header(title, right=""):
+def header(title: Any, right: str="") -> Any:
     """Title (left, bold) + optional right-aligned info, then a divider rule."""
-    title = title[:W]
+    title = slice_by_width(title, W)
     t = Text()
     if right:
-        gap = max(1, W - len(title) - len(right))
+        gap = max(1, W - display_len(title) - display_len(right))
         t.append(title + " " * gap, style=INK_B)
         t.append(right, style=DIM)
     else:
@@ -24,13 +45,13 @@ def header(title, right=""):
     return t
 
 
-def bar(title, right=""):
+def bar(title: Any, right: str="") -> Any:
     """Compact 1-line title (bold) + optional right-aligned info, no divider -
     for the scene-heavy activity screens that can't spare a line."""
     t = Text()
-    title = title[:W]
+    title = slice_by_width(title, W)
     if right:
-        gap = max(1, W - len(title) - len(right))
+        gap = max(1, W - display_len(title) - display_len(right))
         t.append(title + " " * gap, style=INK_B)
         t.append(right, style=DIM)
     else:
@@ -39,9 +60,10 @@ def bar(title, right=""):
     return t
 
 
-def row(label, selected=False):
+def row(label: Any, selected: bool=False) -> Any:
     """A selectable list row with a ▸ cursor; selected rows render inverted."""
-    line = (("▸ " if selected else "  ") + label)[:W].ljust(W)
+    prefix_and_label = ("▸ " if selected else "  ") + label
+    line = ljust_width(slice_by_width(prefix_and_label, W), W)
     return Text(line + "\n", style=SEL if selected else INK)
 
 
@@ -56,7 +78,7 @@ NOTE_GAP = "      "
 TICK = 0
 
 
-def _scrolled(msg, tick):
+def _scrolled(msg: str, tick: Any) -> Any:
     """The marquee window over an over-wide line (note()'s cadence: hold on
     the head, then one character per NOTE_STEP ticks, wrap through NOTE_GAP)."""
     if tick is None:
@@ -65,35 +87,35 @@ def _scrolled(msg, tick):
     cycle = len(loop) + NOTE_HOLD                 # hold on the head again each wrap
     pos = (tick // NOTE_STEP) % cycle
     off = max(0, pos - NOTE_HOLD)
-    return (loop + loop)[off:off + W]
+    return slice_by_width((loop + loop)[off:], W)
 
 
-def note(msg, tick=None):
+def note(msg: str, tick: Optional[Any]=None) -> Any:
     """A status line (bold).  A message wider than the LCD used to CLIP silently
     (the battle menu's 'It IGNORED you!' vanished off the end -- audit 2026-07-04;
     then the bag's futon gate lost its tail -- 2026-07-15).  Long messages ALWAYS
     marquee now: panels pass their frame counter or inherit the module TICK."""
-    if len(msg) <= W:
+    if display_len(msg) <= W:
         return Text(msg + "\n", style=INK_B)
     return Text(_scrolled(msg, tick) + "\n", style=INK_B)
 
 
-def footer(hint):
+def footer(hint: Any) -> Any:
     """Control hints (dim), no trailing newline."""
-    return Text(hint[:W], style=DIM)
+    return Text(slice_by_width(hint, W), style=DIM)
 
 
-def footer_note(msg, tick=None):
+def footer_note(msg: str, tick: Optional[Any]=None) -> Any:
     """A MESSAGE riding the footer slot (dim, no trailing newline).  Control
     footers still never marquee (the shop-tease pin) -- this variant is for
     data-driven lines that cannot be pre-fit: the egg-unlock teaser was
     silently clipping 32 of 46 hints mid-word (tidy sweep 2026-07-18)."""
-    if len(msg) <= W:
+    if display_len(msg) <= W:
         return Text(msg, style=DIM)
     return Text(_scrolled(msg, tick), style=DIM)
 
 
-def hints(*pairs):
+def hints(*pairs: Any) -> Any:
     """The MESSAGE-BOX hint line (hint overhaul, Joel 2026-07-10): keys bright,
     labels dim, dot-separated -- '[b]KEY[/][dim] label[/] [dim]·[/] ...'.  One
     convention for every screen's strip(); keep the PLAIN text <= 40 cols so
@@ -101,11 +123,11 @@ def hints(*pairs):
     return " [dim]·[/] ".join(f"[b]{k}[/][dim] {lbl}[/]" for k, lbl in pairs)
 
 
-def blanks(n):
+def blanks(n: Any) -> Any:
     return Text("\n" * max(0, n), style=INK)
 
 
-def scene_ink(bgimg):
+def scene_ink(bgimg: Any) -> Any:
     """The paint() rule: sprites over a background image render as dark
     silhouettes (SIL_SCENE), plain LCD ink otherwise -- NEVER white over a bg.
     This one-line invariant lived in 13 hand-rolled copies across the scene
@@ -114,7 +136,7 @@ def scene_ink(bgimg):
     return SIL_SCENE if bgimg else LCD_ON
 
 
-def paint(placements, bgimg, rows=12, cols=40, overlay=None, clip=None, overlay_free=None, free_ink=None):
+def paint(placements: Any, bgimg: Any, rows: int=12, cols: int=40, overlay: Optional[Any]=None, clip: Optional[Any]=None, overlay_free: Optional[Any]=None, free_ink: Optional[Any]=None) -> Any:
     """render_scene under the paint() rule -- the whole-LCD scene call the
     scene screens share (screens that reuse one ink across several render
     calls take scene_ink directly).  `clip` forwards the window-law rect --
@@ -130,7 +152,7 @@ def paint(placements, bgimg, rows=12, cols=40, overlay=None, clip=None, overlay_
 IC_W, IC_ROWS = 10, 4   # the selected-item icon cell every icon view shares
 
 
-def icon_cell(src):
+def icon_cell(src: Any) -> Any:
     """Rasterise one sprite bitmap into the IC_W x IC_ROWS icon cell,
     auto-downsampled to fit both dimensions so it never clips."""
     blank = [" " * IC_W] * IC_ROWS
@@ -154,7 +176,7 @@ def icon_cell(src):
     return (blank + lines)[-IC_ROWS:]
 
 
-def item_icon(e):
+def item_icon(e: Any) -> Any:
     """A consumable/egg entry's icon as IC_ROWS cell lines.  ONE lookup for
     every icon view -- the shop, the bag, the feed menu and the town shops
     (refactor 2026-07-05); shop eggs ride their real egg frames."""
@@ -174,16 +196,16 @@ def item_icon(e):
     return icon_cell(fr[shop.icon_frame(e.get("key")) % len(fr)])
 
 
-def icon_info(out, icon, info):
+def icon_info(out: Any, icon: Any, info: Any) -> None:
     """The selected-item block: icon column + info column, first line bold --
     the ONE layout shared by every icon view."""
     tw = W - IC_W - 2
     for r in range(IC_ROWS):
         tx = info[r] if r < len(info) else ""
         out.append(icon[r] + "  ", style=INK)
-        out.append(tx[:tw] + "\n", style=INK_B if r == 0 else INK)
+        out.append(slice_by_width(tx, tw) + "\n", style=INK_B if r == 0 else INK)
 
-def list_window(out, rows, cursor, vis, fmt, empty=None):
+def list_window(out: Any, rows: Any, cursor: Any, vis: Any, fmt: Any, empty: Optional[Any]=None) -> Any:
     """The shared scrolling list body: a vis-row window centred on the cursor,
     each row through fmt(item, index), padded with blanks.  Retires seven
     hand-rolled copies (audit 2026-07).  fmt returns a plain label (rendered
@@ -207,7 +229,7 @@ def list_window(out, rows, cursor, vis, fmt, empty=None):
     return cursor
 
 
-def page_step(cursor, n, vis, k):
+def page_step(cursor: Any, n: Any, vis: Any, k: Any) -> Any:
     """PgUp/PgDn for a CURSOR list: a vis-1 leap, clamped at both ends (never
     wrapped -- a page key is "get me across this list", and wrapping past the
     end reads as a bug).  Returns the new cursor, or None when k isn't a page
@@ -227,7 +249,7 @@ def page_step(cursor, n, vis, k):
     return max(0, min(n - 1, cursor + delta))
 
 
-def scroll_window(out, rows, off, vis, fmt):
+def scroll_window(out: Any, rows: Any, off: Any, vis: Any, fmt: Any) -> Any:
     """list_window's cursor-less cousin: a vis-row window at a raw scroll
     OFFSET (requirement checklists, logs) -- no selection, no centring.  Same
     fmt contract (plain label or a styled whole-line Text).  Returns the
@@ -250,7 +272,7 @@ class SubHost:
 
     sub = None
 
-    def sub_anim(self):
+    def sub_anim(self) -> Any:
         """Delegate a frame to the child; bubble its sfx up.  True if handled.
         A child with no anim() (ShopPanel) is simply held -- the host's own
         clock pauses either way (adventure road-keys 2026-07-07)."""
@@ -263,7 +285,7 @@ class SubHost:
             self.sub.sfx = None
         return True
 
-    def sub_key(self, k, on_done):
+    def sub_key(self, k: Any, on_done: Any) -> Any:
         """Route a key to the child.  When the child finishes (('done', r)),
         clear it and hand r to on_done.  Returns True if the child had the key."""
         if self.sub is None:

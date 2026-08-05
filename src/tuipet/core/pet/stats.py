@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -8,7 +9,7 @@ import tuipet.core.lines as lines_mod
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def stomach_capacity(pet):
+def stomach_capacity(pet: Any) -> Any:
     """Canon getStomachCapacity: the SPECIES stomach (monster.csv), shrunk
     linearly through old age toward MinStomachCapacity(7) -- an elder
     fills up on smaller meals (food audit 2026-07-15).  The shrink runs
@@ -22,11 +23,11 @@ def stomach_capacity(pet):
     return cap
 
 
-def _base_weight(pet):
+def _base_weight(pet: Any) -> Any:
     return data.load_requirements().get(pet.num, {}).get("base_weight", 20)
 
 
-def _set_weight(pet, value):
+def _set_weight(pet: Any, value: Any) -> None:
     """PhysicalState.setWeight (weight audit 2026-07-06): clamp to
     baseWeight +- round(baseWeight x WeightLimitMultiple 0.75); slamming
     into either wall fires weightLimitPenalty (mood -10, obedience -0 at
@@ -44,13 +45,13 @@ def _set_weight(pet, value):
         pet.weight = max(1, value)
 
 
-def _weight_limit_penalty(pet):
+def _weight_limit_penalty(pet: Any) -> None:
     """PhysicalState.weightLimitPenalty: hitting the body's hard wall."""
     pet._set_obedience(pet.obedience - WEIGHT_LIMIT_OBED_PENALTY)
     pet._set_enthusiasm(pet.enthusiasm - WEIGHT_LIMIT_ENTH_PENALTY)
 
 
-def _set_calories(pet, value):
+def _set_calories(pet: Any, value: Any) -> None:
     """DVPet setCalories: the buffer clamps at +-CalorieLimit -- and an
     OVERFLOW while rising bumps the BM gauge (AboveMaxCaloriesBMGaugeChange:
     overeating hastens the poop; proportional to the species poop_limit
@@ -66,7 +67,7 @@ def _set_calories(pet, value):
     pet.calories = _clamp(value, -CALORIE_LIMIT, CALORIE_LIMIT)
 
 
-def _set_obedience(pet, value):
+def _set_obedience(pet: Any, value: Any) -> None:
     """LIVE again (canon restoration B, 2026-07-23, Joel: "whatever
     is canon bring back"): the gauge clamps 0..100 and every canon
     write-site that spent the strip as an inert citation -- clean's
@@ -84,14 +85,14 @@ def _set_obedience(pet, value):
     pet.obedience = _clamp(int(value), 0, MAX_OBEDIENCE)  # noqa: F405
 
 
-def _set_enthusiasm(pet, value):
+def _set_enthusiasm(pet: Any, value: Any) -> None:
     """A NO-OP: the spirit meter left with the enthusiasm system (BASIC
     VPET 2026-07-16, converging on the clone sim).  The canon write-sites
     stay as inert citations and die with their own systems; the meter is
     pinned at 0."""
 
 
-def _set_energy(pet, value):
+def _set_energy(pet: Any, value: Any) -> None:
     """DVPet setEnergy, canon order (mood re-audit 2026-07-06): a drop INTO
     the red bills mood AND obedience scaled by the depth (dec - newEnergy)
     and FATIGUES an uninjured pet -- being pushed past empty is the
@@ -109,7 +110,7 @@ def _set_energy(pet, value):
     pet.energy = _clamp(raw, -pet.max_energy, pet.max_energy)
 
 
-def energy_pct(pet):
+def energy_pct(pet: Any) -> Any:
     return max(0, pet.energy) * 100 // pet.max_energy if pet.max_energy else 0
 
 

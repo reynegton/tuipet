@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 import tuipet.utils.backgrounds as backgrounds
 import tuipet.data.loaders.data as data
@@ -14,7 +15,7 @@ DIV = "[dim]" + "─" * CARD_W + "[/]"
 
 from .helpers import *
 
-def raid(app):
+def raid(app: Any) -> None:
     """RAID: the boss, the shared pool, your standing — ALL the numbers
     live HERE (scene-screen law, raid uncramp 2026-07-23: the LCD page
     duplicated every one of these lines and crushed the boss for it)."""
@@ -49,7 +50,7 @@ def raid(app):
         subtitle=gen_subtitle(app.pet))
 
 
-def tournament(app):
+def tournament(app: Any) -> None:
     # (the cup's own sub->battle hand-off moved into painter_for -- the
     # dispatcher lends every host's card to its embedded fight now)
     p, t, T = app.pet, app.mode.tourney, theme
@@ -98,7 +99,7 @@ def tournament(app):
     app.stats_w.update("\n".join(lines))
 
 
-def battle(app):
+def battle(app: Any) -> None:
     p, m, T = app.pet, app.mode, theme
     b = m.battle                    # None until the timing bar locks (0.5)
     app.stats_w.border_subtitle = gen_subtitle(p)

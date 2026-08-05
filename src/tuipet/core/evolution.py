@@ -7,6 +7,7 @@ smallest deviation, then at random. Comparison semantics match testCondition:
 GreaterThan -> actual > threshold, LessThan -> actual < threshold, EqualTo -> ==.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import tuipet.data.loaders.data as data
 
@@ -25,7 +26,7 @@ R = {
 }
 
 
-def _cmp(cond, threshold, actual):
+def _cmp(cond: Any, threshold: Any, actual: Any) -> Any:
     if cond == "None":
         return True
     if cond == "GreaterThan":
@@ -37,7 +38,7 @@ def _cmp(cond, threshold, actual):
     return False
 
 
-def _attr(gate, actual, total):
+def _attr(gate: Any, actual: Any, total: Any) -> Any:
     """Attribute-power gate; fractional thresholds (0<v<1) compare a ratio."""
     cond, val = gate
     if cond == "None":
@@ -47,7 +48,7 @@ def _attr(gate, actual, total):
     return _cmp(cond, val, actual)
 
 
-def _scale_rate(cond, first, second):
+def _scale_rate(cond: Any, first: Any, second: Any) -> Any:
     """Config.scaleRate: weight a met attribute gate by the target threshold's
     distance from the current form's threshold (Java switch fall-through)."""
     if cond in ("GreaterThan", "EqualTo") and first > second:
@@ -57,17 +58,17 @@ def _scale_rate(cond, first, second):
     return 1.0
 
 
-def weight_category(weight, base):
+def weight_category(weight: Any, base: Any) -> Any:
     hi = base + round(base * WEIGHT_THRESH)
     lo = base - round(base * WEIGHT_THRESH)
     return "Over" if weight > hi else ("Under" if weight < lo else "Healthy")
 
 
-def _stats(pet):
+def _stats(pet: Any) -> Any:
     return pet.vaccine, pet.data_power, pet.virus
 
 
-def _win_rate(pet):
+def _win_rate(pet: Any) -> Any:
     return int(pet.wins / pet.battles * 100) if pet.battles else 0
 
 
@@ -76,7 +77,7 @@ def _win_rate(pet):
 # checkStatTotal gates read the per-attribute powers directly)
 
 
-def _dna_ok(pet, req):
+def _dna_ok(pet: Any, req: Any) -> Any:
     """testDNA + hasDNARequirement: the form declares Field-DNA gates AND the pet's
     charged-DNA distribution satisfies every one. This is DVPet's universal
     evolution-requirement bypass (EnableDNAReqReplacement=TRUE)."""
@@ -86,7 +87,7 @@ def _dna_ok(pet, req):
     return all(_cmp(cond, val, pet.dna_percent(f)) for f, (cond, val) in dna.items())
 
 
-def check(pet, num, item=-1, food=-1, connecting=False):
+def check(pet: Any, num: int, item: Any=-1, food: Any=-1, connecting: bool=False) -> Any:
     """checkEvolReq, verbatim semantics (canon re-audit 2026-07):
 
     * NO DNA gate-forgiveness (the canon consume-once excuse left with the
@@ -133,7 +134,7 @@ def check(pet, num, item=-1, food=-1, connecting=False):
     # (checkStatTotal DROPPED with the six per-attr stat gates, 2026-07-17:
     # the same DVPet-only power wall under the same +1-per-win economy)
     gates = [
-        _cmp(*req["battles"], pet.battles),
+        _cmp(*req["battles"], pet.battles),  # type: ignore
         # (the six vaccine/data/virus stat gates DROPPED 2026-07-17: they
         # were DVPet-app truth -- the humulos guides gate on mistakes/
         # trainings/battles/wins, never power numbers -- and the 0.5 economy
@@ -143,8 +144,8 @@ def check(pet, num, item=-1, food=-1, connecting=False):
         # day/night system -- BASIC VPET 2026-07-17: an hour nothing can
         # reach would wall 374 corpus forms, the temp_req/habitat_req call)
         req["weight"] == "None" or req["weight"] == weight_category(pet.weight, pet._base_weight()),
-        _cmp(*req["disturb"], pet.disturb),
-        _cmp(*req["overeat"], pet.overeat),
+        _cmp(*req["disturb"], pet.disturb),  # type: ignore
+        _cmp(*req["overeat"], pet.overeat),  # type: ignore
         # (the sick_count gates DROPPED with the sickness system (BASIC VPET 2026-07-17) --
         # GreaterThan rows would wall forever on a count nothing can move;
         # the injured gates already read a pinned 0 -- and 41 GreaterThan
@@ -157,16 +158,16 @@ def check(pet, num, item=-1, food=-1, connecting=False):
         # the 70 Mood=Unhappy requirement rows for any deeply-sad pet.
         True,   # (mood gates left with the mood system; BASIC VPET 2026-07-16)
         True,   # (obedience gates left with the discipline system)
-        _cmp(*req["wins"], _win_rate(pet)),
-        _cmp(*req["mistakes"], pet.care_mistakes),
+        _cmp(*req["wins"], _win_rate(pet)),  # type: ignore
+        _cmp(*req["mistakes"], pet.care_mistakes),  # type: ignore
         True,   # (major_food gates left with the nutrition/taste system)
-        _cmp(*req.get("incarnations", ("None", 0)), getattr(pet, "generation", 1)),
+        _cmp(*req.get("incarnations", ("None", 0)), getattr(pet, "generation", 1)),  # type: ignore
     ]
     # LevelFought: enough opponents of at least MinLevelFought power beaten this stage
     lf_min = req.get("level_fought_min", 0)
     if lf_min:
         cnt = sum(1 for lv in getattr(pet, "levels_fought", ()) if lv >= lf_min)
-        gates.append(_cmp(*req["level_fought"], cnt))
+        gates.append(_cmp(*req["level_fought"], cnt))  # type: ignore
     # (temp_req gates left with the weather system -- BASIC VPET 2026-07-16:
     # a temperature band nothing can move would permanently wall those forms)
     # (habitat_req gates DROPPED with the habitat system -- BASIC VPET
@@ -188,12 +189,12 @@ def check(pet, num, item=-1, food=-1, connecting=False):
     return True
 
 
-def _met(gate, actual):
+def _met(gate: Any, actual: Any) -> Any:
     cond, val = gate
     return cond != "None" and _cmp(cond, val, actual)
 
 
-def fulfilled(pet, num):
+def fulfilled(pet: Any, num: int) -> Any:
     """getFulfilledReq: 1 + priority + summed rates of every met gate."""
     req = data.load_requirements()[num]
     vac, dat, vir = _stats(pet)
@@ -227,7 +228,7 @@ def fulfilled(pet, num):
     lf_min = req.get("level_fought_min", 0)
     if lf_min and req["level_fought"][0] != "None":
         cnt = sum(1 for lv in getattr(pet, "levels_fought", ()) if lv >= lf_min)
-        if _cmp(*req["level_fought"], cnt):
+        if _cmp(*req["level_fought"], cnt):  # type: ignore
             score += 1  # Config._levelFoughtRate
     # canon scores ONLY an Induced X requirement (evolution audit 2026-07-06:
     # the old "Natural" arm over-scored 180 corpus forms)
@@ -246,7 +247,7 @@ def fulfilled(pet, num):
     return score
 
 
-def deviation(pet, num):
+def deviation(pet: Any, num: int) -> Any:
     """tieBreaker: total absolute distance from the met gates' thresholds."""
     req = data.load_requirements()[num]
     vac, dat, vir = _stats(pet)
@@ -268,7 +269,7 @@ def deviation(pet, num):
     return dev
 
 
-def _failed_form(pet, by_num):
+def _failed_form(pet: Any, by_num: Any) -> Any:
     """DVPet's safety net: a pet that meets no requirement still evolves -- into
     its species' 'Failed' form (e.g. Numemon) rather than getting stuck."""
     failed = [t for t in data.load_evolutions().get(pet.num, [])
@@ -278,7 +279,7 @@ def _failed_form(pet, by_num):
     return random.choice(failed) if failed else None
 
 
-def item_select(pet, item_id):
+def item_select(pet: Any, item_id: Any) -> Any:
     """Forms reachable by USING item `item_id`: graph targets whose EvolItemID == item_id
     and whose care gates pass (the item is an extra gate, not a bypass). Best by fulfilled."""
     _, by_num = data.load_sprites()
@@ -295,7 +296,7 @@ def item_select(pet, item_id):
     return random.choice(top)
 
 
-def food_select(pet, food_id):
+def food_select(pet: Any, food_id: Any) -> Any:
     """Forms reachable by EATING food `food_id` (processFoodEvol): graph
     targets whose EvolFood == food_id and whose care gates pass -- the meal
     is an extra gate, not a bypass.  Best by fulfilled, like item_select."""
@@ -315,7 +316,7 @@ def food_select(pet, food_id):
     return random.choice(top)
 
 
-def item_direct(pet, dexnum):
+def item_direct(pet: Any, dexnum: Any) -> Any:
     """Direct evolution item (items.csv MonsterID names the form): evolve into `dexnum`
     if it is a reachable graph neighbour of the current form."""
     if dexnum is None or dexnum < 0:
@@ -323,7 +324,7 @@ def item_direct(pet, dexnum):
     return dexnum if dexnum in data.load_evolutions().get(pet.num, []) else None
 
 
-def select(pet):
+def select(pet: Any) -> Any:
     """Return the chosen evolution target num, or None.
 
     Normal evolution climbs a stage.  (The X-Antibody steering and same-stage
@@ -387,7 +388,7 @@ DIVERGE_NEED = {"Fresh": 2, "InTraining": 4, "Rookie": 8,
 _STAGE_ORDER = ["Fresh", "InTraining", "Rookie", "Champion", "Ultimate", "Mega"]
 
 
-def divergence_target(pet):
+def divergence_target(pet: Any) -> Any:
     """The armed steer's destination, or None while unarmed (no strict-max
     Field, an under-threshold charge, or no graph edge in that Field)."""
     field = pet.highest_dna()
@@ -430,7 +431,7 @@ def divergence_target(pet):
     return random.choice(top)
 
 
-def divergence_roads(pet):
+def divergence_roads(pet: Any) -> Any:
     """{field: [target nums]} of every next-stage graph edge from the current
     form, by Field -- the DNA screen's map of where each charge can lead
     (legibility arc: the door must be visible to be a choice)."""
@@ -440,7 +441,7 @@ def divergence_roads(pet):
         return {}
     _, by_num = data.load_sprites()
     reqs = data.load_requirements()
-    roads = {}
+    roads = {}  # type: ignore
     for t in data.load_evolutions().get(pet.num, []):
         rec = by_num.get(t)
         if rec is None or t == pet.num or data.is_placeholder(t):
@@ -457,12 +458,12 @@ def divergence_roads(pet):
     return roads
 
 
-def is_mode_form(num):
+def is_mode_form(num: int) -> Any:
     """This form IS a Mode (SpecialEvolution=Mode) -- mode change reverts it."""
     return data.load_requirements().get(num, {}).get("special") == "Mode"
 
 
-def can_mode_change(pet):
+def can_mode_change(pet: Any) -> Any:
     """Evolution.canModeChange: the current form is a Mode, or any of its
     evolution targets is one (raw dex check; validity is tested on use)."""
     if is_mode_form(pet.num):
@@ -470,7 +471,7 @@ def can_mode_change(pet):
     return any(is_mode_form(t) for t in data.load_evolutions().get(pet.num, []))
 
 
-def mode_targets(pet):
+def mode_targets(pet: Any) -> Any:
     """The valid Mode evolutions right now (checkSpecialCondition Mode + the
     FULL requirement gates -- check's connecting flag waives only the
     special-type early-return, exactly like jogress), best-fulfilled first."""
@@ -479,7 +480,7 @@ def mode_targets(pet):
     return sorted(out, key=lambda t: -fulfilled(pet, t))
 
 
-def death_targets(pet):
+def death_targets(pet: Any) -> Any:
     """The valid Death-special evolutions (checkSpecialCondition Death: only a
     dying pet qualifies; the full requirement gates still apply), best first."""
     out = [t for t in data.load_evolutions().get(pet.num, [])
@@ -488,7 +489,7 @@ def death_targets(pet):
     return sorted(out, key=lambda t: -fulfilled(pet, t))
 
 
-def pre_evolution(num):
+def pre_evolution(num: int) -> Any:
     """getPreEvolutions().get(0): the first dex form that evolves into `num`."""
     for src in sorted(data.load_evolutions()):
         if num in data.load_evolutions()[src]:
@@ -499,7 +500,7 @@ def pre_evolution(num):
 _SYM = {"GreaterThan": ">", "LessThan": "<", "EqualTo": "="}
 
 
-def requirement_report(pet, num):
+def requirement_report(pet: Any, num: int) -> Any:
     """The data book's requirement checklist for one evolution target: a list of
     (met, text) rows, one per CONSTRAINED gate, mirroring check()'s reads exactly
     (unconstrained "None" gates are skipped).  met is True/False, or None for an
@@ -509,7 +510,7 @@ def requirement_report(pet, num):
         return [(False, "unknown form")]
     rows = []
 
-    def cmp_row(label, gate, actual, pct=False):
+    def cmp_row(label: Any, gate: Any, actual: Any, pct: bool=False) -> None:
         cond, val = gate
         if cond == "None":
             return
@@ -575,7 +576,7 @@ def requirement_report(pet, num):
     return rows or [(True, "no requirements \u2014 time alone")]
 
 
-def candidates(pet):
+def candidates(pet: Any) -> Any:
     """Debug helper: (num, name, passes, fulfilled) for each target."""
     _, by_num = data.load_sprites()
     out = []

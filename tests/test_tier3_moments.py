@@ -75,7 +75,7 @@ def test_trophy_page_shows_raid_conquest():
 
 def test_quit_prints_a_saved_acknowledgement():
     import inspect
-    from tuipet import app as app_mod
+    import tuipet.appboot as app_mod
     src = inspect.getsource(app_mod.main)
     assert "Saved ✓" in src
     assert "couldn't save" in src                      # ...but never over a dead disk

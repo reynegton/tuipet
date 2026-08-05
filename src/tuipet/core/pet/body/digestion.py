@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -7,7 +8,7 @@ import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines_mod
 from tuipet.core.petbase import *
 
-def _filth_effects(pet, dt):
+def _filth_effects(pet: Any, dt: Any) -> None:
     """checkFilthMoodDec + the filth sickness rolls (canon re-audit 2026-07):
     every FilthMoodDecMin the mess costs species filth_mood x piles; every
     game-min each pile is a sickness risk (chance x piles vs the bound x the
@@ -40,7 +41,7 @@ def _filth_effects(pet, dt):
             pet.sick = True
 
 
-def _tick_hunger(pet, dt):
+def _tick_hunger(pet: Any, dt: Any) -> None:
     """hunger: the DVPet calorie buffer drains each lapse; emptying it drops
     a hunger heart, then refills.  The care MISTAKE is the call light
     (LINES_SPEC §5, canon on all three devices): hunger empty and unanswered
@@ -93,7 +94,7 @@ def _tick_hunger(pet, dt):
             pet.calories = CALORIE_LIMIT
 
 
-def _add_filth(pet, size):
+def _add_filth(pet: Any, size: int) -> None:
     """addFilth (poop/filth audit 2026-07-06): below the cap the pile takes
     the next slot; a FULL room UPGRADES the first pile smaller than the new
     mess instead of dropping it (canon's overflow rule -- the old cap
@@ -109,12 +110,12 @@ def _add_filth(pet, size):
             break
 
 
-def _start_poop(pet):
+def _start_poop(pet: Any) -> None:
     """DVPet startPoop: drop a sized pile."""
     pet._add_filth(pet._poop_size())
 
 
-def _do_poop(pet, backlog=False):
+def _do_poop(pet: Any, backlog: bool=False) -> None:
     if pet.auto_clean_until and pet.world_seconds < pet.auto_clean_until:
         pet.poop = 0             # the smart potty flushes it (DSprite item)
         pet.poop_sizes = []

@@ -6,6 +6,7 @@ key map gives it its own key.  Content mirrors drawAutoCareValidation: the
 and "{care}/care" for the CURRENT stage, plus the on/off switch.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import LCD_ON, LCD_BG, INK, INK_B, DIM, SEL, POS, NEG    # noqa: F401  (palette names bound for theme.apply propagation)
@@ -14,24 +15,24 @@ from tuipet.i18n.translator import t
 
 
 class AssistPanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.msg = t("ast_msg_intro", "A helper minds the pet, for a fee.")
         self._fresh = False       # a toggle happened THIS visit: its verdict
         #                           rides home on ESC (round 32)
 
-    def strip(self):
+    def strip(self) -> Any:
         on = getattr(self.pet, "auto_care", False)
         return menu.hints(("ENTER", t("ast_hint_dismiss", "dismiss helper") if on else t("ast_hint_hire", "hire helper")),
                           ("ESC", t("ast_hint_out", "out")))
 
-    def anim(self):
+    def anim(self) -> None:
         # a frame heartbeat so the app repaints at 10 Hz and an
         # over-wide menu.note can actually SCROLL (marquee sweep
         # 2026-07-15) -- this panel had no animation of its own
         pass
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("enter", "space"):
             self.msg = self.pet.set_auto_care(not self.pet.auto_care)
             self._fresh = True
@@ -41,7 +42,7 @@ class AssistPanel:
             return ("done", self.msg if self._fresh else None)
         return None
 
-    def text(self):
+    def text(self) -> Any:
         p = self.pet
         out = menu.header(t("ast_hdr_ast", "AI ASSISTANT"), f"{p.bits}b")
         hour = AUTO_CARE_HOUR_PRICE.get(p.stage, 0)

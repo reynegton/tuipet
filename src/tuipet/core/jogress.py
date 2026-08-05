@@ -4,6 +4,7 @@ attributeJogress matrix; jogress targets are flagged SpecialEvolution=Jogress in
 the evolution graph and bypass the normal care requirements (the partner provides
 the "DNA"), so it's a deliberate fusion the player triggers."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import tuipet.data.loaders.data as data
 import tuipet.core.evolution as evolution
@@ -35,14 +36,14 @@ JOGRESS_PAIRS = [
 ATTRS = ("Vaccine", "Data", "Virus")
 
 
-def required_partners(player_attr, target_attr):
+def required_partners(player_attr: Any, target_attr: Any) -> Any:
     """Partner attributes that fuse a `player_attr` monster into a `target_attr` form
     (attributeJogress.csv, both blocks -- handles None/Free combinations natively)."""
     return [par for (evol, dig, par) in JOGRESS_PAIRS
             if dig == player_attr and evol == target_attr]
 
 
-def _partner_for(pet, attrs):
+def _partner_for(pet: Any, attrs: Any) -> Any:
     _, by = data.load_sprites()
     same = [n for n, r in by.items() if r["stage"] == pet.stage and r["attribute"] in attrs
             and not data.is_placeholder(n) and n != pet.num]
@@ -51,7 +52,7 @@ def _partner_for(pet, attrs):
     return n, (by[n]["name"] if n else "?")
 
 
-def options(pet):
+def options(pet: Any) -> Any:
     """Available fusions from the pet's current form."""
     _, by = data.load_sprites()
     reqs = data.load_requirements()
@@ -114,7 +115,7 @@ def options(pet):
     return out
 
 
-def can_jogress(pet, remote=False):
+def can_jogress(pet: Any, remote: bool=False) -> Any:
     if getattr(pet, "dead", False):
         # the missing dead leg let a full-DP corpse pass -- this gate also
         # drives the lobby invite auto-decline (dead sweep 2026-07-06)
@@ -152,14 +153,14 @@ def can_jogress(pet, remote=False):
     return None
 
 
-def fuse_targets(pet, partner_attr):
+def fuse_targets(pet: Any, partner_attr: Any) -> Any:
     """Multiplayer jogress: the forms `pet` can fuse into when the partner has
     attribute `partner_attr` (the real partner replaces offline `_partner_for`)."""
     pa = partner_attr or "None"
     return [o for o in options(pet) if pa in o["partners"]]
 
 
-def _final_pick(pet, targets):
+def _final_pick(pet: Any, targets: Any) -> Any:
     """getFinalEvolution's pick (canon re-audit 2026-07): highest fulfilled
     score, ties broken by smallest deviation, then at random."""
     best = max(evolution.fulfilled(pet, o["num"]) for o in targets)
@@ -170,20 +171,20 @@ def _final_pick(pet, targets):
     return random.choice(top)
 
 
-def resolve(pet, partner_attr):
+def resolve(pet: Any, partner_attr: Any) -> Any:
     """Choose the fusion form from the partner's attribute alone (the offline
     panel + the LEGACY online path -- see resolve_online)."""
     targets = fuse_targets(pet, partner_attr)
     return _final_pick(pet, targets) if targets else None
 
 
-def pairable_attrs(pet):
+def pairable_attrs(pet: Any) -> Any:
     """The partner attributes that unlock at least one fusion for this pet --
     canon's 'attributes' half of the jogressMatch wire string."""
     return sorted({p for o in options(pet) for p in o["partners"]})
 
 
-def _distinct_component(pet, peer_num):
+def _distinct_component(pet: Any, peer_num: Any) -> Any:
     """Canon named fusions need TWO DIFFERENT components (Fusion/Mode canon
     audit 2026-07-18): two WarGreymons never make an Omnimon, whatever the
     name channel says.  DISTINCTNESS is the whole law: the extra demand
@@ -198,7 +199,7 @@ def _distinct_component(pet, peer_num):
     return data.canonical_num(peer_num) != data.canonical_num(pet.num)
 
 
-def resolve_online(pet, payload):
+def resolve_online(pet: Any, payload: Any) -> Any:
     """Canon JogressProtocol.jogressFindFusionsAndAttributes (lobby session
     audit 2026-07-07).  The match runs in canon's two channels:
       1. SHARED FUSION NAMES -- the intersection of both sides' reachable
@@ -250,7 +251,7 @@ def resolve_online(pet, payload):
     return _final_pick(pet, targets) if targets else None
 
 
-def fuse(pet, target_num):
+def fuse(pet: Any, target_num: Any) -> Any:
     """Perform the fusion: the pet jogress-evolves into the target form.
     A fusion drinks 66% of max energy (JogressEnergyChange -0.66)."""
     _, by = data.load_sprites()

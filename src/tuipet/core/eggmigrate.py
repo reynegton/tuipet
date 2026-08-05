@@ -3,6 +3,7 @@ shipped bank order and the (name, occurrence) translation between them.
 Self-contained on purpose — the tables ARE the history; see the v5 notes
 for the fake-egg cut."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 
 # --- egg-bank index migration (2026-07-10 egg saga) ---------------------------
@@ -96,11 +97,11 @@ _CUT_FALLBACK = {
     "Pichimon": "Deep Savers Egg", "Mokumon": "Nightmare Soldiers Egg",
     "Nyokimon": "Wind Guardians Egg", "Choromon": "Metal Empire Egg"}
 
-def _current_names():
+def _current_names() -> Any:
     import tuipet.core.egg as egg_mod
     return [egg_mod.hatch_name(i) for i in range(egg_mod.count())]
 
-def _find_occurrence(names, name, occ):
+def _find_occurrence(names: Any, name: str, occ: Any) -> Any:
     seen = 0
     for i, n in enumerate(names):
         if n == name:
@@ -109,7 +110,7 @@ def _find_occurrence(names, name, occ):
                 return i
     return None
 
-def _migrate_egg_index(old, table=_V401_FULL, fallback=True):
+def _migrate_egg_index(old: Any, table: Any=_V401_FULL, fallback: bool=True) -> Any:
     """Translate an old-bank egg index into the current bank (None = drop)."""
     if not isinstance(old, int) or not (0 <= old < len(table)):
         return None
@@ -125,12 +126,12 @@ def _migrate_egg_index(old, table=_V401_FULL, fallback=True):
             return _find_occurrence(cur, fb, 1)
     return None
 
-def _table_for(save_v):
+def _table_for(save_v: Any) -> Any:
     """The FULL bank order a given save version's indices were written
     against; None = indices are already current."""
     return {2: _V402_FULL, 3: _V403_FULL, 4: _V404_FULL}.get(save_v, _V401_FULL)
 
-def _sane_owned(owned):
+def _sane_owned(owned: Any) -> Any:
     """Drop impossible eggs_owned entries: out-of-range, and TEMP lineage
     eggs (can_perm FALSE) which are never ownable however they snuck in."""
     import tuipet.data.loaders.data as data
@@ -146,7 +147,7 @@ def _sane_owned(owned):
         out.add(i)
     return sorted(out)
 
-def _migrate_v401_save(data):
+def _migrate_v401_save(data: Any) -> None:
     """In-place pet-save migration across bank versions (egg indices only)."""
     v = data.get("egg_order_v")
     if v == EGG_ORDER_V:
@@ -157,7 +158,7 @@ def _migrate_v401_save(data):
         data["egg_type"] = new if new is not None else 1
     data["egg_order_v"] = EGG_ORDER_V
 
-def _migrate_v401_settings(d):
+def _migrate_v401_settings(d: Any) -> Any:
     """One-time owned-egg index translation + sanity pass for older settings
     files (v4 also REPAIRS v3's fallback leak: temp eggs granted as owned)."""
     if not d or d.get("egg_order_v") == EGG_ORDER_V:

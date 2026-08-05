@@ -16,6 +16,7 @@ arrow `O` sits at the left margin pointing at the selected row.  Glyphs are
 the EXACT bitmaps ripped from the decompile (`me`/`he`/`O`), not hand-drawn.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.utils.grid as grid
 import tuipet.ui.components.menu as menu
 import tuipet.utils.render as render
@@ -85,7 +86,7 @@ ROWS_MENU = [("meat", "feed_meat_item"), ("pill", "feed_pill_item")]
 
 
 class FeedPanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         # a SICK pet opens on its own cure: the HUD nag names it, and meat
         # would only be refused -- don't make the cure extra presses in the
@@ -93,13 +94,13 @@ class FeedPanel:
         self.cursor = 1 if pet.sick else 0
         self.frame_i = 0
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         return menu.hints(("↑↓", t('hint_pick', 'pick')), ("ENTER", t('hint_feed', 'feed')), ("ESC", t('hint_out', 'out')))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("up", "k", "down", "j"):
             self.cursor = 1 - self.cursor
         elif k in ("enter", "space"):
@@ -129,7 +130,7 @@ class FeedPanel:
             return ("done", None)
         return None
 
-    def text(self):
+    def text(self) -> Any:
         """The LCD scene: canon's two-glyph stack, the arrow pointing at the
         row ENTER will act on."""
         overlay = render.blit(MEAT, ICON_X, grid.TOP)

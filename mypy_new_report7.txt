@@ -1,0 +1,2 @@
+src/tuipet/app_mixins/hud.py:64: error: Unexpected indent  [syntax]
+Found 1 error in 1 file (errors prevented further checking)

@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -9,7 +10,7 @@ import tuipet.utils.backgrounds as backgrounds
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def background(pet, file=None):
+def background(pet: Any, file: Optional[Any]=None) -> Any:
     """The home scene frame (or None).  The scene is WIRED TO THE EGG the
     pet hatched from and stands for its whole life -- the real device's
     per-version backgrounds, worn as the DSprite rebuild's rip set
@@ -28,7 +29,7 @@ def background(pet, file=None):
     return frames[0] if frames else None
 
 
-def pick_background(pet, key):
+def pick_background(pet: Any, key: str) -> Any:
     """The E picker's commit: '' returns the scene to the egg's own."""
     pet.bg_pick = key
     if not key:
@@ -36,7 +37,7 @@ def pick_background(pet, key):
     return f"{backgrounds.name(key)} it is."
 
 
-def _guard(pet, asleep_blocks=True):
+def _guard(pet: Any, asleep_blocks: bool=True) -> Any:
     """The shared action gate: dead / still-an-egg / asleep (a sleeping pet
     is DISTURBED, not served).  Returns the refusal string or None."""
     if pet.dead:
@@ -48,26 +49,26 @@ def _guard(pet, asleep_blocks=True):
     return None
 
 
-def _phys(pet):
+def _phys(pet: Any) -> Any:
     return data.load_requirements().get(pet.num, {})
 
 
-def good_nutrition(pet):
+def good_nutrition(pet: Any) -> Any:
     """Always False: the nutrition macros left (BASIC VPET 2026-07-16)."""
     return False
 
 
-def _species_food(pet):
+def _species_food(pet: Any) -> Any:
     r = data.load_requirements().get(pet.num, {})
     return (r.get("food_pref", "None"), r.get("food_aversion", "None"),
             r.get("food_intol", []))
 
 
-def _set_anim(pet, name, ttl):
+def _set_anim(pet: Any, name: str, ttl: Any) -> None:
     pet.anim, pet.anim_ttl = name, ttl
 
 
-def _poop_size(pet):
+def _poop_size(pet: Any) -> Any:
     """DVPet poop(): pile size from base weight (heavier mons drop bigger)."""
     bw = pet._base_weight()
     if bw >= POOP_INC_WEIGHT_FACTOR:

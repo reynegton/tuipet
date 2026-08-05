@@ -5,6 +5,7 @@ play, full stop (the licence shop was cut 2026-07-17): meet a rule's condition
 and the egg joins the carousel, permanently when the rule allows.
 ←→ glide, ENTER hatches the centred egg, ESC backs out."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.utils.backgrounds as _bgs
 import tuipet.data.loaders.data as data
 import tuipet.core.egg as egg_mod
@@ -32,7 +33,7 @@ SNAP = 0.03                   # below this, settle exactly
 
 
 class EggSelectPanel:
-    def __init__(self, pet=None):
+    def __init__(self, pet: Optional[Any]=None) -> None:
         self.pet = pet
         prog = persistence.get_progress()
         owned = persistence.get_eggs_owned()
@@ -54,7 +55,7 @@ class EggSelectPanel:
         self.msg_t = 0
         self.sfx = None
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.msg_t > 0:
             self.msg_t -= 1
@@ -66,10 +67,10 @@ class EggSelectPanel:
         else:
             self.scroll += diff * EASE
 
-    def _flash(self, text):
+    def _flash(self, text: str) -> None:
         self.msg, self.msg_t = text, 22
 
-    def strip(self):
+    def strip(self) -> Any:
         """The message-box line: a fresh verdict, then the unlock tease on
         its beat, then the hints (carousel redo 2026-07-19: the LCD is pure
         scene now -- the dossier lives on the STATUS card, the words live
@@ -82,7 +83,7 @@ class EggSelectPanel:
             return t("eggsel_msg_more", "{locked} more out there · {hint}").format(locked=self.locked, hint=self.hint)
         return menu.hints(("←→", t("eggsel_hint_browse", "browse")), ("ENTER", t("eggsel_hint_pick", "pick")), ("E", t("eggsel_hint_guide", "guide")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("right", "l", "down", "j"):
             self.pos += 1
             self.i = int(self.pos) % self.n if self.n else 0
@@ -105,17 +106,17 @@ class EggSelectPanel:
             return ("done", None)                      # back out without choosing
         return None
 
-    def _egg(self, pos):
+    def _egg(self, pos: Any) -> Any:
         return self.carousel[pos % self.n]
 
-    def _frame(self, pos, center):
+    def _frame(self, pos: Any, center: Any) -> Any:
         idx = self._egg(pos)
         fr = egg_mod.record(idx)["frames"]
         if center and self.scroll == self.pos:         # settled: idle wobble on the chosen egg
             return fr[(self.frame_i // 5) % 2] or fr[0]
         return fr[0]
 
-    def _note(self, idx):
+    def _note(self, idx: int) -> Any:
         """The hatch line (carousel polish 2026-07-18): a multi-target
         egg keeps its mystery instead of wearing the EGG's label, and
         a species never raised on this profile earns its ★new badge --
@@ -131,14 +132,14 @@ class EggSelectPanel:
         tail = t("eggsel_msg_this_gen", "  (this gen only)") if state == "temp" else ""
         return t("eggsel_msg_hatches", "hatches: {name}{new}{tail}").format(name=name, new=t("eggsel_lbl_new", "  ★new") if new else "", tail=tail)
 
-    def _scene_bg(self, idx):
+    def _scene_bg(self, idx: int) -> Any:
         """The browsed egg's OWN backdrop behind the carousel -- the egg
         decides the home scene for the pet's whole life, so the choice
         shows you the home you're choosing (carousel polish 2026-07-18)."""
         frames = data.load_backgrounds().get(_bgs.scene_for_egg(idx))
         return frames[0] if frames else None
 
-    def text(self):
+    def text(self) -> Any:
         if not self.n:                                 # defensive: starters keep this non-empty
             out = menu.header(t("eggsel_hdr_choose", "CHOOSE YOUR EGG"), "0/0")
             out.append_text(menu.blanks(ROWS // 2))

@@ -72,9 +72,9 @@ def test_the_picker_embarks_on_enter_and_backs_out_on_esc():
 def test_a_panel_boss_win_records_progression(monkeypatch):
     # monkeypatch, not bare assignment: the old direct writes leaked zeroed
     # chances into every later test (pollution fix 2026-07-21)
-    monkeypatch.setattr(A, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(A, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(A, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(A.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(A.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(A.run, "FIND_CHANCE", 0.0)
     p = _champ()
     pan = AdventurePanel(p, zone=ZONES[A.PROGRESSION[0]])   # the road's frontier
     for _ in range(TELE_LEAVE_T + TELE_ARRIVE_T + pan.adv.total * TRAVEL_TICKS + 20):

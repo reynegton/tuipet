@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import time
@@ -20,7 +21,7 @@ import tuipet.utils.persistio as _persistio
 from .settings_io import load_settings, save_settings
 
 
-def snapshot_prev_gen(pet):
+def snapshot_prev_gen(pet: Any) -> None:
     """Record the just-ended pet's traits for the 'previous generation' egg
     gates -- and the careBonusOnReset math (death/rebirth audit 2026-07-06):
     the ended life's care ADJUSTS the bonus the next generation inherits.
@@ -77,7 +78,7 @@ def snapshot_prev_gen(pet):
     del legacy[:-30]                 # the book keeps the 30 most recent elders
     save_settings(d)
 
-def _heal_bag(inv):
+def _heal_bag(inv: Any) -> Any:
     """The bag heal, both eras in one pass: shed the dead staple props
     (strict-DSprite 2026-07-17) and map the retired catalog's keys onto
     their TUIPET heirs 1:1 (shop.LEGACY_KEYS; catalog turnover 2026-07-18
@@ -102,7 +103,7 @@ def _heal_bag(inv):
             inv[new] = inv.get(new, 0) + n
     return inv
 
-def prev_gen_estate():
+def prev_gen_estate() -> Any:
     """The device-lifetime estate the next generation inherits (bits, the bag,
     the trophy room -- canon resetToEgg preserves them all)."""
     d = load_settings()
@@ -124,7 +125,7 @@ def prev_gen_estate():
             "trophies_won": tw,
             "dna_owned": dict(last.get("dna_owned") or {})}
 
-def to_save_dict(pet):
+def to_save_dict(pet: Any) -> Any:
     """The on-disk/cloud save payload: the flat pet plus a wall-clock stamp used
     for offline catch-up AND last-write-wins cloud merge."""
     data = asdict(pet)
@@ -132,7 +133,7 @@ def to_save_dict(pet):
     data["egg_order_v"] = EGG_ORDER_V   # marks post-.402 egg indices (migration guard)
     return data
 
-def pet_from_save(data, strict=False):
+def pet_from_save(data: Any, strict: bool=False) -> Any:
     """Build (pet, message) from a save dict (disk or cloud). Returns (None, '')
     on malformed data.
 
@@ -206,9 +207,9 @@ def pet_from_save(data, strict=False):
         if isinstance(proto, bool):
             want = (bool, int)
         elif isinstance(proto, (int, float)):
-            want = (int, float)
+            want = (int, float)  # type: ignore
         else:
-            want = type(proto)
+            want = type(proto)  # type: ignore
         if not isinstance(data[f.name], want):
             return None, ""
     # THE MANNERS HEAL, once per save (D1/P3, 2026-07-23).  _set_obedience

@@ -1,0 +1,2 @@
+src/tuipet/app_mixins/timers.py:120: error: "TimersMixin" has no attribute "pet"  [attr-defined]
+Found 1 error in 1 file (checked 141 source files)

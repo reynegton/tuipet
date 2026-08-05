@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 import tuipet.utils.backgrounds as backgrounds
 import tuipet.data.loaders.data as data
@@ -14,7 +15,7 @@ DIV = "[dim]" + "─" * CARD_W + "[/]"
 
 from .helpers import *
 
-def _zone_display(name, avail):
+def _zone_display(name: str, avail: Any) -> Any:
     """A zone's display name shortened to `avail` visible cols: the full
     name when it fits, else its gate BOSS (zone names are "{Boss}'s
     {biome}", and the boss IS the destination), else a plain clip."""
@@ -23,14 +24,14 @@ def _zone_display(name, avail):
     return name.split("'s ", 1)[0][:avail]
 
 
-def _frontier_name(pet, avail):
+def _frontier_name(pet: Any, avail: Any) -> Any:
     """The frontier zone's display name (the stats column is 26 wide,
     zone names run to 32)."""
     import tuipet.core.adventure as adventure
     return _zone_display(adventure.ZONES[adventure.frontier(pet)]["name"], avail)
 
 
-def _where(pet):
+def _where(pet: Any) -> Any:
     """The @ line's PLACE, <=16 cols: on the road it's the current zone's
     BIOME, the home scene otherwise -- both read as a place the pet stands.
 
@@ -48,7 +49,7 @@ def _where(pet):
                             or backgrounds.scene_for_egg(pet.egg_type))[:16]
 
 
-def adventure_line(pet):
+def adventure_line(pet: Any) -> Any:
     """The home card's quest readout -- LIVE from pet.adv_progress (zones
     conquered of the 26), plus the FRONTIER zone's name (Joel 2026-07-21:
     "show the frontier zone name on the card") -- the road the pet walks
@@ -65,7 +66,7 @@ def adventure_line(pet):
     return f"{t('status_quest', 'Quest').ljust(8)}{count}[dim]▸ {_frontier_name(pet, 16 - len(count))}[/]"
 
 
-def home_lines(pet):
+def home_lines(pet: Any) -> Any:
     import tuipet.core.lines as _lines    # DMX level: exp vs canon thresholds
     T = theme
     word = pet.status_word()

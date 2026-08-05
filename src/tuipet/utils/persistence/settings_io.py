@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import time
@@ -21,14 +22,14 @@ DM_KEEP = 50
 from . import progress_io
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     """`save_failed` is MUTABLE state owned by persistio's writer -- a
     static re-export would freeze it at import; delegate reads instead."""
     if name == "save_failed":
         return _persistio.save_failed
     raise AttributeError(name)
 
-def load_settings(path=None):
+def load_settings(path: Optional[Any]=None) -> Any:
     """App-level prefs that outlive any single pet (e.g. the lobby account).
     Falls back to the .bak rotated by save_settings -- settings hold the album,
     lifetime wins, owned eggs and the banked Memory; one corrupt write must
@@ -44,50 +45,50 @@ def load_settings(path=None):
         return d
     return {}
 
-def get_auto_update():
+def get_auto_update() -> Any:
     """Should the game install a newer release for itself at launch?  On by
     default (Joel 2026-07-14) -- a player can turn it off in g options."""
     return bool(load_settings().get("auto_update", True))
 
-def get_cloud_sync():
+def get_cloud_sync() -> Any:
     """The player-facing cloud-save switch (settings only; see sync_enabled)."""
     return bool(load_settings().get("cloud_sync", True))
 
-def set_cloud_sync(on):
+def set_cloud_sync(on: Any) -> Any:
     d = load_settings()
     d["cloud_sync"] = bool(on)
     save_settings(d)
     return bool(on)
 
-def sync_enabled():
+def sync_enabled() -> Any:
     """Cloud sync is completely disabled for this hard fork."""
     # TODO: Estudar a comunicação de rede do servidor gringo original e manter a compatibilidade
     # dos envios/recebimentos para reativar o cloud sync futuramente.
     return False
 
-def set_auto_update(on):
+def set_auto_update(on: Any) -> Any:
     d = load_settings()
     d["auto_update"] = bool(on)
     save_settings(d)
     return bool(on)
 
-def save_settings(d, path=None):
+def save_settings(d: Any, path: Optional[Any]=None) -> None:
     # every write stamps the CURRENT egg-bank version -- without it, a
     # settings file created THIS session would look like a pre-migration
     # (.400/.401) file on the next load and get wrongly re-translated
     d["egg_order_v"] = EGG_ORDER_V
     _atomic_write_json(path or SETTINGS_PATH, d, keep_bak=True)
 
-def get_blocked():
+def get_blocked() -> Any:
     """Muted lobby peers (names)."""
     return set(load_settings().get("blocked", []))
 
-def set_blocked(names):
+def set_blocked(names: Any) -> None:
     d = load_settings()
     d["blocked"] = sorted(names)
     save_settings(d)
 
-def get_dms():
+def get_dms() -> Any:
     """Persisted lobby DM threads -> ({peer: [(from, text), ...]}, unread set).
     Conversations survive leaving the thread/lobby (Joel 2026-07-10)."""
     d = load_settings()
@@ -95,25 +96,25 @@ def get_dms():
            for p, v in (d.get("dms") or {}).items()}
     return dms, set(d.get("dm_unread") or [])
 
-def save_dms(dms, unread):
+def save_dms(dms: Any, unread: Any) -> None:
     d = load_settings()
     d["dms"] = {p: [list(m) for m in v[-DM_KEEP:]] for p, v in dms.items() if v}
     d["dm_unread"] = sorted(n for n in unread if n in d["dms"])
     save_settings(d)
 
-def get_account():
+def get_account() -> Any:
     """The cached lobby account: (name, password). (None, "") if unset."""
     a = load_settings().get("account") or {}
     name = (a.get("name") or "").strip()
     return (name or None, a.get("pw") or "")
 
-def set_account(name, pw):
+def set_account(name: str, pw: Any) -> None:
     d = load_settings()
     name = (name or "").strip()[:24]
     d["account"] = {"name": name, "pw": pw or ""}
     save_settings(d)
 
-def erase_all():
+def erase_all() -> Any:
     """Erase the WHOLE local state: pet save (+bak), settings (progress,
     account, memory, +bak), sound + theme prefs -- and every other file
     carrying the erased pet's data: quarantined save.corrupt.* copies, the
@@ -148,3 +149,13 @@ def erase_all():
     progress_io._ALBUM_SEEN.clear()
     return removed
 
+
+def get_saved_language() -> str:
+    """Gets the persisted user language preference."""
+    return load_settings().get("language") or ""
+
+def set_saved_language(lang: str) -> None:
+    """Sets and persists the user language preference."""
+    d = load_settings()
+    d["language"] = lang
+    save_settings(d)

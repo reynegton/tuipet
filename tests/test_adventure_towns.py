@@ -28,8 +28,8 @@ def test_every_real_zone_ships_a_town_waypoint():
 
 
 def test_reaching_the_town_refills_lives_and_energy(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
     z = _town_zone()
     p = _pet()
     a = Adventure(p, zone=z)
@@ -49,8 +49,8 @@ def test_reaching_the_town_refills_lives_and_energy(monkeypatch):
 
 
 def test_the_town_fires_only_once_per_span(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
     z = _town_zone()
     a = Adventure(_pet(), zone=z)
     towns = sum(1 for _ in range(a.total) if a.travel() == "town")
@@ -58,7 +58,7 @@ def test_the_town_fires_only_once_per_span(monkeypatch):
 
 
 def test_town_ground_suppresses_encounters(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)   # every leg would fight
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)   # every leg would fight
     z = _town_zone()
     a = Adventure(_pet(), zone=z)
     a.loc = z["town_legs"][0][0]
@@ -67,9 +67,9 @@ def test_town_ground_suppresses_encounters(monkeypatch):
 
 
 def test_the_panel_stops_at_the_town_to_visit_or_walk_on(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(_pet())
     # march until the panel stands at the town waypoint
     stopped = False

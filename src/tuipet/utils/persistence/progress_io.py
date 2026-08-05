@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import time
@@ -18,7 +19,7 @@ from tuipet.utils.persistio import (  # noqa: F401
 import tuipet.utils.persistio as _persistio
 _ALBUM_SEEN: set[int] = set()
 
-def get_album():
+def get_album() -> Any:
     """Set of distinct Monster species ever raised, NAME-CANONICAL (the
     DM20-style zukan).  DVPet's dex sync is by name (checkNaturalUnlocked):
     the 1410+ egg-hatch duplicate rows and their chart twins reveal together
@@ -28,11 +29,11 @@ def get_album():
     return {data.canonical_num(n)
             for n in _prog().get("album", [])}
 
-def get_wins():
+def get_wins() -> Any:
     """Lifetime battle wins across all pets/generations."""
     return int(_prog().get("wins", 0))
 
-def album_seen(num):
+def album_seen(num: int) -> Any:
     """Has ANY generation been this form -- under EITHER of its name-twin nums?
     (canon Evolution.setUnlocked + checkNaturalUnlocked: the dex reveal state
     the hidden-evolution mask keys on, synced across same-name rows)."""
@@ -42,7 +43,7 @@ def album_seen(num):
         return True
     return num in get_album()
 
-def album_add(num):
+def album_add(num: int) -> None:
     if num is None or num < 0:
         return
     import tuipet.data.loaders.data as data
@@ -60,13 +61,13 @@ def album_add(num):
     prog["album"] = sorted(album)
     save_settings(d)
 
-def ladder_award_claimed(season):
+def ladder_award_claimed(season: Any) -> Any:
     """Has this device already granted the season's ladder award?  The server
     keeps its own claim ledger; this local one stops a double-grant when the
     claim message races a re-query (monthly ladder, 2026-07-14)."""
     return season in _prog().get("ladder_claimed", [])
 
-def note_ladder_award(season):
+def note_ladder_award(season: Any) -> None:
     from .settings_io import load_settings, save_settings
     d = load_settings()
     lst = d.setdefault("progress", {}).setdefault("ladder_claimed", [])
@@ -74,7 +75,7 @@ def note_ladder_award(season):
         lst.append(season)
         save_settings(d)
 
-def album_has(num):
+def album_has(num: int) -> Any:
     """Is this species (name-canonical) already in the cross-pet album?  Lets
     the evolve/hatch moment announce a genuine FIRST -- album_add() itself is
     buried in save() and records silently (sweep 2026-07-14)."""
@@ -86,7 +87,7 @@ def album_has(num):
         return True
     return num in set(_prog().get("album", []))
 
-def _note_add(key, n):
+def _note_add(key: str, n: Any) -> Any:
     """Bump a lifetime progress counter (the generic behind wins/mega_kills --
     the load-modify-save dance was copied per counter; refactor 2026-07-05)."""
     from .settings_io import load_settings, save_settings
@@ -96,58 +97,58 @@ def _note_add(key, n):
     save_settings(d)
     return prog[key]
 
-def wins_add(n=1):
+def wins_add(n: int=1) -> Any:
     return _note_add("wins", n)
 
-def record_connection(peer_name):
+def record_connection(peer_name: Any) -> None:
     """A completed online link (versus bout or jogress) with another tamer --
     the DM20 connection-battle signal behind the Corona/Luna/Meicoo/DORU
     eggs.  Distinct tamers count once, like the device's friend list."""
     if peer_name:
         _note_set("connections", str(peer_name)[:24])
 
-def mega_kills_add(n=1):
+def mega_kills_add(n: int=1) -> Any:
     """Lifetime Mega/Ultimate-class foes felled (gates the X egg; LINES_SPEC §7)."""
     return _note_add("mega_kills", n)
 
-def armor_add(n=1):
+def armor_add(n: int=1) -> Any:
     """Lifetime armor (Relic) evolutions performed -- the crest-wave
     Relic shop gate (2026-07-17)."""
     return _note_add("armor_evos", n)
 
-def _prog():
+def _prog() -> Any:
     from .settings_io import load_settings
     return load_settings().get("progress", {})
 
-def get_eggs_owned():
+def get_eggs_owned() -> Any:
     """Egg indices permanently earned (a met can_perm unlock, stuck forever)."""
     return set(_prog().get("eggs_owned", []))
 
-def egg_own(idx):
+def egg_own(idx: int) -> None:
     if idx is not None:
         _note_set("eggs_owned", idx)
 
-def get_titles_owned():
+def get_titles_owned() -> Any:
     """Honor titles bought (profile-level, survives generations)."""
     return set(_prog().get("titles_owned", []))
 
-def title_own(tid):
+def title_own(tid: Any) -> None:
     _note_set("titles_owned", int(tid))
 
-def get_title_worn():
+def get_title_worn() -> Any:
     """The WORN honor title id (-1 = none)."""
     try:
         return int(_prog().get("title_worn", -1))
     except (TypeError, ValueError):
         return -1
 
-def set_title_worn(tid):
+def set_title_worn(tid: Any) -> None:
     from .settings_io import load_settings, save_settings
     d = load_settings()
     d.setdefault("progress", {})["title_worn"] = int(tid)
     save_settings(d)
 
-def _note_max(key, value):
+def _note_max(key: str, value: Any) -> None:
     from .settings_io import load_settings, save_settings
     d = load_settings()
     prog = d.setdefault("progress", {})
@@ -155,13 +156,13 @@ def _note_max(key, value):
         prog[key] = int(value)
         save_settings(d)
 
-def note_generation(g):
+def note_generation(g: Any) -> None:
     _note_max("max_gen", g)
 
-def note_stage_index(i):
+def note_stage_index(i: Any) -> None:
     _note_max("max_stage", i)
 
-def note_xanti():
+def note_xanti() -> None:
     from .settings_io import load_settings, save_settings
     d = load_settings()
     prog = d.setdefault("progress", {})
@@ -169,7 +170,7 @@ def note_xanti():
         prog["xanti_ever"] = True
         save_settings(d)
 
-def _note_set(key, value):
+def _note_set(key: str, value: Any) -> None:
     from .settings_io import load_settings, save_settings
     d = load_settings()
     prog = d.setdefault("progress", {})
@@ -180,10 +181,10 @@ def _note_set(key, value):
     prog[key] = sorted(cur)
     save_settings(d)
 
-def map_complete_add(map_index):
+def map_complete_add(map_index: Any) -> None:
     _note_set("maps", int(map_index))
 
-def zone_best_set(zone_index, score):
+def zone_best_set(zone_index: Any, score: Any) -> Any:
     """Record an adventure run's SCORE against the zone's standing best
     (arcade arc, 2026-07-21).  Returns True when it's a NEW best -- the
     summary card's brag."""
@@ -198,12 +199,12 @@ def zone_best_set(zone_index, score):
         return True
     return False
 
-def zone_bests():
+def zone_bests() -> Any:
     """zone_index -> best run score (str-keyed in storage, int-keyed here)."""
     return {int(k): int(v)
             for k, v in (_prog().get("zone_bests", {}) or {}).items()}
 
-def raid_add():
+def raid_add() -> None:
     """One community raid boss this save contributed to FELL (counted at the
     claim, when the relay confirms defeated=True).  The count re-gates the
     old MapComplete egg rows (BASIC VPET 2026-07-16)."""
@@ -213,24 +214,24 @@ def raid_add():
     prog["raids"] = int(prog.get("raids", 0)) + 1
     save_settings(d)
 
-def tourney_add(trophy_id):
+def tourney_add(trophy_id: Any) -> None:
     _note_set("tourneys", int(trophy_id))
 
-def festival_add(name):
+def festival_add(name: str) -> None:
     """Celebrated a festival -- conquered an adventure zone on a holiday day.
     A set of the festival NAMES seen (distinct festivals only, so same-day
     conquers count once); gates the seasonal egg (Draco/Examon, the grand
     festival prize -- festivals were reward-hollow before, 2026-07-20)."""
     _note_set("festivals", str(name))
 
-def _note_put(key, value):
+def _note_put(key: str, value: Any) -> None:
     """Park a one-slot value in the generational progress channel."""
     from .settings_io import load_settings, save_settings
     d = load_settings()
     d.setdefault("progress", {})[key] = value
     save_settings(d)
 
-def _note_take(key):
+def _note_take(key: str) -> Any:
     """Pop a one-slot progress value (None when the slot is empty)."""
     from .settings_io import load_settings, save_settings
     d = load_settings()
@@ -239,7 +240,7 @@ def _note_take(key):
         save_settings(d)
     return v
 
-def shop_unlock_add(key):
+def shop_unlock_add(key: str) -> None:
     """Canon unlockItem/unlockFood (shop/economy audit 2026-07-06): finding a
     consumable in the wild UNLOCKS its home-shop listing for good -- device-
     lifetime in canon (the bag survives resetToEgg), so the per-save progress
@@ -252,32 +253,32 @@ def shop_unlock_add(key):
         got.append(key)
         save_settings(d)
 
-def shop_unlocks():
+def shop_unlocks() -> Any:
     from .settings_io import load_settings, save_settings
     d = load_settings()
     return set((d.get("progress") or {}).get("shop_unlocks") or [])
 
-def bank_memory(mem):
+def bank_memory(mem: Any) -> None:
     """Park the departed's inheritance data in the generational channel (DVPet
     keeps items across resetToEgg; tuipet's per-save channel is progress, the
     same place the last_gen egg gates live).  One slot, like the device."""
     _note_put("memory", dict(mem))
 
-def bank_bonus_seed(n):
+def bank_bonus_seed(n: Any) -> None:
     """Park the departed's care grade (careBonusOnReset) for the next egg."""
     _note_put("bonus_seed", int(n))
 
-def take_bonus_seed():
+def take_bonus_seed() -> Any:
     return int(_note_take("bonus_seed") or 0)
 
-def peek_memory():
+def peek_memory() -> Any:
     return _prog().get("memory") or None
 
-def take_memory():
+def take_memory() -> Any:
     """Pop the banked memory (the heir now carries it on its own save)."""
     return _note_take("memory") or None
 
-def get_progress():
+def get_progress() -> Any:
     """Assemble the full progress view egg.evaluate() consumes."""
     prog = _prog()
     last = prog.get("last_gen", {}) or {}
@@ -300,7 +301,7 @@ def get_progress():
         "armor_evos": int(prog.get("armor_evos", 0)),
     }
 
-def add_pending_bug(rec):
+def add_pending_bug(rec: Any) -> Any:
     """Stash a bug that could not be sent (offline) to retry next launch.
     True when it is safely on disk -- the caller PROMISES the player it will
     send later, so a failed stash must not be reported as a save (swallowed-
@@ -315,7 +316,7 @@ def add_pending_bug(rec):
     except OSError:
         return False
 
-def peek_pending_bugs():
+def peek_pending_bugs() -> Any:
     """Read the stashed bugs WITHOUT deleting them (bug audit 2026-07-19:
     the old take-then-send cleared the stash up front, so quitting mid-
     flush lost every unsent report -- the round-5 PM-flush lesson).  The
@@ -328,7 +329,7 @@ def peek_pending_bugs():
     except (OSError, ValueError):
         return []
 
-def write_pending_bugs(recs):
+def write_pending_bugs(recs: Any) -> Any:
     """Atomically rewrite the stash to exactly `recs` ([] removes the file).
     True when it landed on disk."""
     import os as _os

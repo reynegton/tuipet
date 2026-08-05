@@ -18,9 +18,9 @@ def _pet():
 
 
 def _land(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(_pet(), zone=adventure.ZONES[0])
     for _ in range(TELE_LEAVE_T + TELE_ARRIVE_T + 2):
         pan.anim()

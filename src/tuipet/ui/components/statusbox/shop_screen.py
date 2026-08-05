@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 import tuipet.utils.backgrounds as backgrounds
 import tuipet.data.loaders.data as data
@@ -14,7 +15,7 @@ DIV = "[dim]" + "─" * CARD_W + "[/]"
 
 from .helpers import *
 
-def feed(app):
+def feed(app: Any) -> None:
     """FEED: the selected row's true effects beside the live gauges."""
     p, m = app.pet, app.mode
     # both rows disclose in FULL, weight included -- the meat row used to
@@ -47,7 +48,7 @@ def feed(app):
         subtitle=gen_subtitle(p))
 
 
-def eat(app):
+def eat(app: Any) -> None:
     """The live feeding readout (plays while the eat fx runs).  What is live:
     the hunger hearts filling, weight, effort, and the premium-meat satiety
     window.  (The Fuel/calorie bar left 2026-07-20: calories is a DVPet-only
@@ -69,7 +70,7 @@ def eat(app):
     app.stats_w.update("\n".join(lines))
 
 
-def shop(app):
+def shop(app: Any) -> None:
     """SHOP/BAG: the selected entry's dossier."""
     import tuipet.core.shop as shop_mod
     T = theme

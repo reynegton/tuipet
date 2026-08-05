@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -8,12 +9,12 @@ import tuipet.core.lines as lines_mod
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def _rand_personality_traits(pet):
+def _rand_personality_traits(pet: Any) -> Any:
     """PhysicalState.randPersonalityTraits: each trait rolls Random.nextInt(3) ->
     {0:-1, 1:0, 2:+1} (only assigned while still neutral) -- and SEEDS the
     matching tracker rank at +-42 so the Champion re-roll starts from the
     rolled temperament, not from zero (taste/rank audit 2026-07-06)."""
-    def roll(cur):
+    def roll(cur: Any) -> Any:
         if cur != 0:
             return cur
         r = random.randint(0, 2)
@@ -26,7 +27,7 @@ def _rand_personality_traits(pet):
     pet.mood_rank = pet.disposition * PCHAMP_RANK
 
 
-def _rand_on_champion(pet):
+def _rand_on_champion(pet: Any) -> None:
     """PhysicalState.randOnChampion: at the CHAMPION evolution the
     temperament is RE-ROLLED from the tracked childhood ranks -- a pup
     kept energetic turns restless, one kept fat turns gluttonous, one
@@ -39,19 +40,19 @@ def _rand_on_champion(pet):
                         else -1 if pet.mood_rank <= -PCHAMP_RANK else 0)
 
 
-def _disposition(pet):
+def _disposition(pet: Any) -> Any:
     return pet.disposition          # DVPet _disposition: fixed personality trait
 
 
-def _glutton(pet):
+def _glutton(pet: Any) -> Any:
     return pet.glutton
 
 
-def _restless(pet):
+def _restless(pet: Any) -> Any:
     return pet.restless
 
 
-def personality(pet):
+def personality(pet: Any) -> Any:
     if pet.num == -1 or pet.stage == "Egg":
         return "Não chocado"
     trio = _PERSONALITY[(pet._disposition(), pet._glutton())]
@@ -59,7 +60,7 @@ def personality(pet):
     return trio[0 if rst == 0 else (1 if rst == 1 else 2)]
 
 
-def _personality_mood(pet, e):
+def _personality_mood(pet: Any, e: Any) -> Any:
     """consumablePersonalityMoodChange: +-10 per personality tag the
     consumable shares/clashes with the pet (disposition/restless/glutton)."""
     total = 0

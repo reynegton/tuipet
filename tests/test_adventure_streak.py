@@ -50,9 +50,9 @@ def test_the_streak_scales_the_bounty_to_the_cap():
 
 
 def test_any_town_rest_breaks_the_chain(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     z = _wild_zone()
     a = Adventure(_pet(), zone=z)
     a.chain(True), a.chain(True)
@@ -71,9 +71,9 @@ def test_the_panel_chains_fights_and_wears_the_marker(monkeypatch):
     """_battle_done feeds the chain BEFORE the bounty (a win pays its own
     streak), the march strip wears the xN marker from 2 up, a loss strips
     it, and the summary brags the run's best."""
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     p = _pet()
     pan = AdventurePanel(p, zone=_wild_zone())
     pan._trans = None

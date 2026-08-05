@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -5,7 +6,7 @@ import tuipet.data.loaders.data as data
 import tuipet.utils.sound as sound
 from tuipet.core.petbase import FULL_HUNGER, CLEAN_OBED_INC
 
-def clean(pet):
+def clean(pet: Any) -> Any:
     """PhysicalState.clean: wash the filth off the floor.  (The mood and
     obedience rewards this once paid are INERT -- both meters left with
     their systems 2026-07-16; the write-calls below are the standing
@@ -21,14 +22,14 @@ def clean(pet):
     return f"Limpou {n} cocôs."
 
 
-def heal(pet):
+def heal(pet: Any) -> Any:
     """The pill (BASIC VPET 2026-07-16): the med/bandage staples left
     with the DVPet item system -- one staple treats everything, from the
     F menu (and the road's h key)."""
     return pet.feed_pill()
 
 
-def set_auto_care(pet, on):
+def set_auto_care(pet: Any, on: Any) -> Any:
     """SpriteAnim's Set_AutoCare switch -> PhysicalState.setAutoCare: hiring
     the assistant also rolls WHICH Monster answers, from the monster.csv
     CanAssist pool (Evolution.getRandomAssistMonster)."""
@@ -44,7 +45,7 @@ def set_auto_care(pet, on):
     return "O assistente foi dispensado."
 
 
-def toggle_lights(pet):
+def toggle_lights(pet: Any) -> Any:
     """The lights button (DVPet setLights): toggles the room light ONLY. The pet
     sleeps and wakes on its own schedule -- this does not force sleep or wake."""
     if (_g := pet._guard(asleep_blocks=False)) is not None:

@@ -25,7 +25,7 @@ def _to_travelling(pan):
 
 # -- engine -------------------------------------------------------------------
 def test_a_forced_encounter_pulls_a_real_wild_and_holds_the_leg(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
     a = Adventure(_champ())
     r = a.travel()
     assert isinstance(r, tuple) and r[0] == "encounter"
@@ -35,9 +35,9 @@ def test_a_forced_encounter_pulls_a_real_wild_and_holds_the_leg(monkeypatch):
 
 
 def test_win_grants_a_grace_leg_then_the_march_resumes(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)   # isolate the grace leg
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)  # (immunity covers
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)   # isolate the grace leg
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)  # (immunity covers
     # encounters only -- an unlucky hazard roll made this flake, 2026-07-23)
     a = Adventure(_champ())
     a.travel()                                             # encounter
@@ -47,7 +47,7 @@ def test_win_grants_a_grace_leg_then_the_march_resumes(monkeypatch):
 
 
 def test_flee_costs_no_life_and_no_progress(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
     a = Adventure(_champ())
     a.travel()
     assert a.resolve(False, fled=True) == "fled"
@@ -55,7 +55,7 @@ def test_flee_costs_no_life_and_no_progress(monkeypatch):
 
 
 def test_three_losses_fail_the_run(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
     a = Adventure(_champ())
     outs = []
     for _ in range(MAX_LIVES):
@@ -68,8 +68,8 @@ def test_three_losses_fail_the_run(monkeypatch):
 
 
 def test_suppressed_encounters_cross_clean(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
     bossless = {"name": "Testfield", "scene": "greenhills",
                 "steps": adventure.INTERACTIVE_STEPS, "randoms": [], "bosses": []}
     a = Adventure(_champ(), zone=bossless)     # bossless: the crossing is the win
@@ -79,7 +79,7 @@ def test_suppressed_encounters_cross_clean(monkeypatch):
 
 # -- panel integration --------------------------------------------------------
 def test_the_panel_opens_a_wild_fight_on_the_road_biome(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
     pan = AdventurePanel(_champ())
     _to_travelling(pan)
     for _ in range(20):
@@ -93,7 +93,7 @@ def test_the_panel_opens_a_wild_fight_on_the_road_biome(monkeypatch):
 
 
 def test_a_real_fight_runs_through_the_sub_and_resolves(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
     random.seed(5)
     pan = AdventurePanel(_champ())
     _to_travelling(pan)
@@ -119,8 +119,8 @@ def test_a_real_fight_runs_through_the_sub_and_resolves(monkeypatch):
 
 
 def test_life_pips_ride_the_march_strip(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
     pan = AdventurePanel(_champ())
     _to_travelling(pan)
     assert "♥" in pan.strip()                  # full hearts while marching

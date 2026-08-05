@@ -8,6 +8,7 @@ the target breaks (hit) or the attacker deflates (miss).  battlescreen owns the 
 (WINDUP_T / FIRE_T / ...); this module owns the geometry + orb flight so both stay in lockstep.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.utils.grid as grid
 
 # the orb rides the same 16px creature band every sprite stands in
@@ -18,7 +19,7 @@ BAND_BOT = grid.FLOOR        # 22
 from tuipet.utils.render import blit    # one blit for app/training/strikefx (refactor 2026-07-05)
 
 
-def beat_sfx(m, strong):
+def beat_sfx(m: Any, strong: Any) -> Any:
     """The launch/impact stings every strike timeline shares -- battle and
     training hand-rolled the same two arms (refactor 2026-07-05).  None for
     markers the caller shades itself (reveal, miss, bossdie)."""
@@ -42,7 +43,7 @@ _FONT_3X5 = {
 LOCK_GRACE = 2   # trailing marker steps forgiven on a bar lock (10Hz: ~200ms)
 
 
-def grade_lock(hist, mega_lo, mega_hi, veteran=False):
+def grade_lock(hist: Any, mega_lo: Any, mega_hi: Any, veteran: bool=False) -> Any:
     """ONE grading rule for every bar lock (the drill and the bout ran
     hand-copies).  Reflex honesty (timing rework 2026-07-23, Joel: "i hit
     the center every time, what are you talking about"): the marker steps
@@ -65,7 +66,7 @@ def grade_lock(hist, mega_lo, mega_hi, veteran=False):
     return "miss"
 
 
-def timing_bar(bar, mega_lo, mega_hi):
+def timing_bar(bar: Any, mega_lo: Any, mega_hi: Any) -> Any:
     """The canon timing bar, pixel for pixel from the source's
     TRAINING_MINIGAME render (Joel 2026-07-15: 'do it canon style'):
     HIT! in the 3x5 font at (9,0), the 28x5 outlined track at (2,7),
@@ -76,16 +77,16 @@ def timing_bar(bar, mega_lo, mega_hi):
     training slide bar')."""
     pts = []
 
-    def L(x, y):                              # the source's pixel-set
+    def L(x: Any, y: Any) -> None:                              # the source's pixel-set
         pts.append((grid.X0 + x, grid.TOP + y))
 
-    def B(x, y, w, h):                        # the source's rect outline
+    def B(x: Any, y: Any, w: Any, h: Any) -> None:                        # the source's rect outline
         for i in range(w):
-            L(x + i, y), L(x + i, y + h - 1)
+            L(x + i, y), L(x + i, y + h - 1)  # type: ignore
         for i in range(h):
-            L(x, y + i), L(x + w - 1, y + i)
+            L(x, y + i), L(x + w - 1, y + i)  # type: ignore
 
-    def R(s, x, y):                           # the source's 3x5 font run
+    def R(s: Any, x: Any, y: Any) -> None:                           # the source's 3x5 font run
         for ci, ch in enumerate(s):
             g = _FONT_3X5.get(ch, _FONT_3X5[" "])
             for gy in range(5):
@@ -97,26 +98,26 @@ def timing_bar(bar, mega_lo, mega_hi):
     B(2, 7, 28, 5)
     lo, hi = 3 + mega_lo, 3 + mega_hi + 1
     for tx in (lo, hi):                       # the mega window's ticks
-        L(tx, 6), L(tx, 12)
+        L(tx, 6), L(tx, 12)  # type: ignore
     B(3 + bar, 8, 2, 3)                       # the marker (outline == solid at 2 wide)
     return pts
 
 
-def cbounds(rows):
+def cbounds(rows: Any) -> Any:
     """Leftmost / rightmost lit column of a sprite (its real content bounds)."""
     w = max(len(r) for r in rows)
     cols = [x for x in range(w) if any(x < len(r) and r[x] == "1" for r in rows)]
     return (min(cols), max(cols)) if cols else (0, w - 1)
 
 
-def clamp_grid(x, lo, hi):
+def clamp_grid(x: Any, lo: Any, hi: Any) -> Any:
     """Clamp x so the sprite's lit content [x+lo, x+hi] stays inside the grid [X0, X1).
     Steady poses hug the grid wall; a rear-back that would push past it compresses against
     the wall instead of escaping (the lunge-forward beat still reads)."""
     return max(grid.X0 - lo, min(x, (grid.X1 - 1) - hi))
 
 
-def place_combatant(faces_left, rows, xshift=0, mirror=True, turn=False):
+def place_combatant(faces_left: Any, rows: Any, xshift: int=0, mirror: bool=True, turn: bool=False) -> Any:
     """Place the ONE combatant on screen, grounded in the grid, clamped in-bounds.
     faces_left=True  -> attacker/pet: stands RIGHT, faces left, fires left (content right edge
                         hugs the grid); mouth = its LEFT edge (toward the target).
@@ -141,7 +142,7 @@ def place_combatant(faces_left, rows, xshift=0, mirror=True, turn=False):
     return [(rows, x, m)], x + hi + 1
 
 
-def orb_flight(orb, fires_left, m, prog, mouth, double=False):
+def orb_flight(orb: Any, fires_left: Any, m: Any, prog: Any, mouth: Any, double: bool=False) -> Any:
     """The attacker's real orb, flying between the mouth and the grid edge.
     m 'fire_out' -> leaves the mouth, off the near grid edge.
     m 'fire_in'  -> arrives from the far grid edge, stops at the defender's edge (mouth).
@@ -163,7 +164,7 @@ def orb_flight(orb, fires_left, m, prog, mouth, double=False):
     return blit(src, x, BAND_TOP + (16 - h) // 2)
 
 
-def build_volley(success, strong):
+def build_volley(success: Any, strong: Any) -> Any:
     """A single-attacker volley timeline (the battle player's attack, standalone):
     windup -> fire_out -> fire_in -> hit + break (success) / miss (fail).  Beats come from
     battlescreen so the pace matches the real battle exactly."""

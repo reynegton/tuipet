@@ -18,6 +18,7 @@ onto the 40px arena at ~0.4 (moves of 6px -> 2, 3px -> 1); canon item frames
 are 1-based over 8 -> ours cycle the 4 extracted frames ((n-1) % 4).
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import tuipet.utils.grid as grid
 
@@ -35,11 +36,11 @@ ITEM_X = grid.X0                     # the left wall (canon setLoc(3, floor))
 # rows 1..8 are the show.  The old (n-1)%4 wrap was an off-by-one against a
 # 4-row extraction: it put the icon cell into every script's walk.  Kept as
 # a function so scripts still read in canon frame numbers.
-def _fr(n):
+def _fr(n: Any) -> Any:
     return n
 
 
-def _interact(snds):
+def _interact(snds: Any) -> Any:
     """cycleItemFrames(rate=6): item frames 1..8 at 6-beat steps, the pet
     watching (pose 0 arrival, pose 1 after), end beat 48 -> cheer."""
     rows = {0: {"i": _fr(1), "p": 0}}
@@ -228,7 +229,7 @@ _SCRIPT_OVERRIDE = {"dna_crystal": "Study", "x_antibody": "Study",
 NO_FX = {"Idling"}
 
 
-def state(action, step, iw, ih, px_h, n=9):
+def state(action: Any, step: Any, iw: Any, ih: Any, px_h: Any, n: int=9) -> Any:
     """Replay a script to `step`: (item_frame, pet_pose, item_x, item_y,
     pet_dx, pet_dy).  Geometry: item icon iw x ih on a COLS x px_h arena.
     `n` is the item's REAL strip length (icon + anim frames): any frame

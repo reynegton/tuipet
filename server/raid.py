@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import state
+from typing import Any, Dict, List, Optional
 
 LOG = logging.getLogger("tuipet.lobby")
 
@@ -12,7 +13,7 @@ try:
 except (OSError, ValueError):
     _RAID_MULT_BY_NUM = {}
 
-def _load_raid():
+def _load_raid() -> Dict[str, Any]:
     try:
         with open(state.RAID_PATH) as f:
             d = json.load(f)
@@ -26,7 +27,7 @@ def _load_raid():
         return {"boss": None, "board": {}, "history": [], "claimed": {},
                 "attempts": {}}
 
-def _save_raid():
+def _save_raid() -> None:
     try:
         tmp = state.RAID_PATH + ".tmp"
         with open(tmp, "w") as f:
@@ -35,20 +36,20 @@ def _save_raid():
     except OSError:
         LOG.warning("raid: disk refused %s", state.RAID_PATH)
 
-def _raid_pool():
+def _raid_pool() -> List[Dict[str, Any]]:
     try:
         with open(state.RAID_POOL_PATH) as f:
             return json.load(f)
     except Exception:
         return [{"num": 0, "name": "Unknown Boss", "energy_max": 65}]
 
-def _raid_mult_for_num(num):
+def _raid_mult_for_num(num: Any) -> int:
     try:
         return _RAID_MULT_BY_NUM.get(int(num), 1)
     except (TypeError, ValueError):
         return 1
 
-def _adaptive_hp():
+def _adaptive_hp() -> int:
     if not state.RAID["history"]:
         return state.RAID_HP_FLOOR
     last = state.RAID["history"][-1]
@@ -59,7 +60,7 @@ def _adaptive_hp():
         base = dealt * state.RAID_FIT
     return int(max(state.RAID_HP_FLOOR, min(state.RAID_HP_CAP, base)))
 
-def _raid_stage_next(now):
+def _raid_stage_next(now: float) -> Dict[str, Any]:
     import random as _r
     pick = _r.choice(_raid_pool())
     hp = _adaptive_hp()
@@ -70,7 +71,7 @@ def _raid_stage_next(now):
             "hp": hp, "max_hp": hp,
             "start": start, "end": start + state.RAID_WINDOW_S}
 
-def _raid_rotate(now=None):
+def _raid_rotate(now: Optional[float] = None) -> None:
     now = time.time() if now is None else now
     b = state.RAID["boss"]
     if b is not None and b["hp"] > 0 and now <= b["end"]:
@@ -87,7 +88,7 @@ def _raid_rotate(now=None):
     state.RAID["boss"] = _raid_stage_next(now)
     _save_raid()
 
-def _raid_attempts(name, now=None):
+def _raid_attempts(name: str, now: Optional[float] = None) -> Dict[str, Any]:
     now = time.time() if now is None else now
     day = time.strftime("%Y-%m-%d", time.gmtime(now))
     rec = state.RAID["attempts"].get(name)
@@ -99,12 +100,12 @@ def _raid_attempts(name, now=None):
                                       if r.get("date") == day}
     return rec
 
-def _raid_rank(board, name):
+def _raid_rank(board: Dict[str, Any], name: str) -> int:
     top = sorted(board.items(), key=lambda kv: (-kv[1]["damage"],
                                                 kv[1].get("ts", 0)))
     return next((i + 1 for i, (who, _v) in enumerate(top) if who == name), 0)
 
-def _raid_award(name):
+def _raid_award(name: str) -> Optional[Dict[str, Any]]:
     for rec in sorted(state.RAID["history"], key=lambda r: r["id"], reverse=True):
         if name in state.RAID["claimed"].get(rec["id"], []):
             continue
@@ -125,7 +126,7 @@ def _raid_award(name):
                 "boss": rec["boss_name"], "bits": bits, "items": items}
     return None
 
-def _raid_view(name, now=None):
+def _raid_view(name: str, now: Optional[float] = None) -> Dict[str, Any]:
     now = time.time() if now is None else now
     _raid_rotate(now)
     b = state.RAID["boss"]
@@ -141,7 +142,7 @@ def _raid_view(name, now=None):
             "attempts": _raid_attempts(name, now)["left"],
             "award": _raid_award(name)}
 
-def _raid_hit(name, raw, num, now=None):
+def _raid_hit(name: str, raw: Any, num: Any, now: Optional[float] = None) -> Dict[str, Any]:
     now = time.time() if now is None else now
     _raid_rotate(now)
     b = state.RAID["boss"]
@@ -165,7 +166,7 @@ def _raid_hit(name, raw, num, now=None):
     _save_raid()
     return {"t": "raid_hit", "ok": True, "dealt": dealt}
 
-def _raid_claim(name, raid_id, now=None):
+def _raid_claim(name: str, raid_id: Any, now: Optional[float] = None) -> Dict[str, Any]:
     now = time.time() if now is None else now
     a = _raid_award(name)
     if not a or a["id"] != str(raid_id):

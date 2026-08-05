@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -5,7 +6,7 @@ import tuipet.data.loaders.data as data
 import tuipet.utils.sound as sound
 from tuipet.core.petbase import FULL_HUNGER, DISOBEY_BELOW, DISOBEY_MAX_P, SCOLD_OBED_INC
 
-def check_refused(pet, food=None, attr=None, energy_change=0.0, item=None):
+def check_refused(pet: Any, food: Optional[Any]=None, attr: Optional[Any]=None, energy_change: float=0.0, item: Optional[Any]=None) -> Any:
     """The obedience refusal roll left with the discipline system (BASIC
     VPET 2026-07-16): the pet obeys care commands.  TWO meter rules
     survive because they are affordability, not temperament: the energy
@@ -18,7 +19,7 @@ def check_refused(pet, food=None, attr=None, energy_change=0.0, item=None):
     return False
 
 
-def manners_refusal(pet, kind):
+def manners_refusal(pet: Any, kind: Any) -> Any:
     """EARNED DISOBEDIENCE (D3, 2026-07-23): a NEGLECTED pet blows off
     a command.  True == it refused.
 
@@ -48,13 +49,13 @@ def manners_refusal(pet, kind):
     return True
 
 
-def refuse_attack(pet, my_hp, enemy_hp):
+def refuse_attack(pet: Any, my_hp: Any, enemy_hp: Any) -> Any:
     """Always False: the Orders-style mid-fight refusal left with the
     discipline system."""
     return False
 
 
-def stop_travel_prob(pet):
+def stop_travel_prob(pet: Any) -> Any:
     """PhysicalState.checkStopTravel as a per-fire PROBABILITY (the caller
     composes it over a full stride).  One draw per controller fire,
     r in [cap, cap + chance*3000); the energy fraction scales the draw
@@ -67,13 +68,13 @@ def stop_travel_prob(pet):
     return 1.0 if energy_mod <= 0 else 0.0
 
 
-def stop_travel_effects(pet):
+def stop_travel_effects(pet: Any) -> None:
     """The refusal's side effects (split from the roll so it can compose)."""
     pet.refused = True
     pet._set_anim("refuse", 1.5)
 
 
-def check_stop_travel(pet):
+def check_stop_travel(pet: Any) -> Any:
     """One canonical per-fire draw (kept for tests/direct callers)."""
     if random.random() < pet.stop_travel_prob():
         pet.stop_travel_effects()
@@ -81,7 +82,7 @@ def check_stop_travel(pet):
     return False
 
 
-def check_compliant(pet):
+def check_compliant(pet: Any) -> Any:
     """Always False ("never grudging"): compliance left with the
     discipline system.  Canon's True meant "it obeyed only because you
     spent its compliance token" -- the resentment branches (forced-feed
@@ -90,20 +91,20 @@ def check_compliant(pet):
     return False
 
 
-def _open_praise(pet):
+def _open_praise(pet: Any) -> None:
     """A win or a mega drill opens a 600 game-min praise window
     (= ~10 REAL minutes; see THE UNIT LAW in petbody._tick_life --
     the label used to read "10 game-min", the P0b mislabel)."""
     pet.praise_window = pet.world_seconds + 600.0
 
 
-def _open_scold(pet):
+def _open_scold(pet: Any) -> None:
     """The tantrum's answer window: 600 game-min (~10 REAL minutes)
     before ignoring it counts."""
     pet.scold_window = pet.world_seconds + 600.0
 
 
-def _calm_discipline_call(pet):
+def _calm_discipline_call(pet: Any) -> None:
     """Bedtime (and canBattle, per canon) placates an open tantrum --
     no reward, no penalty, the moment just passes."""
     if pet.discipline_call:
@@ -111,7 +112,7 @@ def _calm_discipline_call(pet):
         pet.scold_window = 0.0
 
 
-def praise(pet):
+def praise(pet: Any) -> Any:
     """PRAISE: inside a proud-moment window it pays obedience +10 and
     the cheer; outside one, nothing -- the no-praise-farming rule
     (from the pre-strip discipline audit)."""
@@ -126,7 +127,7 @@ def praise(pet):
     return f"{pet.name} parece satisfeito — mas não sabe por quê."
 
 
-def scold(pet):
+def scold(pet: Any) -> Any:
     """SCOLD: answering an open tantrum pays obedience +25 and the
     scolded sulk; scolding a calm pet just makes it sulk, no gain."""
     if (_g := pet._guard()) is not None:

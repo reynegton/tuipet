@@ -8,6 +8,7 @@ the lobby); the dead pick/no-partner phases were stripped in the follow-up
 polish arc.  The lobby constructs this panel directly at the result phase and
 drives anim()/text(); any key skips the converge to the reveal."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 from tuipet.utils.render import render_scene
 import tuipet.utils.grid as grid
@@ -24,7 +25,7 @@ FUSE_STEPS = 16 + POSE_T
 
 
 class JogressPanel:
-    def __init__(self, pet, old_num, partner_num, fused_num):
+    def __init__(self, pet: Any, old_num: Any, partner_num: Any, fused_num: Any) -> None:
         self.pet = pet
         self.frame_i = 0
         self.phase = "fusing"          # fusing | fused
@@ -33,14 +34,14 @@ class JogressPanel:
         self.partner_num = partner_num
         self.fused_num = fused_num
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.phase == "fusing":
             self.fuse_step += 1
             if self.fuse_step >= FUSE_STEPS:
                 self.phase = "fused"
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.phase == "fusing" and k:
             # ANY key skips the converge to the reveal -- the contract both
             # this docstring and the lobby's forwarder always stated, now
@@ -48,18 +49,18 @@ class JogressPanel:
             self.phase = "fused"
         return None
 
-    def _palette(self):
+    def _palette(self) -> Any:
         bgimg = self.pet.background()
         return menu.scene_ink(bgimg), bgimg
 
-    def _sprite(self, num, role="idle", idx=None):
+    def _sprite(self, num: int, role: str="idle", idx: Optional[Any]=None) -> Any:
         if idx is None:
             return data.bob_frame(num, self.frame_i, role,
                                   egg_type=getattr(self.pet, "egg_type", 0))
         fr = data.frames_for(num, getattr(self.pet, "egg_type", 0))
         return (fr[idx] if idx < len(fr) else None) or fr[0]
 
-    def text(self):
+    def text(self) -> Any:
         if self.phase == "fusing":
             return self._render_fusing()
         on, bgimg = self._palette()
@@ -67,7 +68,7 @@ class JogressPanel:
                                          ph=FUSE_ROWS * 2)],
                             COLS, FUSE_ROWS, on, LCD_BG, bgimg=bgimg)
 
-    def _render_fusing(self):
+    def _render_fusing(self) -> Any:
         ph = FUSE_ROWS * 2
         if self.fuse_step < POSE_T:
             # canon pre-fusion beat (the Jogress intro anim): BOTH parents stand

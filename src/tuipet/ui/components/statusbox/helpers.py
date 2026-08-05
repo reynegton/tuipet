@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 import tuipet.utils.backgrounds as backgrounds
 import tuipet.data.loaders.data as data
@@ -12,14 +13,14 @@ from tuipet.i18n.translator import t
 CARD_W = 26
 DIV = "[dim]" + "─" * CARD_W + "[/]"
 
-def gen_subtitle(pet):
+def gen_subtitle(pet: Any) -> Any:
     """'gen N', wearing the bought honor when one is worn (the honors board,
     prestige sink 2026-07-14)."""
     t = data.title_name(persistence.get_title_worn())
     return f"gen {pet.generation} · {t}" if t else f"gen {pet.generation}"
 
 
-def age_compact(seconds):
+def age_compact(seconds: Any) -> Any:
     """d/h then h/m then m/s -- raw total minutes read as noise on an older
     pet ('4325m40s', status-box audit 2026-07-04)."""
     s = int(max(0, seconds))
@@ -30,7 +31,7 @@ def age_compact(seconds):
     return f"{s // 60}m{s % 60:02d}s"
 
 
-def care_deco(pet, word=None):
+def care_deco(pet: Any, word: Optional[Any]=None) -> Any:
     """The care badges shown beside the status word -- one list, shared by the
     home Stats panel and every card that wants them.  Order is priority: the
     lowest ones drop first on overflow."""
@@ -69,7 +70,7 @@ def care_deco(pet, word=None):
     # auto-clean only ever showed in the transient eat readout, and a
     # hired assistant (billing per visit!) showed nowhere at all.  Lowest
     # priority: they drop first when the need badges pile up.
-    def _left(until):
+    def _left(until: Any) -> Any:
         s = int(until - pet.world_seconds)
         return f"{s // 3600}h" if s >= 3600 else f"{max(1, s // 60)}m"
     full = getattr(pet, "full_until", 0.0)
@@ -83,13 +84,13 @@ def care_deco(pet, word=None):
     return deco
 
 
-def status_line(status, deco, width=26):
+def status_line(status: Any, deco: Any, width: int=26) -> Any:
     """Assemble the status word + deco glyphs, bounded to `width` visible cols
     so the Stats box never wraps past its 16-row height. Drops the lowest-priority
     deco that would overflow (rare: only when asleep+sick+poop+effect pile up)."""
     from rich.text import Text
     used = len(status) + 3                      # the status word + 3 spaces
-    shown = []
+    shown = []  # type: ignore
     for d in deco:
         vis = len(Text.from_markup(d).plain)
         add = vis + (2 if shown else 0)         # 2-space separator between glyphs
@@ -99,7 +100,7 @@ def status_line(status, deco, width=26):
     return f"[b]{status}[/]   " + "  ".join(shown)
 
 
-def wrap(text, max_lines, width=CARD_W):
+def wrap(text: str, max_lines: Any, width: Any=CARD_W) -> Any:
     """Word-wrap PLAIN text into card rows on WORD boundaries (card audit
     2026-07-24, Joel "words are getting cut off").  The Options card used a
     raw text[:26] / [26:52] slice, which split "auto-install" mid-glyph and
@@ -116,7 +117,7 @@ def wrap(text, max_lines, width=CARD_W):
     return lines
 
 
-def card(app, title, lines, subtitle=""):
+def card(app: Any, title: Any, lines: Any, subtitle: str="") -> None:
     """The shared card frame: bold title, divider, body."""
     app.stats_w.border_subtitle = subtitle
     body = [f"[b]{title}[/]", DIV] + lines

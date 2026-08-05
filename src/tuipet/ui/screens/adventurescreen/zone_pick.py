@@ -26,6 +26,7 @@ mid-march to spend a town/danger warp item (skip ahead, rest or get ambushed).
 Nothing here is faked.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.cells import cell_len
 from rich.text import Text
 import tuipet.data.loaders.data as data
@@ -58,7 +59,7 @@ TRAVEL_TICKS = 8              # auto-march pace: ticks per travel step (~0.8s a 
 TOWN_HOLD = 14                # ticks the pet rests at a town before marching on
 NOTE_HOLD = 30                # ticks a road-item verdict rides the strip
 _cells = cell_len             # budgets are CELLS, not chars (bug-#32 law)
-def _fit(name, budget):
+def _fit(name: str, budget: Any) -> Any:
     """Ellipsis-trim a name to a cell budget: a strip's REQUIRED keys never
     ride the marquee for a long boss name (audit 2026-07-25)."""
     if _cells(name) <= budget:
@@ -74,7 +75,7 @@ TELE_LEAVE_SNDS = {3: "strongHit", 15: "strongHit", 21: "strongHit",
                    26: "attackHit", 44: "attack"}
 TELE_ARRIVE_SNDS = {1: "attack", 5: "attackHit",
                     24: "strongHit", 28: "strongHit", 37: "strongHit"}
-def _brighten(bg, f):
+def _brighten(bg: Any, f: Any) -> Any:
     """Lerp a backdrop toward white -- the LCD's zonePulse flash."""
     out = []
     for r in bg:
@@ -86,7 +87,7 @@ def _brighten(bg, f):
                 for c in ((v >> 16) & 255, (v >> 8) & 255, v & 255)))
         out.append("".join(row))
     return out
-def _curtain_pts(x, y, w, h):
+def _curtain_pts(x: Any, y: Any, w: Any, h: Any) -> Any:
     """The evol curtain as overlay pixels: the canon stripe pattern (each 3-px
     band = 1 clear + 2 filled) over an LCD rect.  Rides paint()'s overlay so it
     covers the PET too, like canon's room-effect layer.  Window-law: the ink is
@@ -104,7 +105,7 @@ class ZonePickPanel:
 
     VIS = 8
 
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         import tuipet.utils.persistence as persistence
         self.pet = pet
         self.frame_i = 0
@@ -113,10 +114,10 @@ class ZonePickPanel:
         self.holiday = adventure.active_holiday()        # festival banner + double rewards
         self.bests = persistence.zone_bests()            # standing run scores per zone
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         n = len(self.indices)
         if k in ("up", "k"):
             self.cursor = (self.cursor - 1) % n
@@ -130,10 +131,10 @@ class ZonePickPanel:
             return ("done", None)                               # back out
         return None
 
-    def strip(self):
+    def strip(self) -> Any:
         return menu.hints(("↑↓", "pick"), ("ENTER", "go"), ("ESC", "back"))
 
-    def _fmt(self, zi, _i):
+    def _fmt(self, zi: Any, _i: Any) -> Any:
         z = ZONES[zi]
         mark = "✓" if adventure.is_conquered(self.pet, zi) else "★"   # conquered vs the frontier
         best = self.bests.get(zi)
@@ -143,13 +144,13 @@ class ZonePickPanel:
             return _fit(f"{mark} {z['name']}", 27).ljust(27) + f"{best:>6}"
         return _fit(f"{mark} {z['name']}", 34)
 
-    def _bounty_claimed(self, zi):
+    def _bounty_claimed(self, zi: Any) -> Any:
         """Today's replay bounty already paid for this zone (the ration)."""
         import tuipet.core.shop as shop
         led = getattr(self.pet, "road_bounty", None) or {}
         return led.get("day") == shop._today_ordinal() and led.get(str(zi))
 
-    def text(self):
+    def text(self) -> Any:
         right = "★ FESTIVAL" if self.holiday else f"{len(self.indices)}/{len(ZONES)}"
         out = menu.header("ADVENTURE", right)
         self.cursor = menu.list_window(out, self.indices, self.cursor, self.VIS, self._fmt)

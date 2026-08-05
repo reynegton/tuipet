@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -8,7 +9,7 @@ import tuipet.core.lines as lines_mod
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def _hunger_interval(pet):
+def _hunger_interval(pet: Any) -> Any:
     # checkNeedDecay's glutton jitter: each lapse has a 1-in-LessHungerChance(9)
     # roll shifted by glutton -- in expectation a glutton drains ~11% faster,
     # a picky eater ~11% slower.  Applied as a steady coefficient.
@@ -16,7 +17,7 @@ def _hunger_interval(pet):
     return CALORIE_DECAY_SEC * (pet._phys().get("hunger_decay", 60) / REF_HUNGER_COEF) * glut
 
 
-def _poop_interval(pet):
+def _poop_interval(pet: Any) -> Any:
     """The species' own bowel cadence, with its RANGE compressed (Joel
     2026-07-25, option b -- see POOP_SPREAD_CAP).  The canon ratio
     `poop_limit / poop_lapse` is kept as the ordering, but read as a
@@ -30,11 +31,11 @@ def _poop_interval(pet):
     return POOP_INTERVAL_BASE / max(1.0, rate)
 
 
-def _strength_interval(pet):
+def _strength_interval(pet: Any) -> Any:
     return STRENGTH_DECAY_BASE * (pet._phys().get("strength_decay", 50) / REF_STRENGTH_COEF)
 
 
-def _growth_period(pet):
+def _growth_period(pet: Any) -> Any:
     """The growth curve's total: egg + every stage through the current one
     (canon _growthPeriod; the longevity leg credits life lived past it).
     Mega's 9e9 STAGE_DURATION is the "never auto-evolves" sentinel, not a

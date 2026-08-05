@@ -14,6 +14,7 @@ board archives and pays on claim — and a felled boss is a Mega down: the
 claim counts KO6 and the raids egg-unlock channel.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.utils.grid as grid
 import tuipet.utils.persistence as persistence
@@ -28,7 +29,7 @@ from tuipet.i18n.translator import t
 COLS, ROWS = 40, 12
 
 
-def _fmt(n):
+def _fmt(n: Any) -> Any:
     """Board damage is raw x5000 x mult — millions.  Keep it readable."""
     n = int(n)
     if n >= 10_000_000:
@@ -41,11 +42,11 @@ def _fmt(n):
 
 
 class RaidPanel(menu.SubHost):
-    def __init__(self, pet, connect, client=None):
+    def __init__(self, pet: Any, connect: Any, client: Optional[Any]=None) -> None:
         self.pet = pet
         self.sub = None
         self.frame_i = 0
-        self.sfx = None
+        self.sfx = None  # type: ignore
         self.msg = t("raid_msg_calling", "Calling the raid gate…")
         self._pool_seen = None        # (start, hp, end, name) of the last-seen boss
         self._dealt = 0
@@ -59,21 +60,21 @@ class RaidPanel(menu.SubHost):
 
     # ---- data ----
     @property
-    def view(self):
+    def view(self) -> Any:
         return getattr(self.client, "raid", None)
 
-    def _boss(self):
+    def _boss(self) -> Any:
         v = self.view or {}
         return v.get("boss") or {}
 
-    def _standing(self):
+    def _standing(self) -> Any:
         """The boss takes hits: announced (start passed) and pool > 0."""
         v = self.view or {}
         b = self._boss()
         return bool(b) and b.get("start", 0) <= v.get("now", 0) \
             and b.get("hp", 0) > 0
 
-    def anim(self):
+    def anim(self) -> None:
         if self.sub_anim():
             return
         self.frame_i += 1
@@ -118,7 +119,7 @@ class RaidPanel(menu.SubHost):
             if dealt > 0:
                 self._credited += dealt
                 self.msg = t("raid_msg_credits", "Gate credits {dealt:,} damage!").format(dealt=dealt)
-                self.sfx = "attackHit"
+                self.sfx = "attackHit"  # type: ignore
             else:
                 # the gate REFUSED the report -- speak ITS reason (the ack
                 # carries `why`: a fallen boss OR spent attempts; the old
@@ -130,7 +131,7 @@ class RaidPanel(menu.SubHost):
                 why = hit.get("why") or ""
                 default_refusal = t("raid_msg_refused", "O portal recusou o relatório.")
                 self.msg = t(code, why) if code else (why or default_refusal)
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
         reward = getattr(self.client, "raid_reward", None)
         if reward is not None:
             self.client.raid_reward = None
@@ -148,14 +149,14 @@ class RaidPanel(menu.SubHost):
             if (prev is not None and b.get("start") != prev[0]
                     and prev[1] > 0 and now <= prev[2]):
                 self.msg = t("raid_msg_falls", "{name} falls — the pool is broken!").format(name=prev[3])
-                self.sfx = "win"
-            self._pool_seen = (b.get("start"), b.get("hp", 0),
+                self.sfx = "win"  # type: ignore
+            self._pool_seen = (b.get("start"), b.get("hp", 0),  # type: ignore
                                b.get("end", 0), b.get("name", t("raid_msg_the_boss", "The boss")))
 
-    def _apply_reward(self, reward):
+    def _apply_reward(self, reward: Any) -> None:
         if not reward.get("ok"):
             self.msg = t("raid_msg_nothing", "Nada a coletar.")
-            self.sfx = "error"
+            self.sfx = "error"  # type: ignore
             return
         bits = int(reward.get("bits", 0))
         self.pet.bits += bits
@@ -181,18 +182,18 @@ class RaidPanel(menu.SubHost):
             rank = reward.get('rank', '?')
             base_msg = t("raid_msg_fell_full", "{boss} fell! Rank {rank}: {bits}b").format(boss=boss_name, rank=rank, bits=bits)
             self.msg = base_msg + (f" + {names}" if names else "")
-            self.sfx = "champion"
+            self.sfx = "champion"  # type: ignore
         else:
             self.msg = t("raid_msg_escaped", "The boss escaped… {bits}b consolation.").format(bits=bits)
-            self.sfx = "confirm"
+            self.sfx = "confirm"  # type: ignore
 
-    def strip(self):
+    def strip(self) -> Any:
         if self.sub is not None:
             return ""
         return menu.hints(("SPACE", t("raid_hint_raid", "raid!")), ("C", t("raid_hint_claim", "claim")), ("ESC", t("raid_hint_out", "out")))
 
     # ---- the attempt ----
-    def _boss_enemy(self):
+    def _boss_enemy(self) -> Any:
         b = self._boss()
         num = int(b.get("num", -1))
         rec = data.record_for(num)
@@ -204,7 +205,7 @@ class RaidPanel(menu.SubHost):
                 # 2026-07-23: the card showed RaidBout's 5/5 display stub)
                 "pool": (int(b.get("hp", 0)), max(1, int(b.get("max_hp", 1))))}
 
-    def _report(self, b):
+    def _report(self, b: Any) -> None:
         if b is None:
             # ESC before the bell: no volley rolled, no report, no attempt
             # spent -- the old "Not a scratch" called the walk-away a whiff
@@ -232,7 +233,7 @@ class RaidPanel(menu.SubHost):
         else:
             self.msg = t("raid_msg_scratch", "Not a scratch. Rest and try again.")
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.sub is not None:
             r = self.sub.key(k)
             if r is not None and r[0] == "done":
@@ -247,11 +248,11 @@ class RaidPanel(menu.SubHost):
                 return None
             if not self._standing():
                 self.msg = t("raid_msg_not_stand", "O chefe não está ativo.")
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
                 return None
             if int(v.get("attempts", 0)) <= 0:
                 self.msg = t("raid_msg_no_att", "Nenhuma tentativa restante hoje.")
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
                 return None
             # THE SLEEPER ANSWERS FIRST (sleep audit 2026-07-25, S1).  The
             # gate below took the BODY half of the house rule and left the
@@ -266,7 +267,7 @@ class RaidPanel(menu.SubHost):
             # STRANGER's invite is not the player's finger.)
             if self.pet.asleep:
                 self.msg = self.pet._disturbed()
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
                 return None
             # THE DEVICE'S GATE (battle audit ruling 2026-07-25, Joel: "as
             # close to bandai vpet as much as possible"): a volley is a
@@ -277,11 +278,11 @@ class RaidPanel(menu.SubHost):
             # itself at a Mega three times a day.
             if (cond := self.pet.battle_condition()) is not None:
                 self.msg = cond
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
                 return None
             # the clone raid bout: RaidBout precomputes generate_raid and
             # the battlescreen replays it (records nothing on the pet)
-            self.sub = BattlePanel(self.pet, self._boss_enemy(), raid=True)
+            self.sub = BattlePanel(self.pet, self._boss_enemy(), raid=True)  # type: ignore
             return None
         if k in ("c", "C"):        # both cases, like the lobby's letter keys
             award = (self.view or {}).get("award")
@@ -305,7 +306,7 @@ class RaidPanel(menu.SubHost):
         return None
 
     # ---- render ----
-    def _context_line(self, v, b):
+    def _context_line(self, v: Any, b: Any) -> Any:
         """The raid page's one context line: the status message alternates
         with the waiting purse / weekly cadence on the shop-tease beat (40
         ticks), so neither starves the other (menu.note marquees any of
@@ -338,7 +339,7 @@ class RaidPanel(menu.SubHost):
             return self.msg
         return alt or self.msg
 
-    def text(self):
+    def text(self) -> Any:
         if self.sub is not None:
             return self.sub.text()
         v = self.view

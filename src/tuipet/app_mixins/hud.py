@@ -1,13 +1,13 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.utils.persistence as persistence
 from tuipet.i18n.translator import t
 from tuipet.app import _hud_fits, _hud_plain, _hud_esc, HUD_W, HUD_GAP, HUD_STEP, HUD_HOLD
 from rich.cells import set_cell_size
 import tuipet.utils.theme as theme
-
 class HudMixin:
-    def _hud(self, markup):
+    def _hud(self, markup: Any) -> None:
             """Single entry point for the message box.  Any message wider than the box
             is marquee-scrolled (see _hud_marquee) so it is never clipped; messages that
             fit render as-is with their Rich markup.  Re-sending the SAME text is a
@@ -18,15 +18,14 @@ class HudMixin:
             self._hud_text = markup
             if _hud_fits(markup):
                 self._hud_scroll = None
-                self.msg_w.update(markup)
+                self.msg_w.update(markup)  # type: ignore
             else:
                 self._hud_scroll = _hud_plain(markup)   # scroll plain text (overflow msgs carry no markup)
                 self._hud_off = 0
                 self._hud_hold = HUD_HOLD
                 self._hud_tick = 0
-                self.msg_w.update(_hud_esc(set_cell_size(self._hud_scroll, HUD_W)))
-
-    def _hud_marquee(self):
+                self.msg_w.update(_hud_esc(set_cell_size(self._hud_scroll, HUD_W)))  # type: ignore
+    def _hud_marquee(self) -> None:
             """Advance the message marquee one step.  Called from the 10 Hz frame clock;
             a no-op unless the current message overflows the box."""
             if self._hud_scroll is None:
@@ -40,48 +39,43 @@ class HudMixin:
             loop = self._hud_scroll + HUD_GAP
             # the window is cropped in CELLS (see _hud_fits) -- a char slice with a
             # wide glyph inside would spill the box and wrap-clip the tail
-            self.msg_w.update(_hud_esc(set_cell_size(
+            self.msg_w.update(_hud_esc(set_cell_size(  # type: ignore
                 (loop + loop)[self._hud_off:self._hud_off + HUD_W], HUD_W)))
             self._hud_off += 1
             if self._hud_off >= len(loop):
                 self._hud_off = 0
                 self._hud_hold = HUD_HOLD               # hold again when it loops back to the head
-
-    def flash(self, text):
+    def flash(self, text: str) -> None:
             self._hud(text)
-            self._flash_t = self.FLASH_HOLD
-
-    def _evolve_msg(self, old_num):
+            self._flash_t = self.FLASH_HOLD  # type: ignore
+    def _evolve_msg(self, old_num: Any) -> Any:
             """'Koromon evoluiu para Agumon (Rookie)!' -- old name -> NEW NAME, stage
             in parentheses.  The old form ('X! evolved to InTraining!') read as if
             the stage were the pet's NAME (Joel, 2026-07-04: 'the babys name is
             intraining????'), because the species name never appeared."""
             _, by = data.load_sprites()
             old = by.get(old_num, {}).get("name") or "It"
-            msg = f"[b]{old}[/] evoluiu para [b]{self.pet.name}[/] ({self.pet.stage})!"
+            msg = f"[b]{old}[/] evoluiu para [b]{self.pet.name}[/] ({self.pet.stage})!"  # type: ignore
             # genuine FIRSTS get named (sweep 2026-07-14): a first-ever Mega and a
             # first-ever species read no bigger than a baby's first bump before.
             # Both checks race nothing: the progress stamps trail on autosave and
             # album_add fires inside save(), so at THIS tick both still say "new".
             extra = []
-            if self.pet.stage in data.STAGE_ORDER:
-                if data.STAGE_ORDER.index(self.pet.stage) > \
-                        persistence.get_progress().get("max_stage", 0):
-                    extra.append(f"seu primeiro {self.pet.stage} da história")
-            if not persistence.album_has(self.pet.num):
+            if self.pet.stage in data.STAGE_ORDER:  # type: ignore
+                if data.STAGE_ORDER.index(self.pet.stage) > persistence.get_progress().get("max_stage", 0):  # type: ignore
+                    extra.append(f"seu primeiro {self.pet.stage} da história")  # type: ignore
+            if not persistence.album_has(self.pet.num):  # type: ignore
                 extra.append("uma espécie NOVA para o álbum")
             if extra:
                 msg += f"  [b]★ {' · '.join(extra)}![/]"
             return msg
-
-    def _armed_field(self, p):
+    def _armed_field(self, p: Any) -> Any:
             """The strict-max Field whose charge has ARMED a divergence, or None
             -- the HUD's wrapper over evolution.divergence_target (cheap: the
             corpus tables behind it are all lru_cached loads)."""
             import tuipet.core.evolution as evolution
             return p.highest_dna() if evolution.divergence_target(p) is not None else None
-
-    def _need_message(self, p):
+    def _need_message(self, p: Any) -> Any:
             """HUD announcement for the pet's most urgent unmet care need (or '')."""
             name = p.name or "Your pet"
             if p.asleep and p.lights:               # lightsCall: the one asleep call
@@ -116,4 +110,3 @@ class HudMixin:
                           if left else "trate com perfeição!"))
             else:                 return ""
             return f"[{theme.NEG}]\u26a0 {msg}[/]"
-

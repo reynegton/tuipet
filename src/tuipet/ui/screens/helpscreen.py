@@ -2,6 +2,7 @@
 staring at single-letter keys (Joel 2026-07-09).  Scrolls in the LCD box; open
 with ? from anywhere on the home screen."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.ui.components.menu as menu
 from tuipet.utils.theme import INK, INK_B, DIM    # noqa: F401  (palette names bound for theme.apply propagation)
 from tuipet.i18n.translator import t
@@ -9,7 +10,7 @@ from tuipet.i18n.translator import t
 VIS = 8                                   # lines shown at once in the box
 
 # (text, kind): 2 = section head (bold), 1 = a control line, 0 = prose (dim)
-def get_help():
+def get_help() -> Any:
     res = [
         (t("help_txt_care", "CARE"), 2),
         (t("help_txt_feed", "f feed - meat fills; the pill"), 1),
@@ -115,22 +116,22 @@ def get_help():
     return res
 
 class HelpPanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.top = 0
         self.frame_i = 0
         self.msg = t("help_msg_intro", "Como jogar tuipet.")
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         return menu.hints(("↑↓", t("help_hint_scroll", "scroll")), ("ESC", t("help_hint_out", "out")))
 
-    def _max_top(self):
+    def _max_top(self) -> Any:
         return max(0, len(get_help()) - VIS)
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("up", "k"):
             self.top = max(0, self.top - 1)
         elif k in ("down", "j"):
@@ -146,7 +147,7 @@ class HelpPanel:
             return ("done", None)
         return None
 
-    def _more_cue(self):
+    def _more_cue(self) -> Any:
         """A scroll affordance for the footer -- it says THERE IS more (the
         message strip already says HOW to move), so the two never echo."""
         up, dn = self.top > 0, self.top < self._max_top()
@@ -158,7 +159,7 @@ class HelpPanel:
             return t("help_more_above", "▲ more above")
         return ""
 
-    def text(self):
+    def text(self) -> Any:
         HELP = get_help()
         self.top = max(0, min(self.top, self._max_top()))
         pos = "%d-%d/%d" % (self.top + 1, min(self.top + VIS, len(HELP)), len(HELP))

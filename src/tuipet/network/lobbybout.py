@@ -7,6 +7,7 @@ companion commits.  _clamp_card is the untrusted-peer boundary — every
 wire card passes through it.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import hashlib
 import random
@@ -33,7 +34,7 @@ from tuipet.network.lobbychat import _fit, _wrap, _tail_cells, _hpbar    # noqa:
 
 
 
-def _evo_note(pet):
+def _evo_note(pet: Any) -> Any:
     """L17 keeps online duels progression-neutral -- when this pet is mid
     WIN-gate the purse line says where the wins must come from ("i dont
     think its filling either way"; Joel bug report 2026-07-21).  Quiet for
@@ -42,11 +43,11 @@ def _evo_note(pet):
     wg = _lines.win_gate_progress(pet)
     return "  (evo: local wins only)" if wg and wg[0] < wg[1] else ""
 
-def _clamp_card(card):
+def _clamp_card(card: Any) -> Any:
     """Bound an UNTRUSTED battle card to what the game can actually produce.
     Module-level because seeded PvP feeds BOTH engines identically-clamped
     cards -- including one's own, clamped exactly as the peer clamps it."""
-    def _n(v, d=0, lo=0, hi=999):
+    def _n(v: Any, d: int=0, lo: int=0, hi: int=999) -> Any:
         if not isinstance(v, (int, float)) or isinstance(v, bool):
             v = d
         return max(lo, min(int(v), hi))
@@ -90,7 +91,7 @@ def _clamp_card(card):
 
 
 class BoutMixin:
-    def _battle_begin(self, opp_card, commit=None):
+    def _battle_begin(self, opp_card: Any, commit: Optional[Any]=None) -> None:
         """Cards crossed: clamp the untrusted card, verify the proto, and
         reveal my nonce.  The fight itself is SEEDED SYMMETRIC: both clients
         run the identical precomputed engine on identically-clamped cards, so
@@ -106,35 +107,35 @@ class BoutMixin:
             self.bt_payload = ("battle_msg", "Battle void — the other side "
                               "runs an older tuipet.")
             self.bphase = "over"
-            if self.partner:
-                self.client.relay(self.partner[0], {"kind": "battle", "abort": True})
+            if self.partner:  # type: ignore
+                self.client.relay(self.partner[0], {"kind": "battle", "abort": True})  # type: ignore
             return
         self.bt_peer_commit = commit
         self.my_max = self.my_hp = 5
         self.opp_max = self.opp_hp = 5
         self.bphase = "wait"
         # the nonce reveal is its own message now (no picks in this world)
-        self.client.relay(self.partner[0],
-                          {"kind": "battle", "t": "pick", "nonce": self.bt_nonce})
+        self.client.relay(self.partner[0],  # type: ignore
+                          {"kind": "battle", "t": "pick", "nonce": self.bt_nonce})  # type: ignore
         self._maybe_build()
-    def _maybe_build(self):
+    def _maybe_build(self) -> None:
         """Both nonces in -> verify the commit, seed the shared engine, and
         precompute the whole 5-round fight (both sides independently)."""
-        if self.battle is not None or self.bt_peer_nonce is None \
-                or self.opp_card is None:
+        if (self.battle is not None or self.bt_peer_nonce is None  # type: ignore
+                or self.opp_card is None):  # type: ignore  # type: ignore
             return
-        pn = self.bt_peer_nonce
+        pn = self.bt_peer_nonce  # type: ignore
         if hashlib.sha256(str(pn).encode()).hexdigest() != (self.bt_peer_commit or ""):
             self.bt_outcome = "Battle void — bad checksum."
             self.bt_payload = ("battle_msg", "Battle void — bad checksum.")
             self.bphase = "over"
-            if self.partner:
-                self.client.relay(self.partner[0], {"kind": "battle", "abort": True})
+            if self.partner:  # type: ignore
+                self.client.relay(self.partner[0], {"kind": "battle", "abort": True})  # type: ignore
             return
-        hn, gn = (self.bt_nonce, pn) if self.is_host else (pn, self.bt_nonce)
+        hn, gn = (self.bt_nonce, pn) if self.is_host else (pn, self.bt_nonce)  # type: ignore
         seed = int.from_bytes(hashlib.sha256(f"{hn}:{gn}".encode()).digest()[:8], "big")
-        host_card, guest_card = ((self.bt_my_card, self.opp_card) if self.is_host
-                                 else (self.opp_card, self.bt_my_card))
+        host_card, guest_card = ((self.bt_my_card, self.opp_card) if self.is_host  # type: ignore
+                                 else (self.opp_card, self.bt_my_card))  # type: ignore
         rng = random.Random(seed).random
         host = battle.Side.of_card(dict(host_card))
         guest = battle.Side.of_card(dict(guest_card))
@@ -143,7 +144,7 @@ class BoutMixin:
         self.battle = {"seq": seq, "host_hp": 5, "guest_hp": 5, "i": 0}
         self.bphase = "fight"
         self._play_next_round()
-    def _play_next_round(self):
+    def _play_next_round(self) -> None:
         """Advance the precomputed fight one round and stage its volley."""
         b = self.battle
         if b is None:
@@ -157,21 +158,21 @@ class BoutMixin:
             b["guest_hp"] = max(0, b["guest_hp"] - h_dmg)
         if g_hit:
             b["host_hp"] = max(0, b["host_hp"] - g_dmg)
-        if self.is_host:
+        if self.is_host:  # type: ignore
             dealt = h_dmg if h_hit else 0
             taken = g_dmg if g_hit else 0
         else:
             dealt = g_dmg if g_hit else 0
             taken = h_dmg if h_hit else 0
         my0, opp0 = self.my_hp, self.opp_hp
-        self.my_hp = b["host_hp"] if self.is_host else b["guest_hp"]
-        self.opp_hp = b["guest_hp"] if self.is_host else b["host_hp"]
+        self.my_hp = b["host_hp"] if self.is_host else b["guest_hp"]  # type: ignore
+        self.opp_hp = b["guest_hp"] if self.is_host else b["host_hp"]  # type: ignore
         self._stage_volley(my0, opp0, dealt, taken)
         self.bt_log = f"you \u2192 {dealt} dmg\n  them \u2192 {taken} dmg"
-    def _battle_over(self):
+    def _battle_over(self) -> None:
         b = self.battle
-        my_hp = b["host_hp"] if self.is_host else b["guest_hp"]
-        opp_hp = b["guest_hp"] if self.is_host else b["host_hp"]
+        my_hp = b["host_hp"] if self.is_host else b["guest_hp"]  # type: ignore
+        opp_hp = b["guest_hp"] if self.is_host else b["host_hp"]  # type: ignore
         won = opp_hp <= 0 and my_hp > 0
         draw = (my_hp > 0 and opp_hp > 0 and my_hp == opp_hp) \
             or (my_hp <= 0 and opp_hp <= 0)
@@ -179,39 +180,39 @@ class BoutMixin:
             won = True                     # rounds ran dry: higher HP stands
         self.bphase = "over"
         self.sfx = "attack"
-        if self.partner:                   # a finished bout is a connection
-            persistence.record_connection(self.partner[1])
+        if self.partner:                   # type: ignore
+            persistence.record_connection(self.partner[1])  # type: ignore
         # the ladder needs BOTH stories: the winner's claim only credits when
         # the LOSER's agreeing report lands too, keyed by ACCOUNT name -- the
         # old code filed only on won (nobody ever confirmed) and led with the
         # PET name (which the server doesn't know), so the monthly ladder
         # never credited a single win (audit 2026-07-15)
-        opp_nm = (self.partner or (0, ""))[1] or (self.opp_card or {}).get("name")
-        report = getattr(self.client, "ladder_report", None)
+        opp_nm = (self.partner or (0, ""))[1] or (self.opp_card or {}).get("name")  # type: ignore
+        report = getattr(self.client, "ladder_report", None)  # type: ignore
         if report and opp_nm and not draw:
             report(won, opp_nm)
         from tuipet.core.pet import online_reward
         purse = online_reward(won, draw=draw)
-        self.pet.record_battle(won and not draw, online=True)
+        self.pet.record_battle(won and not draw, online=True)  # type: ignore
         # pet.add_bits died with the classic revert (v0.5.0) -- every online
         # payout has crashed on BOTH sides since; caught by the live two-bot
         # smoke 2026-07-17.  The raid claim's idiom is the house style.
-        self.pet.bits += int(purse)
+        self.pet.bits += int(purse)  # type: ignore
         self.bt_outcome = ("DRAW" if draw
                            else "\u2605 YOU WIN! \u2605" if won else "YOU LOSE\u2026")
         # ask the calendar, not the amount: the weekend loss purse (150)
         # equals the plain draw purse, which hid the tag on weekend losses
         from tuipet.core.pet import weekend_bonus
-        self.bt_reward = f"+{purse}b" + ("  (weekend bonus!)" if weekend_bonus() > 1 else "") + _evo_note(self.pet)
+        self.bt_reward = f"+{purse}b" + ("  (weekend bonus!)" if weekend_bonus() > 1 else "") + _evo_note(self.pet)  # type: ignore
         self.bt_payload = ("battle_msg", self.bt_outcome)
-    def _stage_volley(self, my0, opp0, dealt, taken):
+    def _stage_volley(self, my0: Any, opp0: Any, dealt: Any, taken: Any) -> None:
         """A presentation-only BattlePanel replays the round: my pet RIGHT,
         the opponent's LEFT, orbs/hit/dodge from the engine's numbers."""
         try:
             card = dict(self.opp_card or {})
             if not card.get("num"):
                 return
-            show = battlescreen.BattlePanel(self.pet, enemy=card)
+            show = battlescreen.BattlePanel(self.pet, enemy=card)  # type: ignore
             show.foe_attr = card.get("attribute", "Free")
             show.timeline = battlescreen.round_timeline(my0, opp0, dealt, taken, True)
             show.i = 0
@@ -219,11 +220,11 @@ class BoutMixin:
             show._last_m = None
             self.bshow = show
         except Exception:
-            self.bshow = None               # presentation must never break the bout
-    def _key_battle(self, k):
+            self.bshow = None               # type: ignore
+    def _key_battle(self, k: Any) -> Any:
         if self.bshow is not None:              # the round is replaying
             if k in ("space", "enter", "escape"):
-                self.bshow = None               # skip to the between-rounds card
+                self.bshow = None               # type: ignore
             return None
         if self.bphase == "over":
             if k in ("enter", "space", "escape"):
@@ -238,7 +239,7 @@ class BoutMixin:
         if self.bphase in ("card", "wait") and k == "escape":
             self._forfeit()
         return None
-    def _forfeit(self):
+    def _forfeit(self) -> None:
         """Leave a battle in progress -> tell the opponent, then back to the lobby.
         Once the seeded fight is RUNNING the bout is committed: walking out is
         a forfeit LOSS, filed with the ladder like any decided bout -- ESC in
@@ -247,57 +248,57 @@ class BoutMixin:
         (MED audit 2026-07-19).  Pre-commit (card/wait) stays a free back-out."""
         counted = self.bphase == "fight" and self.battle is not None
         if counted:
-            opp_nm = (self.partner or (0, ""))[1] or (self.opp_card or {}).get("name")
-            report = getattr(self.client, "ladder_report", None)
+            opp_nm = (self.partner or (0, ""))[1] or (self.opp_card or {}).get("name")  # type: ignore
+            report = getattr(self.client, "ladder_report", None)  # type: ignore
             if report and opp_nm:
                 report(False, opp_nm)
-            self.pet.record_battle(False, online=True)
-        if self.partner:
-            self.client.relay(self.partner[0], {"kind": "battle", "abort": True})
-        self._return_to_lobby("Forfeit — counted as a loss." if counted
+            self.pet.record_battle(False, online=True)  # type: ignore
+        if self.partner:  # type: ignore
+            self.client.relay(self.partner[0], {"kind": "battle", "abort": True})  # type: ignore
+        self._return_to_lobby("Forfeit — counted as a loss." if counted  # type: ignore
                               else "You forfeited.")
-    def _opp_fled(self):
+    def _opp_fled(self) -> None:
         """The partner walked out of a RUNNING seeded fight (abort relay or
         roster vanish): that is THEIR forfeit.  File the winner's half so the
         pair credits when their agreeing loss lands, and pay the win -- both
         sites used to call it void, so the ladder never heard of it (MED
         audit 2026-07-19)."""
-        opp_nm = (self.partner or (0, ""))[1] or (self.opp_card or {}).get("name")
-        report = getattr(self.client, "ladder_report", None)
+        opp_nm = (self.partner or (0, ""))[1] or (self.opp_card or {}).get("name")  # type: ignore
+        report = getattr(self.client, "ladder_report", None)  # type: ignore
         if report and opp_nm:
             report(True, opp_nm)
         from tuipet.core.pet import online_reward
         purse = online_reward(True)
-        self.pet.record_battle(True, online=True)
-        self.pet.bits += int(purse)
+        self.pet.record_battle(True, online=True)  # type: ignore
+        self.pet.bits += int(purse)  # type: ignore
         self.bt_outcome = "Opponent fled — you win!"
         from tuipet.core.pet import weekend_bonus
         self.bt_reward = f"+{purse}b" + ("  (weekend bonus!)"      # calendar, not amount
-                                         if weekend_bonus() > 1 else "") + _evo_note(self.pet)
+                                         if weekend_bonus() > 1 else "") + _evo_note(self.pet)  # type: ignore
         self.bt_payload = ("battle_msg", self.bt_outcome)
         self.bphase = "over"
 
     # ---- input -----------------------------------------------------------
-    def _commit_fusion(self):
+    def _commit_fusion(self) -> None:
         """BOTH confirms are in (or the peer is legacy): perform the fusion --
         the same path as offline jogress.  A COMPANION lends its data and
         stays itself (canon one-sided doors; jogress audit 2026-07-17)."""
-        if self.partner:                # swapping DNA is the strongest connection
-            persistence.record_connection(self.partner[1])
-        if (self.jresult or {}).get("companion"):
+        if self.partner:                # type: ignore
+            persistence.record_connection(self.partner[1])  # type: ignore
+        if (self.jresult or {}).get("companion"):  # type: ignore
             self.sfx = "jogress"
-            self._return_to_lobby("It lent its power to the fusion.")
+            self._return_to_lobby("It lent its power to the fusion.")  # type: ignore
             return
-        msg = jogress.fuse(self.pet, self.jresult["num"])
+        msg = jogress.fuse(self.pet, self.jresult["num"])  # type: ignore
         # (the jogress contagion left with the sickness system (BASIC VPET 2026-07-17))
         self.sfx = "jogress"
-        self._return_to_lobby(msg)
-    def _key_jogress(self, k):
-        if self.jphase == "result":
-            if self.jshow is not None and self.jshow.phase == "fusing":
-                self.jshow.key(k)                       # any key skips the converge to the reveal
+        self._return_to_lobby(msg)  # type: ignore
+    def _key_jogress(self, k: Any) -> Any:
+        if self.jphase == "result":  # type: ignore
+            if self.jshow is not None and self.jshow.phase == "fusing":  # type: ignore
+                self.jshow.key(k)                       # type: ignore
                 return None
-            if not self.j_peer_two_phase:
+            if not self.j_peer_two_phase:  # type: ignore
                 # LEGACY peer (pre-v0.2.350): its client commits on any key with
                 # no decline -- mirror it, or a mixed-version pair goes one-sided
                 if k in ("enter", "space", "escape"):
@@ -305,51 +306,51 @@ class BoutMixin:
                 return None
             # two-phase commit (consent audit 2026-07-07): the fusion is
             # PERMANENT -- both players must say yes at the result screen
-            if k in ("enter", "space") and not self.j_confirmed:
+            if k in ("enter", "space") and not self.j_confirmed:  # type: ignore
                 self.j_confirmed = True
-                self.client.relay(self.partner[0], {"kind": "jogress", "t": "confirm"})
-                if self.j_partner_confirmed:
+                self.client.relay(self.partner[0], {"kind": "jogress", "t": "confirm"})  # type: ignore
+                if self.j_partner_confirmed:  # type: ignore
                     self._commit_fusion()
                 else:
                     self.status = "Waiting for the partner…"
             elif k == "escape":
                 # a real DECLINE: nobody fuses, both sides told
-                self.client.relay(self.partner[0], {"kind": "jogress", "t": "decline"})
-                self._return_to_lobby("Fusion declined — no one fused.")
+                self.client.relay(self.partner[0], {"kind": "jogress", "t": "decline"})  # type: ignore
+                self._return_to_lobby("Fusion declined — no one fused.")  # type: ignore
             return None
-        if self.jphase == "failed":
+        if self.jphase == "failed":  # type: ignore
             if k in ("enter", "space", "escape"):
-                self._return_to_lobby(self.fail_reason or "No resonance.")
+                self._return_to_lobby(self.fail_reason or "No resonance.")  # type: ignore
             return None
         if k == "escape":                                  # cancel mid-fusion -> free the partner
-            if self.partner:
-                self.client.relay(self.partner[0], {"kind": "jogress", "abort": True})
-            self._return_to_lobby("Fusion cancelled.")
+            if self.partner:  # type: ignore
+                self.client.relay(self.partner[0], {"kind": "jogress", "abort": True})  # type: ignore
+            self._return_to_lobby("Fusion cancelled.")  # type: ignore
         return None
-    def _text_jogress(self):
+    def _text_jogress(self) -> Any:
         t = Text()
-        pname = self.partner[1] if self.partner else "?"
-        if self.jphase == "result":
-            if self.jshow is not None:          # the real fusion scene plays
-                return self.jshow.text()
-            me = self._card()["name"]
-            other = self.partner_species or pname
+        pname = self.partner[1] if self.partner else "?"  # type: ignore
+        if self.jphase == "result":  # type: ignore
+            if self.jshow is not None:          # type: ignore
+                return self.jshow.text()  # type: ignore
+            me = self._card()["name"]  # type: ignore
+            other = self.partner_species or pname  # type: ignore
             t.append("\n  ✦ JOGRESS ✦\n\n", style=INK_B)
             t.append(f"  {me} + {other}\n", style=INK)
-            t.append(f"   →  {self.jresult['name']}\n\n", style=INK_B)
-            verb = ("lend" if (self.jresult or {}).get("companion")
+            t.append(f"   →  {self.jresult['name']}\n\n", style=INK_B)  # type: ignore
+            verb = ("lend" if (self.jresult or {}).get("companion")  # type: ignore
                     else "fuse")       # a companion LENDS and stays itself --
             #                            "fuse" promised a change that never
             #                            comes (round 33)
-            if self.j_confirmed and not self.j_partner_confirmed:
+            if self.j_confirmed and not self.j_partner_confirmed:  # type: ignore
                 t.append("  waiting for the partner…", style=DIM)
-            elif self.j_peer_two_phase:
+            elif self.j_peer_two_phase:  # type: ignore
                 t.append(f"  [Enter] {verb}    [Esc] decline", style=DIM)
             else:
                 t.append(f"  [Enter] complete the {verb}", style=DIM)
-        elif self.jphase == "failed":
+        elif self.jphase == "failed":  # type: ignore
             t.append("\n  NO RESONANCE\n\n", style=INK_B)
-            t.append(f"  {self.fail_reason}\n\n", style=INK)
+            t.append(f"  {self.fail_reason}\n\n", style=INK)  # type: ignore
             t.append("  [Enter] back to lobby", style=DIM)
         else:
             t.append("\n  FUSING…\n\n", style=INK_B)
@@ -358,7 +359,7 @@ class BoutMixin:
             t.append(f"  syncing DNA with {marquee(pname, 21, getattr(self, '_mq', 0) // 2)}\n\n", style=INK)
             t.append("  [Esc] cancel", style=DIM)
         return t
-    def _text_battle(self):
+    def _text_battle(self) -> Any:
         if self.bshow is not None:              # the round's volley replay
             return self.bshow.text()
         t = Text()

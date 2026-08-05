@@ -36,7 +36,7 @@ def test_pick_is_deterministic_and_one_biome_per_run():
 
 
 def test_the_wild_pool_is_the_zones_own_table(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
     # a zone that actually ships randoms
     z = next(z for z in ZONES if z["randoms"])
     a = Adventure(_champ(), zone=z)

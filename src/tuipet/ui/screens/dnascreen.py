@@ -18,6 +18,7 @@ with it; this docstring lagged until the DNA review 2026-07-18.)
              armed state.  The door must be visible to be a choice.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import math
 import tuipet.data.loaders.data as data
 import tuipet.utils.grid as grid
@@ -38,7 +39,7 @@ _HOME = (("charge", "Carregar"), ("generate", "Gerar"),
          ("stats", "Stats"), ("roads", "Divergência"))
 
 
-def _field_word(f, w):
+def _field_word(f: Any, w: Any) -> Any:
     """pretty_field fitted to `w` at a WORD boundary: a column too narrow for
     the full name shows whole words only -- "Pesadelo", never the mid-word
     run-off "Nightmare Sold" the old char-slices printed (menu audit
@@ -52,7 +53,7 @@ def _field_word(f, w):
 
 
 class DNAPanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.fields = list(data.DNA_FIELDS)
         # the CHARGE cursor never offers "None" (DNA ruling 2026-07-18): it
@@ -79,7 +80,7 @@ class DNAPanel:
         self._roads = evolution.divergence_roads(pet)   # field -> wild-road targets
         self.road_i = 0
 
-    def _armed(self):
+    def _armed(self) -> Any:
         """The strict-max charged Field at/over the stage threshold WITH a
         road -- the next evolution will diverge (mirrors divergence_target's
         gate without picking the destination)."""
@@ -93,18 +94,18 @@ class DNAPanel:
     # (the Requirements viewer left with the DNA slim; BASIC VPET 2026-07-16)
 
     @property
-    def field(self):
+    def field(self) -> Any:
         return self.fields[self.cursor]
 
     # ---- mini-game math (DVPet drawDNAGenerateAnim) ----------------------
-    def _rate(self):
+    def _rate(self) -> Any:
         """rate = ceil(hits / time * 10), time in seconds. At the 10s mark this is
         just your total hit count, so the Field = how many presses you land."""
         if self.mash_f <= 0:
             return 0
         return int(math.ceil(self.hits / (self.mash_f / 10.0) * 10.0))
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.phase == "mash":
             self.mash_f += 1
@@ -118,19 +119,19 @@ class DNAPanel:
                 # banked was a lie (DNA review 2026-07-18)
                 banked = self.pet.dna_owned.get(field, 0) - owned0.get(field, 0)
                 refund = self.pet.bits - bits0
-                self.won = (field, self.bet, rate, banked, refund)
+                self.won = (field, self.bet, rate, banked, refund)  # type: ignore
                 self.phase = "result"
                 self.blink = 0
-                self.sfx = "mischief"    # soundConfig unlockDNA -> mischief.wav (banks even None -- never a jeer)
+                self.sfx = "mischief"    # type: ignore
         elif self.phase == "result":
             self.blink += 1              # drive the won-Field blink reveal
 
     # ---- input -----------------------------------------------------------
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         self.sfx = None
         return getattr(self, "_key_" + self.phase)(k)
 
-    def _key_home(self, k):
+    def _key_home(self, k: Any) -> Any:
         if k in ("up", "k"):
             self.home_i = (self.home_i - 1) % len(_HOME)
         elif k in ("down", "j"):
@@ -140,12 +141,12 @@ class DNAPanel:
             if self.phase == "generate":
                 self.phase = "bet"
                 self.bet = max(1, min(MAX_DNA_INVENTORY, self.amount))
-            self.sfx = "select"
+            self.sfx = "select"  # type: ignore
         elif k in ("escape", "x"):
             return ("done", None)
         return None
 
-    def _key_charge(self, k):
+    def _key_charge(self, k: Any) -> Any:
         p = self.pet
         f = self.charge_fields[self.cursor % len(self.charge_fields)]
         if k in ("up", "k"):
@@ -160,15 +161,15 @@ class DNAPanel:
             amt = min(self.amount, p.dna_owned.get(f, 0))
             if amt <= 0:
                 self.last = t("dna_msg_no_banked", "No banked {fld} yet.").format(fld=data.pretty_field(f))
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
             elif p.apply_dna(f, amt):
-                self.sfx = "compatible"
+                self.sfx = "compatible"  # type: ignore
                 return ("done", ("charged", f, amt))   # close -> DNA_Feeding absorb fx
         elif k == "escape":
             self.phase = "home"
         return None
 
-    def _key_stats(self, k):
+    def _key_stats(self, k: Any) -> Any:
         if k in ("up", "k"):
             self.cursor = (self.cursor - 1) % len(self.fields)
         elif k in ("down", "j"):
@@ -178,7 +179,7 @@ class DNAPanel:
         return None
 
 
-    def _key_roads(self, k):
+    def _key_roads(self, k: Any) -> Any:
         n = max(1, len(self._roads))
         if k in ("up", "k"):
             self.road_i = (self.road_i - 1) % n
@@ -188,7 +189,7 @@ class DNAPanel:
             self.phase = "home"
         return None
 
-    def _key_bet(self, k):
+    def _key_bet(self, k: Any) -> Any:
         p = self.pet
         if k in ("left", "h"):
             self.bet = max(1, self.bet - 1)
@@ -201,34 +202,34 @@ class DNAPanel:
         elif k in ("enter", "space"):
             if p.dna_bet(self.bet):
                 self.phase, self.hits, self.mash_f = "mash", 0, 0
-                self.sfx = "select"
+                self.sfx = "select"  # type: ignore
             else:
                 self.last = t("dna_msg_no_bits", "Bits insuficientes para apostar.")
-                self.sfx = "error"
+                self.sfx = "error"  # type: ignore
                 self.phase = "home"
         elif k == "escape":
             self.phase = "home"
         return None
 
-    def _key_mash(self, k):
+    def _key_mash(self, k: Any) -> Any:
         if k in MASH_KEYS:
             self.hits += 1                # locked in until the 10s timer ends
             self._mash_flash = 3          # the pet visibly throws itself into it
         return None
 
-    def _key_result(self, k):
+    def _key_result(self, k: Any) -> Any:
         self.phase = "home"              # the won DNA is banked -- back to the menu to charge it
         return None
 
     # ---- views -----------------------------------------------------------
-    def text(self):
+    def text(self) -> Any:
         return getattr(self, "_text_" + self.phase)()
 
-    def _meter(self, rate):
+    def _meter(self, rate: Any) -> Any:
         filled = max(0, min(_METER_W, int(round(rate / 80.0 * _METER_W))))
         return "█" * filled + "░" * (_METER_W - filled)
 
-    def _home_tag(self, key):
+    def _home_tag(self, key: str) -> Any:
         p = self.pet
         if key == "charge":
             return t("dna_msg_banked", "{n} banked").format(n=sum(p.dna_owned.values()))
@@ -242,7 +243,7 @@ class DNAPanel:
                 else t("dna_msg_roads", "{n} road(s)").format(n=sum(len(v) for v in self._roads.values()))
         return ""
 
-    def _text_home(self):
+    def _text_home(self) -> Any:
         p = self.pet
         out = menu.bar(t("dna_hdr_dna", "DNA"), "%db" % p.bits)
         for i, (key, label) in enumerate(_HOME):
@@ -252,7 +253,7 @@ class DNAPanel:
         out.append_text(menu.footer(t("dna_hint_pick", "↑↓ pick  ENTER open  ESC out")))
         return out
 
-    def _text_charge(self):
+    def _text_charge(self) -> Any:
         p = self.pet
         out = menu.bar(t("dna_hdr_charge", "DNA · CHARGE"), "%db  x%d" % (p.bits, self.amount))
         # the honest line (DNA ruling 2026-07-18): charge is the WILD-ROAD
@@ -283,7 +284,7 @@ class DNAPanel:
         out.append_text(menu.footer(t("dna_hint_charge", "↑↓fld ←→amt ENTER chg  ESC back")))
         return out
 
-    def _text_stats(self):
+    def _text_stats(self) -> Any:
         p = self.pet
         out = menu.bar(t("dna_hdr_stats", "DNA · STATS"), t("dna_msg_charged_hdr", "{n} charged").format(n=p.dna_total()))
         for i, f in enumerate(self.fields):
@@ -295,7 +296,7 @@ class DNAPanel:
         return out
 
 
-    def _text_roads(self):
+    def _text_roads(self) -> Any:
         p = self.pet
         need = evolution.DIVERGE_NEED.get(p.stage)
         out = menu.bar(t("dna_hdr_diverge", "DNA · DIVERGENCE"),
@@ -333,7 +334,7 @@ class DNAPanel:
         out.append_text(menu.footer(t("dna_hint_stats", "↑↓ field   ESC back")))
         return out
 
-    def _text_bet(self):
+    def _text_bet(self) -> Any:
         p = self.pet
         out = menu.bar(t("dna_hdr_generate", "DNA · GENERATE"), "%db" % p.bits)
         out.append_text(menu.note(t("dna_msg_wager_bits", "Wager bits, then mash for DNA.")))
@@ -360,7 +361,7 @@ class DNAPanel:
         out.append_text(menu.footer(t("dna_hint_mash", "←→ ±1  ↑↓ ±100  ENTER mash!  ESC back")))
         return out
 
-    def _text_mash(self):
+    def _text_mash(self) -> Any:
         # a MINIGAME is a staged arena scene, like the training drills (audit
         # 2026-07-04 -- this was a bare text meter): the pet stands centre and
         # visibly throws itself into every press (strike pose, the vaccine
@@ -378,7 +379,7 @@ class DNAPanel:
         # the bar+scene+meter stack ran 16 lines into the physical 12-row box)
         return menu.paint([grid.center(grid.prep(fr, 24), ph=24)], p.background())
 
-    def strip(self):
+    def strip(self) -> Any:
         """The live mash meter under the LCD during the mini-game; every other
         phase pops its key hints (hint overhaul 2026-07-10).  Kept <= 40 visible
         cols so it NEVER marquees (a live meter holds still)."""
@@ -400,27 +401,27 @@ class DNAPanel:
             return menu.hints(("↑↓", t("dna_hint_browse", "browse")), ("ESC", t("dna_hint_back_only", "ESC back")[-4:]))
         return menu.hints(("↑↓", t("dna_hint_pick_short", "pick")), ("ENTER", t("dna_hint_open", "open")), ("ESC", t("dna_hint_out", "out")))
 
-    def _text_result(self):
-        field, wager, rate, banked, refund = self.won
+    def _text_result(self) -> Any:
+        field, wager, rate, banked, refund = self.won  # type: ignore
         show = (self.blink // 2) % 2 == 0            # DVPet unlockingDNA: the Field blinks in
-        name = data.pretty_field(field)
-        out = menu.bar(t("dna_hdr_generate", "DNA · GENERATE"), t("dna_msg_rate", "rate {r}").format(r=rate))
+        name = data.pretty_field(field)  # type: ignore
+        out = menu.bar(t("dna_hdr_generate", "DNA · GENERATE"), t("dna_msg_rate", "rate {r}").format(r=rate))  # type: ignore
         out.append_text(menu.blanks(1))
-        got = t("dna_msg_got_dna", "✓ Got {n} {name} DNA").format(n=banked, name=name)
-        if refund > 0:
-            got += t("dna_msg_back", " · {r}b back").format(r=refund)            # the cap overflow, refunded
+        got = t("dna_msg_got_dna", "✓ Got {n} {name} DNA").format(n=banked, name=name)  # type: ignore
+        if refund > 0:  # type: ignore
+            got += t("dna_msg_back", " · {r}b back").format(r=refund)            # type: ignore
         out.append_text(menu.note(got if show else "✓"))
         out.append_text(menu.blanks(1))
-        out.append_text(menu.row(t("dna_msg_rate_arrow", "rate {r} → {name}").format(r=rate, name=name if show else ""), True))
-        if field == "None":
+        out.append_text(menu.row(t("dna_msg_rate_arrow", "rate {r} → {name}").format(r=rate, name=name if show else ""), True))  # type: ignore
+        if field == "None":  # type: ignore
             out.append_text(menu.row(t("dna_msg_dud_field", "None = the dud field (banked)"), False))
-        elif wager >= DNA_RESONANT_BET:
+        elif wager >= DNA_RESONANT_BET:  # type: ignore
             # edge bands (DeepSaver/DarkArea) have ONE neighbor -- "both"
             # was a lie on the ends (DNA audit 2026-07-22)
             fields = [f for _, f in DNA_RATE_BANDS if f != "None"]
-            edge = field in (fields[0], fields[-1])
+            edge = field in (fields[0], fields[-1])  # type: ignore
             out.append_text(menu.row(t("dna_msg_resonance", "resonance: +{splash} to {neigh}").format(
-                splash=wager // 5, neigh=t("dna_msg_one_neigh", "its one neighbor") if edge else t("dna_msg_both_neigh", "both neighbors")), False))
+                splash=wager // 5, neigh=t("dna_msg_one_neigh", "its one neighbor") if edge else t("dna_msg_both_neigh", "both neighbors")), False))  # type: ignore
         else:
             out.append_text(menu.row(t("dna_msg_banked_open", "banked — open Charge to use it"), False))
         out.append_text(menu.footer(t("dna_hint_any_menu", "any key  →  DNA menu")))

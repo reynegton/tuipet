@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -8,7 +9,7 @@ import tuipet.core.lines as lines_mod
 from tuipet.core.petbase import *
 from tuipet.i18n.translator import t
 
-def _tick_asleep(pet, dt):
+def _tick_asleep(pet: Any, dt: Any) -> None:
     """The sleep branch: lights neglect, deep-sleep regen, the awakeLapse
     clock with the restless jitter, asleep death checks, desperate poop."""
     # lightsCall (DVPet): sleeping with the room light ON is neglect.
@@ -41,14 +42,14 @@ def _tick_asleep(pet, dt):
     phys = pet._phys()
     awake_inc = phys.get("awake_inc", 1)
 
-    def _inc_sleep_minutes(gain):
+    def _inc_sleep_minutes(gain: Any) -> None:
         # incSleepMinutes: the meter fills by AwakeLapseInc; a crossing pays
         pet._sleep_min = getattr(pet, "_sleep_min", 0.0) + awake_inc * dt
         if pet._sleep_min >= SLEEP_MIN_TO_GAIN:
             pet._sleep_min -= SLEEP_MIN_TO_GAIN
             pet._set_energy(pet.energy + gain)
 
-    def _nap_energy(mult=1):
+    def _nap_energy(mult: int=1) -> None:
         # checkNapEnergy: the nap's own accumulator pays NapEnergyGain (1)
         pet._nap_e = getattr(pet, "_nap_e", 0.0) + awake_inc * dt * mult
         if pet._nap_e >= NAP_ENERGY_INC:
@@ -140,7 +141,7 @@ def _tick_asleep(pet, dt):
         pet._set_anim("poop", 2.2)
 
 
-def _near_bedtime(pet, n):
+def _near_bedtime(pet: Any, n: Any) -> Any:
     """checkMaxHoursBeforeSleep's clock half: asleep aside, is nod-off
     within `n` game-minutes?  Pressure pets read the sleep clock
     (sleepLimit - sleepLapse <= n, canon verbatim); line pets read the
@@ -154,7 +155,7 @@ def _near_bedtime(pet, n):
     return pet.sleep_limit - pet.sleep_lapse <= n
 
 
-def _in_sleep_window(pet):
+def _in_sleep_window(pet: Any) -> Any:
     """Line pets sleep by the CLOCK: True/False = inside/outside the form's
     fixed bedtime→7:00 window; None = not a line pet (pressure model)."""
     bt = lines_mod.bedtime_minutes(pet) if lines_mod.active(pet) else None
@@ -166,7 +167,7 @@ def _in_sleep_window(pet):
     return bt <= mod < pet.WAKE_MINUTE           # a midnight sleeper (24:00 -> 0)
 
 
-def _tick_bedtime(pet, dt):
+def _tick_bedtime(pet: Any, dt: Any) -> None:
     """LINES_SPEC §5: the fixed per-form bedtime replaces the pressure clock.
     Inside the window the pet drops off by itself (a disturb postpones the
     re-sleep); lights-out OUTSIDE the window is a shallow nap, like checkNap.
@@ -207,7 +208,7 @@ def _tick_bedtime(pet, dt):
         pet._to_nap_t = 0.0
 
 
-def _calc_to_nap(pet):
+def _calc_to_nap(pet: Any) -> Any:
     """calcToSleepNapLapse: how long the pet sits in the DARK before it
     nods off -- an energetic pet resists (~40 game-min), a drained one
     folds in 20; restless +-1.  (The obedience +1 left with the
@@ -219,7 +220,7 @@ def _calc_to_nap(pet):
             else TO_NAP_LOW_ENERGY) + r
 
 
-def _tick_sleep_pressure(pet, dt):
+def _tick_sleep_pressure(pet: Any, dt: Any) -> None:
     """bedtime is a PRESSURE clock, not the sun (setSleepLapse): SleepLapseInc
     per game-min while awake; at the limit the pet drops off by itself --
     babies (inc 9) nap constantly, adults run a free ~24h rhythm.
@@ -263,12 +264,12 @@ def _tick_sleep_pressure(pet, dt):
             pet._to_nap_t = 0.0                        # the light resets the wait
 
 
-def _sleep_inc(pet):
+def _sleep_inc(pet: Any) -> Any:
     """Species sleep-pressure rate (SleepLapseInc: 1 adult / 2 / 9 baby)."""
     return data.load_requirements().get(pet.num, {}).get("sleep_lapse_inc", 1)
 
 
-def _fall_asleep(pet):
+def _fall_asleep(pet: Any) -> None:
     """PhysicalState.sleep(): the pressure clock rolls over -- sleep long
     enough to refill the energy bar (clamped 6..15 game-hours), and the
     next awake stretch is whatever remains of the 24."""
@@ -285,7 +286,7 @@ def _fall_asleep(pet):
     pet._set_anim("yawn", 1.8)
 
 
-def _wake(pet):
+def _wake(pet: Any) -> None:
     """setAsleep(false): the wake roll runs on EVERY rise -- natural,
     disturbed or lights-on alike (mood re-audit 2026-07-06; canon disturb()
     funnels through setAsleep(false) unconditionally, so even a grumbled
@@ -348,7 +349,7 @@ def _wake(pet):
     pet._set_anim(wake_anim, 1.6)
 
 
-def _disturbed(pet):
+def _disturbed(pet: Any) -> Any:
     """PhysicalState.disturb(): bothering a sleeper wakes it grumpy.  The
     bookkeeping (count, missed day, postpone, sick risks) only bills REAL
     sleep -- but the mood/spirit dec and the wake land on a NAP too (mood

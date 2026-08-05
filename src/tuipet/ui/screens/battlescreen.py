@@ -10,6 +10,7 @@ blast.  Before the fight a TIMING BAR sets your hit-type for the bout —
 good condition widens the mega window (care widens skill).
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import tuipet.data.loaders.data as data
@@ -27,7 +28,7 @@ with open(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__)
 BANNER = _OV["battle_banner"]
 
 
-def _hit_explode():
+def _hit_explode() -> Any:
     """The hit flash: the source's Hit_1 blast blinked against blank (its
     renderer strobes it at 100ms).  The skull-and-crossbones that strobed
     here before was the OLD game's KO marker riding along in
@@ -74,7 +75,7 @@ DODGE_T = 14                                     # 1.4s weave
 BAR_MAX = 24                                     # the timing bar sweeps 0..24
 
 
-def mega_window(pet):
+def mega_window(pet: Any) -> Any:
     """Care widens the skill ceiling: condition score -> the mega zone
     [12-c, 12+c] on the 0..24 bar (width 1/3/5/7); ±5 around it = normal.
     (Classic gauges: flat 4-heart meters, age off the world clock.)"""
@@ -94,8 +95,8 @@ def mega_window(pet):
     return 12 - c, 12 + c
 
 
-def round_timeline(ph0, fh0, pdmg, edmg, player_first, effect=None,
-                   hold_foe_bar=False):
+def round_timeline(ph0: Any, fh0: Any, pdmg: Any, edmg: Any, player_first: Any, effect: Optional[Any]=None,
+                   hold_foe_bar: bool=False) -> Any:
     """One round's alternating-view volley timeline, from PURE round data --
     shared by the PvE panel (which reads it off its Battle) and the lobby's
     PvP replay (which reads it off the relayed result; lobby audit 2026-07-04:
@@ -155,7 +156,7 @@ BOSSDIE_ON, BOSSDIE_OFF = 4, 2
 BOSSDIE_STEP_T = 6                               # ...then a 3-step squash into the ground
 
 
-def boss_death_timeline(ph):
+def boss_death_timeline(ph: Any) -> Any:
     """SpriteAnim.zoneBossDeath: a beaten ZONE BOSS doesn't just explode -- it
     blinks out (three lights-flicker cycles over a shaken hurt pose, bossDying
     stings) and then SQUASHES into the ground in three steps (canon sizeY
@@ -171,7 +172,7 @@ def boss_death_timeline(ph):
     return tl
 
 
-def _squash_rows(rows, keep):
+def _squash_rows(rows: Any, keep: Any) -> Any:
     """Vertical squash with the feet planted: sample `keep` rows across the
     sprite's height and pad the removed height with blank rows on top."""
     h = len(rows)
@@ -183,7 +184,7 @@ def _squash_rows(rows, keep):
     return [blank] * (h - keep) + [rows[i] for i in idx]
 
 
-def _full(frame):
+def _full(frame: Any) -> Any:
     # window-law: the 32x16 banner/flash fills the PLAY WINDOW exactly (like
     # training's explosion), not the whole LCD -- LCD-centring put its top two
     # rows in the bezel sky at y4-5 (audit 2026-07-13)
@@ -199,8 +200,8 @@ def _full(frame):
 
 
 class BattlePanel:
-    def __init__(self, pet, enemy=None, wild=False, scene=None, rounds=None,
-                 raid=False, skip_intro=False):
+    def __init__(self, pet: Any, enemy: Optional[Any]=None, wild: bool=False, scene: Optional[Any]=None, rounds: Optional[Any]=None,
+                 raid: bool=False, skip_intro: bool=False) -> None:
         from tuipet.core.battle import ROUNDS_LOCAL
         self.pet = pet
         self.raid = raid              # a RaidBout replay: boss bar holds, dealt counts
@@ -228,7 +229,7 @@ class BattlePanel:
         self._last_m = None          # timeline marker edges -> per-event sfx
         self.bar = 0                 # the timing bar
         self.bar_dir = 1
-        self._bar_hist = []          # trailing marker steps (the lock's latency grace)
+        self._bar_hist = []          # type: ignore
         self._ready_frame = 0        # frame the bar appeared (the intro-mash guard)
         self.mega_lo, self.mega_hi = mega_window(pet)
         self.locked = None           # the locked hit-type
@@ -254,20 +255,20 @@ class BattlePanel:
             self.phase = "ready"
             self.timeline = []
             self._ready_frame = 0
-            self.sfx = None                # the cup owns the entrance sting
+            self.sfx = None                # type: ignore
 
     @property
-    def enemy(self):
+    def enemy(self) -> Any:
         return self.battle.enemy if self.battle else self._pick
 
-    def _start_fight(self, hit_type):
+    def _start_fight(self, hit_type: Any) -> None:
         """The bar locked: build the precomputed fight and roll the rounds."""
         self.pet.saved_hit_type = hit_type
         self.locked = hit_type
         self._lock_frame = self.frame_i
         if self.raid:
             from tuipet.core.battle import RaidBout
-            self.battle = RaidBout(self.pet, self._pick)
+            self.battle = RaidBout(self.pet, self._pick)  # type: ignore
         else:
             # (the `source="pvp" if ... self._pick.get("pvp")` selector was
             # CUT 2026-07-25 on Joel's order, battle audit §5: nothing has
@@ -277,14 +278,14 @@ class BattlePanel:
             # (phase "anim", its own timeline, keys intercepted upstream)
             # and files the bout itself with record_battle(online=True).
             # Every fight that DOES lock this bar is a local one.)
-            self.battle = Battle(self.pet, self._pick, rounds=self._rounds)
-        self.hud_php, self.hud_fhp = self.battle.pet_hp, self.battle.enemy_hp
+            self.battle = Battle(self.pet, self._pick, rounds=self._rounds)  # type: ignore
+        self.hud_php, self.hud_fhp = self.battle.pet_hp, self.battle.enemy_hp  # type: ignore
         self._next_round()
 
-    def _next_round(self):
+    def _next_round(self) -> None:
         b = self.battle
-        ph0, fh0 = b.pet_hp, b.enemy_hp
-        rec = b.play_round()
+        ph0, fh0 = b.pet_hp, b.enemy_hp  # type: ignore
+        rec = b.play_round()  # type: ignore
         if rec is None:
             self._enter_result()
             return
@@ -292,18 +293,18 @@ class BattlePanel:
                                        True, hold_foe_bar=self.raid)
         # the death beat is for a boss BEATEN TO ZERO -- won alone would fire
         # it on a survived raid, whose boss never falls
-        if b.over and b.won and (b.enemy or {}).get("boss") and b.enemy_hp <= 0:
-            self.timeline += boss_death_timeline(b.pet_hp)   # boss-death beat
+        if b.over and b.won and (b.enemy or {}).get("boss") and b.enemy_hp <= 0:  # type: ignore
+            self.timeline += boss_death_timeline(b.pet_hp)   # type: ignore
         self.i = 0
         self.phase = "anim"
 
-    def _enter_result(self):
+    def _enter_result(self) -> None:
         self.done_anim = True
-        self.won = bool(self.battle.won) if self.battle else False
+        self.won = bool(self.battle.won) if self.battle else False  # type: ignore
         self.phase = "result"
 
     # ---- driving ----
-    def _emit_sfx(self):
+    def _emit_sfx(self) -> None:
         """A one-shot beep at timeline marker edges."""
         entry = self.timeline[self.i]
         m = entry.get("m")
@@ -321,9 +322,9 @@ class BattlePanel:
                 self.sfx = s
             elif m == "reveal":
                 self.sfx = "startBattle"
-        self._last_m = m
+        self._last_m = m  # type: ignore
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.phase == "ready":
             self._bar_hist = (self._bar_hist + [self.bar])[-strikefx.LOCK_GRACE:]
@@ -346,7 +347,7 @@ class BattlePanel:
             else:
                 self._next_round()
 
-    def strip(self):
+    def strip(self) -> Any:
         """The message-box hint line."""
         if self.phase == "ready":
             return menu.hints(("SPACE", "lock the bar"),
@@ -359,7 +360,7 @@ class BattlePanel:
         # (hazard duck, dig) prompt on the strip, so this does too
         return menu.hints(("SPACE", "hurry"), ("ESC", "end it"))
 
-    def _lock_bar(self):
+    def _lock_bar(self) -> None:
         # ONE grading source with the drill (strikefx.grade_lock: the
         # latency grace, the 2px marker, the veteran rule)
         t = strikefx.grade_lock(self._bar_hist + [self.bar],
@@ -368,7 +369,7 @@ class BattlePanel:
         self.sfx = "confirm" if t != "miss" else "refuse"
         self._start_fight(t)
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.phase == "intro":
             if k in ("space", "enter", "escape"):
                 self.i = len(self.timeline) - 1
@@ -422,7 +423,7 @@ class BattlePanel:
         return None
 
     # ---- rendering ----
-    def _rows(self, num, pose):
+    def _rows(self, num: int, pose: Any) -> Any:
         rec = data.record_for(num) if num >= 0 else None
         if rec is None or rec.get("_placeholder"):
             # no roster sheet (an egg's num -1): render the shell art instead
@@ -433,7 +434,7 @@ class BattlePanel:
         fr = rec["frames"]
         return (fr[pose] if pose < len(fr) else None) or fr[0]
 
-    def _scene(self, placements, overlay):
+    def _scene(self, placements: Any, overlay: Any) -> Any:
         # the habitat background is part of the scene -- the crisp sprites + orbs read fine
         # over it now (the clunk was the sprites/explosion, since fixed), so keep it visible.
         # clip: battle is a verified full-LCD 12-row canvas, so the window law
@@ -445,7 +446,7 @@ class BattlePanel:
                               else ("tourneyBack" if self.arena else None)),
                           rows=ROWS, cols=COLS, overlay=overlay, clip=grid.WINDOW)
 
-    def _place_one(self, view, rows, xshift=0, turn=False):
+    def _place_one(self, view: Any, rows: Any, xshift: int=0, turn: bool=False) -> Any:
         """Place the ONE monster currently on screen. Player stands RIGHT (faces left), enemy
         LEFT (faces right). turn=True wears the opposite facing (the airborne beat of the
         turn-away dodge). Returns (placements, mouth_edge) -- the inner edge the orb leaves
@@ -453,7 +454,7 @@ class BattlePanel:
         # shared placement: pet (view!="foe") faces left on the right; foe faces right on the left
         return strikefx.place_combatant(view != "foe", rows, xshift, turn=turn)
 
-    def _orb_overlay(self, fr, mouth):
+    def _orb_overlay(self, fr: Any, mouth: Any) -> Any:
         """The attacker's projectile flown by the shared strikefx, tinted
         with the firing mon's own hue (audit 2026-07-15)."""
         atk = fr["atk"]
@@ -464,7 +465,7 @@ class BattlePanel:
         return strikefx.orb_flight(orb, atk == "pet", fr["m"], fr["prog"],
                                    mouth, fr.get("double"))
 
-    def _render_scene_frame(self, fr):
+    def _render_scene_frame(self, fr: Any) -> Any:
         b = self.battle
         m = fr["m"]
         # intro frames (banner/reveal) carry no HP: fall back to the
@@ -561,7 +562,7 @@ class BattlePanel:
         self.hud_php, self.hud_fhp, self.hud_note = ph, fh, note
         return scene
 
-    def _result_note(self):
+    def _result_note(self) -> Any:
         """Record + the WHY (gameplay polish #1+#5, 2026-07-22): a win says
         how close it stood, a draw names the draw-counts-as-loss rule, a
         loss carries battle.coach_line's biggest fixable drag.  A raid
@@ -581,7 +582,7 @@ class BattlePanel:
         why = _b.coach_line(b.me, b.foe)
         return f"{why} · {rec}" if why else rec
 
-    def _render_ready(self):
+    def _render_ready(self) -> Any:
         """The timing bar: a marker sweeps 0..24; SPACE locks it.  Inside the
         mega zone = double blasts most rounds; near it = normal; wide = miss.
         Rendered as the CANON pixel bar over the arena -- the same sprite as
@@ -609,7 +610,7 @@ class BattlePanel:
         return self._scene([], strikefx.timing_bar(self.bar, self.mega_lo,
                                                    self.mega_hi))
 
-    def text(self):
+    def text(self) -> Any:
         if self.phase == "ready":
             return self._render_ready()
         if self.phase == "result":

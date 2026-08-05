@@ -17,9 +17,9 @@ def _pet():
 
 
 def _on_the_road(monkeypatch, p=None):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(p or _pet(), zone=ZONES[0])
     pan._trans = None
     pan._landed = True
@@ -75,9 +75,9 @@ def test_a_sleeping_traveller_naps_by_the_road(monkeypatch):
 
 
 def test_only_a_pet_pushed_past_empty_refuses(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     p = _pet()
     a = Adventure(p, zone=ZONES[0])
     assert a.travel() == "step"                        # rested: never refuses

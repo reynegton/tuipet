@@ -12,6 +12,7 @@ Ground truth: _audit_src/View/SpriteAnim.java
   idleNormal :11246   idleWalk :11337   idleSleep :11525   idleUnwell :11447
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 
 STEP_PX = 2        # device-exact: 2px per beat over the 16px travel range
@@ -27,14 +28,14 @@ SICK_PERIOD = 50   # idleUnwell: collapse held, tiny shuffle 30..45, weary flash
 IDLE_EXPR_CHANCE = 0.30   # stepFrame: a fraction of idle steps show a mood pose, not the walk toggle
 
 
-def idle_hold(restless):
+def idle_hold(restless: Any) -> Any:
     """idleNormal holds each idle pose 5/6/7 intervals (restless >0 / 0 / <0)."""
     return 5 if restless > 0 else (7 if restless < 0 else 6)
 
 
 
 
-def sick_frame(frame):
+def sick_frame(frame: Any) -> Any:
     """idleUnwell: returns (sprite_index, dx_px).  Collapse pose (10) dominates the
     50-interval cycle; the weary pose (9) only flashes on the reset beat.  DVPet's
     shuffle is moveLeft1@30, moveRight1@35, moveRight1@40, moveLeft1@45 -- which is
@@ -55,7 +56,7 @@ def sick_frame(frame):
     return idx, dx
 
 
-def mood_pose(pet):
+def mood_pose(pet: Any) -> Any:
     """DVPet stepFrame substitutes a `checkMoodFrame` expression pose for the plain
     walk toggle on a fraction of idle steps, so a resting pet *reads* its state:
     weary when spent, sour when unwell, bright when genuinely well-kept.
@@ -83,7 +84,7 @@ class Roamer:
     (TURN_CHANCE) so it wanders rather than marches.  A filth pile on the floor is
     a hard left wall it turns at."""
 
-    def __init__(self, x, cols, sprite_w, face=1):
+    def __init__(self, x: Any, cols: Any, sprite_w: Any, face: int=1) -> None:
         self.x = float(x)
         self.cols = cols
         self.sw = sprite_w
@@ -94,7 +95,7 @@ class Roamer:
         self._t = 0
         self._wall = 1            # departure direction once the pause ends
 
-    def step(self, left_bound=0, right_bound=None):
+    def step(self, left_bound: int=0, right_bound: Optional[Any]=None) -> None:
         """Advance one interval.  Movement happens on the WALK_BEAT cadence,
         device-exact per the 2026-07-14 GML decompile (obj_char_vpet Alarm_2):
         each beat picks a walk frame at RANDOM (50/50, not a strict toggle),
@@ -130,11 +131,11 @@ class Roamer:
             self.pause, self._wall = WALL_PAUSE, 1
 
     @property
-    def xshift(self):
+    def xshift(self) -> Any:
         """Offset from screen centre that render_screen expects (it centres first)."""
         base = (self.cols - self.sw) // 2
         return int(round(self.x)) - base
 
     @property
-    def mirror(self):
+    def mirror(self) -> Any:
         return self.face > 0          # sprites face left by default; mirror to face right

@@ -7,6 +7,7 @@ queue; incoming messages update the snapshot or land in `inbox` for the session
 logic (jogress/battle) to drain.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import asyncio
 import json
@@ -24,7 +25,7 @@ SAVE_WIRE_MAX = 56 * 1024    # refuse to push saves near the server's 64KB drop
 #                              forever without ever landing (audit 2026-07-18)
 
 
-def parse_msg(raw):
+def parse_msg(raw: Any) -> Any:
     """One JSON-envelope guard for every lobby message: (msg, type) or
     (None, None) on anything malformed."""
     try:
@@ -50,40 +51,40 @@ class _WsClient:
     # left uncapped (QOL sweep 2026-07-23).
     _open_timeout = 6.0
 
-    def retry_now(self):
+    def retry_now(self) -> None:
         """Hurry the backoff: the player knows the wifi is back."""
         self._hurry = True
 
-    async def run(self):
+    async def run(self) -> None:
         backoff = self._backoff0
         self._hurry = False
-        while not self._stop:
+        while not self._stop:  # type: ignore
             try:
-                async with websockets.connect(self.uri, max_size=WIRE_READ_MAX,
+                async with websockets.connect(self.uri, max_size=WIRE_READ_MAX,  # type: ignore
                                               open_timeout=self._open_timeout) as ws:
                     self._ws = ws
-                    await ws.send(json.dumps(self._login_msg()))
-                    self._on_connect()
+                    await ws.send(json.dumps(self._login_msg()))  # type: ignore
+                    self._on_connect()  # type: ignore
                     backoff = self._backoff0
-                    sender = asyncio.create_task(self._send_loop())
+                    sender = asyncio.create_task(self._send_loop())  # type: ignore
                     try:
                         async for raw in ws:
-                            self._handle(raw)
+                            self._handle(raw)  # type: ignore
                     finally:
                         sender.cancel()
             except Exception as e:
                 self._on_error(e)
             finally:
-                self._on_disconnect()
-                self._ws = None
-            if self._stop:
+                self._on_disconnect()  # type: ignore
+                self._ws = None  # type: ignore
+            if self._stop:  # type: ignore
                 break
             self._on_retry_wait()
             # sliced sleep so retry_now() (a UI-thread bool flip) can cut a
             # 30s backoff short -- the player watching "reconnecting…" had
             # no key to hurry it (QOL sweep 2026-07-23)
             waited = 0.0
-            while waited < backoff and not self._hurry and not self._stop:
+            while waited < backoff and not self._hurry and not self._stop:  # type: ignore
                 await asyncio.sleep(0.2)
                 waited += 0.2
             if self._hurry:
@@ -94,20 +95,20 @@ class _WsClient:
         self._on_stopped()
 
     # hooks -- default no-ops
-    def _on_error(self, e):
+    def _on_error(self, e: Any) -> None:
         pass
 
-    def _on_retry_wait(self):
+    def _on_retry_wait(self) -> None:
         pass
 
-    def _on_stopped(self):
+    def _on_stopped(self) -> None:
         pass
 
 
 class LobbyState:
     """Render-friendly snapshot of the lobby; the Panel reads this every tick."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.connected = False
         self.error: str | None = None
         self.me_id: int | None = None
@@ -122,7 +123,7 @@ class LobbyState:
         self.blocked: set = set()              # muted peers (loaded from settings on connect)
         self.room: str | None = None           # current password room (None = main lobby)
 
-    def others(self):
+    def others(self) -> Any:
         """Roster minus me — the people you can battle/jogress."""
         return [p for p in self.roster if p["id"] != self.me_id]
 
@@ -139,7 +140,7 @@ class SyncClient(_WsClient):
 
     _backoff_cap = 60.0
 
-    def __init__(self, uri, name, pw="", on_pull=None):
+    def __init__(self, uri: Any, name: str, pw: str="", on_pull: Optional[Any]=None) -> None:
         # The server ACKs every save with {"t":"saved","ok":...} and answers
         # ok=False when it DROPPED it (a stale lease: a newer session of this
         # account owns the saves).  We never read that ack -- _handle had no
@@ -158,11 +159,11 @@ class SyncClient(_WsClient):
         self.connected = False
         self.inbox: list = []                 # (from_name, text) PMs -> the home-screen alert
         self._pending = None                  # latest save dict awaiting upload
-        self._ws = None
+        self._ws = None  # type: ignore
         self._wake: asyncio.Event = asyncio.Event()
         self._stop = False                    # set on auth failure -> don't retry
 
-    def push_save(self, save):
+    def push_save(self, save: Any) -> None:
         try:
             if len(json.dumps(save)) > SAVE_WIRE_MAX:
                 self.save_too_big = True      # surfaced once by the app's warn pass
@@ -173,20 +174,20 @@ class SyncClient(_WsClient):
         self._pending = save                  # keep only the newest; server is last-write-wins
         self._wake.set()
 
-    def _login_msg(self):
+    def _login_msg(self) -> Any:
         from tuipet.network.cloudsync import BOOT    # one launch stamp per process
         return {"t": "login", "name": self.name, "pw": self.pw,
                 "sync_only": True, "boot": BOOT}
 
-    def _on_connect(self):
+    def _on_connect(self) -> None:
         self.connected = True
         if self._pending is not None:
             self._wake.set()                  # flush anything queued while we were down
 
-    def _on_disconnect(self):
+    def _on_disconnect(self) -> None:
         self.connected = False
 
-    async def _send_loop(self):
+    async def _send_loop(self) -> None:
         while True:
             await self._wake.wait()
             self._wake.clear()
@@ -201,7 +202,7 @@ class SyncClient(_WsClient):
                     self._wake.set()
                     await asyncio.sleep(1.0)
 
-    def _handle(self, raw):
+    def _handle(self, raw: Any) -> None:
         m, t = parse_msg(raw)
         if t == "welcome":
             if self.on_pull is not None:
@@ -235,13 +236,13 @@ class SyncClient(_WsClient):
 
 
 class LobbyClient(_WsClient):
-    def __init__(self, uri, name, pw="", pet=None, state=None):
+    def __init__(self, uri: Any, name: str, pw: str="", pet: Optional[Any]=None, state: Optional[Any]=None) -> None:
         self.uri = uri
         self.name = name
         self.pw = pw
         self.pet = pet or {}
         self.state = state or LobbyState()
-        self._ws = None
+        self._ws = None  # type: ignore
         self._q: asyncio.Queue = asyncio.Queue()
         self._stop = False                    # rejected login (or teardown) -> no retry
         self._had_welcome = False             # a past successful login makes drops RECONNECTS
@@ -253,68 +254,68 @@ class LobbyClient(_WsClient):
         self.last_hit = None                  # the gate's raid_hit ack (authoritative dealt)
 
     # ---- outgoing (called from the UI thread/loop) -----------------------
-    def _send(self, obj):
+    def _send(self, obj: Any) -> None:
         self._q.put_nowait(obj)
 
-    def chat(self, text):
+    def chat(self, text: str) -> None:
         self._send({"t": "chat", "text": text})
 
     # ---- the raid boss (DSprite raids; BASIC VPET 2026-07-16) -------------
-    def raid_get(self):
+    def raid_get(self) -> None:
         self._send({"t": "raid_get"})
 
-    def raid_hit(self, damage):
+    def raid_hit(self, damage: Any) -> None:
         # (the old `stage` field was DEAD wire weight: the gate binds the
         # multiplier to the roster card's num -- raid round 2026-07-19)
         self._send({"t": "raid_hit", "damage": int(damage)})
 
-    def raid_claim(self, raid_id):
+    def raid_claim(self, raid_id: Any) -> None:
         self._send({"t": "raid_claim", "raid": raid_id})
 
-    def update_pet(self, pet):
+    def update_pet(self, pet: Any) -> None:
         self.pet = pet
         self._send({"t": "pet", "pet": pet})
 
-    def invite(self, to, kind):
+    def invite(self, to: Any, kind: Any) -> None:
         self._send({"t": "invite", "to": to, "kind": kind})
 
-    def pm(self, to, text, to_name=None):
+    def pm(self, to: Any, text: str, to_name: Optional[Any]=None) -> None:
         msg = {"t": "pm", "to": to, "text": text}
         if to_name:
             msg["to_name"] = to_name       # lets the server queue when the id is stale/offline
         self._send(msg)
 
-    def ping(self, to):
+    def ping(self, to: Any) -> None:
         """Nudge a ghost (app open, not in the lobby) to come battle -- rides the PM
         channel, which lands on their home-screen alert."""
         self.pm(to, "\u2694\ufe0f wants to battle -- come to the Lobby!")
 
-    def respond(self, to, kind, accept, busy=False):
+    def respond(self, to: Any, kind: Any, accept: Any, busy: bool=False) -> None:
         msg = {"t": "invite_resp", "to": to, "kind": kind, "accept": bool(accept)}
         if busy:
             msg["busy"] = True
         self._send(msg)
 
-    def relay(self, to, payload):
+    def relay(self, to: Any, payload: Any) -> None:
         self._send({"t": "relay", "to": to, "payload": payload})
 
-    def room(self, code):
+    def room(self, code: Any) -> None:
         """Join the password room for `code` (everyone typing the same phrase
         meets there); empty code returns to the main lobby."""
         self._send({"t": "room", "code": code})
 
-    def ladder_report(self, won, opp):
+    def ladder_report(self, won: Any, opp: Any) -> None:
         """File this side of a PvP outcome; the server pairs both stories."""
         self._send({"t": "ladder_report", "won": bool(won), "opp": opp})
 
-    def ladder_get(self):
+    def ladder_get(self) -> None:
         self._send({"t": "ladder_get"})
 
-    def ladder_claim(self, season):
+    def ladder_claim(self, season: Any) -> None:
         self._send({"t": "ladder_claim", "season": season})
 
     # ---- lifecycle (the loop itself lives on _WsClient) --------------------
-    def _login_msg(self):
+    def _login_msg(self) -> Any:
         from tuipet.network.cloudsync import BOOT    # one launch stamp per process: the
         #                                       server lets the newest launch evict
         #                                       its own stale room session (message
@@ -322,27 +323,27 @@ class LobbyClient(_WsClient):
         return {"t": "login", "name": self.name, "pw": self.pw, "pet": self.pet,
                 "boot": BOOT}
 
-    def _on_connect(self):
+    def _on_connect(self) -> None:
         self.state.connected = True
         self.state.reconnecting = False
 
-    def _on_error(self, e):                          # surfaced in the lobby as a banner
+    def _on_error(self, e: Any) -> None:                          # surfaced in the lobby as a banner
         if not self._had_welcome:
             self.state.error = str(e) or e.__class__.__name__
 
-    def _on_disconnect(self):
+    def _on_disconnect(self) -> None:
         self.state.connected = False
 
-    def _on_retry_wait(self):
+    def _on_retry_wait(self) -> None:
         # nobody is reachable while down: an empty roster voids any live
         # session panel-side, exactly like a partner leaving
         self.state.roster = []
         self.state.reconnecting = True
 
-    def _on_stopped(self):
+    def _on_stopped(self) -> None:
         self.state.reconnecting = False
 
-    async def _send_loop(self):
+    async def _send_loop(self) -> None:
         while True:
             obj = await self._q.get()
             try:
@@ -358,7 +359,7 @@ class LobbyClient(_WsClient):
                     pass
                 return
 
-    def _handle(self, raw):
+    def _handle(self, raw: Any) -> None:
         m, t = parse_msg(raw)
         s = self.state
         if t == "welcome":
@@ -425,7 +426,7 @@ class LobbyClient(_WsClient):
             msg = m.get("msg") or ""
             s.error = t(code, msg) if code else msg
 
-    def _replayed(self, m, nm):
+    def _replayed(self, m: Any, nm: Any) -> Any:
         """True for a server-marked backlog `replay` line the pane already
         shows: reconnects and room→main returns re-send the same window, and
         with no client dedup every line printed twice.  Live repeats are
@@ -433,7 +434,7 @@ class LobbyClient(_WsClient):
         return bool(m.get("replay")) and (nm, m.get("text", "")) in self.state.chat[-30:]
 
 
-async def submit_bug(uri, text, meta=None, name="", timeout=8.0):
+async def submit_bug(uri: Any, text: str, meta: Optional[Any]=None, name: str="", timeout: float=8.0) -> Any:
     """One-shot bug submit: connect, send a bug envelope (NO login needed),
     await the server ack, close.  True only on a server-confirmed store."""
     payload = {"t": "bug", "text": text, "name": name}

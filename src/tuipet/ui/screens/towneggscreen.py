@@ -6,6 +6,7 @@ the selection.  ENTER buys the centred egg outright (bits -> egg_own); it
 joins your hatch carousel.  Eggs still unlock FREE by condition elsewhere;
 this is the road shortcut, priced.  ←→ ↑↓ browse, ENTER buy, ESC leave."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.text import Text
 import tuipet.core.egg as egg_mod
 import tuipet.ui.components.menu as menu
@@ -19,7 +20,7 @@ PER_ROW, SHOWN = 4, 8        # 2 rows of 4 thumbnails
 
 
 class TownEggPanel:
-    def __init__(self, pet, town_id=0):
+    def __init__(self, pet: Any, town_id: int=0) -> None:
         self.pet = pet
         self.town_id = town_id
         self.stock = shop.town_egg_stock(town_id)      # egg indices this town sells
@@ -31,19 +32,19 @@ class TownEggPanel:
         self.msg = t("tegg_msg_intro", "The town egg vendor — pick one up for the road.")
         self.msg_t = 0
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.msg_t > 0:
             self.msg_t -= 1
 
-    def _flash(self, text):
+    def _flash(self, text: str) -> None:
         self.msg, self.msg_t = text, 26
 
-    def strip(self):
+    def strip(self) -> Any:
         return menu.hints(("←→↑↓", t("tegg_hint_browse", "browse")), ("ENTER", t("tegg_hint_buy", "buy")), ("ESC", t("tegg_hint_leave", "leave")))
 
     # -- input -----------------------------------------------------------------
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if not self.n:
             return ("done", None) if k == "escape" else None
         if k in ("right", "l"):
@@ -60,7 +61,7 @@ class TownEggPanel:
             return ("done", None)
         return None
 
-    def _buy(self):
+    def _buy(self) -> None:
         # THE single buy path lives in shop.town_egg_buy (shops-look-the-
         # same 2026-07-22) -- this panel is unrouted now (the town hub's
         # Eggs door opens the shop's own Eggs tab) but stays functional
@@ -71,7 +72,7 @@ class TownEggPanel:
         self._flash(msg)
 
     # -- render (the real 8x8 thumbnails, framed selection) --------------------
-    def _grid(self):
+    def _grid(self) -> Any:
         buf = [[0] * GW for _ in range(GH)]
         lo = max(0, min(self.i - SHOWN // 2, self.n - SHOWN)) if self.n > SHOWN else 0
         for j in range(SHOWN):
@@ -97,7 +98,7 @@ class TownEggPanel:
                             buf[y][xx] = 1
         return buf
 
-    def text(self):
+    def text(self) -> Any:
         if not self.n:
             out = menu.header(t("tegg_hdr_market", "EGG MARKET"), "0/0")
             out.append_text(menu.blanks(4))

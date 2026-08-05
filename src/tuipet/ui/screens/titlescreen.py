@@ -1,5 +1,6 @@
 """Boot/title screen shown on launch (the device powering on)."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 from rich.text import Text
 import tuipet.data.loaders.data as data
@@ -18,7 +19,7 @@ _FONT = {
 }
 
 
-def _wordmark(s):
+def _wordmark(s: Any) -> Any:
     rows = ["", "", "", "", ""]
     for ch in s:
         g = _FONT[ch]
@@ -36,7 +37,7 @@ WORD = _wordmark("TUIPET")
 # SOMETHING at step 0 (the flash has to visibly break the moment the
 # transition starts) and keep moving every step.
 
-def _fx_dissolve(buf, step):
+def _fx_dissolve(buf: Any, step: Any) -> None:
     keep = BOOT_FADE - step                      # thinning noise as the title emerges
     for y in range(PXH):
         for x in range(COLS):
@@ -44,21 +45,21 @@ def _fx_dissolve(buf, step):
                 buf[y][x] = 1
 
 
-def _fx_wipe(buf, step):
+def _fx_wipe(buf: Any, step: Any) -> None:
     edge = (step + 1) * COLS // BOOT_FADE        # curtain sweeps left to right
     for y in range(PXH):
         for x in range(edge, COLS):
             buf[y][x] = 1
 
 
-def _fx_scan(buf, step):
+def _fx_scan(buf: Any, step: Any) -> None:
     edge = (step + 1) * PXH // BOOT_FADE         # CRT scan, top to bottom
     for y in range(edge, PXH):
         for x in range(COLS):
             buf[y][x] = 1
 
 
-def _fx_blinds(buf, step):
+def _fx_blinds(buf: Any, step: Any) -> None:
     slit = 1 + step * 5 // (BOOT_FADE - 1)       # venetian slats open downward
     for y in range(PXH):
         if y % 6 >= slit:
@@ -66,7 +67,7 @@ def _fx_blinds(buf, step):
                 buf[y][x] = 1
 
 
-def _fx_iris(buf, step):
+def _fx_iris(buf: Any, step: Any) -> None:
     rx = (step + 1) * (COLS // 2) // BOOT_FADE   # box iris opens from centre
     ry = max(1, (step + 1) * (PXH // 2) // BOOT_FADE)
     cx, cy = COLS // 2, PXH // 2
@@ -76,7 +77,7 @@ def _fx_iris(buf, step):
                 buf[y][x] = 1
 
 
-def _fx_checker(buf, step):
+def _fx_checker(buf: Any, step: Any) -> None:
     for y in range(PXH):                         # 4x4 tiles flip in, staggered
         for x in range(COLS):
             if ((x // 4) * 3 + (y // 4) * 7) % BOOT_FADE > step:
@@ -89,7 +90,7 @@ BOOT_FX = (_fx_dissolve, _fx_wipe, _fx_scan, _fx_blinds, _fx_iris, _fx_checker)
 class TitlePanel:
     """Shows a bobbing mascot + the TUIPET wordmark; any key starts the game (q quits)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         _, by = data.load_sprites()
         pool = [n for n, r in by.items()
                 if r["stage"] in ("Rookie", "Champion", "Ultimate", "Mega")
@@ -104,10 +105,10 @@ class TitlePanel:
         import tuipet.utils.update as update
         self.version = update.current_version() or ""   # blank when running from source
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         """The press-to-start prompt rides the #msg strip.  It used to be set
         once by the app and the v0.2.223 strip plumbing blanked it a frame
         later (title audit 2026-07-04) — panels own their strips now."""
@@ -122,12 +123,12 @@ class TitlePanel:
             return f"[b]{msg}[/b]" + tag
         return f"[dim]{msg}[/dim]" + tag
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k == "q":
             return ("quit", None)      # q quits the app rather than starting the game
         return ("done", None)
 
-    def text(self):
+    def text(self) -> Any:
         mascot = data.bob_frame(self.num, self.frame_i, beat=4)  # gentle bob (~0.5s), not every fast-tick
         buf = [[0] * COLS for _ in range(PXH)]
         sw = max(len(r) for r in mascot)

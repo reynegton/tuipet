@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 """The DSprite background catalog, wired to the eggs (BASIC VPET 2026-07-16).
 
 Habitats are gone (Joel: "remove the habitats. wire in the dsprite
@@ -160,7 +161,7 @@ PICKS = tuple(sorted((k for k in NAMES if k != "tourneyBack"),
                      key=lambda k: NAMES[k]))
 
 
-def scene_for_egg(egg_type):
+def scene_for_egg(egg_type: Any) -> Any:
     """The scene an egg wires its whole line to (unknown egg -> DEFAULT)."""
     try:
         return EGG_BG.get(int(egg_type), DEFAULT)
@@ -168,5 +169,5 @@ def scene_for_egg(egg_type):
         return DEFAULT
 
 
-def name(key):
+def name(key: str) -> Any:
     return NAMES.get(key, key)

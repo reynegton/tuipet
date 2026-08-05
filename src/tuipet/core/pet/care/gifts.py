@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -6,7 +7,7 @@ import tuipet.utils.sound as sound
 import tuipet.core.shop as shop
 from tuipet.core.petbase import FULL_HUNGER
 
-def _pick_gift(pet, festival=False):
+def _pick_gift(pet: Any, festival: bool=False) -> Any:
     """A SURPRISE present (2026-07-24, Joel: "presents should be just
     that, a surprise" / "make these items actually work").  Where the
     old pool was four fixed treats, a gift is now a TIER-WEIGHTED pick
@@ -26,7 +27,7 @@ def _pick_gift(pet, festival=False):
         else random.choices(pool, weights=weights, k=1)[0]
 
 
-def claim_gift(pet):
+def claim_gift(pet: Any) -> Any:
     """ClockTic.giftEnd: the present lands in the bag and the pet cheers."""
     key, pet.gift = pet.gift, ""
     if not key:

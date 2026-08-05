@@ -27,6 +27,7 @@ the footer (they were beep-only before -- self.msg was never rendered);
 the sealed Relic waves tease there on the egg-carousel cadence.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import textwrap
 
 from rich.text import Text
@@ -77,8 +78,8 @@ _LAST_POS: dict[str, tuple[int, int]] = {}
 
 
 class ShopPanel:
-    def __init__(self, pet, start_mode="shop", bag_only=False, town_id=None,
-                 start_tab=None):
+    def __init__(self, pet: Any, start_mode: str="shop", bag_only: bool=False, town_id: Optional[Any]=None,
+                 start_tab: Optional[Any]=None) -> None:
         self.pet = pet
         self.mode = start_mode
         self.bag_only = bag_only        # road bag: use/sell only
@@ -93,8 +94,8 @@ class ShopPanel:
         self.cursor = 0
         # per-tab cursor memory for this visit: tabbing away and back no
         # longer dumps you at row 0 (QOL 2026-07-23)
-        self._tab_pos = {}
-        self._mode_pos = {}             # (tab, cursor) per shop/bag side
+        self._tab_pos = {}  # type: ignore
+        self._mode_pos = {}             # type: ignore
         if town_id is None and start_tab is None and not bag_only:
             self.tab, self.cursor = _LAST_POS.get(start_mode, (0, 0))
         self._retarget = False          # the stack under the cursor just
@@ -109,20 +110,20 @@ class ShopPanel:
         self.msg = ""                   # transient footer flash (last verdict)
         self.msg_t = 0
         self.sealed, self.wave_hint = shop.wave_status()
-        self._answers = {}              # (num, key) -> crest_answer cache
+        self._answers = {}              # type: ignore
         self._flash(t("shop_welcome_bag", "Sua mochila.") if start_mode == "bag"
                     else t("shop_welcome_shop", "Welcome! Spend your bits."))
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.msg_t > 0:
             self.msg_t -= 1
 
-    def _flash(self, text):
+    def _flash(self, text: str) -> None:
         if text:
             self.msg, self.msg_t = text, 26
 
-    def strip(self):
+    def strip(self) -> Any:
         """Verdict flash > the sealed-wave tease > mode-true hints -- the
         egg-carousel grammar (round 31: the old in-LCD footer doubled the
         keys the strip carried and squeezed the shelf; its row feeds the
@@ -143,7 +144,7 @@ class ShopPanel:
                           ("TAB", t("shop_hint_shop", "shop")), ("ESC", t("shop_hint_out", "out")))
 
     # ---- data ----
-    def _tabs(self):
+    def _tabs(self) -> Any:
         """Shop: the classic four; a TOWN counter carries its two authored
         shelves + the egg band as an EGGS tab (shops-look-the-same
         2026-07-22: the market rode a separate one-off grid screen while
@@ -155,7 +156,7 @@ class ShopPanel:
             return [g for g, _ in GROUPS]
         return [g for g, cats in GROUPS if cats is not None]
 
-    def _grouped(self, rows, tab_name, cats):
+    def _grouped(self, rows: Any, tab_name: Any, cats: Any) -> Any:
         """P4: sort the Items tab by CATEGORY and slip a dim sub-header in
         front of each run.  Header rows are NOT selectable -- `_snap` walks
         the cursor past them, and every consumer guards on `.get("header")`.
@@ -165,7 +166,7 @@ class ShopPanel:
         if tab_name != _GROUPED_TAB or not rows:
             return rows
         order = [c for c in shop.CATEGORY_ORDER if c in set(cats or ())]
-        def rank(e):
+        def rank(e: Any) -> Any:
             c = e.get("category", "")
             return (order.index(c) if c in order else len(order), e["name"])
         out, last = [], None
@@ -178,10 +179,10 @@ class ShopPanel:
         return out
 
     @staticmethod
-    def _is_header(e):
+    def _is_header(e: Any) -> Any:
         return bool(e) and e.get("header") is not None
 
-    def _snap(self, rows, idx, step=1):
+    def _snap(self, rows: Any, idx: int, step: int=1) -> Any:
         """Move OFF a header row in `step` direction; never loops forever
         (a list of nothing but headers can't happen, but guard anyway)."""
         n = len(rows)
@@ -194,7 +195,7 @@ class ShopPanel:
             idx = (idx + step) % n
         return idx
 
-    def _normalize_cursor(self, rows):
+    def _normalize_cursor(self, rows: Any) -> None:
         """Never leave the cursor parked on a header (opening a tab, a
         list that shrank under it, restored session position)."""
         if not rows:
@@ -204,7 +205,7 @@ class ShopPanel:
         if self._is_header(rows[self.cursor]):
             self.cursor = self._snap(rows, self.cursor, 1)
 
-    def _rows(self):
+    def _rows(self) -> Any:
         tabs = self._tabs()
         name = tabs[self.tab % len(tabs)]
         cats = dict(GROUPS)[name]
@@ -227,7 +228,7 @@ class ShopPanel:
         out = []
         for k, n in self.pet.inventory.items():
             e = shop.entry(k)
-            if e and e["category"] in cats:
+            if e and e["category"] in cats:  # type: ignore
                 e = dict(e, count=n)
                 if self.town is not None:  # local demand: the town's OWN offer
                     e["sell_price"] = shop.town_sell_price(k, self.town)
@@ -236,7 +237,7 @@ class ShopPanel:
         return self._grouped(out, name, cats)
 
     # ---- keys ----
-    def _buy_title(self, e):
+    def _buy_title(self, e: Any) -> Any:
         """Buy an honor once, then ENTER toggles wearing it.  Purely cosmetic:
         the worn title rides the STATUS panel border and the lobby card.
         Returns (msg, sfx) like shop.buy -- the old flat confirm played the
@@ -254,7 +255,7 @@ class ShopPanel:
         persistence.set_title_worn(tid)
         return "Earned the honor: %s!" % e["name"], "confirm"
 
-    def _use(self, e):
+    def _use(self, e: Any) -> Any:
         p = self.pet
         old = p.num
         key = e["key"]
@@ -265,7 +266,7 @@ class ShopPanel:
             return ("done", ("evolve", old))
         if out is None:
             self._flash("Você não tem isso.")
-            self.sfx = "error"
+            self.sfx = "error"  # type: ignore
             return None
         if out == "":
             self._flash(f"{e['name']} não faz nada aqui.")
@@ -295,23 +296,23 @@ class ShopPanel:
             # inherit fx plays on the LCD (_after_shop's waiting route)
             return ("done", ("inherit", mem))
         self._flash(out)
-        self.sfx = "error" if refused else "confirm"   # a kept item is a NO
+        self.sfx = "error" if refused else "confirm"   # type: ignore
         return None
 
-    def _arm_deal_guard(self, key):
+    def _arm_deal_guard(self, key: str) -> None:
         """A deal purchase just landed: if that was the LAST cut-price copy,
         arm the one-press guard (the bag's `_retarget` grammar) so the next
         ENTER on the same row can't quietly pay full price."""
         if any(r.get("key") == key and r.get("deal") for r in self._rows()):
             return                        # copies left: the deal still stands
-        self._deal_guard = key
+        self._deal_guard = key  # type: ignore
 
-    def _remember_pos(self):
+    def _remember_pos(self) -> None:
         """Session memory: the HOME shop/bag reopen where you left off."""
         if self.town is None and not self.bag_only:
             _LAST_POS[self.mode] = (self.tab, self.cursor)
 
-    def _check_retarget(self, e):
+    def _check_retarget(self, e: Any) -> None:
         """After a bag use/sell: if that emptied the stack, the list shifts
         under the cursor -- arm the one-press guard so a mashed R/ENTER
         can't silently hit the neighbor (QOL 2026-07-23)."""
@@ -320,7 +321,7 @@ class ShopPanel:
                                    if not self._is_header(r)):
             self._retarget = True
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         rows = self._rows()
         self._normalize_cursor(rows)
         n = len(rows)
@@ -395,7 +396,7 @@ class ShopPanel:
                 if self._retarget:
                     self._retarget = False
                     self._flash(f"agora em {e['name']} — aperte de novo")
-                    self.sfx = "cancel"
+                    self.sfx = "cancel"  # type: ignore
                     return None
                 r = self._use(e)
                 if r is not None:
@@ -409,7 +410,7 @@ class ShopPanel:
             if self._retarget:
                 self._retarget = False
                 self._flash(f"agora em {e['name']} — aperte de novo")
-                self.sfx = "cancel"
+                self.sfx = "cancel"  # type: ignore
                 return None
             msg, self.sfx = shop.sell(self.pet, e)
             self._flash(msg)
@@ -430,7 +431,7 @@ class ShopPanel:
         return None
 
     # ---- render ----
-    def _crest_answer(self, key):
+    def _crest_answer(self, key: str) -> Any:
         """The crest egg's LIVE answer for this pet (cached per form+key --
         evolution.check walks the gate table)."""
         ck = (self.pet.num, key)
@@ -438,7 +439,7 @@ class ShopPanel:
             self._answers[ck] = shop.crest_answer(self.pet, key)
         return self._answers[ck]
 
-    def _icon(self, sel):
+    def _icon(self, sel: Any) -> Any:
         """The icon cell: honors wear the plate; a crest egg shows the crest
         GLYPH DVPet itself draws for the Relic (drawEvolutionInventory's
         Items-sheet icon, via the _CREST_IDS identity the item flow uses);
@@ -464,7 +465,7 @@ class ShopPanel:
                 return menu.icon_cell(fr[shop.icon_frame(key) % len(fr)])
         return menu.item_icon(sel)
 
-    def _info(self, sel, tw):
+    def _info(self, sel: Any, tw: Any) -> Any:
         """The four info rows beside the icon -- the LIVE dossier."""
         if sel.get("title_id") is not None:
             state = ("worn now" if sel.get("worn")
@@ -498,21 +499,21 @@ class ShopPanel:
                                          shop.resell_price(sel))
         if sel.get("category") == shop.ARMOR_CATEGORY:
             # list crest-capable evolutions that YOU have active rn
-            names = [egg_mod.destined_name(idx) for idx in shop.crest_answer(self.pet, sel["key"])]
+            names = [egg_mod.destined_name(idx) for idx in shop.crest_answer(self.pet, sel["key"])]  # type: ignore
             tail = (("→ " + " / ".join(names))[:tw] if names
                     else t("shop_nothing_answers", "nothing answers yet"))
             return [sel["name"][:tw], price[:tw], t("shop_armor_evol", "armor evolution"), tail]
         eff = textwrap.wrap(shop.effect_line(sel), tw)[:2]
         return [sel["name"][:tw], price[:tw]] + eff + [""] * (2 - len(eff))
 
-    def _bar_text(self, tabs):
+    def _bar_text(self, tabs: Any) -> Any:
         bar = ""
         for i, tb in enumerate(tabs):
             translated_tab = t(f"shop_tab_{tb}", tb)
             bar += ("[%s]" % translated_tab) if i == (self.tab % len(tabs)) else (" %s " % translated_tab)
         return bar[:menu.W].ljust(menu.W) + "\n"
 
-    def text(self):
+    def text(self) -> Any:
         p = self.pet
         tabs = self._tabs()
         rows = self._rows()
@@ -541,7 +542,7 @@ class ShopPanel:
 
         empty = (t("shop_empty_shelves", "(shelves empty)") if self.mode == "shop"
                  else t("shop_empty_bag", "(none of these owned)"))
-        def dim_if_short(label, e, i):
+        def dim_if_short(label: Any, e: Any, i: Any) -> Any:
             """Affordability at a GLANCE: an unaffordable row renders dim
             across the whole shelf, not just as the selected row's "short
             Xb" dossier tail (QOL 2026-07-23).  The selected row keeps the
@@ -551,7 +552,7 @@ class ShopPanel:
                             style=DIM)
             return label
 
-        def fmt(e, i):
+        def fmt(e: Any, i: Any) -> Any:
             if self._is_header(e):
                 # owns its whole line: dim, no ▸ cursor (it can't be selected).
                 # "── Medicine ──────" to the panel width, so the eye reads a

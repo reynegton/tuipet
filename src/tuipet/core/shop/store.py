@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import datetime
 import time
@@ -7,9 +8,9 @@ from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 from tuipet.core.shop.catalog import *
 import tuipet.core.shop.eggs as eggs
-import tuipet.core.shop.catalog as catalog
+import tuipet.core.shop.catalog as catalog  # type: ignore
 
-def buy(pet, e):
+def buy(pet: Any, e: Any) -> Any:  # type: ignore
     """-> (message, sfx)."""
     if pet.bits < e["price"]:
         return (f"Precisa de {e['price']}b — você tem {pet.bits}b.", "error")
@@ -18,7 +19,7 @@ def buy(pet, e):
     return (f"Comprou {e['name']}!", "confirm")
 
 
-def resell_price(e):
+def resell_price(e: Any) -> Any:  # type: ignore
     # a town-priced bag row carries its LOCAL sell price (buy-low/sell-high,
     # shops arc 2026-07-21); home keeps the flat half
     if "sell_price" in e:
@@ -26,7 +27,7 @@ def resell_price(e):
     return max(1, e.get("price", 0) // 2)
 
 
-def sell(pet, e):
+def sell(pet: Any, e: Any) -> Any:  # type: ignore
     if pet.inventory.get(e["key"], 0) <= 0:
         return ("Você não tem isso.", "error")
     pet.take_item(e["key"])                    # classic take_item returns None
@@ -34,7 +35,7 @@ def sell(pet, e):
     return (f"Vendeu {e['name']} por {resell_price(e)}b.", "confirm")
 
 
-def _today_ordinal(today=None):
+def _today_ordinal(today: Optional[Any]=None) -> Any:
     import tuipet.core.tournament as tournament
     d = today if today is not None else tournament._today()
     return d.toordinal()
@@ -43,7 +44,7 @@ def _today_ordinal(today=None):
 from functools import lru_cache
 
 @lru_cache()
-def _town_maps():
+def _town_maps() -> Any:
     """town_id -> the MAP whose zone hosts the town (the road's own
     geography; item diversity audit 2026-07-23)."""
     import tuipet.data.loaders.data as data
@@ -55,7 +56,7 @@ def _town_maps():
     return out
 
 
-def _econ_stub(key):
+def _econ_stub(key: str) -> Any:
     """A synthetic econ row for non-authored shelf rows (guest/regional):
     catalog price, standard factors, capped stock -- no money printer."""
     v = CATALOG[key]
@@ -65,7 +66,7 @@ def _econ_stub(key):
 
 
 @lru_cache()
-def _base_rows(town_id):
+def _base_rows(town_id: Any) -> Any:
     """The town's authored shelf + its map's regional specialty:
     [(sid, catalog_key, econ_row, local_price)] in list order (items shelf
     first, then the food family).  local_price is the PRICE-LAW ratio (see
@@ -79,7 +80,7 @@ def _base_rows(town_id):
     ov = data.load_shop_overrides()
     import tuipet.data.loaders.data_shop as data_shop
     foods, items = data_shop._load_consumables()
-    rows = []
+    rows = []  # type: ignore
     for sid in t["items_override"] + t["foods_override"]:
         o = ov.get(sid)
         if not o or o["price"] <= 0:
@@ -112,7 +113,7 @@ def _base_rows(town_id):
 
 
 @lru_cache()
-def _guest_deal():
+def _guest_deal() -> Any:
     """town_id -> its standing guest good, dealt WITHOUT replacement
     across ALL towns (item diversity audit 2026-07-23: the old per-town
     crc32 pick birthday-collided -- 8 items served 2-3 towns each, and
@@ -137,7 +138,7 @@ def _guest_deal():
     pool = [k for k, v in CATALOG.items()
             if v.price is not None and v.category != "Road"
             and k != "poison_mushroom"]
-    base_anywhere = set()
+    base_anywhere = set()  # type: ignore
     for tid in _town_maps():
         base_anywhere.update(k for _sid, k, _o, _p in _base_rows(tid))
     pool.sort(key=lambda k: (k in base_anywhere,
@@ -154,7 +155,7 @@ def _guest_deal():
     return out
 
 
-def _town_rows(town_id):
+def _town_rows(town_id: Any) -> Any:
     """The full town shelf: authored base + regional specialty + the
     standing guest good (gameplay polish #24; re-dealt collision-free in
     the item diversity audit 2026-07-23) + THE ROAD SHELF.
@@ -182,7 +183,7 @@ def _town_rows(town_id):
     return rows
 
 
-def _open_rows(town_id, prog=None):
+def _open_rows(town_id: Any, prog: Optional[Any]=None) -> Any:
     """The town shelf a tamer can actually SHOP today: `_town_rows` minus
     anything whose earned-access gate is still shut.
 
@@ -203,7 +204,7 @@ def _open_rows(town_id, prog=None):
 
 _DEAL_LOOKBACK = 32
 
-def _deal_index(seed, count, today=None):
+def _deal_index(seed: Any, count: int, today: Optional[Any]=None) -> Any:
     """A daily rotating index in [0, count), crc32-seeded on (seed, day):
     stable all day, different tomorrow.  DEDUPED (2026-07-24, Joel: "dedup
     the town deal") -- it never repeats YESTERDAY's pick, so no shelf shows
@@ -220,7 +221,7 @@ def _deal_index(seed, count, today=None):
     if count == 1:
         return 0
     import zlib
-    def raw(day):
+    def raw(day: Any) -> Any:
         return zlib.crc32(f"{seed}:{day}".encode()) % count
     day = _today_ordinal(today)
     final = raw(day - _DEAL_LOOKBACK)
@@ -232,7 +233,7 @@ def _deal_index(seed, count, today=None):
     return final
 
 
-def town_deal_sid(town_id, today=None, prog=None):
+def town_deal_sid(town_id: Any, today: Optional[Any]=None, prog: Optional[Any]=None) -> Any:  # type: ignore
     """The town's ONE rotating daily deal: seeded on (town, day) -- stable
     all day, different tomorrow, different next town, and never the same as
     yesterday (dedup 2026-07-24).
@@ -246,12 +247,12 @@ def town_deal_sid(town_id, today=None, prog=None):
     return rows[_deal_index(town_id, len(rows), today)][0]
 
 
-def _home_deal_pool():
+def _home_deal_pool() -> Any:
     return sorted(k for k, v in CATALOG.items()
                   if v.price is not None and v.category != "Road")
 
 
-def home_deal_key(today=None):
+def home_deal_key(today: Optional[Any]=None) -> Any:  # type: ignore
     """The home shelf's ONE rotating daily deal key (2026-07-24, Joel: "add
     the home daily deal") -- seeded on the day, deduped vs yesterday."""
     pool = _home_deal_pool()
@@ -259,7 +260,7 @@ def home_deal_key(today=None):
     return pool[i] if i is not None else None
 
 
-def home_band(today=None):
+def home_band(today: Optional[Any]=None) -> Any:
     """The day's rotating guest rows.
 
     A SHUFFLED CYCLE, not a random draw (audit 2026-07-27): the first cut
@@ -289,14 +290,14 @@ def home_band(today=None):
     return hand
 
 
-def _ration_left(shop_id, key, taken):
+def _ration_left(shop_id: Any, key: str, taken: Any) -> Any:
     """Today's remaining ration for a tier-limited row -- THE one place the
     arithmetic lives (assembly dedup 2026-07-27: home and town each hand-
     rolled this line, the seam where the two shelves could drift)."""
     return max(0, tier_stock(key) - int(taken.get(f"{shop_id}:{key}", 0)))
 
 
-def home_stock(today=None, pet=None):
+def home_stock(today: Optional[Any]=None, pet: Optional[Any]=None) -> Any:
     """The home shelf: staples + the day's band + the deal, decorated the
     same way a town counter is (shops-look-the-same law).
 
@@ -338,7 +339,7 @@ def home_stock(today=None, pet=None):
     return out
 
 
-def _stocked(town_id, key):
+def _stocked(town_id: Any, key: str) -> Any:
     """This town's shelf row for `key`, or None (the demand test)."""
     for _sid, k, o, local in _town_rows(town_id):
         if k == key:
@@ -346,13 +347,13 @@ def _stocked(town_id, key):
     return None
 
 
-def _town_taken(pet, today=None):
+def _town_taken(pet: Any, today: Optional[Any]=None) -> Any:
     """The day's purchase ledger for this pet ({} once the day turns)."""
     tb = getattr(pet, "town_bought", None) or {}
     return tb if tb.get("day") == _today_ordinal(today) else {}
 
 
-def town_stock(town_id, today=None, pet=None):
+def town_stock(town_id: Any, today: Optional[Any]=None, pet: Optional[Any]=None) -> Any:
     """The town shop's shelves as ready entries [{key,name,price,category,
     base_price,deal,left,town_id}].  The day's rotating deal (and, on a
     FESTIVAL, every row -- the festival market) sells at the canon
@@ -386,7 +387,7 @@ def town_stock(town_id, today=None, pet=None):
     return out
 
 
-def town_buy(pet, e, today=None):
+def town_buy(pet: Any, e: Any, today: Optional[Any]=None) -> Any:
     """A town counter purchase: blocked once the day's authored stock is
     gone, recorded in the pet's daily ledger otherwise.
 
@@ -418,7 +419,7 @@ def town_buy(pet, e, today=None):
     return (msg, sfx)
 
 
-def town_sell_price(key, town_id):
+def town_sell_price(key: str, town_id: Any) -> Any:
     """Buy-low/sell-high: a good this town STOCKS resells at the canon
     local_price // ResellFactor (it has plenty); one it DOESN'T stock is
     in DEMAND -- 70% of catalog price, better than home's half.  The

@@ -2,6 +2,7 @@
 evolution graph, the requirement corpus, canonical species mapping, stage
 grammar.  Everything the SIM reads to know who a Monster is."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import csv  # noqa: F401
 import gzip  # noqa: F401
 import json  # noqa: F401
@@ -20,7 +21,7 @@ class AssetsError(RuntimeError):
     the first render (professionalism sweep 2026-07-14).  Optional atlases
     (effects/icons/backgrounds) keep degrading gracefully instead."""
 
-def _damaged(name):
+def _damaged(name: str) -> Any:
     """The one damaged-install message, shared by every loader."""
     return AssetsError(
         f"tuipet's game data is missing or damaged ({name}).\n"
@@ -29,7 +30,7 @@ def _damaged(name):
         f"tools/setup_assets.sh)")
 
 
-def _load_bundled(name):
+def _load_bundled(name: str) -> Any:
     """gunzip+parse a required atlas, or raise AssetsError in plain words."""
     try:
         with gzip.open(os.path.join(_DATA, name), "rt") as fh:
@@ -38,7 +39,7 @@ def _load_bundled(name):
         raise _damaged(name) from e
 
 
-def _open_data(path):
+def _open_data(path: str) -> Any:
     """open() a required csv/json data file, or raise AssetsError in the
     same plain words as _load_bundled -- the gz side always spoke kindly
     about a broken install while the csv side crashed with a raw
@@ -94,7 +95,7 @@ STAGE_ORDER = ["Fresh", "InTraining", "Rookie", "Champion", "Ultimate", "Mega"]
 # full growth order including the Egg stage, for age/stage-rank gating (shop, tournament)
 STAGE_RANK = ["Egg"] + STAGE_ORDER
 
-def stage_rank(stage):
+def stage_rank(stage: Any) -> Any:
     """Index of `stage` in the full growth order (Egg..Mega); an unknown stage
     counts as fully grown (gates shop unlocks and tournament age limits)."""
     try:
@@ -102,7 +103,7 @@ def stage_rank(stage):
     except ValueError:
         return len(STAGE_RANK)      # unknown stage -> treat as fully grown
 
-def pretty_field(name):
+def pretty_field(name: str) -> Any:
     """Display form of a CamelCase Field value (the data keeps it joined for
     matching): 'NightmareSoldier' -> 'Nightmare Soldier'. 'None'/single words
     are unchanged."""
@@ -110,7 +111,7 @@ def pretty_field(name):
 
 PLACEHOLDER_NUMS: set[int] = set()
 
-def _content_fill(frame):
+def _content_fill(frame: Any) -> Any:
     rows = [r for r in frame if "1" in r]
     if not rows:
         return 0.0
@@ -119,7 +120,7 @@ def _content_fill(frame):
     w = right - left + 1
     return sum(r[left:right + 1].count("1") for r in rows) / (w * len(rows))
 
-def frames_for(num, egg_type=0):
+def frames_for(num: int, egg_type: int=0) -> Any:
     """The full frames list for a roster num -- or the egg's shell frames for
     num -1, which has NO roster sheet.  Raw `load_sprites()[1][num]` lookups
     were the recurring egg-crash pattern (habitat, training, battle, adventure,
@@ -131,7 +132,7 @@ def frames_for(num, egg_type=0):
     rec = load_sprites()[1].get(num)
     return rec["frames"] if rec else [""]
 
-def record_for(num):
+def record_for(num: int) -> Any:
     """The roster record for a num -- NEVER a KeyError.  A save can carry a
     num this build's dex doesn't know (a data refresh, a downgrade after an
     evolution on a newer roster, a lobby peer on a newer build): persistence
@@ -146,7 +147,7 @@ def record_for(num):
                "h": placeholder.H, "_placeholder": True}
     return rec
 
-def bob_frame(num, frame_i, role="idle", beat=5, egg_type=0):
+def bob_frame(num: int, frame_i: Any, role: str="idle", beat: int=5, egg_type: int=0) -> Any:
     """The idle-bob frame fetch: the role's pose keyed at frame_i // beat
     (beat 5 = the ~2Hz WALK_BEAT bob every scene screen uses; dna's urgency
     bob passes 2, the title's gentle bob 4).  This fetch lived in EIGHT
@@ -172,7 +173,7 @@ def bob_frame(num, frame_i, role="idle", beat=5, egg_type=0):
     return f or next((x for x in fr if x), None)
 
 @lru_cache(maxsize=1)
-def load_sprites():
+def load_sprites() -> Any:
     import tuipet.utils.placeholder as placeholder
     data = _load_bundled("sprites.json.gz")
     for rec in data:
@@ -193,12 +194,12 @@ def load_sprites():
     by_num = {d["num"]: d for d in data}
     return data, by_num
 
-def is_placeholder(num):
+def is_placeholder(num: int) -> Any:
     load_sprites()
     return num in PLACEHOLDER_NUMS
 
 @lru_cache(maxsize=1)
-def load_evolutions():
+def load_evolutions() -> Any:
     """num -> list of target nums it can evolve into."""
     path = os.path.join(_RAW, "evolutions.csv")
     evo = {}
@@ -220,14 +221,14 @@ def load_evolutions():
         evo[1129].append(1119)
     return evo
 
-def _temp_range(s):
+def _temp_range(s: Any) -> Any:
     try:
         a, b = (s or "40t60").split("t")
         return (int(a), int(b))
     except (ValueError, AttributeError):
         return (40, 60)
 
-def _temp_req(s):
+def _temp_req(s: Any) -> Any:
     """Evolution temperature requirement (TempReq "lo t hi"), or None if unset
     ("0t-1" means no requirement)."""
     try:
@@ -237,7 +238,7 @@ def _temp_req(s):
     except (ValueError, AttributeError):
         return None
 
-def _int_or(s, default):
+def _int_or(s: Any, default: Any) -> Any:
     try:
         return int(float(s))
     except (ValueError, TypeError):
@@ -247,7 +248,7 @@ DNA_FIELDS = ("VirusBuster", "MetalEmpire", "DragonsRoar", "JungleTrooper",
               "DeepSaver", "NightmareSoldier", "WindGuardian", "NatureSpirit",
               "DarkArea", "None")
 
-def _gate(row, key, val):
+def _gate(row: Any, key: str, val: Any) -> Any:
     cond = (row.get(key) or "None").strip() or "None"
     try:
         v = float(row.get(val) or 0)
@@ -255,7 +256,7 @@ def _gate(row, key, val):
         v = 0.0
     return (cond, v)
 
-def _attack_index(s):
+def _attack_index(s: Any) -> Any:
     """monster.csv col 55 'vaccineNum:dataNum:virusNum' -> per-attribute special-orb index (-1 = none)."""
     parts = (s or "").split(":")
     out = {}
@@ -267,7 +268,7 @@ def _attack_index(s):
     return out
 
 @lru_cache(maxsize=1)
-def load_requirements():
+def load_requirements() -> Any:
     from tuipet.i18n.translator import t_col
     path = os.path.join(_RAW, "monster.csv")
     reqs = {}
@@ -365,13 +366,13 @@ def load_requirements():
         }
     return reqs
 
-def assist_pool():
+def assist_pool() -> Any:
     """The monster.csv CanAssist pool -- Evolution.getRandomAssistMonster's
     candidates for WHICH Monster answers an AI Assistant contract."""
     return sorted(n for n, r in load_requirements().items() if r.get("can_assist"))
 
 @lru_cache(maxsize=1)
-def _name_canonical_map():
+def _name_canonical_map() -> Any:
     """num -> the CANONICAL (lowest) num among same-name roster rows.  DVPet
     stores duplicate species rows (the 1410+ egg-hatch block mirrors the
     chart's canonical rows) and its dex sync is BY NAME: checkNaturalUnlocked
@@ -379,7 +380,7 @@ def _name_canonical_map():
     either num reveals both (album/dex audit 2026-07-06).  Empty names stay
     themselves -- never lump the unnamed rows into one group."""
     _, by_num = load_sprites()
-    groups = {}
+    groups = {}  # type: ignore
     for n, rec in by_num.items():
         nm = (rec.get("name") or "").upper()
         if nm:
@@ -391,11 +392,11 @@ def _name_canonical_map():
             out[n] = c
     return out
 
-def canonical_num(num):
+def canonical_num(num: int) -> Any:
     """The name-canonical roster num (checkNaturalUnlocked's identity)."""
     return _name_canonical_map().get(num, num)
 
-def album_roster():
+def album_roster() -> Any:
     """The album's page order: every name-canonical, non-placeholder roster
     num, sorted.  The SINGLE SOURCE for both the datacore trophy denominator
     and the album screen's pages — the book and its scoreboard can never

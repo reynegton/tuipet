@@ -54,7 +54,7 @@ def test_more_loot_spills_on_a_holiday(monkeypatch):
     a = Adventure(_pet(), zone=next(z for z in ZONES if z["find_keys"]))
     assert a.holiday
     # force a roll: on a holiday, FIND_CHANCE*mult >= 1 fires every eligible step
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.6)   # *2 = 1.2 -> always fires
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.6)   # *2 = 1.2 -> always fires
     a.loc = 5                                            # a mid-road step, not a town
     assert not a._in_town(a.loc)
     assert a._roll_find() is not None                   # a festival find lands
@@ -65,7 +65,7 @@ def test_no_double_reward_on_an_ordinary_day(monkeypatch):
     z = _boss_zone()
     a = Adventure(_pet(), zone=z)
     assert a.holiday is None
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.4)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.4)
     # 0.4 (no mult) does NOT always fire -> a deterministic seed check is flaky,
     # so just assert the multiplier is not applied to the bounty
     boss = z["bosses"][0]

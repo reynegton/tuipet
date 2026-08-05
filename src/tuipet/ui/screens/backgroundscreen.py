@@ -6,6 +6,7 @@ the LCD live-previews the pet standing in the browsed backdrop, the picker
 line rides the #msg strip, ENTER commits.  Row 0 is the egg's own scene
 (the default wiring stays the truth; a pick merely overrides it)."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.utils.backgrounds as bgs
 import tuipet.data.loaders.data as data
 import tuipet.utils.grid as grid
@@ -18,7 +19,7 @@ COLS, ROWS = 40, 12
 
 
 class BackgroundPanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.rows = [""] + list(bgs.PICKS)          # "" = follow the egg
         self.cursor = next((i for i, k in enumerate(self.rows)
@@ -27,14 +28,14 @@ class BackgroundPanel:
         self.msg = t("bg_msg_intro", "pick a scene — it hangs behind the mon")
         self.sfx = None
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def _key_of(self, row):
+    def _key_of(self, row: Any) -> Any:
         """The scene a row previews (row 0 = the egg's own)."""
         return row or bgs.scene_for_egg(self.pet.egg_type)
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("up", "k", "left", "h"):          # the strip reads sideways too
             self.cursor = (self.cursor - 1) % len(self.rows)
         elif k in ("down", "j", "right", "l"):
@@ -51,20 +52,20 @@ class BackgroundPanel:
                 self.msg = t("bg_msg_already_up", "Already up.")
             else:
                 self.msg = self.pet.pick_background(key)
-                self.sfx = "confirm"
+                self.sfx = "confirm"  # type: ignore
         elif k in ("escape", "n"):
             return ("done", self.msg)
         return None
 
-    def _name(self, row):
+    def _name(self, row: Any) -> Any:
         if not row:
             return t("bg_msg_eggs_own", "{name} (egg's own)").format(name=bgs.name(bgs.scene_for_egg(self.pet.egg_type)))
         return bgs.name(row)
 
-    def _tag(self, row):
+    def _tag(self, row: Any) -> Any:
         return t("bg_msg_here", "● here") if row == self.pet.bg_pick else ""
 
-    def strip(self):
+    def strip(self) -> Any:
         # budgeted to HUD_W 40 (menu-bounds law): the name field scrolls,
         # the chrome stands still
         from tuipet.utils.render import marquee
@@ -72,7 +73,7 @@ class BackgroundPanel:
                 f" {self.cursor + 1}/{len(self.rows)}"
                 f" {t('bg_hint_footer', '[dim]←→ ENTER ESC[/]')}")
 
-    def text(self):
+    def text(self) -> Any:
         """The browsed backdrop AS A SCENE: the pet stands in it --
         window-shopping included (render-only preview)."""
         key = self._key_of(self.rows[self.cursor])

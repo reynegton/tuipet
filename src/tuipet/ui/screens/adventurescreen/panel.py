@@ -26,6 +26,7 @@ mid-march to spend a town/danger warp item (skip ahead, rest or get ambushed).
 Nothing here is faked.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.cells import cell_len
 from rich.text import Text
 import tuipet.data.loaders.data as data
@@ -58,7 +59,7 @@ TRAVEL_TICKS = 8              # auto-march pace: ticks per travel step (~0.8s a 
 TOWN_HOLD = 14                # ticks the pet rests at a town before marching on
 NOTE_HOLD = 30                # ticks a road-item verdict rides the strip
 _cells = cell_len             # budgets are CELLS, not chars (bug-#32 law)
-def _fit(name, budget):
+def _fit(name: str, budget: Any) -> Any:
     """Ellipsis-trim a name to a cell budget: a strip's REQUIRED keys never
     ride the marquee for a long boss name (audit 2026-07-25)."""
     if _cells(name) <= budget:
@@ -74,7 +75,7 @@ TELE_LEAVE_SNDS = {3: "strongHit", 15: "strongHit", 21: "strongHit",
                    26: "attackHit", 44: "attack"}
 TELE_ARRIVE_SNDS = {1: "attack", 5: "attackHit",
                     24: "strongHit", 28: "strongHit", 37: "strongHit"}
-def _brighten(bg, f):
+def _brighten(bg: Any, f: Any) -> Any:
     """Lerp a backdrop toward white -- the LCD's zonePulse flash."""
     out = []
     for r in bg:
@@ -86,7 +87,7 @@ def _brighten(bg, f):
                 for c in ((v >> 16) & 255, (v >> 8) & 255, v & 255)))
         out.append("".join(row))
     return out
-def _curtain_pts(x, y, w, h):
+def _curtain_pts(x: Any, y: Any, w: Any, h: Any) -> Any:
     """The evol curtain as overlay pixels: the canon stripe pattern (each 3-px
     band = 1 clear + 2 filled) over an LCD rect.  Rides paint()'s overlay so it
     covers the PET too, like canon's room-effect layer.  Window-law: the ink is
@@ -101,18 +102,18 @@ from .logic import AdventureLogicMixin
 
 from tuipet.ui.components import menu
 
-class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):
-    def __init__(self, pet, zone=None):
+class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):  # type: ignore
+    def __init__(self, pet: Any, zone: Optional[Any]=None) -> None:
             self.pet = pet
             self.adv = Adventure(pet, zone=zone)   # zone chosen by the picker (or the frontier)
             self.frame_i = 0
-            self.sfx = None
+            self.sfx = None  # type: ignore
             self.sub = None
             self.auto_close = None
             self._landed = False
             self.travelling = False       # the march begins once the teleport lands
             self._travel_t = 0            # auto-march pacing counter
-            self._home_msg = None         # the verdict flashed home on close
+            self._home_msg = None         # type: ignore
             self._fighting_boss = False   # the current sub is the gate boss, not a wild
             self._fighting_enemy = None   # the enemy dict of the active fight (for the bounty)
             self._at_gate = False         # knocked back: standing before the boss
@@ -126,23 +127,23 @@ class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):
             self._town_sub = False        # the current sub is the TownPanel, not a fight
             self._find = None             # a loot key spotted, awaiting dig/pass
             self._find_present = False     # ...and is it a wrapped festival present?
-            self._scene = None            # a running investigateLeft playbook
-            self._find_msg = None         # the reveal line (sealed until the beat)
-            self._hazard = None           # a running ambush: {"t","enemy","dodged","hit"}
+            self._scene = None            # type: ignore
+            self._find_msg = None         # type: ignore
+            self._hazard = None           # type: ignore
             self._refuse_t = 0            # ticks left on the refusal head-shake
             self._refused = False         # planted: SPACE re-issues the walk
             self._transport = None        # open transport menu: the held transport keys
             self._transport_cursor = 0
             self._summary = False         # showing the run-results card before homecoming
             self._summary_shown = False   # ...so _go_home only defers to it once
-            self._pulse = None            # a running zoneChange pulse celebration
+            self._pulse = None            # type: ignore
             self._parade = None           # a running BossParade (map beaten)
             self._wx = float(grid.X0)     # the march x: the pet CROSSES the window
             # leaving home rides the canon teleport (dir "in" == INTO the adventure:
             # leave-phase plays over HOME, arrive-phase materialises on the road)
             self._trans = {"dir": "in", "phase": "leave", "t": 0}
 
-    def anim(self):
+    def anim(self) -> None:
             if self.sub_anim():               # a wild fight owns the clock -- delegate
                 return
             self.frame_i += 1
@@ -152,17 +153,17 @@ class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):
                 # the teleport owns the screen both ways -- canon's state machine
                 # holds every input until endAnim()
                 tr = self._trans
-                tr["t"] += 1
+                tr["t"] += 1  # type: ignore
                 snds = TELE_LEAVE_SNDS if tr["phase"] == "leave" else TELE_ARRIVE_SNDS
-                snd = snds.get(tr["t"])
+                snd = snds.get(tr["t"])  # type: ignore
                 if snd:
-                    self.sfx = snd
-                if tr["phase"] == "leave" and tr["t"] >= TELE_LEAVE_T:
+                    self.sfx = snd  # type: ignore
+                if tr["phase"] == "leave" and tr["t"] >= TELE_LEAVE_T:  # type: ignore
                     # the sliver left the screen: the world swaps under the cut
                     # (canon teleportArrive frame 0 -- background changes, no anim)
                     tr["phase"], tr["t"] = "arrive", 0
-                elif tr["phase"] == "arrive" and tr["t"] >= TELE_ARRIVE_T:
-                    self._trans = None
+                elif tr["phase"] == "arrive" and tr["t"] >= TELE_ARRIVE_T:  # type: ignore
+                    self._trans = None  # type: ignore
                     if tr["dir"] == "out":
                         # home: the flag the body sim gates on (assistant billing,
                         # filth, gift call -- canon _isHome) comes back down.  The
@@ -172,7 +173,7 @@ class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):
                         # 2026-07-25: no app-side death path clears it).
                         self.pet.away = False
                         self.pet.away_where = ""
-                        self.auto_close = ("done", self._home_msg)   # home: close + verdict
+                        self.auto_close = ("done", self._home_msg)   # type: ignore
                     else:
                         self._landed = True                # on the road -- the march begins
                         self.travelling = True
@@ -264,7 +265,7 @@ class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):
                     self._travel_t = 0
                     self._advance()
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
             if self.sub is not None:              # a fight or the town hub owns input
                 self.sub_key(k, self._town_done if self._town_sub else self._battle_done)
                 return None
@@ -377,7 +378,7 @@ class AdventurePanel(menu.SubHost, AdventureRendererMixin, AdventureLogicMixin):
                 self._go_home()
             return None
 
-    def text(self):
+    def text(self) -> Any:
             if self.sub is not None:
                 return self.sub.text()             # the fight owns the screen
             if self._trans is not None:

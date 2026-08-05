@@ -19,4 +19,4 @@ for mod in (accounts, cloud, messaging, ladder, raid, core):
 sys.modules[__name__] = state
 
 if __name__ == "__main__":
-    state.run()
+    core.run()

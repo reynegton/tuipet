@@ -4,30 +4,31 @@ import logging
 import os
 import time
 import state
+from typing import Any, Dict
 
 LOG = logging.getLogger("tuipet.lobby")
 
-def _load_pending():
+def _load_pending() -> Dict[str, Any]:
     try:
         return json.load(open(state.PENDING_PATH))
     except (OSError, ValueError):
         return {}
 
-async def _save_pending():
+async def _save_pending() -> None:
     async with state._pending_lock:
         tmp = state.PENDING_PATH + ".tmp"
         with open(tmp, "w") as f:
             json.dump(state.PENDING, f)
         os.replace(tmp, state.PENDING_PATH)
 
-async def _queue_pm(key, from_name, text):
+async def _queue_pm(key: str, from_name: str, text: str) -> None:
     q = state.PENDING.setdefault(key, [])
     q.append({"from_name": from_name, "text": text,
               "ts": time.strftime("%Y-%m-%d %H:%M:%SZ", time.gmtime())})
     del q[:-state.MAX_PENDING_PER_ACCT]
     await _save_pending()
 
-async def _flush_pending(client, key):
+async def _flush_pending(client: Any, key: str) -> None:
     q = state.PENDING.get(key)
     if not q:
         return

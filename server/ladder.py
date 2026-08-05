@@ -3,14 +3,15 @@ import logging
 import os
 import time
 import state
+from typing import Any, Dict, Optional, Tuple
 
 LOG = logging.getLogger("tuipet.lobby")
 
-_ladder_pending = {}
-_ladder_confirm = {}
-_ladder_pair_hour = {}
+_ladder_pending: Dict[Any, float] = {}
+_ladder_confirm: Dict[Any, float] = {}
+_ladder_pair_hour: Dict[Any, int] = {}
 
-def _load_ladder():
+def _load_ladder() -> Dict[str, Any]:
     try:
         d = json.load(open(state.LADDER_PATH))
         return {"seasons": dict(d.get("seasons", {})),
@@ -18,7 +19,7 @@ def _load_ladder():
     except (OSError, ValueError):
         return {"seasons": {}, "claimed": {}}
 
-def _save_ladder():
+def _save_ladder() -> None:
     try:
         tmp = state.LADDER_PATH + ".tmp"
         with open(tmp, "w") as f:
@@ -27,15 +28,15 @@ def _save_ladder():
     except OSError:
         LOG.warning("ladder: disk refused %s", state.LADDER_PATH)
 
-def _season_key(now=None):
+def _season_key(now: Optional[float] = None) -> str:
     return time.strftime("%Y-%m", time.gmtime(now))
 
-def _season_days_left(now=None):
+def _season_days_left(now: Optional[float] = None) -> int:
     import calendar
     tm = time.gmtime(now)
     return calendar.monthrange(tm.tm_year, tm.tm_mon)[1] - tm.tm_mday
 
-def _ladder_credit(winner, loser, now=None):
+def _ladder_credit(winner: str, loser: str, now: Optional[float] = None) -> bool:
     now = time.time() if now is None else now
     pair = tuple(sorted((winner, loser))) + (time.strftime("%Y-%m-%dT%H", time.gmtime(now)),)
     if _ladder_pair_hour.get(pair, 0) >= state.LADDER_PAIR_CAP:
@@ -50,7 +51,7 @@ def _ladder_credit(winner, loser, now=None):
     _save_ladder()
     return True
 
-def _ladder_report(name, won, opp, now=None):
+def _ladder_report(name: str, won: bool, opp: str, now: Optional[float] = None) -> None:
     now = time.time() if now is None else now
     if not opp or opp == name:
         return
@@ -67,10 +68,10 @@ def _ladder_report(name, won, opp, now=None):
         return
     mine[key] = now
     if len(mine) > 512:
-        for k in sorted(mine, key=mine.get)[:256]:
+        for k in sorted(mine, key=lambda k: mine[k])[:256]:
             mine.pop(k, None)
 
-def _ladder_award(name, now=None):
+def _ladder_award(name: str, now: Optional[float] = None) -> Optional[Dict[str, Any]]:
     now = time.time() if now is None else now
     cur = _season_key(now)
     for season in sorted(state.LADDER["seasons"], reverse=True):
@@ -83,7 +84,7 @@ def _ladder_award(name, now=None):
                         "bits": state.LADDER_PAYOUT[rank]}
     return None
 
-def _ladder_view(name, now=None):
+def _ladder_view(name: str, now: Optional[float] = None) -> Dict[str, Any]:
     now = time.time() if now is None else now
     season = _season_key(now)
     table = state.LADDER["seasons"].get(season, {})
@@ -93,7 +94,7 @@ def _ladder_view(name, now=None):
             "top": top[:10], "you": [you, table.get(name, 0)],
             "award": _ladder_award(name, now)}
 
-def _ladder_claim(name, season):
+def _ladder_claim(name: str, season: str) -> Dict[str, Any]:
     a = _ladder_award(name)
     if not a or a["season"] != season:
         return {"t": "ladder_reward", "ok": False}

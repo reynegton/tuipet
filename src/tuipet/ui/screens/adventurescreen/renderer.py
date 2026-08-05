@@ -26,6 +26,7 @@ mid-march to spend a town/danger warp item (skip ahead, rest or get ambushed).
 Nothing here is faked.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.cells import cell_len
 from rich.text import Text
 import tuipet.data.loaders.data as data
@@ -58,7 +59,7 @@ TRAVEL_TICKS = 8              # auto-march pace: ticks per travel step (~0.8s a 
 TOWN_HOLD = 14                # ticks the pet rests at a town before marching on
 NOTE_HOLD = 30                # ticks a road-item verdict rides the strip
 _cells = cell_len             # budgets are CELLS, not chars (bug-#32 law)
-def _fit(name, budget):
+def _fit(name: str, budget: Any) -> Any:
     """Ellipsis-trim a name to a cell budget: a strip's REQUIRED keys never
     ride the marquee for a long boss name (audit 2026-07-25)."""
     if _cells(name) <= budget:
@@ -74,7 +75,7 @@ TELE_LEAVE_SNDS = {3: "strongHit", 15: "strongHit", 21: "strongHit",
                    26: "attackHit", 44: "attack"}
 TELE_ARRIVE_SNDS = {1: "attack", 5: "attackHit",
                     24: "strongHit", 28: "strongHit", 37: "strongHit"}
-def _brighten(bg, f):
+def _brighten(bg: Any, f: Any) -> Any:
     """Lerp a backdrop toward white -- the LCD's zonePulse flash."""
     out = []
     for r in bg:
@@ -86,7 +87,7 @@ def _brighten(bg, f):
                 for c in ((v >> 16) & 255, (v >> 8) & 255, v & 255)))
         out.append("".join(row))
     return out
-def _curtain_pts(x, y, w, h):
+def _curtain_pts(x: Any, y: Any, w: Any, h: Any) -> Any:
     """The evol curtain as overlay pixels: the canon stripe pattern (each 3-px
     band = 1 clear + 2 filled) over an LCD rect.  Rides paint()'s overlay so it
     covers the PET too, like canon's room-effect layer.  Window-law: the ink is
@@ -97,72 +98,72 @@ def _curtain_pts(x, y, w, h):
             and grid.X0 <= px < grid.X1 and grid.TOP <= py < grid.FLOOR]
 
 class AdventureRendererMixin:
-    def strip(self):
-            if self.sub is not None:
-                return self.sub.strip()            # the wild fight owns the line
-            if self._trans is not None:
+    def strip(self) -> Any:
+            if self.sub is not None:  # type: ignore
+                return self.sub.strip()            # type: ignore
+            if self._trans is not None:  # type: ignore
                 return ""                          # the teleport plays out wordless
-            if self._pulse is not None:
-                line = self._pulse.get("line")     # the flash SAYS what it's for
+            if self._pulse is not None:  # type: ignore
+                line = self._pulse.get("line")     # type: ignore
                 return f"[b]★ {line}[/]" if line else ""
-            if self._parade is not None:
-                msg = self._parade.get("msg")      # the parade carries the victory line
+            if self._parade is not None:  # type: ignore
+                msg = self._parade.get("msg")      # type: ignore
                 return f"[b]★ {msg}[/]" if msg else ""
-            if self._summary:
+            if self._summary:  # type: ignore
                 return menu.hints(("any key", t("msg_adv_any_key", "any key")), ("", t("msg_adv_home", "home")))
-            if self._at_gate:                      # knocked back before the boss
-                hearts = "♥" * self.adv.lives + "[dim]♡[/]" * (MAX_LIVES - self.adv.lives)
-                if self._heal_t > 0 and self._note:
-                    return f"[b]{self._note}[/] {hearts}"   # the second wind speaks here too
-                if self._gate_refusal:             # the body said no: SAY WHICH
+            if self._at_gate:                      # type: ignore
+                hearts = "♥" * self.adv.lives + "[dim]♡[/]" * (MAX_LIVES - self.adv.lives)  # type: ignore
+                if self._heal_t > 0 and self._note:  # type: ignore
+                    return f"[b]{self._note}[/] {hearts}"   # type: ignore
+                if self._gate_refusal:             # type: ignore
                     # single spacing: the hungriest clause + a held warp ran 41
                     # cells and put the outs on the marquee (audit 2026-07-25)
-                    out = t("msg_adv_t_warp", "T warp · ") if self.adv.held_transports() else ""
-                    return f"[b]{self._gate_refusal}[/] [dim]· {out}{t('msg_adv_esc_home', 'ESC home')}[/]"
+                    out = t("msg_adv_t_warp", "T warp · ") if self.adv.held_transports() else ""  # type: ignore
+                    return f"[b]{self._gate_refusal}[/] [dim]· {out}{t('msg_adv_esc_home', 'ESC home')}[/]"  # type: ignore
                 # CELL BUDGET (audit 2026-07-25: ten boss names ran 41-45 cells
                 # and scrolled the required keys off the box): the hints + hearts
                 # are fixed, the NAME takes what remains, ellipsis-trimmed
-                held = "T " if self.adv.held_transports() else ""
+                held = "T " if self.adv.held_transports() else ""  # type: ignore
                 tail = f" {hearts} [dim]· {t('msg_adv_space_fight', 'SPACE fight')} {held}{t('msg_adv_esc_home', 'ESC home')}[/]"
-                plain = f" {'♥' * self.adv.lives}{'♡' * (MAX_LIVES - self.adv.lives)}" \
-                        f" · {t('msg_adv_space_fight', 'SPACE fight')} {held}{t('msg_adv_esc_home', 'ESC home')}"
-                return f"{_fit(self.adv.boss_name, 40 - _cells(plain))}{tail}"
-            if self.travelling:
-                lost = MAX_LIVES - self.adv.lives
-                hearts = "♥" * self.adv.lives + "[dim]♡[/]" * lost
-                if self._transport is not None:
+                plain = (f" {'♥' * self.adv.lives}{'♡' * (MAX_LIVES - self.adv.lives)}"  # type: ignore
+                        f" · {t('msg_adv_space_fight', 'SPACE fight')} {held}{t('msg_adv_esc_home', 'ESC home')}")  # type: ignore  # type: ignore
+                return f"{_fit(self.adv.boss_name, 40 - _cells(plain))}{tail}"  # type: ignore
+            if self.travelling:  # type: ignore
+                lost = MAX_LIVES - self.adv.lives  # type: ignore
+                hearts = "♥" * self.adv.lives + "[dim]♡[/]" * lost  # type: ignore
+                if self._transport is not None:  # type: ignore
                     import tuipet.core.shop as shop
-                    key = self._transport[self._transport_cursor]
+                    key = self._transport[self._transport_cursor]  # type: ignore
                     name = (shop.entry(key) or {}).get("name", "Transporte")
-                    nav = " ↑↓" if len(self._transport) > 1 else ""
+                    nav = " ↑↓" if len(self._transport) > 1 else ""  # type: ignore
                     return f"[b]{t('msg_adv_transport', '⟿ {name}').replace('{name}', name)}[/]  [dim]{t('msg_adv_transport_hint', 'ENTER use{nav} · ESC').replace('{nav}', nav)}[/]"
-                if self._town_prompt:
+                if self._town_prompt:  # type: ignore
                     return t("msg_adv_town", "[b]⌂ A town[/]") + "  [dim]" + t("msg_adv_town_hint", "ENTER visit · SPACE walk on") + "[/]"
-                if self.pet.asleep:
+                if self.pet.asleep:  # type: ignore
                     # unreachable today (the door disturbs sleepers, the pill
                     # refuses on the road) -- but a waiting state must name its
                     # key if it ever becomes reachable (SHOW-FLOW, audit 2026-07-25)
                     return f"[dim]{t('msg_adv_nap', 'zzZ — a roadside nap · ESC home')}[/]"
-                if self._refuse_t > 0 or self._refused:
+                if self._refuse_t > 0 or self._refused:  # type: ignore
                     # the refusal only ever fires PAST EMPTY (stop_travel_prob:
                     # negative energy only) -- say so, or the bare "SPACE urge"
                     # invites a dead mash (QOL sweep 2026-07-23).  HONEST outs
                     # only (energy audit 2026-07-23): energy cannot rise on the
                     # road itself -- a town's rest or home are the ways out.
-                    out = (t("msg_adv_t_warp", "T warp · ") if self.adv.held_transports() else "")
+                    out = (t("msg_adv_t_warp", "T warp · ") if self.adv.held_transports() else "")  # type: ignore
                     return f"[b]{t('msg_adv_refuses', 'Refuses — spent!')}[/]  [dim]{out}{t('msg_adv_esc_home', 'ESC home')}[/]"
-                if self._scene is not None:
-                    s, t_val = self._scene, self._scene["t"]
+                if self._scene is not None:  # type: ignore
+                    s, t_val = self._scene, self._scene["t"]  # type: ignore
                     if s["grade"] is None and t_val >= INV_WALK_T:
                         return menu.hints(("SPACE", t("msg_adv_space_dig", "dig!")))   # the meter is live
                     if t_val >= INV_REVEAL_T:         # the reveal, unsealed
-                        return f"[b]✦ {self._find_msg}[/]"
+                        return f"[b]✦ {self._find_msg}[/]"  # type: ignore
                     if t_val >= INV_WALK_T:           # suspense: . .. ...
                         dots = "." * min(3, 1 + (t_val - INV_WALK_T) // 6)
                         return f"[dim]{dots}[/]"
                     return ""                     # the walk-out plays wordless
-                if self._hazard is not None:
-                    h = self._hazard
+                if self._hazard is not None:  # type: ignore
+                    h = self._hazard  # type: ignore
                     if h["t"] < HZ_TELE_T:        # the warning: DON'T press yet
                         if h.get("spent"):
                             return "[b]Jumped too soon![/]"
@@ -176,15 +177,15 @@ class AdventureRendererMixin:
                     if h["dodged"]:
                         return "[b]Dodged the ambush![/]"
                     return f"[b]Ambushed![/]  ⚡-{adventure.HAZARD_ENERGY}"
-                if self._find is not None:
+                if self._find is not None:  # type: ignore
                     # <= 40 plain (budget sweep 2026-07-21: the long line ran 45)
                     return "[b]✦ A glint![/]  [dim]ENTER dig · SPACE pass[/]"
-                if self._rest_t > 0:
-                    return f"[b]⌂ Town — rested up[/]  ⚡{self.pet.energy} {hearts}"
-                if self._heal_t > 0 or self._note_t > 0:
+                if self._rest_t > 0:  # type: ignore
+                    return f"[b]⌂ Town — rested up[/]  ⚡{self.pet.energy} {hearts}"  # type: ignore
+                if self._heal_t > 0 or self._note_t > 0:  # type: ignore
                     # the road-item / balk verdict (A3/A12; the ⚡ moved into the
                     # transport notes -- a balk's verdict is not an energy event)
-                    return f"[b]{self._note}[/] {hearts}" if self._note else ""
+                    return f"[b]{self._note}[/] {hearts}" if self._note else ""  # type: ignore
                 # the key hint CYCLES (Joel 2026-07-24 "anchor + rotate labels,
                 # ~2s"): the bare key SET is the anchor, and between each one
                 # labelled key rotates in -- so the full labels reach the player
@@ -197,42 +198,42 @@ class AdventureRendererMixin:
                 # "space t" mystery this strip was rebuilt to end.  One key,
                 # named, per beat; the set still cycles so every out reaches
                 # the player, and the shorter line gives the ribbon more road).
-                held = self.adv.held_transports()
+                held = self.adv.held_transports()  # type: ignore
                 steps = ([("SPACE", "walk")]
                          + ([("T", "warp")] if held else [])
                          + [("ESC", "home")])
-                k, lbl = steps[(self.frame_i // HINT_BEAT) % len(steps)]
+                k, lbl = steps[(self.frame_i // HINT_BEAT) % len(steps)]  # type: ignore
                 hint = f"[dim]· [/][b]{k}[/][dim] {lbl}[/]"
-                chain = f" [b]×{self.adv.streak}[/]" if self.adv.streak >= 2 else ""
+                chain = f" [b]×{self.adv.streak}[/]" if self.adv.streak >= 2 else ""  # type: ignore
                 # the packed line must fit the box in CELLS or the anchor beat is
                 # mutilated (bug report #32, v0.5.264 "what is space t?": '⚡' is
                 # two cells wide, so the char budget passed while the render ran
                 # 41 cells and 'ESC' wrapped onto the box's invisible second row).
                 # The ribbon absorbs the squeeze -- energy/hearts/chain are LIVE
                 # data and the hint is the whole point; a dot of road is not.
-                tail = f" ⚡{self.pet.energy} {hearts}{chain}  {hint}"
+                tail = f" ⚡{self.pet.energy} {hearts}{chain}  {hint}"  # type: ignore
                 w = max(6, min(14, STRIP_W - cell_len(Text.from_markup(tail).plain)))
-                return f"[dim]{self.adv.ribbon(w)}[/]" + tail
+                return f"[dim]{self.adv.ribbon(w)}[/]" + tail  # type: ignore
             return menu.hints(("ESC", "home"))
 
-    def _rows(self, idx):
-            fr = data.frames_for(self.pet.num, getattr(self.pet, "egg_type", 0))
+    def _rows(self, idx: int) -> Any:
+            fr = data.frames_for(self.pet.num, getattr(self.pet, "egg_type", 0))  # type: ignore
             return grid.prep((fr[idx] if idx < len(fr) else None) or fr[0], ph=ROWS * 2)
 
-    def _road_bg(self):
-            return self.pet.background(self.adv.scene)   # the run's ONE biome (own-game law)
+    def _road_bg(self) -> Any:
+            return self.pet.background(self.adv.scene)   # type: ignore
 
-    def _jx(self, rows, clamp=True):
+    def _jx(self, rows: Any, clamp: bool=True) -> Any:
             """Where the mon stands RIGHT NOW: the march position (it walks
             clear across the window while travelling -- old build 8ab28a0).
             Beats, reveals and stand-stills play at this spot; `clamp` pulls it
             fully inside the walkable band so a beat never plays half-off an
             edge.  Journey progress lives on the ribbon."""
-            x = int(self._wx)
+            x = int(self._wx)  # type: ignore
             if clamp:
                 lo, hi = grid.roam_bounds(grid.width(rows))
                 x = min(max(x, lo), hi)
-                if x != int(self._wx):
+                if x != int(self._wx):  # type: ignore
                     # a beat that clamps also RE-ANCHORS the march (anim audit
                     # A6): the beat still never plays half-off an edge, and the
                     # resume now walks on from where the beat played -- one
@@ -240,31 +241,31 @@ class AdventureRendererMixin:
                     self._wx = float(x)
             return x
 
-    def _condition_rows(self, wi):
+    def _condition_rows(self, wi: Any) -> Any:
             """The pet's road sprite, CONDITION-aware (pass 3 restored): a SICK
             pet drags the idleUnwell collapse/weary trudge with its canon 1px
             shuffle; a GERIATRIC one walks the +9 aged frames (home stepFrame
             idiom); everyone else walks the frame given.  Returns (rows, dx)."""
             import tuipet.utils.anim as anim
-            if self.pet.sick and self.pet.num != -1:
-                si, dx = anim.sick_frame(self.frame_i)
+            if self.pet.sick and self.pet.num != -1:  # type: ignore
+                si, dx = anim.sick_frame(self.frame_i)  # type: ignore
                 return self._rows(si), dx
-            if self.pet.is_geriatric and self.pet.num != -1:
+            if self.pet.is_geriatric and self.pet.num != -1:  # type: ignore
                 wi += 9                            # the aged shuffle
             return self._rows(wi), 0
 
-    def _march_frame(self):
+    def _march_frame(self) -> Any:
             """The pet walking the road: the idleWalk pose-flip, FACING the way
             it's going, at the RAW march x -- partial edge exits ARE the journey
             (window law: exits are left/right, so the crossing clips at the
             play window, not the LCD border)."""
-            wi = data.ROLES["walk"][(self.frame_i // WALK_BEAT) % 2]
+            wi = data.ROLES["walk"][(self.frame_i // WALK_BEAT) % 2]  # type: ignore
             rows, dx = self._condition_rows(wi)
             return menu.paint([(rows, self._jx(rows, clamp=False) + dx, True)],
                               self._road_bg(), rows=ROWS, cols=COLS,
                               clip=grid.WINDOW)
 
-    def _standing_frame(self):
+    def _standing_frame(self) -> Any:
             """The pet standing on the road: beats (glint, town, rest, gate)
             play WHERE IT STANDS -- the clamped march x -- not snapped back to
             centre (old build: "beats play wherever it stands")."""
@@ -277,25 +278,25 @@ class AdventureRendererMixin:
                               self._road_bg(), rows=ROWS, cols=COLS,
                               clip=grid.WINDOW)
 
-    def _heal_frame(self):
+    def _heal_frame(self) -> Any:
             """The Life Recovery beat (anim audit A3): the happy pose-flip where
             the pet stands -- the glint celebration frames -- while the hearts
             refill on the strip."""
-            rows = self._rows((5, 7)[(self.frame_i // 5) % 2])
+            rows = self._rows((5, 7)[(self.frame_i // 5) % 2])  # type: ignore
             return menu.paint([(rows, self._jx(rows), True)], self._road_bg(),
                               rows=ROWS, cols=COLS, clip=grid.WINDOW)
 
-    def _nap_frame(self):
+    def _nap_frame(self) -> Any:
             """The roadside nap (pass 3): the sleep pose-flip where the pet lay
             down, the Zzz hanging at the band's top-right exactly like the home
             sleep scene (arenafx idiom: nothing above the band)."""
             import tuipet.utils.strikefx as strikefx
-            rows = self._rows(data.ROLES["sleep"][(self.frame_i // 10) % 2])
+            rows = self._rows(data.ROLES["sleep"][(self.frame_i // 10) % 2])  # type: ignore
             px = self._jx(rows)
             overlay = []
             zz = data.load_effects().get("zzz")
             if zz:
-                z = grid._crop(zz[(self.frame_i // 10) % len(zz)])
+                z = grid._crop(zz[(self.frame_i // 10) % len(zz)])  # type: ignore
                 if z:
                     zw = len(z[0])
                     zx = grid.X1 - zw
@@ -309,31 +310,31 @@ class AdventureRendererMixin:
                               rows=ROWS, cols=COLS, overlay=overlay,
                               clip=grid.WINDOW)
 
-    def _refuse_frame(self):
+    def _refuse_frame(self) -> Any:
             """The travel refusal: the canon head-shake (refuse pose under the
             mirror toggle) while the shake runs, then the WEARY stand -- the
             planted pet is refusing because it's spent past empty."""
-            if self._refuse_t > 0:
+            if self._refuse_t > 0:  # type: ignore
                 rows = self._rows(data.ROLES["refuse"][0])
-                shake = ((REFUSE_T - self._refuse_t) // 6) % 2 == 0
+                shake = ((REFUSE_T - self._refuse_t) // 6) % 2 == 0  # type: ignore
                 return menu.paint([(rows, self._jx(rows), shake)], self._road_bg(),
                                   rows=ROWS, cols=COLS, clip=grid.WINDOW)
             rows = self._rows(data.ROLES["tired"][0])
             return menu.paint([(rows, self._jx(rows), True)], self._road_bg(),
                               rows=ROWS, cols=COLS, clip=grid.WINDOW)
 
-    def _glint_frame(self):
+    def _glint_frame(self) -> Any:
             """A glint spotted: the DiscoverCall attention bounce (happy 5<->7)
             with the atlas "!" riding the up-beats, side-flipped to the free
             side so it never clamps INTO the sprite -- restored from the old
             build (audit passes 1+2)."""
             import tuipet.utils.strikefx as strikefx
-            rows = self._rows(data.ROLES["happy"][(self.frame_i // 6) % 2])
+            rows = self._rows(data.ROLES["happy"][(self.frame_i // 6) % 2])  # type: ignore
             x = self._jx(rows)
             overlay = []
             att = data.load_effects().get("attention")
             if att:
-                ef = att[(self.frame_i // 6) % len(att)]
+                ef = att[(self.frame_i // 6) % len(att)]  # type: ignore
                 ew = max((len(r) for r in ef), default=0)
                 ex = x + grid.width(rows) + 1
                 if ex + ew > grid.X1:                 # no room on the right
@@ -342,7 +343,7 @@ class AdventureRendererMixin:
             return menu.paint([(rows, x, True)], self._road_bg(), rows=ROWS,
                               cols=COLS, overlay=overlay, clip=grid.WINDOW)
 
-    def _held_icon(self, icon, x, rows, gap):
+    def _held_icon(self, icon: Any, x: Any, rows: Any, gap: Any) -> Any:
             """The find beside the mon, vertically centred in the band: in
             FRONT when the right has room, flipped BEHIND when it doesn't (the
             glint's side-flip rule).  The old right-wall pin (min(.., X1-iw))
@@ -359,14 +360,14 @@ class AdventureRendererMixin:
                 ox = max(grid.X0, x - iw - gap)
             return strikefx.blit(icon, ox, oy)
 
-    def _scene_frame(self):
+    def _scene_frame(self) -> Any:
             """One frame of the investigateLeft playbook (the restored discover
             sequence): walk OUT to the left goal (native facing), the suspense
             dig under the pulsing "!", the cheer reveal with the find held up
             beside, then ReturnItem -- the carry back to the journey spot, the
             find riding IN FRONT of the walking mon."""
             import tuipet.utils.strikefx as strikefx
-            s, bg = self._scene, self._road_bg()
+            s, bg = self._scene, self._road_bg()  # type: ignore
             t = s["t"]
             if t < INV_WALK_T:                        # walk out to the LEFT goal
                 rows = self._rows((t // 3) % 2)
@@ -403,7 +404,7 @@ class AdventureRendererMixin:
             return menu.paint([(rows, x, True)], bg, rows=ROWS, cols=COLS,
                               overlay=overlay, clip=grid.WINDOW)
 
-    def _hazard_frame(self):
+    def _hazard_frame(self) -> Any:
             """The ambush, frame by frame: the "!" blinking at the road's right
             edge, one of the zone's own wilds pouncing in (attack pose, riding
             the overlay like fx do), then the duck-under -- the pouncer sails
@@ -411,7 +412,7 @@ class AdventureRendererMixin:
             leap-over) -- or the eaten hit: the atlas burst over the hurt pose.
             All real art; window-law edges throughout."""
             import tuipet.utils.strikefx as strikefx
-            h, t = self._hazard, self._hazard["t"]
+            h, t = self._hazard, self._hazard["t"]  # type: ignore
             impact = HZ_TELE_T + HZ_LUNGE_T
             if h["hit"]:
                 prows = self._rows(9)                 # eaten: the hurt pose
@@ -483,22 +484,22 @@ class AdventureRendererMixin:
             return menu.paint([(prows, px, True)], self._road_bg(), rows=ROWS,
                               cols=COLS, overlay=overlay, clip=grid.WINDOW)
 
-    def _pulse_frame(self):
+    def _pulse_frame(self) -> Any:
             """The zoneChange pulse: the conqueror stands its ground while the
             world flashes bright on the canon beat spans (restored old build)."""
             rows = self._rows(0)
             bg = self._road_bg()
-            if bg and any(on <= self._pulse["t"] < off for on, off in PULSE_ON):
+            if bg and any(on <= self._pulse["t"] < off for on, off in PULSE_ON):  # type: ignore
                 bg = _brighten(bg, 0.6)            # the zonePulse light, on the LCD
             return menu.paint([(rows, self._jx(rows), True)], bg, rows=ROWS,
                               cols=COLS, clip=grid.WINDOW)
 
-    def _parade_frame(self):
+    def _parade_frame(self) -> Any:
             """BossParade: the map's bosses march across, one at a time (canon
             moveLeft; the one-mon LCD rule serialises canon's three-abreast) --
             over a BRIGHTENED stage, so dark marcher ink pops (old audit pass 2:
             a dim stage read worse)."""
-            p = self._parade
+            p = self._parade  # type: ignore
             i = min(p["t"] // PARADE_T, len(p["nums"]) - 1)
             t = p["t"] % PARADE_T
             fr = data.frames_for(p["nums"][i])
@@ -518,15 +519,15 @@ class AdventureRendererMixin:
             return menu.paint([(rows, x, False)], bg, rows=ROWS, cols=COLS,
                               clip=grid.WINDOW)
 
-    def _gate_frame(self):
+    def _gate_frame(self) -> Any:
             """The GATE FACEOFF (restored from the old build, audit pass 1: a
             knocked-back gate showed the mon alone on empty road): squared up
             at the left, stepping in place, while the boss LOOMS half-emerged
             past the gate's right edge -- flush placement would read as one
             blob (two 16px sprites cannot share the 32px window with a gap)."""
-            rows = self._rows((self.frame_i // 8) % 2)
+            rows = self._rows((self.frame_i // 8) % 2)  # type: ignore
             placements = [(rows, grid.X0, True)]
-            boss = self.adv.boss
+            boss = self.adv.boss  # type: ignore
             bfr = data.frames_for(boss["num"]) if boss else []
             bf = next((f for f in bfr if f), None)
             if bf:
@@ -536,15 +537,15 @@ class AdventureRendererMixin:
             return menu.paint(placements, self._road_bg(), rows=ROWS, cols=COLS,
                               clip=grid.WINDOW)
 
-    def _teleport_frame(self):
+    def _teleport_frame(self) -> Any:
             """One frame of the canon teleport, on the side of the wipe the beat
             script says the world is showing (verbatim port)."""
-            tr = self._trans
+            tr = self._trans  # type: ignore
             t, ph = tr["t"], tr["phase"]
             # which world is under the curtain: leaving-out and arriving-in show the
             # ROAD; leaving-in and arriving-out show HOME
             home_side = (tr["dir"] == "in") == (ph == "leave")
-            bgimg = self.pet.background() if home_side else self._road_bg()
+            bgimg = self.pet.background() if home_side else self._road_bg()  # type: ignore
             wx0, wy0, ww, wh = grid.X0, grid.TOP, grid.W, grid.BAND
             cx, cy = wx0 + (ww - 4) // 2, wy0 + (wh - 6) // 2
             pet_on, cur = False, None
@@ -592,12 +593,12 @@ class AdventureRendererMixin:
             return menu.paint(placements, bgimg, rows=ROWS, cols=COLS,
                               overlay=overlay, clip=grid.WINDOW)
 
-    def _summary_frame(self):
+    def _summary_frame(self) -> Any:
             """The run-results card, shown on the LCD before the homecoming teleport."""
-            a = self.adv
+            a = self.adv  # type: ignore
             out = menu.header("ADVENTURE", "results")
             out.append(a.name[:26] + "\n", style=INK_B)
-            word = self._outcome_word()
+            word = self._outcome_word()  # type: ignore
             out.append(word + "\n", style={"Conquistado!": POS, "Derrotado": NEG}.get(word, DIM))
             out.append(f"Bits    +{a.bits_earned}\n", style=INK)
             out.append(f"Fights  {a.wins}W/{a.fights}\n", style=INK)

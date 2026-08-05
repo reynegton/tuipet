@@ -1,5 +1,6 @@
 """Memorial screen shown when the pet passes away."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
 import tuipet.utils.grid as grid
@@ -11,7 +12,7 @@ COLS, ROWS = 40, 12   # the ONE locked arena: the grave rests in the home scener
 GRAVE = (data.load_effects().get("grave") or [None])[0]
 
 
-def _age_str(secs):
+def _age_str(secs: Any) -> Any:
     """Readable lifespan for the memorial (was raw minutes)."""
     secs = int(max(0, secs))
     d, rem = divmod(secs, 86400)
@@ -25,8 +26,8 @@ def _age_str(secs):
 
 
 class DeathPanel:
-    def __init__(self, pet, new_mem=None, old_mem=None, hold=0, grade_kept=0,
-                 banked_new=False):
+    def __init__(self, pet: Any, new_mem: Optional[Any]=None, old_mem: Optional[Any]=None, hold: int=0, grade_kept: int=0,
+                 banked_new: bool=False) -> None:
         """new_mem: inheritance data the departed CAN etch (make_memory);
         old_mem: data already banked from an earlier generation.
 
@@ -52,14 +53,14 @@ class DeathPanel:
         self._hold = int(hold)
         self.sfx = "error" if hold else None    # soundConfig dieLoop -> error
 
-    def anim(self):
+    def anim(self) -> None:
         self._mq = getattr(self, "_mq", 0) + 1  # drives the strip field marquee
         if self._hold > 0:
             self._hold -= 1
             if self._hold == 10:
                 self.sfx = "error"              # canon loops dieLoop twice
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self._hold > 0:                      # the grave beat absorbs the mash
             return None
         if self.ask_etch:
@@ -96,7 +97,7 @@ class DeathPanel:
             return ("done", None)
         return None
 
-    def strip(self):
+    def strip(self) -> Any:
         """The epitaph + choices ride the strip under the LCD (box-clip audit
         2026-07-04: the in-LCD stack ran 16 lines and everything below the
         grave was clipped off the physical box).  Long lines marquee."""
@@ -115,7 +116,7 @@ class DeathPanel:
         if self.asking:
             # setNewMemory validation: only one Memory may exist
             return t("death_msg_only_one", "Only one: [b]E[/] {new_name} · [b]K[/] {old_name}").format(
-                new_name=marquee(p.name, 10, mq), old_name=marquee(self.old_mem.get('name', '?'), 10, mq))
+                new_name=marquee(p.name, 10, mq), old_name=marquee(self.old_mem.get('name', '?'), 10, mq))  # type: ignore
         rip = t("death_msg_rip_base", "R.I.P. {name} · gen {gen} · lived {age}").format(
             name=p.name, gen=p.generation, age=_age_str(p.age_seconds))
         if getattr(p, "death_cause", ""):
@@ -128,7 +129,7 @@ class DeathPanel:
         # app's leave-to-home word
         return t("death_msg_footer", "[b]{rip}[/] [dim]· N new egg · ESC out[/]").format(rip=marquee(rip, 18, mq))
 
-    def text(self):
+    def text(self) -> Any:
         p = self.pet
         if not GRAVE:
             out = menu.bar(t("death_hdr_memorial", "MEMORIAL"), "")

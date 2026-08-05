@@ -1,6 +1,7 @@
 """The world + presentation data (tier-1 split, 2026-07-17):
 backgrounds, effects, icons, battle fx, attacks/orbs, enemies, cups, maps."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import csv  # noqa: F401
 import gzip  # noqa: F401
 import json  # noqa: F401
@@ -17,7 +18,7 @@ from tuipet.data.loaders.data_core import (  # noqa: F401  (shared plumbing +
 
 
 @lru_cache(maxsize=1)
-def load_battle_fx():
+def load_battle_fx() -> Any:
     """The 0.5 battle-effect bitmaps (battle_fx.json.gz, ported from the
     clone 2026-07-17: attacks / hit / ready / start / wall / dead -- the
     DSprite rips the HP-race show draws from)."""
@@ -28,11 +29,11 @@ def load_battle_fx():
         return {}
 
 @lru_cache(maxsize=1)
-def load_orbs():
+def load_orbs() -> Any:
     return _load_bundled("orbs.json.gz")
 
 @lru_cache(maxsize=1)
-def load_device_attacks():
+def load_device_attacks() -> Any:
     """deviceAttacks.csv: species -> its real-hardware attack in orbs.json.gz
     'device' (ripped from MultiVPet's data.win, the classic V-Pet lineup).
     Keyed by normalized name so every roster row of the species matches."""
@@ -45,7 +46,7 @@ def load_device_attacks():
                 out[nm] = r["AttackKey"]
     return out
 
-def attack_orb(num, attribute, power, frame_i=0):
+def attack_orb(num: int, attribute: Any, power: Any, frame_i: int=0) -> Any:
     """The attack projectile.  Device-accurate first (Joel 2026-07-14): a species
     in deviceAttacks.csv fires ITS OWN real-hardware attack for EVERY attribute,
     exactly like the original V-Pet -- frame_i animates the 2-frame attacks at
@@ -70,9 +71,9 @@ def attack_orb(num, attribute, power, frame_i=0):
     t = max(0, min(int(power) // 25, len(tiers) - 1))
     return tiers[t] or next((x for x in tiers if x), None)
 
-_ATTACKS = None
+_ATTACKS = None  # type: ignore
 
-def _load_attacks():
+def _load_attacks() -> Any:
     global _ATTACKS
     if _ATTACKS is None:
         _ATTACKS = {}
@@ -91,18 +92,18 @@ def _load_attacks():
             _ATTACKS[n] = info
     return _ATTACKS
 
-def move_name(num, attribute):
+def move_name(num: int, attribute: Any) -> Any:
     """The flavour name of a Monster's attack for an attribute (DVPet
     VaccineName/DataName/VirusName columns), e.g. 'Exhaust Flame'."""
     return (_load_attacks().get(num) or {}).get(attribute, {}).get("name", "")
 
-def attack_info(num, attribute):
+def attack_info(num: int, attribute: Any) -> Any:
     """Full DVPet attack for an attribute: {name, effect, conditions[]} parsed from
     the monster.csv Name:Effect:Condition(s) cell (AttackEffectProcess input)."""
     return (_load_attacks().get(num) or {}).get(attribute) or {"name": "", "effect": "None", "conditions": []}
 
 @lru_cache(maxsize=1)
-def load_enemies():
+def load_enemies() -> Any:
     _, by_num = load_sprites()
     path = os.path.join(_DATA, "enemies.csv")
     enemies = []
@@ -148,7 +149,7 @@ def load_enemies():
         })
     return enemies
 
-def enemies_for_stage(stage):
+def enemies_for_stage(stage: Any) -> Any:
     """Enemies whose Monster are at the given stage (fallback: all)."""
     pool = [e for e in load_enemies() if e["stage"] == stage]
     return pool or load_enemies()
@@ -158,7 +159,7 @@ def enemies_for_stage(stage):
 # enemies and zone boss(es), parsed from zones.csv + enemies.csv.
 # ---------------------------------------------------------------------------
 @lru_cache(maxsize=1)
-def load_tournies():
+def load_tournies() -> Any:
     """Tournament trophies (tournies.csv): per-season cups with field/attribute/age
     restrictions, a BitModifier prize, ItemWon/FoodWon prizes, and enemy overrides."""
     path = os.path.join(_DATA, "tournies.csv")
@@ -169,7 +170,7 @@ def load_tournies():
     age_col = next((k for k in hdr if k.startswith("AgeLimit")), "AgeLimit")
     food_col = next((k for k in hdr if k.startswith("FoodWon")), "FoodWonqAmount")
 
-    def na(v):
+    def na(v: Any) -> Any:
         v = (v or "NA").strip()
         return "" if v in ("NA", "None", "") else v
 
@@ -216,7 +217,7 @@ def load_tournies():
         })
     return out
 
-def _town_ranges():
+def _town_ranges() -> Any:
     """towns.csv TownRange ("4201t4300") per TownID -- the REAL step spans."""
     out = {}
     for t in csv.DictReader(_open_data(os.path.join(_DATA, "towns.csv"))):
@@ -227,7 +228,7 @@ def _town_ranges():
             continue
     return out
 
-def _zone_bgs(spec):
+def _zone_bgs(spec: Any) -> Any:
     """'0t600:12;601t1300:6;...' -> [(lo, hi, habitat_id)] step spans."""
     out = []
     for part in spec.split(";"):
@@ -243,10 +244,10 @@ def _zone_bgs(spec):
     return out
 
 @lru_cache(maxsize=1)
-def load_maps():
+def load_maps() -> Any:
     from collections import defaultdict
     enemies = load_enemies()
-    by_mz = defaultdict(lambda: {"randoms": [], "bosses": []})
+    by_mz = defaultdict(lambda: {"randoms": [], "bosses": []})  # type: ignore
     for e in enemies:
         slot = "bosses" if e["boss"] else "randoms"
         by_mz[(e["map"], e["zone"])][slot].append(e)
@@ -276,7 +277,7 @@ def load_maps():
             for m in sorted(zmap)]
 
 @lru_cache(maxsize=1)
-def load_backgrounds():
+def load_backgrounds() -> Any:
     """Background scene sheets keyed by file name: the DSprite rip set (one
     frame each) plus the arena's 5-frame tourneyBack (BASIC VPET 2026-07-16;
     backgrounds.scene_for_egg wires a scene to every egg)."""
@@ -290,7 +291,7 @@ def load_backgrounds():
         return {}
 
 @lru_cache(maxsize=1)
-def load_effects():
+def load_effects() -> Any:
     """Auxiliary effect overlays (poop/zzz/frozen/wash/emotes) keyed by name."""
     path = os.path.join(_DATA, "effects.json.gz")
     if not os.path.exists(path):
@@ -302,7 +303,7 @@ def load_effects():
         return {}
 
 @lru_cache(maxsize=1)
-def load_icons():
+def load_icons() -> Any:
     """Food/item icons (frame 0) keyed f:<id> / i:<id>, or empty if not extracted."""
     path = os.path.join(_DATA, "icons.json.gz")
     if not os.path.exists(path):

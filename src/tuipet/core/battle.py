@@ -12,6 +12,7 @@ attribute triangle all feed it.  Transcribed EXACTLY from the source rule
 set (ripped from multiple fan games).
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 
 from tuipet.data.loaders import data
@@ -30,7 +31,7 @@ _RANK = {"Egg": 0, "Fresh": 1, "InTraining": 2, "Rookie": 3,
          "Champion": 4, "Ultimate": 5, "Mega": 6}
 
 
-def _tri(mine, theirs):
+def _tri(mine: Any, theirs: Any) -> Any:
     """The attribute triangle: ±0.05 hit chance."""
     a, b = (mine or "").lower(), (theirs or "").lower()
     if (a, b) in (("vaccine", "virus"), ("virus", "data"), ("data", "vaccine")):
@@ -43,11 +44,11 @@ def _tri(mine, theirs):
 class Side:
     """One combatant, normalized: a live Pet, a lobby card, or a wild foe."""
 
-    def __init__(self, num, name="", stage="", attribute="",
-                 strength=4, strength_max=4, hunger=4, hunger_max=4,
-                 energy=5, energy_max=5, weight=None, base_weight=10,
-                 trainings_cur=0, trainings_total=0,
-                 battles=0, wins=0, hit_type="normal", boss=False):
+    def __init__(self, num: int, name: str="", stage: str="", attribute: str="",
+                 strength: int=4, strength_max: int=4, hunger: int=4, hunger_max: int=4,
+                 energy: int=5, energy_max: int=5, weight: Optional[Any]=None, base_weight: int=10,
+                 trainings_cur: int=0, trainings_total: int=0,
+                 battles: int=0, wins: int=0, hit_type: str="normal", boss: bool=False) -> None:
         self.num = num
         self.name = name or (data.record_for(num).get("name", "?") if num >= 0 else "?")
         self.stage = stage
@@ -64,7 +65,7 @@ class Side:
         self.boss = boss
 
     @classmethod
-    def of_pet(cls, pet):
+    def of_pet(cls, pet: Any) -> Any:
         return cls(pet.num, name=pet.name, stage=pet.stage,
                    attribute=pet.attribute,
                    strength=pet.strength, strength_max=4,
@@ -77,7 +78,7 @@ class Side:
                    hit_type=getattr(pet, "saved_hit_type", "normal"))
 
     @classmethod
-    def wild(cls, num, boss=False):
+    def wild(cls, num: int, boss: bool=False) -> Any:
         """A wild foe: its species at ideal condition, untrained.  (The
         classic roster carries no meter columns -- ideal condition IS the
         definition, so the perfect gauges are pinned directly.)"""
@@ -89,7 +90,7 @@ class Side:
                    weight=10, base_weight=10, boss=boss)
 
     @classmethod
-    def of_card(cls, card):
+    def of_card(cls, card: Any) -> Any:
         """A lobby peer's relayed card (clamped upstream)."""
         return cls(int(card.get("num", 0)), name=card.get("name", "?"),
                    stage=card.get("stage", "Child"),
@@ -107,10 +108,10 @@ class Side:
                    battles=card.get("battles", 0), wins=card.get("wins", 0),
                    hit_type=card.get("hit_type", "normal"))
 
-    def _rank(self):
+    def _rank(self) -> Any:
         return _RANK.get(self.stage, 3)
 
-    def _condition(self):
+    def _condition(self) -> Any:
         """The meter terms of the hit formula (each 0..0.1 - 0.05)."""
         st = (self.strength / self.strength_max) * 0.1 - 0.05
         hu = (self.hunger / self.hunger_max) * 0.1 - 0.05
@@ -121,7 +122,7 @@ class Side:
             w = 0
         return st + hu + en + w
 
-    def hit_chance(self, other):
+    def hit_chance(self, other: Any) -> Any:
         wr = self.wins / self.battles if self.battles > 0 else 0.5
         p = (0.3 + (wr - 0.5) * 0.1
              + (self._rank() - other._rank()) * 0.1
@@ -145,7 +146,7 @@ class Side:
              + (-0.10 if other.hit_type == "mega" else 0.0))
         return min(1.0, max(0.0, p))
 
-    def roll_damage(self, rng):
+    def roll_damage(self, rng: Any) -> Any:
         # Pen20 shake ruling: a miss deals the plain 50% tier, same as
         # normal -- the shanked-lock damage PENALTY (20%) died with the
         # miss punish tier.  Only the mega bonus remains.
@@ -154,7 +155,7 @@ class Side:
         return 2 if rng() < 0.5 else 1
 
 
-def generate(me, foe, rounds=ROUNDS_LOCAL, rng=None):
+def generate(me: Any, foe: Any, rounds: Any=ROUNDS_LOCAL, rng: Optional[Any]=None) -> Any:
     """The whole fight: [(my_hit, my_dmg, foe_hit, foe_dmg), ...] plus final
     HPs.
 
@@ -189,7 +190,7 @@ def generate(me, foe, rounds=ROUNDS_LOCAL, rng=None):
     return seq, max(0, my_hp), max(0, foe_hp)
 
 
-def _drag_key(mine, theirs):
+def _drag_key(mine: Any, theirs: Any) -> Any:
     """The ONE drag detector behind the coach line and the pre-fight
     readiness line (Pen20 honesty 2026-07-23: two surfaces, one truth).
     Precedence = fixability: condition anomalies first (fixable
@@ -209,7 +210,7 @@ def _drag_key(mine, theirs):
     return ""
 
 
-def coach_line(mine, theirs):
+def coach_line(mine: Any, theirs: Any) -> Any:
     """The result screen's one-line WHY (gameplay polish #1, 2026-07-22):
     hit_chance sums seven hidden terms and the old card showed none of
     them, so losses read as arbitrary.  '' when nothing notable dragged
@@ -225,7 +226,7 @@ def coach_line(mine, theirs):
     }[_drag_key(mine, theirs)]
 
 
-def readiness_line(mine, theirs):
+def readiness_line(mine: Any, theirs: Any) -> Any:
     """The PRE-fight read (Pen20 honesty, Joel 2026-07-23: fifty fights
     lost to an invisible starved weight -- "the fight should tell you
     what's deciding it, before it starts").  Present tense, card-width
@@ -252,7 +253,7 @@ class Battle:
     A fight that runs THIS engine on THIS pet is local, full stop, so it
     records like one and always pays the +2."""
 
-    def __init__(self, pet, enemy=None, rng=None, rounds=ROUNDS_LOCAL):
+    def __init__(self, pet: Any, enemy: Optional[Any]=None, rng: Optional[Any]=None, rounds: Any=ROUNDS_LOCAL) -> None:
         self.pet = pet
         rng = rng or random.random
         if enemy is None:
@@ -273,7 +274,7 @@ class Battle:
         self.drawn = False           # both stood at equal HP (counts as a loss)
         self.reward = ""
 
-    def play_round(self, _choice=None):
+    def play_round(self, _choice: Optional[Any]=None) -> Any:
         """Advance one precomputed round -> the round record for the stage
         show: dict(pdmg, edmg, my_hit, foe_hit, ph, fh)."""
         if self.over or self.round >= len(self.seq):
@@ -294,7 +295,7 @@ class Battle:
             self._finish()
         return rec
 
-    def _finish(self):
+    def _finish(self) -> None:
         if self.over:
             return
         self.over = True
@@ -316,7 +317,7 @@ class Battle:
         # DEFEAT card with an empty reward line
         self.reward = "training +2"
 
-    def surrender(self):
+    def surrender(self) -> None:
         if self.over:
             return          # the bout already ended -- never a second
             #                 record_battle on top of _finish's (audit 2026-07-19)
@@ -335,7 +336,7 @@ class RaidBout:
     `dealt` accumulates for the relay report.  Writes NOTHING on the pet,
     exactly like the clone's generate_raid."""
 
-    def __init__(self, pet, boss, rng=None):
+    def __init__(self, pet: Any, boss: Any, rng: Optional[Any]=None) -> None:
         self.pet = pet
         self.enemy = boss                        # dict, kept for the HUD
         me = Side.of_pet(pet)
@@ -348,7 +349,7 @@ class RaidBout:
         self.won = False
         self.reward = ""
 
-    def play_round(self, _choice=None):
+    def play_round(self, _choice: Optional[Any]=None) -> Any:
         if self.over or self.round >= len(self.seq):
             self._finish()
             return None
@@ -364,18 +365,18 @@ class RaidBout:
             self._finish()
         return rec
 
-    def _finish(self):
+    def _finish(self) -> None:
         self.over = True                         # no record_battle: a report, not a bout
         # presentation only: the ATTEMPT succeeded when the pet stood through
         # its rounds -- won=False forever ended EVERY raid on the loser
         # collapse frame, even a full-damage run (the boss still never falls)
         self.won = self.pet_hp > 0
 
-    def surrender(self):
+    def surrender(self) -> None:
         self.over = True
 
 
-def generate_raid(me, boss, rng=None):
+def generate_raid(me: Any, boss: Any, rng: Optional[Any]=None) -> Any:
     """The raid attempt: 10 rounds against an effectively-invincible boss.
     The player fights from 10 HP; the boss never falls IN the fight -- the
     raw damage landed here is what the shared pool eats (x5000 x stage-mult,
@@ -400,7 +401,7 @@ def generate_raid(me, boss, rng=None):
     return seq, dealt, max(0, my_hp)
 
 
-def pick_enemy(pet, boss=False):
+def pick_enemy(pet: Any, boss: bool=False) -> Any:
     """A wild foe scaled to the pet: same stage bracket, one up for a boss."""
     ladder = ["InTraining", "Rookie", "Champion", "Ultimate", "Mega"]
     st = pet.stage if pet.stage in ladder else "Rookie"
@@ -412,7 +413,7 @@ def pick_enemy(pet, boss=False):
             "stage": rec["stage"], "attribute": rec["attribute"]}
 
 
-def battle_card(pet):
+def battle_card(pet: Any) -> Any:
     """The stats card a lobby host/challenger relays (clamped by the peer)."""
     s = Side.of_pet(pet)
     return {"num": s.num, "name": s.name, "stage": s.stage,

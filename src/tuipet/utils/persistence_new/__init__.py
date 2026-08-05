@@ -12,6 +12,7 @@ lobby carve-out was removed for the same day: time passes only while you are
 actually playing.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import time
@@ -35,7 +36,7 @@ from tuipet.utils.persistio import (  # noqa: F401
 import tuipet.utils.persistio as _persistio
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     """`save_failed` is MUTABLE state owned by persistio's writer -- a
     static re-export would freeze it at import; delegate reads instead."""
     if name == "save_failed":
@@ -43,7 +44,7 @@ def __getattr__(name):
     raise AttributeError(name)
 
 
-def load_settings(path=None):
+def load_settings(path: Optional[Any]=None) -> Any:
     """App-level prefs that outlive any single pet (e.g. the lobby account).
     Falls back to the .bak rotated by save_settings -- settings hold the album,
     lifetime wins, owned eggs and the banked Memory; one corrupt write must
@@ -60,39 +61,39 @@ def load_settings(path=None):
     return {}
 
 
-def get_auto_update():
+def get_auto_update() -> Any:
     """Should the game install a newer release for itself at launch?  On by
     default (Joel 2026-07-14) -- a player can turn it off in g options."""
     return bool(load_settings().get("auto_update", True))
 
 
-def get_cloud_sync():
+def get_cloud_sync() -> Any:
     """The player-facing cloud-save switch (settings only; see sync_enabled)."""
     return bool(load_settings().get("cloud_sync", True))
 
 
-def set_cloud_sync(on):
+def set_cloud_sync(on: Any) -> Any:
     d = load_settings()
     d["cloud_sync"] = bool(on)
     save_settings(d)
     return bool(on)
 
 
-def sync_enabled():
+def sync_enabled() -> Any:
     """Cloud sync is completely disabled for this hard fork."""
     # TODO: Estudar a comunicação de rede do servidor gringo original e manter a compatibilidade
     # dos envios/recebimentos para reativar o cloud sync futuramente.
     return False
 
 
-def set_auto_update(on):
+def set_auto_update(on: Any) -> Any:
     d = load_settings()
     d["auto_update"] = bool(on)
     save_settings(d)
     return bool(on)
 
 
-def save_settings(d, path=None):
+def save_settings(d: Any, path: Optional[Any]=None) -> None:
     # every write stamps the CURRENT egg-bank version -- without it, a
     # settings file created THIS session would look like a pre-migration
     # (.400/.401) file on the next load and get wrongly re-translated
@@ -100,7 +101,7 @@ def save_settings(d, path=None):
     _atomic_write_json(path or SETTINGS_PATH, d, keep_bak=True)
 
 
-def get_album():
+def get_album() -> Any:
     """Set of distinct Monster species ever raised, NAME-CANONICAL (the
     DM20-style zukan).  DVPet's dex sync is by name (checkNaturalUnlocked):
     the 1410+ egg-hatch duplicate rows and their chart twins reveal together
@@ -111,7 +112,7 @@ def get_album():
             for n in load_settings().get("progress", {}).get("album", [])}
 
 
-def get_wins():
+def get_wins() -> Any:
     """Lifetime battle wins across all pets/generations."""
     return int(load_settings().get("progress", {}).get("wins", 0))
 
@@ -120,7 +121,7 @@ _ALBUM_SEEN: set[int] = set()   # in-memory mirror: the 10s autosave was re-read
                              # settings.json on every save just to no-op (audit 2026-07)
 
 
-def album_seen(num):
+def album_seen(num: int) -> Any:
     """Has ANY generation been this form -- under EITHER of its name-twin nums?
     (canon Evolution.setUnlocked + checkNaturalUnlocked: the dex reveal state
     the hidden-evolution mask keys on, synced across same-name rows)."""
@@ -131,7 +132,7 @@ def album_seen(num):
     return num in get_album()
 
 
-def album_add(num):
+def album_add(num: int) -> None:
     if num is None or num < 0:
         return
     import tuipet.data.loaders.data as data
@@ -149,14 +150,14 @@ def album_add(num):
     save_settings(d)
 
 
-def ladder_award_claimed(season):
+def ladder_award_claimed(season: Any) -> Any:
     """Has this device already granted the season's ladder award?  The server
     keeps its own claim ledger; this local one stops a double-grant when the
     claim message races a re-query (monthly ladder, 2026-07-14)."""
     return season in load_settings().get("progress", {}).get("ladder_claimed", [])
 
 
-def note_ladder_award(season):
+def note_ladder_award(season: Any) -> None:
     d = load_settings()
     lst = d.setdefault("progress", {}).setdefault("ladder_claimed", [])
     if season not in lst:
@@ -164,7 +165,7 @@ def note_ladder_award(season):
         save_settings(d)
 
 
-def album_has(num):
+def album_has(num: int) -> Any:
     """Is this species (name-canonical) already in the cross-pet album?  Lets
     the evolve/hatch moment announce a genuine FIRST -- album_add() itself is
     buried in save() and records silently (sweep 2026-07-14)."""
@@ -177,7 +178,7 @@ def album_has(num):
     return num in set(load_settings().get("progress", {}).get("album", []))
 
 
-def _note_add(key, n):
+def _note_add(key: str, n: Any) -> Any:
     """Bump a lifetime progress counter (the generic behind wins/mega_kills --
     the load-modify-save dance was copied per counter; refactor 2026-07-05)."""
     d = load_settings()
@@ -187,11 +188,11 @@ def _note_add(key, n):
     return prog[key]
 
 
-def wins_add(n=1):
+def wins_add(n: int=1) -> Any:
     return _note_add("wins", n)
 
 
-def record_connection(peer_name):
+def record_connection(peer_name: Any) -> None:
     """A completed online link (versus bout or jogress) with another tamer --
     the DM20 connection-battle signal behind the Corona/Luna/Meicoo/DORU
     eggs.  Distinct tamers count once, like the device's friend list."""
@@ -199,23 +200,23 @@ def record_connection(peer_name):
         _note_set("connections", str(peer_name)[:24])
 
 
-def mega_kills_add(n=1):
+def mega_kills_add(n: int=1) -> Any:
     """Lifetime Mega/Ultimate-class foes felled (gates the X egg; LINES_SPEC §7)."""
     return _note_add("mega_kills", n)
 
 
-def armor_add(n=1):
+def armor_add(n: int=1) -> Any:
     """Lifetime armor (Relic) evolutions performed -- the crest-wave
     Relic shop gate (2026-07-17)."""
     return _note_add("armor_evos", n)
 
 
-def get_blocked():
+def get_blocked() -> Any:
     """Muted lobby peers (names)."""
     return set(load_settings().get("blocked", []))
 
 
-def set_blocked(names):
+def set_blocked(names: Any) -> None:
     d = load_settings()
     d["blocked"] = sorted(names)
     save_settings(d)
@@ -224,7 +225,7 @@ def set_blocked(names):
 DM_KEEP = 50           # persisted tail per DM thread (the live cap is net.CHAT_CAP)
 
 
-def get_dms():
+def get_dms() -> Any:
     """Persisted lobby DM threads -> ({peer: [(from, text), ...]}, unread set).
     Conversations survive leaving the thread/lobby (Joel 2026-07-10)."""
     d = load_settings()
@@ -233,7 +234,7 @@ def get_dms():
     return dms, set(d.get("dm_unread") or [])
 
 
-def save_dms(dms, unread):
+def save_dms(dms: Any, unread: Any) -> None:
     d = load_settings()
     d["dms"] = {p: [list(m) for m in v[-DM_KEEP:]] for p, v in dms.items() if v}
     d["dm_unread"] = sorted(n for n in unread if n in d["dms"])
@@ -245,30 +246,30 @@ def save_dms(dms, unread):
 # wins, max generation/stage, maps cleared, tournament trophies, X-Antibody ever) plus
 # a snapshot of the pet that just freed the slot, for the "previous generation" gates.
 
-def _prog():
+def _prog() -> Any:
     return load_settings().get("progress", {})
 
 
-def get_eggs_owned():
+def get_eggs_owned() -> Any:
     """Egg indices permanently earned (a met can_perm unlock, stuck forever)."""
     return set(_prog().get("eggs_owned", []))
 
 
-def egg_own(idx):
+def egg_own(idx: int) -> None:
     if idx is not None:
         _note_set("eggs_owned", idx)
 
 
-def get_titles_owned():
+def get_titles_owned() -> Any:
     """Honor titles bought (profile-level, survives generations)."""
     return set(_prog().get("titles_owned", []))
 
 
-def title_own(tid):
+def title_own(tid: Any) -> None:
     _note_set("titles_owned", int(tid))
 
 
-def get_title_worn():
+def get_title_worn() -> Any:
     """The WORN honor title id (-1 = none)."""
     try:
         return int(_prog().get("title_worn", -1))
@@ -276,13 +277,13 @@ def get_title_worn():
         return -1
 
 
-def set_title_worn(tid):
+def set_title_worn(tid: Any) -> None:
     d = load_settings()
     d.setdefault("progress", {})["title_worn"] = int(tid)
     save_settings(d)
 
 
-def _note_max(key, value):
+def _note_max(key: str, value: Any) -> None:
     d = load_settings()
     prog = d.setdefault("progress", {})
     if int(value) > int(prog.get(key, 0)):
@@ -290,15 +291,15 @@ def _note_max(key, value):
         save_settings(d)
 
 
-def note_generation(g):
+def note_generation(g: Any) -> None:
     _note_max("max_gen", g)
 
 
-def note_stage_index(i):
+def note_stage_index(i: Any) -> None:
     _note_max("max_stage", i)
 
 
-def note_xanti():
+def note_xanti() -> None:
     d = load_settings()
     prog = d.setdefault("progress", {})
     if not prog.get("xanti_ever"):
@@ -306,7 +307,7 @@ def note_xanti():
         save_settings(d)
 
 
-def _note_set(key, value):
+def _note_set(key: str, value: Any) -> None:
     d = load_settings()
     prog = d.setdefault("progress", {})
     cur = set(prog.get(key, []))
@@ -317,11 +318,11 @@ def _note_set(key, value):
     save_settings(d)
 
 
-def map_complete_add(map_index):
+def map_complete_add(map_index: Any) -> None:
     _note_set("maps", int(map_index))
 
 
-def zone_best_set(zone_index, score):
+def zone_best_set(zone_index: Any, score: Any) -> Any:
     """Record an adventure run's SCORE against the zone's standing best
     (arcade arc, 2026-07-21).  Returns True when it's a NEW best -- the
     summary card's brag."""
@@ -336,13 +337,13 @@ def zone_best_set(zone_index, score):
     return False
 
 
-def zone_bests():
+def zone_bests() -> Any:
     """zone_index -> best run score (str-keyed in storage, int-keyed here)."""
     return {int(k): int(v)
             for k, v in (_prog().get("zone_bests", {}) or {}).items()}
 
 
-def raid_add():
+def raid_add() -> None:
     """One community raid boss this save contributed to FELL (counted at the
     claim, when the relay confirms defeated=True).  The count re-gates the
     old MapComplete egg rows (BASIC VPET 2026-07-16)."""
@@ -352,11 +353,11 @@ def raid_add():
     save_settings(d)
 
 
-def tourney_add(trophy_id):
+def tourney_add(trophy_id: Any) -> None:
     _note_set("tourneys", int(trophy_id))
 
 
-def festival_add(name):
+def festival_add(name: str) -> None:
     """Celebrated a festival -- conquered an adventure zone on a holiday day.
     A set of the festival NAMES seen (distinct festivals only, so same-day
     conquers count once); gates the seasonal egg (Draco/Examon, the grand
@@ -364,7 +365,7 @@ def festival_add(name):
     _note_set("festivals", str(name))
 
 
-def snapshot_prev_gen(pet):
+def snapshot_prev_gen(pet: Any) -> None:
     """Record the just-ended pet's traits for the 'previous generation' egg
     gates -- and the careBonusOnReset math (death/rebirth audit 2026-07-06):
     the ended life's care ADJUSTS the bonus the next generation inherits.
@@ -423,7 +424,7 @@ def snapshot_prev_gen(pet):
 
 
 
-def _heal_bag(inv):
+def _heal_bag(inv: Any) -> Any:
     """The bag heal, both eras in one pass: shed the dead staple props
     (strict-DSprite 2026-07-17) and map the retired catalog's keys onto
     their TUIPET heirs 1:1 (shop.LEGACY_KEYS; catalog turnover 2026-07-18
@@ -448,7 +449,7 @@ def _heal_bag(inv):
             inv[new] = inv.get(new, 0) + n
     return inv
 
-def prev_gen_estate():
+def prev_gen_estate() -> Any:
     """The device-lifetime estate the next generation inherits (bits, the bag,
     the trophy room -- canon resetToEgg preserves them all)."""
     d = load_settings()
@@ -471,14 +472,14 @@ def prev_gen_estate():
             "dna_owned": dict(last.get("dna_owned") or {})}
 
 
-def _note_put(key, value):
+def _note_put(key: str, value: Any) -> None:
     """Park a one-slot value in the generational progress channel."""
     d = load_settings()
     d.setdefault("progress", {})[key] = value
     save_settings(d)
 
 
-def _note_take(key):
+def _note_take(key: str) -> Any:
     """Pop a one-slot progress value (None when the slot is empty)."""
     d = load_settings()
     v = (d.get("progress") or {}).pop(key, None)
@@ -487,7 +488,7 @@ def _note_take(key):
     return v
 
 
-def shop_unlock_add(key):
+def shop_unlock_add(key: str) -> None:
     """Canon unlockItem/unlockFood (shop/economy audit 2026-07-06): finding a
     consumable in the wild UNLOCKS its home-shop listing for good -- device-
     lifetime in canon (the bag survives resetToEgg), so the per-save progress
@@ -500,37 +501,37 @@ def shop_unlock_add(key):
         save_settings(d)
 
 
-def shop_unlocks():
+def shop_unlocks() -> Any:
     d = load_settings()
     return set((d.get("progress") or {}).get("shop_unlocks") or [])
 
 
-def bank_memory(mem):
+def bank_memory(mem: Any) -> None:
     """Park the departed's inheritance data in the generational channel (DVPet
     keeps items across resetToEgg; tuipet's per-save channel is progress, the
     same place the last_gen egg gates live).  One slot, like the device."""
     _note_put("memory", dict(mem))
 
 
-def bank_bonus_seed(n):
+def bank_bonus_seed(n: Any) -> None:
     """Park the departed's care grade (careBonusOnReset) for the next egg."""
     _note_put("bonus_seed", int(n))
 
 
-def take_bonus_seed():
+def take_bonus_seed() -> Any:
     return int(_note_take("bonus_seed") or 0)
 
 
-def peek_memory():
+def peek_memory() -> Any:
     return _prog().get("memory") or None
 
 
-def take_memory():
+def take_memory() -> Any:
     """Pop the banked memory (the heir now carries it on its own save)."""
     return _note_take("memory") or None
 
 
-def get_progress():
+def get_progress() -> Any:
     """Assemble the full progress view egg.evaluate() consumes."""
     prog = _prog()
     last = prog.get("last_gen", {}) or {}
@@ -554,7 +555,7 @@ def get_progress():
     }
 
 
-def add_pending_bug(rec):
+def add_pending_bug(rec: Any) -> Any:
     """Stash a bug that could not be sent (offline) to retry next launch.
     True when it is safely on disk -- the caller PROMISES the player it will
     send later, so a failed stash must not be reported as a save (swallowed-
@@ -570,7 +571,7 @@ def add_pending_bug(rec):
         return False
 
 
-def peek_pending_bugs():
+def peek_pending_bugs() -> Any:
     """Read the stashed bugs WITHOUT deleting them (bug audit 2026-07-19:
     the old take-then-send cleared the stash up front, so quitting mid-
     flush lost every unsent report -- the round-5 PM-flush lesson).  The
@@ -584,7 +585,7 @@ def peek_pending_bugs():
         return []
 
 
-def write_pending_bugs(recs):
+def write_pending_bugs(recs: Any) -> Any:
     """Atomically rewrite the stash to exactly `recs` ([] removes the file).
     True when it landed on disk."""
     import os as _os
@@ -605,21 +606,21 @@ def write_pending_bugs(recs):
         return False
 
 
-def get_account():
+def get_account() -> Any:
     """The cached lobby account: (name, password). (None, "") if unset."""
     a = load_settings().get("account") or {}
     name = (a.get("name") or "").strip()
     return (name or None, a.get("pw") or "")
 
 
-def set_account(name, pw):
+def set_account(name: str, pw: Any) -> None:
     d = load_settings()
     name = (name or "").strip()[:24]
     d["account"] = {"name": name, "pw": pw or ""}
     save_settings(d)
 
 
-def erase_all():
+def erase_all() -> Any:
     """Erase the WHOLE local state: pet save (+bak), settings (progress,
     account, memory, +bak), sound + theme prefs -- and every other file
     carrying the erased pet's data: quarantined save.corrupt.* copies, the
@@ -654,7 +655,7 @@ def erase_all():
     return removed
 
 
-def to_save_dict(pet):
+def to_save_dict(pet: Any) -> Any:
     """The on-disk/cloud save payload: the flat pet plus a wall-clock stamp used
     for offline catch-up AND last-write-wins cloud merge."""
     data = asdict(pet)
@@ -663,7 +664,7 @@ def to_save_dict(pet):
     return data
 
 
-def save(pet, path=None):
+def save(pet: Any, path: Optional[Any]=None) -> None:
     # the .bak generation matters: a corrupt main save used to mean a silent
     # new egg -- and the next autosave then DESTROYED the old pet
     _atomic_write_json(path or SAVE_PATH, to_save_dict(pet), keep_bak=True)
@@ -671,14 +672,14 @@ def save(pet, path=None):
         album_add(pet.num)            # grow the cross-pet album (gates egg unlocks)
 
 
-def write_save_dict(data, path=None):
+def write_save_dict(data: Any, path: Optional[Any]=None) -> None:
     """Atomically write a raw save dict (e.g. one pulled from the cloud) to disk.
     keep_bak: a cloud pull is the ONE writer that replaces the save with bytes
     this device never played -- it must not also burn the local backup."""
     _atomic_write_json(path or SAVE_PATH, data, keep_bak=True)
 
 
-def local_saved_at(path=None):
+def local_saved_at(path: Optional[Any]=None) -> Any:
     """The _saved_at of the on-disk save, or 0.0 if there's no readable save."""
     path = path or SAVE_PATH
     try:
@@ -687,7 +688,7 @@ def local_saved_at(path=None):
         return 0.0
 
 
-def pet_from_save(data, strict=False):
+def pet_from_save(data: Any, strict: bool=False) -> Any:
     """Build (pet, message) from a save dict (disk or cloud). Returns (None, '')
     on malformed data.
 
@@ -761,9 +762,9 @@ def pet_from_save(data, strict=False):
         if isinstance(proto, bool):
             want = (bool, int)
         elif isinstance(proto, (int, float)):
-            want = (int, float)
+            want = (int, float)  # type: ignore
         else:
-            want = type(proto)
+            want = type(proto)  # type: ignore
         if not isinstance(data[f.name], want):
             return None, ""
     # THE MANNERS HEAL, once per save (D1/P3, 2026-07-23).  _set_obedience
@@ -832,7 +833,7 @@ def pet_from_save(data, strict=False):
     return pet, msg
 
 
-def quarantine_save(path):
+def quarantine_save(path: str) -> Any:
     """Copy an unreadable save aside (save.corrupt.<ts>.json) before a new game
     rotates over it, so the pet stays recoverable by hand.  Returns the
     quarantine path, or None when the disk refused."""
@@ -846,7 +847,7 @@ def quarantine_save(path):
         return None
 
 
-def load(path=None):
+def load(path: Optional[Any]=None) -> Any:
     """Return (pet, message); pet is None if no valid save exists.  A corrupt
     main save falls back to the .bak rotated by save() -- at most one autosave
     (~10s) behind, instead of a silent new egg.  When BOTH generations are
@@ -886,7 +887,7 @@ def load(path=None):
     return None, "Your old save couldn't be read. Starting fresh."
 
 
-def delete(path=None):
+def delete(path: Optional[Any]=None) -> None:
     """Remove the save AND its .bak -- a deliberate delete must not come back
     from the backup on the next launch."""
     path = path or SAVE_PATH
@@ -897,5 +898,5 @@ def delete(path=None):
             pass
 
 
-def exists(path=None):
+def exists(path: Optional[Any]=None) -> Any:
     return os.path.exists(path or SAVE_PATH)

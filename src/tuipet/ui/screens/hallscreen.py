@@ -18,6 +18,7 @@ what the record knows; nothing here is guessed (the never-fake law).
 Opened from the datacore LEGACY page (where the headstones already lived),
 the TROPHIES→ALBUM door's exact grammar."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.text import Text
 import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
@@ -30,7 +31,7 @@ VIS = 9                      # list rows shown at once (the album's window)
 IMG_W, IMG_H = 40, 16        # detail pixel area (8 character rows)
 
 
-def _elders():
+def _elders() -> Any:
     """Newest first, like the LEGACY page reads its own rows."""
     try:
         rows = list(persistence.load_settings()
@@ -41,7 +42,7 @@ def _elders():
 
 
 class HallPanel:
-    def __init__(self, pet=None):
+    def __init__(self, pet: Optional[Any]=None) -> None:
         self.pet = pet
         self.elders = _elders()
         self.n = len(self.elders)
@@ -51,16 +52,16 @@ class HallPanel:
         self.sfx = None
 
     # ---- panel protocol --------------------------------------------------
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         if self.detail:
             return menu.hints(("←→", t("hall_hint_browse_lr", "browse")), ("ESC", t("hall_hint_back", "back")))
         return menu.hints(("↑↓", t("hall_hint_browse_ud", "browse")), ("ENTER", t("hall_hint_view", "view")),
                           ("ESC", t("hall_hint_out", "out")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if not self.n:
             if k in ("escape", "enter", "space"):
                 return ("done", None)
@@ -92,7 +93,7 @@ class HallPanel:
         return None
 
     # ---- the list ----------------------------------------------------------
-    def _epitaph(self, r):
+    def _epitaph(self, r: Any) -> Any:
         """One elder's line: lifespan, then its fate — a fallen elder names
         what took it (when the record knows), a retired one walked on."""
         age = format_mins(float(r.get("age", 0.0)))
@@ -109,10 +110,10 @@ class HallPanel:
             extra += " · " + t("hall_msg_wins", "{n} wins").format(n=wins)
         return t("hall_msg_lived", "lived {age} · {fate}{extra}").format(age=age, fate=fate, extra=extra)
 
-    def _list_scene(self):
+    def _list_scene(self) -> Any:
         out = menu.header(t("hall_hdr_memory", "HALL OF MEMORY"), t("hall_msg_elders_count", "{n} elders").format(n=self.n) if self.n else "")
 
-        def fmt(r, j):
+        def fmt(r: Any, j: Any) -> Any:
             cur = j == self.i
             body = INK_B if cur else INK
             t = Text()
@@ -132,7 +133,7 @@ class HallPanel:
         return out
 
     # ---- one elder's page ----------------------------------------------------
-    def _portrait_rows(self, r):
+    def _portrait_rows(self, r: Any) -> Any:
         """The elder's form bobbing, when the record knows it — headstones
         from before the portrait fields stand behind the grave instead."""
         num = int(r.get("num", 0) or 0)
@@ -140,7 +141,7 @@ class HallPanel:
             return data.bob_frame(num, self.frame_i) or []
         return (data.load_effects().get("grave") or [[]])[0] or []
 
-    def _detail_scene(self):
+    def _detail_scene(self) -> Any:
         r = self.elders[self.i]
         name = str(r.get("name", "?"))
         out = menu.header(t("hall_hdr_memory_name", "MEMORY  {name}").format(name=name[:20].upper()),
@@ -168,5 +169,5 @@ class HallPanel:
         out.right_crop(1)     # keys ride the strip (the egg-guide law)
         return out
 
-    def text(self):
+    def text(self) -> Any:
         return self._detail_scene() if self.detail and self.n else self._list_scene()

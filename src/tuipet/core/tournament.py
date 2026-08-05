@@ -22,6 +22,7 @@ The real thing is a SCHEDULED 8-entrant bracket, not an always-open menu:
   quarterfinal, a third from the semi, half from the final.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import datetime as _dt
 import random
 import tuipet.data.loaders.data as data
@@ -36,7 +37,7 @@ import tuipet.core.shop as shop
 # purses (pet.weekend_bonus); the FEATURED cup gives each real day one
 # any-hour headliner, and festival days open the whole board.
 
-def _today():
+def _today() -> Any:
     """One date source for the cadence layer (tests monkeypatch here)."""
     return _dt.date.today()
 
@@ -55,21 +56,21 @@ HOLIDAYS = {(1, 1): "New Year Festival",
             (12, 25): "Christmas Festival"}
 
 
-def real_season(today=None):
+def real_season(today: Optional[Any]=None) -> Any:
     return SEASON_OF_MONTH[(today or _today()).month]
 
 
-def holiday(today=None):
+def holiday(today: Optional[Any]=None) -> Any:
     """The festival's name, or None on an ordinary day."""
     d = today or _today()
     return HOLIDAYS.get((d.month, d.day))
 
 
-def is_weekend(today=None):
+def is_weekend(today: Optional[Any]=None) -> Any:
     return (today or _today()).weekday() >= 5
 
 
-def featured_now(pet, today=None):
+def featured_now(pet: Any, today: Optional[Any]=None) -> Any:
     """The day's FEATURED cup: one per real date, drawn from the season's
     pool by a date-seeded roll.  The weekend headliner draws from the PET's
     own bracket or the open tier (cup ruling 2026-07-18: the old top-tier-
@@ -89,7 +90,7 @@ def featured_now(pet, today=None):
     return rng.choice(pool)
 
 
-def featured_done(pet, today=None):
+def featured_done(pet: Any, today: Optional[Any]=None) -> Any:
     d = today or _today()
     return getattr(pet, "featured_day", -1) == d.toordinal()
 
@@ -104,7 +105,7 @@ ROUNDS = ["Quartas de final", "Semifinal", "Final"]
 _TIERS = ("Rookie", "Champion", "Ultimate", "Mega")
 
 
-def trophy_label(t):
+def trophy_label(t: Any) -> Any:
     if t.get("label"):                    # a road-only town cup names itself
         return t["label"]
     if t["field_req"]:
@@ -119,7 +120,7 @@ def trophy_label(t):
 TOWN_TROPHY_BASE = 900
 
 
-def town_cup(pet, town_id=0):
+def town_cup(pet: Any, town_id: int=0) -> Any:
     """A DISTINCT, road-only town championship: its own trophy (id 900+town),
     an OPEN bracket any comer can enter, a stake + a healthy purse.  Built from
     a real trophy shell so the Tournament engine runs it unchanged; recorded
@@ -141,14 +142,14 @@ def town_cup(pet, town_id=0):
 
 
 
-def trophy_by_id(tid):
+def trophy_by_id(tid: Any) -> Any:
     for t in data.load_tournies():
         if t["id"] == tid:
             return t
     return None
 
 
-def trophy_name(tid):
+def trophy_name(tid: Any) -> Any:
     """A trophy id's display name, TOWN ids included -- the trophy room's
     single source (cup audit 2026-07-21: 900+ ids fell to the raw-number
     fallback and the room read 'cup 912')."""
@@ -160,12 +161,12 @@ def trophy_name(tid):
     return "cup %d" % tid
 
 
-def _hour(pet):
+def _hour(pet: Any) -> Any:
     from tuipet.core.pet import DAY_LENGTH
     return int((pet.world_seconds % DAY_LENGTH) / DAY_LENGTH * 24)
 
 
-def pet_tier(pet):
+def pet_tier(pet: Any) -> Any:
     """The pet's cup tier by STAGE.  Canon (Trophy.getStageByAge) keyed this to
     age-days because its clock made age and stage equivalent; the 2026-07 pacing
     rebuild compressed growth ~4x, leaving age-tiered cups one tier BEHIND the
@@ -182,7 +183,7 @@ def pet_tier(pet):
 _TIER_RANK = {"Rookie": 0, "Champion": 1, "Ultimate": 2, "Mega": 3}
 
 
-def _pet_tier_rank(pet):
+def _pet_tier_rank(pet: Any) -> Any:
     t = pet_tier(pet)
     return _TIER_RANK.get(t, 3)          # None (Mega) ranks past everything
 
@@ -190,7 +191,7 @@ def _pet_tier_rank(pet):
 ENTRY_FEE_DIV = 4                        # the stake = expected purse / 4
 
 
-def entry_fee(pet, t):
+def entry_fee(pet: Any, t: Any) -> Any:
     """THE STAKE (bit-sink design 2026-07-14): a quarter of the bracket's
     EXPECTED purse (7 entrants x the tier's stage bits x BitModifier), put
     down at entry.  The champion nets +75% of the purse, a final loss +25%,
@@ -206,7 +207,7 @@ def entry_fee(pet, t):
     return int(7 * base * t["bit_mod"]) // ENTRY_FEE_DIV
 
 
-def _rand_trophy_ids(pet):
+def _rand_trophy_ids(pet: Any) -> Any:
     """Tournament.randTrophyIDs: bucket the cups by age tier, then fill
     the 24 hourly slots rotating open/Rookie/open/Champion/open/Ultimate/open/
     Mega; the fill STOPS at the first empty bucket (canon quirk).  Every cup in
@@ -214,13 +215,13 @@ def _rand_trophy_ids(pet):
     The day's pool is the REAL season's cups (cadence layer 2026-07-17): the
     CSV Season column is live again, keyed to the actual calendar."""
     season = real_season()
-    buckets = {"free": [], "Rookie": [], "Champion": [], "Ultimate": [], "Mega": []}
+    buckets = {"free": [], "Rookie": [], "Champion": [], "Ultimate": [], "Mega": []}  # type: ignore
     for t in data.load_tournies():
         if t["season"] != season:
             continue
         buckets[t["age_limit"] if t["age_limit"] in buckets else "free"].append(t)
     order = ["free", "Rookie", "free", "Champion", "free", "Ultimate", "free", "Mega"]
-    sched = []
+    sched = []  # type: ignore
     while len(sched) < HOME_LIMIT:
         for name in order:
             pool = buckets[name]
@@ -233,7 +234,7 @@ def _rand_trophy_ids(pet):
     return sched
 
 
-def schedule(pet):
+def schedule(pet: Any) -> Any:
     """The day's hourly cup schedule (setTrophySchedule; dailyChange re-rolls
     it and clears foughtTrophiesToday)."""
     from tuipet.core.pet import DAY_LENGTH
@@ -253,7 +254,7 @@ def schedule(pet):
 
 
 
-def open_now(pet):
+def open_now(pet: Any) -> Any:
     """The current game-hour's cup -- every other slot is closed
     (checkTourneyClosed: start hour != current hour)."""
     sched = schedule(pet)
@@ -261,7 +262,7 @@ def open_now(pet):
     return trophy_by_id(tid) if tid >= 0 else None
 
 
-def eligibility(pet, t):
+def eligibility(pet: Any, t: Any) -> Any:
     """Tournament.isEligible, minus the fully-recovered gate (no persistent
     battle HP in tuipet).  Returns a refusal reason or None.
 
@@ -284,7 +285,7 @@ def eligibility(pet, t):
             or pet.battle_condition())   # the ONE bout condition gate (audit 2026-07-19)
 
 
-def eligibility_at(pet, t, slot):
+def eligibility_at(pet: Any, t: Any, slot: Any) -> Any:
     """Eligibility for entering the SLOT's cup right now.  Ordinarily only
     the current hour's slot takes entries; on a FESTIVAL day (holiday())
     every un-run slot is open -- each still runs exactly once, so the purse
@@ -298,7 +299,7 @@ def eligibility_at(pet, t, slot):
             or pet.battle_condition())   # the ONE bout condition gate (audit 2026-07-19)
 
 
-def eligibility_featured(pet, t):
+def eligibility_featured(pet: Any, t: Any) -> Any:
     """The featured cup: any hour, once per real day."""
     if featured_done(pet):
         return "Today's featured cup has run."
@@ -306,14 +307,14 @@ def eligibility_featured(pet, t):
             or pet.battle_condition())   # the ONE bout condition gate (audit 2026-07-19)
 
 
-def _stake_check(pet, t):
+def _stake_check(pet: Any, t: Any) -> Any:
     fee = entry_fee(pet, t)
     if pet.bits < fee:
         return "The stake is %db — you can't cover it." % fee
     return None
 
 
-def next_winnable(pet):
+def next_winnable(pet: Any) -> Any:
     """The next hour TODAY whose cup this pet can actually enter (eligibility
     passes) -- scanning from the current hour forward through the schedule.
     Returns (hour, trophy) or None when nothing enterable is left today."""
@@ -331,7 +332,7 @@ def next_winnable(pet):
     return None
 
 
-def _eligibility_rest(pet, t):
+def _eligibility_rest(pet: Any, t: Any) -> Any:
     """Eligibility WITHOUT the cup-hour gate -- for judging a FUTURE slot."""
     if t["id"] in (pet.fought_today or []) and not t["same_day_retry"]:
         return "Já lutou nessa copa hoje."
@@ -355,7 +356,7 @@ def _eligibility_rest(pet, t):
     return None
 
 
-def can_enter(pet):
+def can_enter(pet: Any) -> Any:
     # dead/egg ride the shared _guard -- the dead line was a duplicated
     # string literal here (tidy audit 2026-07-18); youth still outranks
     # sleep, so a too-young pet is never woken just to be refused
@@ -372,7 +373,7 @@ def can_enter(pet):
 
 # ---- the 8-entrant bracket ---------------------------------------------------
 
-def _eligible_forms(pet, trophy):
+def _eligible_forms(pet: Any, trophy: Any) -> Any:
     """randomEnemies' entrant pool: TournamentAble dex forms matching the cup's
     enemy overrides (or, absent those, its restrictions / the pet's age tier)."""
     reqs = data.load_requirements()
@@ -402,7 +403,7 @@ def _eligible_forms(pet, trophy):
     return out
 
 
-def _mk_entrant(rec, trophy, open_mega):
+def _mk_entrant(rec: Any, trophy: Any, open_mega: Any) -> Any:
     """One rolled entrant, 0.5-style (2026-07-17): a plain species card --
     the HP race treats it as a wild Side at ideal condition, so stage rank
     and the attribute triangle carry the bracket (the old power-split/HP
@@ -412,7 +413,7 @@ def _mk_entrant(rec, trophy, open_mega):
 
 
 
-def _npc_winner(a, b):
+def _npc_winner(a: Any, b: Any) -> Any:
     """An NPC match runs the REAL 0.5 engine (2026-07-17): two wild Sides,
     full HP race.  Initiative is a COIN (death-is-final 2026-07-22): the
     engine resolves the 'me' side's volley first now, so a fixed argument
@@ -427,7 +428,7 @@ def _npc_winner(a, b):
     return a if ahp > bhp else b
 
 
-def _prize_key(kind, cid):
+def _prize_key(kind: Any, cid: Any) -> Any:
     """A cup prize id -> its CATALOG key (item expansion 2026-07-26).
     Relic ids speak the crest shelf's own egg_of_* identity; anything
     that somehow fails to resolve pays the old catalog treat rather than
@@ -443,7 +444,7 @@ def _prize_key(kind, cid):
 
 
 class Tournament:
-    def __init__(self, pet, trophy, slot=None, featured=False):
+    def __init__(self, pet: Any, trophy: Any, slot: Optional[Any]=None, featured: bool=False) -> None:
         self.pet = pet
         self.featured = featured
         self._slot = slot
@@ -512,8 +513,8 @@ class Tournament:
         self.bracket = list(self.entrants)
         self.player_i = random.randrange(8)
         self.bracket.insert(self.player_i, "YOU")
-        self.results = []
-        self.results_nums = []
+        self.results = []  # type: ignore
+        self.results_nums = []  # type: ignore
         self.tree = [list(self.bracket)]     # round-by-round history for the bracket page
         tags = []
         if self.defending:
@@ -540,7 +541,7 @@ class Tournament:
                 hrs.append(h)
 
     @property
-    def round_name(self):
+    def round_name(self) -> Any:
         return ROUNDS[min(self.round, 2)]
 
     # the in-bracket ramp (gameplay polish #4, 2026-07-22): every standard
@@ -553,7 +554,7 @@ class Tournament:
     # round -> (trainings_cur, trainings_total, battles, wins)
     _RAMP = {1: (250, 2500, 40, 25), 2: (500, 5000, 80, 55)}
 
-    def current_opponent(self):
+    def current_opponent(self) -> Any:
         i = self.bracket.index("YOU")
         opp = self.bracket[i + 1] if i % 2 == 0 else self.bracket[i - 1]
         ramp = self._RAMP.get(min(self.round, 2))
@@ -564,7 +565,7 @@ class Tournament:
             opp = dict(opp, side=s)     # a copy: the parade keeps its card
         return opp
 
-    def _resolve_npc_round(self):
+    def _resolve_npc_round(self) -> None:
         """The other pairs fight while you catch your breath (npcFight/
         autoFight).  results carries the winners' names for the note;
         results_nums their species, so the screen can PARADE the field
@@ -583,7 +584,7 @@ class Tournament:
         self.results = notes
         self.results_nums = nums
 
-    def _calc_bits(self):
+    def _calc_bits(self) -> Any:
         """Tournament.calcBits: the purse is the sum of the FIELD's stage bits
         x BitModifier (a Mega entrant pays MaxBits once the pet is past 12d)."""
         total = 0
@@ -599,7 +600,7 @@ class Tournament:
             total = total * 3 // 2          # the title defense pays half again
         return total
 
-    def _finish(self, bits):
+    def _finish(self, bits: Any) -> None:
         from tuipet.core.pet import weekend_bonus
         bits = int(bits * weekend_bonus())   # x1.5 purse on real weekends
         self.over = True
@@ -612,7 +613,7 @@ class Tournament:
                 ft.append(self.trophy["id"])
             self.pet.fought_today = ft
 
-    def record(self, won):
+    def record(self, won: Any) -> Any:
         if self.over:
             return self.last
         if getattr(self.pet, "dead", False):

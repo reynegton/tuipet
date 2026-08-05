@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -9,7 +10,7 @@ import tuipet.core.egg as egg_mod
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def new_egg(cls, generation=1, egg_type=None):
+def new_egg(cls, generation: int=1, egg_type: Optional[Any]=None) -> Any:  # type: ignore
     if egg_type is None:
         egg_type = random.randrange(egg_mod.count())
     pet = cls(num=-1, name="Egg", stage="Egg",
@@ -46,7 +47,7 @@ def new_egg(cls, generation=1, egg_type=None):
     return pet
 
 
-def _hatch_into_fresh(pet):
+def _hatch_into_fresh(pet: Any) -> None:
     _, by_num = data.load_sprites()
     target = egg_mod.hatch_target(pet.egg_type)
     if target is None or target not in by_num or data.is_placeholder(target):
@@ -65,7 +66,7 @@ def _hatch_into_fresh(pet):
     pet._rand_personality_traits()               # fix disposition/glutton/restless for life
 
 
-def advance_hatch(pet, dt):
+def advance_hatch(pet: Any, dt: Any) -> Any:
     """Advance the 3s hatch animation at frame cadence (10 Hz) so every DVPet
     crack interval renders (rock 4-15, drawNum(1)@16, drawNum(2)@19, hatch@29).
     Returns True on the frame the egg actually hatches into a Fresh."""
@@ -78,7 +79,7 @@ def advance_hatch(pet, dt):
     return False
 
 
-def from_num(cls, num):
+def from_num(cls, num: int) -> Any:  # type: ignore
     _, by_num = data.load_sprites()
     r = by_num[num]
     pet = cls(num=num, name=r["name"], stage=r["stage"], attribute=r["attribute"],
@@ -86,13 +87,13 @@ def from_num(cls, num):
     return pet
 
 
-def _set_xantibody(pet, state):
+def _set_xantibody(pet: Any, state: Any) -> None:
     """BINARY (the X slim): any raise lands Permanent; never downgrades."""
     if state != "None":
         pet.x_antibody = "Permanente"
 
 
-def _maybe_evolve(pet):
+def _maybe_evolve(pet: Any) -> None:
     if getattr(pet, "evo_blocked", False):
         return                    # the anti-evo chip (DSprite item)
     if pet.asleep or pet.is_geriatric:
@@ -125,7 +126,7 @@ def _maybe_evolve(pet):
         pet.evolve_to(target)
 
 
-def _become(pet, num):
+def _become(pet: Any, num: int) -> Any:
     """The species-swap prologue shared by evolution and mode change:
     identity, energy ceiling, X-antibody lock-in.  Returns the new
     form's requirements record."""
@@ -143,7 +144,7 @@ def _become(pet, num):
     return _req
 
 
-def evolve_to(pet, num):
+def evolve_to(pet: Any, num: int) -> None:
     was_young = pet.stage in ("Egg", "Fresh", "InTraining", "Rookie")
     _req = pet._become(num)
     # Evolution.java's per-stage ARRIVAL setters (egg/hatch audit
@@ -210,7 +211,7 @@ def evolve_to(pet, num):
     pet._set_anim("happy", 2.5)
 
 
-def _swap_form(pet, num, subtract_current=False):
+def _swap_form(pet: Any, num: int, subtract_current: bool=False) -> None:
     """The Mode/revert half of Evolution.evolve: swap the SPECIES ONLY.
     No growth-clock reset, no care-record/DNA/taste reset, no lifespan
     extension -- the transform shares the life (evolve skips all of it
@@ -228,7 +229,7 @@ def _swap_form(pet, num, subtract_current=False):
         pet.virus = max(0, pet.virus + _req.get("virus_change", 0))
 
 
-def mode_change(pet):
+def mode_change(pet: Any) -> Any:
     """PhysicalState.modeChange: a Mode form reverts to its first
     pre-evolution (only if its power changes can be un-applied); anything
     else evolves along a valid Mode target.  The activity refusal rolls
@@ -265,7 +266,7 @@ def mode_change(pet):
     return old, f"MODE CHANGE — {pet.name}!"
 
 
-def can_mode_change(pet):
+def can_mode_change(pet: Any) -> Any:
     return (pet.num != -1 and not pet.dead
             and pet.stage not in ("Egg", "Fresh")
             and evolution.can_mode_change(pet))

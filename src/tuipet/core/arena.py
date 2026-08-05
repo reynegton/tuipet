@@ -11,6 +11,7 @@ NOTE: the Screen renderer resolves `render_screen` in THIS module's namespace.
 Tests that spy on it must patch `tuipet.arena.render_screen`, not `tuipet.app`.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import random
 
@@ -35,12 +36,12 @@ from tuipet.utils.arenafx import (  # noqa: F401,E402
     _filth_right, _sick_mark_up)
 
 
-def hearts(n, total=4, color=None):
+def hearts(n: Any, total: int=4, color: Optional[Any]=None) -> Any:
     color = color or theme.HEART
     return f"[{color}]" + "●" * n + "[/][dim]" + "○" * (total - n) + "[/dim]"
 
 
-def bar(v, width=12, color=None):
+def bar(v: Any, width: int=12, color: Optional[Any]=None) -> Any:
     color = color or theme.LIFE
     fill = max(0, min(width, round(v / 100 * width)))   # clamp: never overrun the track
     return f"[{color}]" + "█" * fill + "[/][dim]" + "─" * (width - fill) + "[/dim]"
@@ -50,7 +51,7 @@ _FX = data.load_effects()
 GRAVESTONE = _FX.get("grave", [None])[0]      # real DVPet death.png
 
 
-def _flip_frames(frames, _fr, first, role=None):
+def _flip_frames(frames: Any, _fr: Any, first: Any, role: Optional[Any]=None) -> Any:
     """A pose-flip needs two DIFFERENT rips (Joel 2026-07-22: "why does
     bubbmon not have a dancing animation?  theres only one frame").  Some
     sheets fill a role's slots with one identical frame -- Bubbmon's
@@ -83,14 +84,14 @@ class Screen(FxMixin, Static):
     #                           -0.05/tick = a ~20-tick dissolve; 15 of our 10Hz
     #                           ticks = 1.5s (background audit 2026-07-15)
 
-    def on_mount(self):
+    def on_mount(self) -> None:
         self.frame_i = 0      # interval counter (10 Hz; 1 tick == 0.1s == one DVPet _interval)
         self.anim_key = None  # last anim state, so cadences restart on a state change
         self.roamer = anim.Roamer(int(SCREEN_COLS * 0.28), SCREEN_COLS, SPRITE_W)  # left-of-centre anchor
-        self.fx = None        # active care-action animation
+        self.fx = None        # type: ignore
         self._idle_expr = None    # DVPet stepFrame mood-pose held for the current idle step (None = walk toggle)
 
-    def paint(self, pet: Pet):
+    def paint(self, pet: Pet) -> Any:
         if self.fx:
             return self._paint_fx(pet)
         # (the per-phase LCD tint left with the day/night system -- BASIC
@@ -208,10 +209,10 @@ class Screen(FxMixin, Static):
                                   mirror=mirror, xshift=xshift, overlay=overlay,
                                   bgimg=bgimg, clip=_WINDOW))
 
-    def _background(self, pet):
+    def _background(self, pet: Any) -> Any:
         return self._crossfade(pet.background())
 
-    def _crossfade(self, target):
+    def _crossfade(self, target: Any) -> Any:
         """Canon BackgroundAnim.animateBack: a background change never snaps --
         the old frame dissolves into the new one (scene picks, egg homes).
         A None or shape change still cuts: lights-off is canon's
@@ -235,7 +236,7 @@ class Screen(FxMixin, Static):
             self._bg_out = target
         return self._bg_out
 
-    def advance(self, pet=None):
+    def advance(self, pet: Optional[Any]=None) -> None:
         if pet is not None and pet.anim != self.anim_key:
             self.anim_key = pet.anim            # new state -> restart its cadence at beat 0
             self.frame_i = -1

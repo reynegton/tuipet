@@ -2,6 +2,7 @@ import asyncio
 import itertools
 import os
 from collections import deque
+from typing import Any, Deque, Dict, Optional
 import time
 
 HOST = os.environ.get("TUIPET_HOST", "0.0.0.0")
@@ -55,15 +56,27 @@ MAX_ROOM = 32
 _ids = itertools.count(1)
 
 class Client:
+    id: int
+    ws: Any
+    name: str
+    pet: Dict[str, Any]
+    live: bool
+    lease: Optional[str]
+    logged: bool
+    boot: float
+    bugs_sent: int
+    room: Optional[str]
+    _msg_tokens: float
+    _msg_refill_t: float
     __slots__ = ("id", "ws", "name", "pet", "live", "lease", "logged", "boot",
                  "bugs_sent", "room", "_msg_tokens", "_msg_refill_t")
-    def __init__(self, ws):
+    def __init__(self, ws: Any) -> None:
         self.id = next(_ids)
         self.ws = ws
         self.name = f"guest{self.id}"
-        self.pet = {}
+        self.pet: Dict[str, Any] = {}
         self.live = False
-        self.lease = None
+        self.lease: Optional[str] = None
         self.logged = False
         self.boot = 0.0
         self.bugs_sent = 0
@@ -71,17 +84,17 @@ class Client:
         self._msg_tokens = 50.0
         self._msg_refill_t = time.time()
 
-CLIENTS = {}
-CHAT_BACKLOG = deque(maxlen=30)
-LEASES = {}
-BOOT_SEEN = {}
+CLIENTS: Dict[int, 'Client'] = {}
+CHAT_BACKLOG: Deque[Any] = deque(maxlen=30)
+LEASES: Dict[str, Any] = {}
+BOOT_SEEN: Dict[str, Any] = {}
 MAX_SEEN_BOOTS = 8
 _saves_lock = asyncio.Lock()
 _pending_lock = asyncio.Lock()
 
-ACCOUNTS = {}
-SAVES = {}
-PENDING = {}
-LADDER = {}
-RAID = {}
-RAID_MULT_BY_NUM = {}
+ACCOUNTS: Dict[str, Any] = {}
+SAVES: Dict[str, Any] = {}
+PENDING: Dict[str, Any] = {}
+LADDER: Dict[str, Any] = {}
+RAID: Dict[str, Any] = {}
+RAID_MULT_BY_NUM: Dict[int, Any] = {}

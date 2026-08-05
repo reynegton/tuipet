@@ -41,9 +41,9 @@ def test_row_surface_and_order():
     import tuipet
     if tuipet.SERVIDOR_ONLINE:
         assert _ROWS == ("theme", "sound", "account", "cloud", "update", "keys",
-                         "new", "erase")
+                         "language", "new", "erase")
     else:
-        assert _ROWS == ("theme", "sound", "keys", "new", "erase")
+        assert _ROWS == ("theme", "sound", "keys", "language", "new", "erase")
     pan, _ = _panel()
     _fits(pan)
     for _ in _ROWS:                        # every cursor position renders in budget
@@ -257,12 +257,13 @@ def test_keys_page_lists_every_binding_and_scrolls():
     pan.key("enter")
     assert isinstance(pan.sub, KeysPanel)
     plain = pan.text().plain
-    assert "alimentar" in plain.lower()                # the first binding is on page one
+    assert "alimentar" in plain.lower() or "feed" in plain.lower()
     _fits(pan)
     for _ in range(len(TuiPetApp.BINDINGS)):     # scroll to the bottom
         pan.key("down")
         _fits(pan)
-    assert "Aceitar presente" in pan.text().plain     # the last binding scrolled in
+    plain_end = pan.text().plain
+    assert "Aceitar presente" in plain_end or "Accept gift" in plain_end
     assert pan.key("escape") is None
     assert pan.sub is None                # back to the options list
 

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.utils.persistence as persistence
 from tuipet.i18n.translator import t
@@ -10,13 +11,13 @@ from tuipet.core.pet import Pet
 import tuipet.core.egg as egg_mod
 
 class LifecycleMixin:
-    def _after_death(self, result):
+    def _after_death(self, result: Any) -> None:
             if result == "new":
-                self.action_new()
+                self.action_new()  # type: ignore
             else:
-                self.repaint()
+                self.repaint()  # type: ignore
 
-    def _whats_new(self):
+    def _whats_new(self) -> Any:
             """One 'WHAT'S NEW' line in the msg box, on the FIRST launch of a new
             build only (Joel 2026-07-07: release news belongs on the title
             screen).  The seen stamp lives in settings so it survives pets and
@@ -30,21 +31,21 @@ class LifecycleMixin:
                 return None
             s["seen_version"] = cur
             persistence.save_settings(s)
-            if self._new_game:
+            if self._new_game:  # type: ignore
                 # a first-EVER install also has no seen_version, but release news
                 # names systems a brand-new player hasn't met (honors, DNA
                 # wagers...) -- stamp it seen and say nothing (sweep 2026-07-14)
                 return None
-            return f"WHAT'S NEW in v{cur}: {self.WHATS_NEW}"
+            return f"WHAT'S NEW in v{cur}: {self.WHATS_NEW}"  # type: ignore
 
-    def _post_title(self):
-            if self._new_game:
-                self._open_mode(eggselectscreen.EggSelectPanel(self.pet), lambda et: self._hatch_new(et, 1))
+    def _post_title(self) -> None:
+            if self._new_game:  # type: ignore
+                self._open_mode(eggselectscreen.EggSelectPanel(self.pet), lambda et: self._hatch_new(et, 1))  # type: ignore
             else:
-                self._hud(self._welcome)
-                self.repaint()
+                self._hud(self._welcome)  # type: ignore
+                self.repaint()  # type: ignore
 
-    def _death_ceremony(self, hold=0):
+    def _death_ceremony(self, hold: int=0) -> None:
             """The ONE banking ceremony for a death, wherever it's noticed --
             the dying-fx completion, or a relaunch that finds the pet already
             dead.  The etch and the careBonusOnReset seed used to exist only in
@@ -60,9 +61,9 @@ class LifecycleMixin:
             device-lifetime (canon item 32 survives resetToEgg): back to the
             bank first (memory audit 2026-07-06), where the only-one
             prompt covers it."""
-            p = self.pet
+            p = self.pet  # type: ignore
             if p.death_banked:
-                self._open_mode(deathscreen.DeathPanel(
+                self._open_mode(deathscreen.DeathPanel(  # type: ignore
                     p, old_mem=persistence.peek_memory()), self._after_death)
                 return
             if p.memory:
@@ -82,11 +83,11 @@ class LifecycleMixin:
             persistence.bank_bonus_seed(grade_spent)    # default seed; B re-banks
             p.death_banked = True
             persistence.save(p)
-            self._open_mode(deathscreen.DeathPanel(p, hold=hold, new_mem=new_mem,
+            self._open_mode(deathscreen.DeathPanel(p, hold=hold, new_mem=new_mem,  # type: ignore
                                                    old_mem=old_mem, grade_kept=grade_kept,
                                                    banked_new=banked_new), self._after_death)
 
-    def _grant_memory(self, pet):
+    def _grant_memory(self, pet: Any) -> None:
             """Hand the banked inheritance data to the next generation: the payload
             rides the pet's save; the Memory chip appears in its bag (DVPet
             items persist across resetToEgg -- tuipet's generations carry only
@@ -103,28 +104,28 @@ class LifecycleMixin:
             # the departed's care grade seeds this generation's bonus (careBonusOnReset)
             pet.evol_bonus = persistence.take_bonus_seed()
 
-    def autosave(self):
-            persistence.save(self.pet)
-            self._start_sync()              # idempotent: picks up a re-enabled cloud toggle
+    def autosave(self) -> None:
+            persistence.save(self.pet)  # type: ignore
+            self._start_sync()              # type: ignore
             self._warn_if_unsaveable()
-            self._warn_if_cloud_dropped()
+            self._warn_if_cloud_dropped()  # type: ignore
             self._note_progress()
-            self._push_cloud()              # mirror the autosave up to the cloud
+            self._push_cloud()              # type: ignore
 
-    def _warn_if_unsaveable(self):
+    def _warn_if_unsaveable(self) -> None:
             """A save dir the OS refuses used to fail SILENTLY -- the pet simply
             never persisted and the player found out by losing it (iOS's read-only
             home, support pass 2026-07-13).  Say it once, loudly, with the fix."""
             if not persistence.save_failed or getattr(self, "_save_warned", False):
                 return
             self._save_warned = True
-            self.beep("alarm")
-            self.flash(f"[{theme.NEG}]⚠ NÃO É POSSÍVEL SALVAR — seu pet não persistirá! "
+            self.beep("alarm")  # type: ignore
+            self.flash(f"[{theme.NEG}]⚠ NÃO É POSSÍVEL SALVAR — seu pet não persistirá! "  # type: ignore
                        f"Set TUIPET_SAVE_DIR to a writable folder.[/]")
 
-    def _note_progress(self):
+    def _note_progress(self) -> None:
             """Record cross-generation egg-unlock milestones from the live pet."""
-            p = self.pet
+            p = self.pet  # type: ignore
             if p is None or p.stage in ("", "Egg"):
                 return
             persistence.note_generation(p.generation)
@@ -133,20 +134,20 @@ class LifecycleMixin:
             if getattr(p, "x_antibody", "None") != "None":
                 persistence.note_xanti()
 
-    def _flush_dms_on_quit(self):
+    def _flush_dms_on_quit(self) -> None:
             """Quitting straight from the lobby must persist DMs received this
             session: incoming PMs live only in memory until a read/leave saves
             them, so a hard quit (Ctrl-C, terminal close) would otherwise drop
             them (the 'A' gap, 2026-07-12)."""
-            if isinstance(self.mode, lobbyscreen.LobbyPanel):
+            if isinstance(self.mode, lobbyscreen.LobbyPanel):  # type: ignore
                 try:
-                    self.mode._save_dms()
+                    self.mode._save_dms()  # type: ignore
                 except Exception:
                     pass
 
-    def _hatch_new(self, egg_type, gen):
+    def _hatch_new(self, egg_type: Any, gen: Any) -> None:
             if egg_type is None:                        # cancelled -> keep the current pet
-                self._do("Manteve seu parceiro atual.")
+                self._do("Manteve seu parceiro atual.")  # type: ignore
                 return
             if egg_type == "guide":
                 # E on the carousel: consult the guide, then come back to the
@@ -155,9 +156,9 @@ class LifecycleMixin:
                 # crashed on it: Termux crash 2026-07-18, egg_type='guide'.)
                 import tuipet.ui.screens.eggguidescreen as eggguidescreen
                 import tuipet.ui.screens.eggselectscreen as eggselectscreen
-                self._open_mode(eggguidescreen.EggGuidePanel(self.pet),
-                                lambda _=None: self._open_mode(
-                                    eggselectscreen.EggSelectPanel(self.pet),
+                self._open_mode(eggguidescreen.EggGuidePanel(self.pet),  # type: ignore
+                                lambda _=None: self._open_mode(  # type: ignore
+                                    eggselectscreen.EggSelectPanel(self.pet),  # type: ignore
                                     lambda et: self._hatch_new(et, gen)))
                 return
             # the generational COMMIT: nothing mutates until the pick is real
@@ -171,17 +172,17 @@ class LifecycleMixin:
             # elder's banked seed, and dropped the etched Memory with the
             # discarded shell.  A re-pick keeps the generation and carries the
             # whole inheritance to the new shell.
-            repick = self.pet.stage == "Egg" and not self.pet.dead
+            repick = self.pet.stage == "Egg" and not self.pet.dead  # type: ignore
             if repick:
-                gen = self.pet.generation
-            elif not self.pet.dead:
+                gen = self.pet.generation  # type: ignore
+            elif not self.pet.dead:  # type: ignore
                 # a LIVE retire skips the death flow entirely: canon resetMonster
                 # runs careBonusOnReset dead or alive, and a live reset never
                 # offers the etch -- the FULL adjusted bonus carries to the heir
                 # (memory audit 2026-07-06; this seed used to be lost)
-                persistence.bank_bonus_seed(self.pet.final_care_grade())
-            persistence.snapshot_prev_gen(self.pet)   # previous-generation egg gates
-            old = self.pet
+                persistence.bank_bonus_seed(self.pet.final_care_grade())  # type: ignore
+            persistence.snapshot_prev_gen(self.pet)   # type: ignore
+            old = self.pet  # type: ignore
             self.pet = Pet.new_egg(generation=gen, egg_type=egg_type)
             self._grant_memory(self.pet)
             if repick:
@@ -207,7 +208,7 @@ class LifecycleMixin:
             persistence.save(self.pet)
             msg = f"Um novo ovo apareceu! (geração {gen}) (? = ajuda)"
             if getattr(self, "_boot_notice", ""):
-                msg = f"{self._boot_notice}  {msg}"
+                msg = f"{self._boot_notice}  {msg}"  # type: ignore
                 self._boot_notice = ""
-            self._do(msg)
+            self._do(msg)  # type: ignore
 

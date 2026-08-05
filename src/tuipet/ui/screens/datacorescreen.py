@@ -12,6 +12,7 @@ the days toward the elder line (age-based since the DSprite mortality port
 The data-book pages after it are tuipet's own readout (kept adaptation).
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.core.datacore as core
 import tuipet.utils.grid as grid
@@ -49,7 +50,7 @@ build_pages = core.build_pages
 
 
 class datacorePanel:
-    def __init__(self, pet, start="CORE"):
+    def __init__(self, pet: Any, start: str="CORE") -> None:
         self.pet = pet
         self.pages = [("CORE", None)] + build_pages(pet)
         # start lands on a page by TITLE (the album round-trip reopens the
@@ -64,14 +65,14 @@ class datacorePanel:
         self.detail = None        # (num, name): the open requirement checklist
         self.det_off = 0          # ...and its scroll offset
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.teaser:
             self.teaser_t += 1
         if self._back_t:
             self._back_t -= 1
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.teaser:
             if k in ("escape", "space", "enter", "d"):
                 self.teaser = False           # EvolSilhouetteBack: dark blink out
@@ -119,7 +120,7 @@ class datacorePanel:
                 return None
             if k == "enter":
                 num, name = rows[self.evo_sel][0], rows[self.evo_sel][1]
-                self.detail = (num, name)
+                self.detail = (num, name)  # type: ignore
                 self.det_off = 0
                 return None
         if k == "enter" and self.pages[self.i][0] == "TROPHIES":
@@ -138,7 +139,7 @@ class datacorePanel:
             return ("done", None)
         return None
 
-    def _pet_rows(self, num, idx=None):
+    def _pet_rows(self, num: int, idx: Optional[Any]=None) -> Any:
         if idx is None or num == -1:
             # WALK_BEAT bob; bob_frame owns the egg's shell art (num -1 has
             # no roster sheet -- the gaze rendered an empty LCD, audit 2026-07-05)
@@ -150,7 +151,7 @@ class datacorePanel:
         return rec["frames"][idx] or next((f for f in rec["frames"] if f), None)
 
     @staticmethod
-    def _core_place(rows, cell=None):
+    def _core_place(rows: Any, cell: Optional[Any]=None) -> Any:
         """Centre the FULL sprite on the core scene (cell 0/1 = that 16px cell,
         None = whole grid).  grid.center(ph=16) rides the grounded-2px floor
         rule (band_h = 14) and box-mushes every 16px-tall mon -- Joel's Devimon
@@ -160,11 +161,11 @@ class datacorePanel:
         span, x0 = (grid.W, grid.X0) if cell is None else (grid.CELL, grid.X0 + cell * grid.CELL)
         return (s, x0 + (span - grid.width(s)) // 2, False)
 
-    def _dots(self):
+    def _dots(self) -> Any:
         return " ".join((chr(0x25CF) if j == self.i else chr(0x25CB))
                         for j in range(len(self.pages)))
 
-    def _core_scene(self):
+    def _core_scene(self) -> Any:
         """The CORE landing page -- a data-menu page like every other datacore
         page (Joel 2026-07-05: one layout language for the whole data book;
         the scene experiment read as inconsistent).  SPACE opens the core
@@ -211,7 +212,7 @@ class datacorePanel:
         out.append_text(menu.footer(t("datacore_hint_footer", "SPACE gaze  ←→ page  ESC out")))
         return out
 
-    def _teaser_scene(self):
+    def _teaser_scene(self) -> Any:
         """EvolSilhouetteTransition: the core badge ZOOMS IN (datacoreExpand,
         canon beats 6-14 grow it 1.5x each), then the next natural evolution
         holds as a STATIC blacked-out shape (canon draws frame 0 -- the old
@@ -251,7 +252,7 @@ class datacorePanel:
         placements = [self._core_place(sil)] if sil else []
         return render_scene(placements, 40, SCENE_ROWS, on, LCD_BG, bgimg=bgimg, clip=grid.WINDOW)
 
-    def strip(self):
+    def strip(self) -> Any:
         """Narration only -- the gaze speaks through the message box; every
         other datacore state leaves it alone."""
         if not self.teaser:
@@ -266,23 +267,23 @@ class datacorePanel:
                 if next_evolution(self.pet) is None
                 else t("datacore_shape_looms", "A shape looms in the core…"))
 
-    def _detail_scene(self):
+    def _detail_scene(self) -> Any:
         """One candidate's requirement checklist (evolution.requirement_report):
         met gates dim out of the way, the unmet ones are the raising guide."""
         from rich.text import Text
-        num, name = self.detail
-        if num == evolution.divergence_target(self.pet):
+        num, name = self.detail  # type: ignore
+        if num == evolution.divergence_target(self.pet):  # type: ignore
             # the steer's own sheet: lines.requirement_report would say
             # "not in this line" -- true, and exactly the point; what
             # fires this jump is the charge (gameplay audit B3)
             report = core.divergence_report(self.pet)
         else:
-            report = (lines.requirement_report(self.pet, num) if lines.active(self.pet)
-                      else evolution.requirement_report(self.pet, num))
+            report = (lines.requirement_report(self.pet, num) if lines.active(self.pet)  # type: ignore
+                      else evolution.requirement_report(self.pet, num))  # type: ignore
         vis = DET_VIS
-        out = menu.header(t("datacore_hdr_req", "DATACORE  {name}").format(name=name[:16].upper()), t("datacore_req_tag", "req"))
+        out = menu.header(t("datacore_hdr_req", "DATACORE  {name}").format(name=name[:16].upper()), t("datacore_req_tag", "req"))  # type: ignore
 
-        def fmt(r, i):
+        def fmt(r: Any, i: Any) -> Any:
             met, txt = r
             mark = {True: " " + chr(0x2713) + " ", False: " " + chr(0x2717) + " ",
                     None: "   "}[met]
@@ -296,7 +297,7 @@ class datacorePanel:
         out.append_text(menu.footer(t("datacore_hint_scroll_back", "↑↓ scroll{more}   ESC back").format(more=more)))
         return out
 
-    def _evolves_scene(self, rows, dots):
+    def _evolves_scene(self, rows: Any, dots: Any) -> Any:
         from rich.text import Text
         out = menu.header(t("datacore_hdr_evolves", "DATACORE  EVOLVES"), dots)
         if isinstance(rows, str):                      # "(final form)"
@@ -307,7 +308,7 @@ class datacorePanel:
 
         div = evolution.divergence_target(self.pet)
 
-        def fmt(r, j):
+        def fmt(r: Any, j: Any) -> Any:
             num, name, ready, unmet = r
             cur = j == self.evo_sel
             # the armed DNA steer wears its own word: it isn't "gates met",
@@ -324,7 +325,7 @@ class datacorePanel:
         out.append_text(menu.footer(t("datacore_hint_evolves", "↑↓ pick  ENTER req  ←→ page  ESC out")))
         return out
 
-    def text(self):
+    def text(self) -> Any:
         if self.teaser:
             return self._teaser_scene()
         if self._back_t:                              # evolSilhouetteBack: dark blink

@@ -4,6 +4,7 @@ Navigating previews a theme (applied to the live UI but NOT saved); Enter keeps
 it (persists to disk); Esc cancels back to whatever theme was active on open.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.text import Text
 import tuipet.utils.theme as theme
 import tuipet.ui.components.menu as menu
@@ -26,33 +27,33 @@ _NOTES = {
 class ThemePanel:
     """Lists the themes with a swatch; navigating live-previews the whole UI."""
 
-    def __init__(self, on_change=None):
+    def __init__(self, on_change: Optional[Any]=None) -> None:
         self.names = theme.names()
         self.original = theme.current()        # restore this if the user cancels
         self.cursor = self.names.index(self.original) if self.original in self.names else 0
         self.on_change = on_change
 
-    def _preview(self):
+    def _preview(self) -> None:
         theme.apply(self.names[self.cursor])   # live preview only -- not persisted yet
         if self.on_change:
             self.on_change()
 
-    def _settle(self, name):
+    def _settle(self, name: str) -> None:
         theme.apply(name)
         if self.on_change:
             self.on_change()
 
-    def strip(self):
+    def strip(self) -> Any:
         return menu.hints(("↑↓", t("theme_hint_preview", "preview")), ("ENTER", t("theme_hint_keep", "keep")),
                           ("ESC", t("theme_hint_revert", "revert")))
 
-    def anim(self):
+    def anim(self) -> None:
         # a frame heartbeat so the app repaints at 10 Hz and an
         # over-wide menu.note can actually SCROLL (marquee sweep
         # 2026-07-15) -- this panel had no animation of its own
         pass
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("up", "k"):
             self.cursor = (self.cursor - 1) % len(self.names)
             self._preview()
@@ -69,7 +70,7 @@ class ThemePanel:
             return ("done", None)
         return None
 
-    def text(self):
+    def text(self) -> Any:
         out = menu.header(t("theme_hdr_themes", "THEMES"), f"{self.cursor + 1}/{len(self.names)}")
         for i, name in enumerate(self.names):
             t_obj = theme.THEMES[name]

@@ -24,9 +24,9 @@ def _wild_zone():
 
 def _at_the_ambush(monkeypatch):
     """March until the ambush springs; returns the panel mid-telegraph."""
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 1.0)
     pan = AdventurePanel(_pet(), zone=_wild_zone())
     for _ in range(TELE_LEAVE_T + TELE_ARRIVE_T + 60):
         pan.anim()
@@ -36,9 +36,9 @@ def _at_the_ambush(monkeypatch):
 
 
 def test_the_engine_rolls_the_zones_own_wilds_and_towns_are_safe(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 1.0)
     z = _wild_zone()
     a = Adventure(_pet(), zone=z)
     r = a.travel()

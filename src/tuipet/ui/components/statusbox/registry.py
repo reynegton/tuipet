@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from .helpers import *
 from .home_screen import *
 from .egg_screen import *
@@ -12,14 +13,14 @@ class _SubView:
     top-level mode only, and BattlePanel is never top-level)."""
     __slots__ = ("_app", "mode")
 
-    def __init__(self, app, mode):
+    def __init__(self, app: Any, mode: Any) -> None:
         self._app, self.mode = app, mode
 
-    def __getattr__(self, k):
+    def __getattr__(self, k: Any) -> Any:
         return getattr(self._app, k)
 
 
-def _registry():
+def _registry() -> Any:
     """Panel class -> painter.  Built lazily: importing every screen at
     module import would be a cycle magnet."""
     from tuipet.ui.screens import (assistscreen, backgroundscreen, battlescreen, bugscreen,
@@ -51,7 +52,7 @@ def _registry():
     )
 
 
-def painter_for(mode):
+def painter_for(mode: Any) -> Any:
     """The painter for a mode instance, or None (home screen -> vitals).
 
     SUB CHAINS RESOLVE FIRST (modularize 2026-07-22, Joel: "why are

@@ -15,6 +15,7 @@ persistence.get_album(); nothing here is guessed or drawn.
 ↑↓ browse, PgUp/PgDn leap, ENTER view, ←→ page inside the book, ESC out.
 Opened from the datacore TROPHIES page (where its count already lived)."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.text import Text
 import tuipet.data.loaders.data as data
 import tuipet.ui.components.menu as menu
@@ -26,7 +27,7 @@ VIS = 9                      # list rows shown at once (the egg-guide window)
 IMG_W, IMG_H = 40, 16        # detail pixel area (8 character rows)
 
 
-def route_hint(num):
+def route_hint(num: int) -> Any:
     """How an undiscovered form is reached (gameplay polish #15,
     2026-07-22): the book was a completion checklist with the HOW
     invisible -- "keep raising" over hundreds of masked entries, while
@@ -58,7 +59,7 @@ def route_hint(num):
 
 
 class AlbumPanel:
-    def __init__(self, pet=None):
+    def __init__(self, pet: Optional[Any]=None) -> None:
         self.pet = pet
         self.roster = data.album_roster()
         self.seen = set(persistence.get_album()) & set(self.roster)
@@ -69,16 +70,16 @@ class AlbumPanel:
         self.sfx = None
 
     # ---- panel protocol --------------------------------------------------
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         if self.detail:
             return menu.hints(("←→", t("album_key_browse", "browse")), ("ESC", t("album_key_back", "back")))
         return menu.hints(("↑↓", t("album_key_browse", "browse")), ("ENTER", t("album_key_view", "view")),
                           ("ESC", t("album_key_out", "out")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.detail:
             if k in ("left", "h", "up", "k"):
                 self.i = (self.i - 1) % self.n
@@ -109,20 +110,20 @@ class AlbumPanel:
         return None
 
     # ---- the list ----------------------------------------------------------
-    def _rec(self, num):
+    def _rec(self, num: int) -> Any:
         return data.load_sprites()[1].get(num) or {}
 
-    def _note(self, num):
+    def _note(self, num: int) -> Any:
         if num not in self.seen:
             return t("album_not_yet_disc", "not yet discovered")
         rec = self._rec(num)
         fld = data.pretty_field(rec.get("field", "") or "")
         return t("album_no", "No. #{num}").format(num=num) + (f" · {fld}" if fld else "")
 
-    def _list_scene(self):
+    def _list_scene(self) -> Any:
         out = menu.header(t("album_hdr_album", "ALBUM"), f"{len(self.seen)}/{self.n}")
 
-        def fmt(num, j):
+        def fmt(num: int, j: Any) -> Any:
             cur = j == self.i
             seen = num in self.seen
             body = INK_B if cur else (INK if seen else DIM)
@@ -142,7 +143,7 @@ class AlbumPanel:
         return out
 
     # ---- one entry's page ----------------------------------------------------
-    def _detail_scene(self):
+    def _detail_scene(self) -> Any:
         from tuipet.core.datacore import silhouette
         num = self.roster[self.i]
         seen = num in self.seen
@@ -183,5 +184,5 @@ class AlbumPanel:
         out.right_crop(1)     # keys ride the strip (the egg-guide law)
         return out
 
-    def text(self):
+    def text(self) -> Any:
         return self._detail_scene() if self.detail else self._list_scene()

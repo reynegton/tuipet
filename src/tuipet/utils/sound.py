@@ -7,6 +7,7 @@ spawn a desktop player (it would play on the server, not at your terminal);
 Termux's termux-media-player always plays on the phone, so it's preferred.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import array
 import os
 import shutil
@@ -36,39 +37,39 @@ _DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "sounds"
 # theme.txt's twin -- a hardcoded ~/.local that silently dropped the
 # volume choice on iOS and escaped the test sandbox.  erase_all sweeps
 # volume.txt + sndcache/ now; it never had either).
-def _state_dir():
+def _state_dir() -> Any:
     import tuipet.utils.persistio as persistio
     return persistio.SAVE_DIR
 
 
-def _vol_conf():
+def _vol_conf() -> Any:
     return os.path.join(_state_dir(), "volume.txt")
 
 
-def _cache_dir():
+def _cache_dir() -> Any:
     return os.path.join(_state_dir(), "sndcache")
 DEFAULT_VOLUME = 50   # Joel 2026-07-23: "audio volume starts at 50% by
 #                       default" -- a saved volume.txt still wins; only a
 #                       fresh install (or a wiped save dir) lands here
 
 
-def _amp(v):
+def _amp(v: Any) -> Any:
     """Slider percent -> amplitude factor: 0.5 * (v/100)^2."""
     return 0.5 * (v / 100.0) ** 2
 
 
-def _load_volume():
+def _load_volume() -> Any:
     try:
         return max(10, min(100, int(open(_vol_conf()).read().strip())))
     except (OSError, ValueError):
         return DEFAULT_VOLUME
 
 
-def volume():
+def volume() -> Any:
     return _volume
 
 
-def set_volume(v):
+def set_volume(v: Any) -> Any:
     """Clamp, remember and persist the playback volume (percent)."""
     global _volume
     _volume = max(10, min(100, int(v)))
@@ -81,7 +82,7 @@ def set_volume(v):
     return _volume
 
 
-def _scaled(f, name):
+def _scaled(f: Any, name: str) -> Any:
     """The pre-attenuated copy of `f` for the current volume (built lazily,
     one cache dir per level, atomic rename so a half-written wav is never
     served).  Any failure falls back to the ORIGINAL file: a full-strength
@@ -119,7 +120,7 @@ def _scaled(f, name):
         return f
 
 
-def _find_player():
+def _find_player() -> Any:
     # iOS (a-Shell, our official iPhone/iPad target) sandboxes audio and gives
     # Python no way to spawn a player -- subprocess/fork is not available.  Say
     # so up front rather than detecting a phantom player we could never run:
@@ -144,11 +145,11 @@ _PLAYER = _find_player()
 _volume = _load_volume()
 
 
-def available():
+def available() -> Any:
     return _PLAYER is not None
 
 
-def backend():
+def backend() -> Any:
     """The detected player's command name ('' when none — the app falls back
     to the terminal bell). Surfaced on the OPTIONS sound row so a silent
     install self-explains (the Termux no-player mystery)."""
@@ -158,7 +159,7 @@ def backend():
 _bridge_checked = False
 
 
-def _termux_bridge_live():
+def _termux_bridge_live() -> Any:
     """Is the Termux:API *app* actually installed behind the bridge?
 
     `pkg install termux-api` gives you the termux-media-player BINARY, but it
@@ -182,7 +183,7 @@ def _termux_bridge_live():
         return False
 
 
-def play(name):
+def play(name: str) -> Any:
     """Play data/sounds/<name>.wav non-blocking; True if a player was dispatched."""
     global _PLAYER, _bridge_checked
     if not _PLAYER:

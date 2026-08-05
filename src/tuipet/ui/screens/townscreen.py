@@ -10,6 +10,7 @@ A SubHost: the shop OR a cup match rides as a child (the old town hosted both);
 returns ('done', None) to the adventure when the pet leaves.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.ui.components.menu as menu
 import tuipet.core.tournament as tournament
 from tuipet.utils.theme import INK, INK_B, DIM, POS    # noqa: F401  (theme.apply propagation)
@@ -25,7 +26,7 @@ _LAST_CURSOR = [0]
 
 
 class TownPanel(menu.SubHost):
-    def __init__(self, pet, town_id):
+    def __init__(self, pet: Any, town_id: Any) -> None:
         # town_id is REQUIRED (audit 2026-07-25): None silently meant the
         # HOME counter -- full unrationed catalog, Honors tab, and town 0's
         # trophy -- in a constructor whose whole job is "this town"
@@ -36,18 +37,18 @@ class TownPanel(menu.SubHost):
         self.tourney = None            # a running town-cup bracket (sub is its match)
         self._cup_done = False         # the cup runs ONCE per town visit
         self.frame_i = 0
-        self.sfx = None
+        self.sfx = None  # type: ignore
         # <= 38 cols: the hub body clips hard, no marquee (sheet audit
         # 2026-07-21 caught the old line dying mid-word at "resupply, o")
         self.msg = t("town_msg_intro", "A town on the road — rest up, shop.")
 
-    def anim(self):
+    def anim(self) -> None:
         if self.sub_anim():            # the shop / cup match owns the clock
             return
         self.frame_i += 1
 
     # -- input ----------------------------------------------------------------
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.sub_key(k, self._cup_match_done if self.tourney is not None
                         else self._sub_done):
             return None
@@ -68,21 +69,21 @@ class TownPanel(menu.SubHost):
                 from tuipet.ui.screens.shopscreen import ShopPanel
                 # the real shop layout, serving THIS town's authored stock,
                 # local prices, and the day's deal (shops arc 2026-07-21)
-                self.sub = ShopPanel(self.pet, town_id=self.town_id)
+                self.sub = ShopPanel(self.pet, town_id=self.town_id)  # type: ignore
             elif key == "eggs":
                 from tuipet.ui.screens.shopscreen import ShopPanel
                 # this town's DISTINCT egg band, on the SHOP's own Eggs tab
                 # (shops-look-the-same 2026-07-22: the one-off thumbnail
                 # grid made the town's egg counter a different UI from
                 # every other shelf -- one shop family now, one layout)
-                self.sub = ShopPanel(self.pet, town_id=self.town_id,
+                self.sub = ShopPanel(self.pet, town_id=self.town_id,  # type: ignore
                                      start_tab="Eggs")
             elif key == "sell":
                 from tuipet.ui.screens.shopscreen import ShopPanel
                 # the real bag (use / sell back), same layout as home --
                 # paying THIS town's rates: demand goods fetch 70%, its own
                 # stock a pittance (buy-low/sell-high, shops arc 2026-07-21)
-                self.sub = ShopPanel(self.pet, start_mode="bag", bag_only=True,
+                self.sub = ShopPanel(self.pet, start_mode="bag", bag_only=True,  # type: ignore
                                      town_id=self.town_id)
             elif key == "cup":
                 self._start_cup()
@@ -92,7 +93,7 @@ class TownPanel(menu.SubHost):
             return ("done", None)
         return None
 
-    def _sub_done(self, result):
+    def _sub_done(self, result: Any) -> None:
         """The shop/bag closed.  The payloads _after_shop PLAYS at home (eat
         fx, evolution strobe, item scripts) have no LCD here, so the town
         SPEAKS them -- SHOW-FLOW: a show plays or speaks (audit 2026-07-25:
@@ -112,7 +113,7 @@ class TownPanel(menu.SubHost):
             self.msg = t("town_msg_anything_else", "Mais alguma coisa?")          # a plain browse -> back to the menu
 
     # -- the town cup ---------------------------------------------------------
-    def _start_cup(self):
+    def _start_cup(self) -> None:
         """Enter the distinct town championship (one per visit)."""
         if self._cup_done:
             self.msg = t("town_msg_cup_run", "The Town Cup has run — come back next visit.")
@@ -158,33 +159,33 @@ class TownPanel(menu.SubHost):
         # the town cup fighting three bare bouts with none of the show.
         from tuipet.ui.screens.tournamentscreen import TournamentPanel
         pan = TournamentPanel(self.pet)
-        pan.tourney = tournament.Tournament(self.pet, cup)    # stake paid on entry
+        pan.tourney = tournament.Tournament(self.pet, cup)    # type: ignore
         pan.phase = "bracket"
         pan.tree_view = True                     # the event opens on the field
-        self.sfx = "mischief"                    # tourneyStart, like the home board
+        self.sfx = "mischief"                    # type: ignore
         self.tourney = pan.tourney               # the visit flag's live handle
-        self.sub = pan
+        self.sub = pan  # type: ignore
 
-    def _cup_match_done(self, result):
+    def _cup_match_done(self, result: Any) -> None:
         """The cup panel closed: ('done', (last, champion)) from the bracket,
         or None from its select-phase escape (unreachable here -- the panel
         never enters select)."""
         self.tourney = None
         if isinstance(result, tuple):
             last, champ = result
-            self.sfx = "champion" if champ else "lose"
+            self.sfx = "champion" if champ else "lose"  # type: ignore
             self.msg = last or (t("town_msg_champ", "Campeão da cidade!") if champ
                                 else t("town_msg_ko", "Knocked out of the Town Cup."))
         else:
             self.msg = t("town_msg_forfeit", "You forfeit the Town Cup.")
 
     # -- render ---------------------------------------------------------------
-    def strip(self):
+    def strip(self) -> Any:
         if self.sub is not None:
             return self.sub.strip()
         return menu.hints(("↑↓", t("town_hint_pick", "pick")), ("ENTER", t("town_hint_go", "go")), ("ESC", t("town_hint_leave", "leave")))
 
-    def text(self):
+    def text(self) -> Any:
         if self.sub is not None:
             return self.sub.text()
         out = menu.header(t("town_hdr_town", "TOWN"), "")

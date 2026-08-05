@@ -11,6 +11,7 @@ licence cut 2026-07-17: every egg is earned, none are sold.)
 ↑↓ browse the list, ENTER opens one egg's story (←→ pages between eggs
 without leaving it), ESC backs out."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.core.egg as egg_mod
 import tuipet.ui.components.menu as menu
@@ -24,7 +25,7 @@ _MARK = {"owned": "✓", "temp": "~", "locked": "✗"}
 _VAL_W = 27                               # detail value column (38 - 10 label - cursor pad)
 
 
-def _wrap(text, width=_VAL_W):
+def _wrap(text: str, width: Any=_VAL_W) -> Any:
     """Greedy word wrap for the detail page's unlock line."""
     words, lines, cur = text.split(), [], ""
     for w in words:
@@ -38,14 +39,14 @@ def _wrap(text, width=_VAL_W):
     return lines
 
 
-def _short_progress(line):
+def _short_progress(line: Any) -> Any:
     """'lifetime wins 37/50' -> '37/50' for the list's right-hand tag."""
     tail = line.rsplit(" ", 1)[-1]
     return tail if "/" in tail else ""
 
 
 class EggGuidePanel:
-    def __init__(self, pet=None):
+    def __init__(self, pet: Optional[Any]=None) -> None:
         self.pet = pet
         self.prog = persistence.get_progress()
         owned = egg_mod.owned_now()           # earned-but-unbanked reads owned
@@ -59,16 +60,16 @@ class EggGuidePanel:
         self.sfx = None
 
     # ---- panel protocol --------------------------------------------------
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         if self.detail:
             return menu.hints(("←→", t("hint_browse", "browse")), ("ESC", t("hint_back", "back")))
         return menu.hints(("↑↓", t("hint_browse", "browse")), ("ENTER", t("hint_story", "story")),
                           ("ESC", t("hint_out", "out")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.detail:
             if k in ("left", "h", "up", "k"):
                 self.i = (self.i - 1) % self.n
@@ -100,7 +101,7 @@ class EggGuidePanel:
         return None
 
     # ---- the list ----------------------------------------------------------
-    def _tag(self, idx):
+    def _tag(self, idx: int) -> Any:
         state = self.states[idx]
         if state == "owned":
             return t("egg_guide_yours", "yours")
@@ -108,18 +109,18 @@ class EggGuidePanel:
             return t("egg_guide_this_gen", "this gen")
         return _short_progress(egg_mod.unlock_progress(idx, self.prog)) or t("egg_guide_locked", "locked")
 
-    def _note(self, idx):
+    def _note(self, idx: int) -> Any:
         """The selected egg's one-line story under the list: the rule's own
         LockedDescription, else the live win-gate counter (mystery eggs)."""
         rule = self.rules.get(idx)
         return (rule["desc"] if rule else "") or egg_mod.unlock_progress(idx, self.prog)
 
-    def _list_scene(self):
+    def _list_scene(self) -> Any:
         from rich.text import Text
         have = sum(1 for s in self.states.values() if s in ("owned", "temp"))
         out = menu.header(t("egg_guide_header", "EGG GUIDE"), f"{have}/{self.n}")
 
-        def fmt(idx, j):
+        def fmt(idx: int, j: Any) -> Any:
             cur = j == self.i
             state = self.states[idx]
             t = Text()
@@ -137,7 +138,7 @@ class EggGuidePanel:
         return out
 
     # ---- one egg's story -----------------------------------------------------
-    def _detail_rows(self, idx):
+    def _detail_rows(self, idx: int) -> Any:
         state = self.states[idx]
         rule = self.rules.get(idx)
         rows = [(t("egg_guide_state_label", "State"), {"owned": t("egg_guide_state_owned", "yours — on the carousel"),
@@ -160,7 +161,7 @@ class EggGuidePanel:
                      if rule is not None and not rule["can_perm"] else t("egg_guide_keeps_forever", "forever")))
         return rows
 
-    def _detail_scene(self):
+    def _detail_scene(self) -> Any:
         name = egg_mod.hatch_name(self.i)
         out = menu.header(f"{t('egg_guide_header_single', 'EGG')}  {name[:20].upper()}", f"{self.i + 1}/{self.n}")
         rows = self._detail_rows(self.i)
@@ -171,5 +172,5 @@ class EggGuidePanel:
         out.right_crop(1)     # keys ride the strip (round 34)
         return out
 
-    def text(self):
+    def text(self) -> Any:
         return self._detail_scene() if self.detail else self._list_scene()

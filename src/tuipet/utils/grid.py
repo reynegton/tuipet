@@ -15,6 +15,7 @@ Rules enforced by the helpers below:
   - no overlap: face-off placements are pulled to opposite edges with a centre gap
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 COLS = 40
 ROWS = 12
@@ -33,7 +34,7 @@ WINDOW = (X0, X1, TOP, FLOOR)   # the LOCKED 32x16 play window as a clip rect
 #                                 occasion; weather alone covers the whole LCD)
 
 
-def _crop(sprite):
+def _crop(sprite: Any) -> Any:
     """Trim a sprite to its lit content (creatures carry transparent padding)."""
     if not sprite:
         return sprite
@@ -46,20 +47,20 @@ def _crop(sprite):
     return [rows[y][xs[0]:xs[-1] + 1] for y in range(ys[0], ys[-1] + 1)]
 
 
-def band_h(ph=PXH):
+def band_h(ph: Any=PXH) -> Any:
     """Tallest a sprite may be to sit inside the band AND ground 2px above the bottom.
     24px arena -> 16 (the classic creature band, top at y6); a shorter embedded strip
     (e.g. the 14px jogress/tournament/adventure box) -> ph-2, filling it grounded."""
     return min(CELL, ph - 2)
 
 
-def lit(c):
+def lit(c: Any) -> Any:
     """Is a sprite pixel INK?  (Ported with the 0.5 battlescreen 2026-07-17;
     this tree's rows are 1-bit "0"/"1" chars.)"""
     return c not in (None, "0")
 
 
-def fit_band(sprite, ph=PXH):
+def fit_band(sprite: Any, ph: Any=PXH) -> Any:
     """Box-downscale a sprite's HEIGHT to <= band_h(ph) so it never overflows the box."""
     if not sprite:
         return sprite
@@ -78,7 +79,7 @@ def fit_band(sprite, ph=PXH):
     return out
 
 
-def fit_w(sprite, target):
+def fit_w(sprite: Any, target: Any) -> Any:
     """Box-downscale a sprite's WIDTH to <= target."""
     if not sprite:
         return sprite
@@ -95,7 +96,7 @@ def fit_w(sprite, target):
     return out
 
 
-def fit(sprite, ph=PXH):
+def fit(sprite: Any, ph: Any=PXH) -> Any:
     """Cap a sprite to one grid cell: <= band_h(ph) tall AND <= CELL wide.
 
     Crops to lit content FIRST so transparent padding never forces a downscale --
@@ -105,11 +106,11 @@ def fit(sprite, ph=PXH):
     return fit_w(fit_band(_crop(sprite), ph), CELL)
 
 
-def width(sprite):
+def width(sprite: Any) -> Any:
     return max((len(r) for r in sprite), default=0)
 
 
-def prep(sprite, ph=PXH):
+def prep(sprite: Any, ph: Any=PXH) -> Any:
     """Fit-to-cell + crop-to-content -- the grid-ready form the placement helpers use
     (handy for custom slide animations that need the fitted sprite + its width)."""
     return _crop(fit(sprite, ph))
@@ -117,19 +118,19 @@ def prep(sprite, ph=PXH):
 
 
 
-def center(sprite, mirror=False, ph=PXH):
+def center(sprite: Any, mirror: bool=False, ph: Any=PXH) -> Any:
     """(sprite, x, mirror) centred in the 32 grid, fitted + cropped."""
     s = _crop(fit(sprite, ph))
     return (s, X0 + (W - width(s)) // 2, mirror)
 
 
-def cell(sprite, side, mirror=False, ph=PXH):
+def cell(sprite: Any, side: Any, mirror: bool=False, ph: Any=PXH) -> Any:
     """(sprite, x, mirror) centred in cell 0 (left) or 1 (right) of the 32x16 grid."""
     s = _crop(fit(sprite, ph))
     return (s, X0 + side * CELL + (CELL - width(s)) // 2, mirror)
 
 
-def faceoff(left_sprite, right_sprite, left_mirror=True, right_mirror=False, ph=PXH):
+def faceoff(left_sprite: Any, right_sprite: Any, left_mirror: bool=True, right_mirror: bool=False, ph: Any=PXH) -> Any:
     """Two creatures facing off: left hugs X0, right hugs X1, each fitted to a cell so a
     centre GAP always remains (no overlap).  Returns [left_placement, right_placement].
     Sprites face LEFT natively, so the defaults (left mirrored, right not) turn them to
@@ -152,7 +153,7 @@ def faceoff(left_sprite, right_sprite, left_mirror=True, right_mirror=False, ph=
     return out
 
 
-def roam_bounds(sprite_w=CELL):
+def roam_bounds(sprite_w: Any=CELL) -> Any:
     """(left_bound, right_bound) for a roaming/walking pet so it stays inside the grid:
     x in [X0, X1 - sprite_w].  Feed to anim.Roamer.step(left_bound, right_bound)."""
     return X0, X1 - sprite_w

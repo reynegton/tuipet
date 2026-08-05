@@ -4,18 +4,19 @@ import logging
 import os
 import time
 import state
+from typing import Any, Dict, Optional
 
 LOG = logging.getLogger("tuipet.lobby")
 
 _STAGES = {"Egg", "Fresh", "InTraining", "Rookie", "Champion", "Ultimate", "Mega"}
 
-def _load_saves():
+def _load_saves() -> Dict[str, Any]:
     try:
         return json.load(open(state.SAVES_PATH))
     except (OSError, ValueError):
         return {}
 
-def _prune_saves(now=None):
+def _prune_saves(now: Optional[float] = None) -> None:
     now = time.time() if now is None else now
     changed = False
     for k, sv in list(state.SAVES.items()):
@@ -46,7 +47,7 @@ def _prune_saves(now=None):
         except OSError:
             LOG.warning("saves prune: disk refused %s", state.SAVES_PATH)
 
-def _valid_save(save):
+def _valid_save(save: Any) -> bool:
     if not isinstance(save, dict):
         return False
     stage = save.get("stage")
@@ -56,7 +57,7 @@ def _valid_save(save):
         return False
     return True
 
-async def _store_save(key, save):
+async def _store_save(key: str, save: Dict[str, Any]) -> bool:
     if not _valid_save(save):
         return False
     now = time.time()
@@ -74,7 +75,7 @@ async def _store_save(key, save):
         os.replace(tmp, state.SAVES_PATH)
     return True
 
-def _take_lease(client, key, boot):
+def _take_lease(client: Any, key: str, boot: Any) -> None:
     cur = state.LEASES.get(key)
     seen = state.BOOT_SEEN.setdefault(key, {})
     if boot and boot not in seen:
@@ -89,6 +90,6 @@ def _take_lease(client, key, boot):
     state.LEASES[key] = (boot, serial)
     client.lease = serial
 
-def _lease_ok(client, key):
+def _lease_ok(client: Any, key: str) -> bool:
     cur = state.LEASES.get(key)
     return cur is not None and cur[1] == getattr(client, "lease", None)

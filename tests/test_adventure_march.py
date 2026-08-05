@@ -27,9 +27,9 @@ def _bossless_zone():
 def no_encounters(monkeypatch):
     """Isolate the MARCH from the wild-encounter roll AND the loot-find roll
     (phases 3/9) so these tests exercise pure travel/progress."""
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
 
 
 def test_zone_pick_is_deterministic_and_one_biome():

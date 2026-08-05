@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -7,7 +8,7 @@ import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines_mod
 from tuipet.core.petbase import *
 
-def _tick_auto_care(pet, dt):
+def _tick_auto_care(pet: Any, dt: Any) -> None:
     """PhysicalState.checkAutoCare, one game-min cadence.  The hourly retainer
     bills first (unpaid -> off duty); then at most one visit per spacing --
     awake: filth > hunger > strength; asleep: filth > a lit room (unless the

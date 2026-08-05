@@ -9,6 +9,7 @@ nothing but land nothing (the no-praise-farming rule); refusals stay
 soft — discipline is the tantrum economy, not a leash.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import tuipet.ui.components.menu as menu
 from tuipet.core.petbase import MAX_OBEDIENCE
@@ -22,19 +23,19 @@ _ROWS = (
 
 
 class DisciplinePanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.cursor = 1 if pet.discipline_call else 0   # an open call preselects Scold
         self.frame_i = 0
         self.sfx = None
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         return menu.hints(("ENTER", t("disc_hint_apply", "apply")), ("ESC", t("disc_hint_back", "back")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k in ("up", "down", "j", "k"):
             self.cursor = 1 - self.cursor
         elif k in ("enter", "space"):
@@ -57,7 +58,7 @@ class DisciplinePanel:
             return ("done", None)
         return None
 
-    def _state_line(self):
+    def _state_line(self) -> Any:
         p = self.pet
         if p.discipline_call:
             return t("disc_msg_acting_up", "it is ACTING UP — a scold lands")
@@ -65,7 +66,7 @@ class DisciplinePanel:
             return t("disc_msg_proud", "a PROUD moment — praise lands")
         return t("disc_msg_calm", "all calm — neither will land")
 
-    def text(self):
+    def text(self) -> Any:
         out = menu.header(t("disc_hdr_disc", "DISCIPLINE"), t("disc_hdr_manners", "manners {ob}/{max}").format(ob=self.pet.obedience, max=MAX_OBEDIENCE))
         for i, (lbl_key, lbl_def, desc_key, desc_def) in enumerate(_ROWS):
             sel = i == self.cursor

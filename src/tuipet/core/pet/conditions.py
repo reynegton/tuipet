@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -8,16 +9,16 @@ import tuipet.core.lines as lines_mod
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def age_days(pet):
+def age_days(pet: Any) -> Any:
     """The clone's age scale (v0.4.12 age_days): whole REAL days lived."""
     return int(pet.age_seconds // AGE_DAY)
 
 
-def ideal_temp(pet):
+def ideal_temp(pet: Any) -> Any:
     return data.load_requirements().get(pet.num, {}).get("ideal_temp", (40, 60))
 
 
-def needs_care(pet):
+def needs_care(pet: Any) -> Any:
     """The PHYSICAL half of the care call -- what the '!' rail icon shows:
     an awake, hatched pet that is starving, effort-empty, sick, HURT,
     filthy or exhausted, or a SLEEPER with the lights burning (canon
@@ -43,7 +44,7 @@ def needs_care(pet):
             or pet.injured or pet.poop >= 3 or pet.energy <= 0)
 
 
-def needs_attention(pet):
+def needs_attention(pet: Any) -> Any:
     """The FULL alarm predicate (HUD beep/nag + mood-lapse gate): physical
     needs OR an open discipline moment.  Split 2026-07-11: the '!' icon
     draws on needs_care() only; this union keeps the alarm and the
@@ -54,7 +55,7 @@ def needs_attention(pet):
     return pet.needs_care()
 
 
-def near_bedtime(pet):
+def near_bedtime(pet: Any) -> Any:
     """sleepNotNap: nod-off sits inside the real-sleep edge -- the yawning
     special idle's eligibility (and lights-out now means SLEEP).  Routed
     through the model-aware _near_bedtime so LINE pets (the wall-clock
@@ -64,7 +65,7 @@ def near_bedtime(pet):
         SLEEP_NOT_NAP_MIN - pet.restless * SLEEP_NOT_NAP_RESTLESS)
 
 
-def condition(pet):
+def condition(pet: Any) -> Any:
     """CONDITION 0..3: how well-kept the pet is RIGHT NOW.  Care pays into
     SKILL, not just survival (2026-07-14): the training drills read this
     tier and widen their timing zones/windows for a well-kept pet -- a
@@ -78,7 +79,7 @@ def condition(pet):
     return tier
 
 
-def current_mood(pet):
+def current_mood(pet: Any) -> Any:
     """DERIVED (no mood meter): the word keys off LIVE state.  Unhappy
     when unwell or unfed; HAPPY when perfectly kept -- condition tier 3
     with nothing else wrong, the same "bright" bar the walk poses use.
@@ -93,12 +94,12 @@ def current_mood(pet):
     return "Neutro"
 
 
-def is_fatigued(pet):
+def is_fatigued(pet: Any) -> Any:
     """Always False: the fatigue system left (BASIC VPET 2026-07-16)."""
     return False
 
 
-def is_injured(pet):
+def is_injured(pet: Any) -> Any:
     """The second ailment, RESTORED (canon restoration 2026-07-23 --
     the 2026-07-16 strip took a feature the real hardware has).
     Battles wound (record_battle's adapted BattleInjury roll); the
@@ -106,7 +107,7 @@ def is_injured(pet):
     return pet.injured
 
 
-def is_frail(pet):
+def is_frail(pet: Any) -> Any:
     """The frailty WARNING (Joel 2026-07-13, after MetalGreymon died with
     8 unseen mistakes): an Ultimate/Mega carrying 3+ care mistakes is
     closing on the 5-slip elder death (_check_death_caps) -- surface it
@@ -114,24 +115,24 @@ def is_frail(pet):
     return pet.stage in ("Ultimate", "Mega") and pet.care_mistakes >= 3
 
 
-def is_freezing(pet):
+def is_freezing(pet: Any) -> Any:
     """Always False: ambient temperature left with the weather system
     (BASIC VPET 2026-07-16).  Kept as an API pin -- screens poke it."""
     return False
 
 
-def is_overheating(pet):
+def is_overheating(pet: Any) -> Any:
     """Always False (same removal as is_freezing)."""
     return False
 
 
-def _is_failed_form(pet):
+def _is_failed_form(pet: Any) -> Any:
     """isFilthyEvol: the current form is a SpecialEvolution=Failed one."""
     r = data.load_requirements().get(pet.num, {})
     return (r.get("special") or "None") == "Falhou"
 
 
-def status_word(pet):
+def status_word(pet: Any) -> Any:
     from tuipet.i18n.translator import t
     if pet.dead:
         return t("status_passed_away", "passed away")

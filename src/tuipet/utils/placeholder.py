@@ -3,10 +3,11 @@
 real, extracted art), but if a future build has an unfinished cell we show a real
 DVPet sprite, never a drawn one."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 
 
-def _frames():
+def _frames() -> Any:
     cm = data.load_effects().get("copymon")
     return cm if cm else [["0000000000000000"]]
 
@@ -23,7 +24,7 @@ W = max(len(r) for r in FRAMES[0])
 H = len(FRAMES[0])
 
 
-def record(num, name, stage, attribute):
+def record(num: int, name: str, stage: Any, attribute: Any) -> Any:
     return {"num": num, "name": name, "stage": stage, "attribute": attribute,
             "field": "None", "element": "None", "spriteSet": 0, "spriteNum": 0,
             "w": W, "h": H, "frames": FRAMES, "_placeholder": True}

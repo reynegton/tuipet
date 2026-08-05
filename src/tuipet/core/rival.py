@@ -15,6 +15,7 @@ pick_enemy, ideal condition, no purse — so nothing about balance changes;
 only the NAME on the fight does.  Rival bouts wear the arena backdrop (a
 visiting tamer brings the ring with them)."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 
 import tuipet.data.loaders.data as data
@@ -29,13 +30,13 @@ CADENCE = 3                     # every 3rd home bout is the rival's challenge
 LADDER = ["InTraining", "Rookie", "Champion", "Ultimate", "Mega"]
 
 
-def _spans(line):
+def _spans(line: Any) -> Any:
     """A line that can walk the ladder with us (rookie AND champion forms)."""
     stages = {r["stage"] for r in line["members"].values()}
     return "Rookie" in stages and "Champion" in stages
 
 
-def ensure(pet):
+def ensure(pet: Any) -> None:
     """First challenge mints the rival: a tamer name (never the player's
     own account name) and a line that is not the pet's own."""
     if pet.rival_name and pet.rival_line:
@@ -50,7 +51,7 @@ def ensure(pet):
     pet.rival_line = random.choice(lids or sorted(all_lines))
 
 
-def form_for(pet):
+def form_for(pet: Any) -> Any:
     """The rival's pet at OUR stage — it grows alongside.  Stable per
     (line, stage): the same face every rematch, evolving when we do.  A
     line missing our bracket borrows a stage-mate, seeded so the borrowed
@@ -65,12 +66,12 @@ def form_for(pet):
     return random.Random(f"{pet.rival_line}:{st}").choice(cands)
 
 
-def challenges(pet):
+def challenges(pet: Any) -> Any:
     """Every CADENCE'th home bout is the rival's — deterministic, no roll."""
     return pet.battles % CADENCE == CADENCE - 1
 
 
-def maybe_challenge(pet):
+def maybe_challenge(pet: Any) -> Any:
     """The home battle's door: the rival's enemy card on its bout, else
     None (and the ordinary pick_enemy stranger answers)."""
     ensure(pet)
@@ -84,6 +85,6 @@ def maybe_challenge(pet):
             "boss": False, "rival": True, "tamer": pet.rival_name}
 
 
-def record_line(pet):
+def record_line(pet: Any) -> Any:
     """The head-to-head, one line: 'Kai · 3W-2L'."""
     return f"{pet.rival_name} · {pet.rival_wins}W-{pet.rival_losses}L"

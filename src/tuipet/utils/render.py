@@ -5,9 +5,10 @@ Top pixel -> foreground colour, bottom pixel -> background colour. "Off" pixels 
 left transparent (terminal default) unless an LCD background colour is supplied.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from rich.text import Text
 
-def blit(bm, ox, oy):
+def blit(bm: Any, ox: Any, oy: Any) -> Any:
     """Sprite bitmap -> (x,y) pixel list for render_scene/_screen's overlay.
     Tolerates None/blank frames: 28 foods ship a blank 'eaten away' last frame
     that extracts as None -- the eat fx crashed on their final bite (2026-07-04).
@@ -18,7 +19,7 @@ def blit(bm, ox, oy):
             for x, c in enumerate(row) if c == "1"]
 
 
-def _stamp(buf, pts, cols, px_h, clip=None, val=1):
+def _stamp(buf: Any, pts: Any, cols: Any, px_h: Any, clip: Optional[Any]=None, val: int=1) -> None:
     """Overlay pixels -> the buffer, clipped to the LCD (and to `clip`).
     `val` is the buffer plane: 1 = sprite/prop ink, 2 = weather particles
     (painted in their own colour by _paint_cells).  A pixel already inked
@@ -30,7 +31,7 @@ def _stamp(buf, pts, cols, px_h, clip=None, val=1):
             buf[oy_][ox_] = buf[oy_][ox_] or val
 
 
-def _paint_cells(buf, cols, rows, on, bg, bgimg, free_ink=None):
+def _paint_cells(buf: Any, cols: Any, rows: Any, on: Any, bg: Any, bgimg: Any, free_ink: Optional[Any]=None) -> Any:
     """The half-block compositor: a filled pixel buffer -> Rich Text.
     render_screen and render_scene carried two byte-identical copies of this
     loop, which had to be edited in lockstep (refactor 2026-07-05).  Background
@@ -59,7 +60,7 @@ def _paint_cells(buf, cols, rows, on, bg, bgimg, free_ink=None):
 
 
 # A few palettes. "on" = creature ink, "off" = LCD background (None = transparent).
-def render_screen(frame_rows, cols, rows, on="#2b2e31", bg="#c6c9cc", baseline=True, mirror=False, xshift=0, yshift=0, overlay=None, bgimg=None, clip=None, overlay_free=None, free_ink=None):
+def render_screen(frame_rows: Any, cols: Any, rows: Any, on: str="#2b2e31", bg: str="#c6c9cc", baseline: bool=True, mirror: bool=False, xshift: int=0, yshift: int=0, overlay: Optional[Any]=None, bgimg: Optional[Any]=None, clip: Optional[Any]=None, overlay_free: Optional[Any]=None, free_ink: Optional[Any]=None) -> Any:
     """Compose a sprite centred on a fixed cols x rows (character) LCD screen.
 
     Returns a rich Text. The screen is rows*2 pixels tall; the sprite is blitted
@@ -72,8 +73,8 @@ def render_screen(frame_rows, cols, rows, on="#2b2e31", bg="#c6c9cc", baseline=T
     return _paint_cells(buf, cols, rows, on, bg, bgimg, free_ink=free_ink)
 
 
-def fill_buf(frame_rows, cols, px_h, baseline=True, mirror=False, xshift=0,
-             yshift=0, overlay=None, clip=None, overlay_free=None):
+def fill_buf(frame_rows: Any, cols: Any, px_h: Any, baseline: bool=True, mirror: bool=False, xshift: int=0,
+             yshift: int=0, overlay: Optional[Any]=None, clip: Optional[Any]=None, overlay_free: Optional[Any]=None) -> Any:
     """The shared pixel-buffer builder behind render_screen.  `clip` is an
     (x0, x1, y0, y1) half-open window over sprite ink AND `overlay`: the main
     pet scene passes the locked 32x16 play window -- a real dot matrix
@@ -106,7 +107,7 @@ def fill_buf(frame_rows, cols, px_h, baseline=True, mirror=False, xshift=0,
     return buf
 
 
-def render_scene(placements, cols, rows, on="#2b2e31", bg="#c6c9cc", overlay=None, bgimg=None, clip=None, overlay_free=None, free_ink=None):
+def render_scene(placements: Any, cols: Any, rows: Any, on: str="#2b2e31", bg: str="#c6c9cc", overlay: Optional[Any]=None, bgimg: Optional[Any]=None, clip: Optional[Any]=None, overlay_free: Optional[Any]=None, free_ink: Optional[Any]=None) -> Any:
     """Compose several sprites onto one LCD screen.
 
     placements: list of (frame_rows, x_left, mirror). Each sprite sits on the
@@ -141,7 +142,7 @@ UPPER, LOWER, FULL = "\u2580", "\u2584", "\u2588"   # half/full blocks (bitmap_t
 #                                                      them -- the v0.2.166-175 feed-screen crash)
 
 
-def marquee(s, width, step, gap="   ", hold=8):
+def marquee(s: Any, width: int, step: Any, gap: str="   ", hold: int=8) -> Any:
     """Universal FIELD scroll (menu-bounds audit 2026-07-07): text that fits
     its slot renders unchanged; longer text slides a width-wide window that
     holds on the head, then loops through a gap.  Panels key `step` off their
@@ -156,7 +157,7 @@ def marquee(s, width, step, gap="   ", hold=8):
     return (loop + loop)[off:off + width]
 
 
-def bitmap_text(rows, on, bg, pad_to=0):
+def bitmap_text(rows: Any, on: Any, bg: Any, pad_to: int=0) -> Any:
     """1-bit rows -> half-block Rich Text lines (square pixels).  The one
     implementation behind every icon/badge mini-render (audit 2026-07: this
     lived in three drifting copies)."""
@@ -180,7 +181,7 @@ def bitmap_text(rows, on, bg, pad_to=0):
     return out
 
 
-def downsample(rows, f):
+def downsample(rows: Any, f: Any) -> Any:
     """Box-downsample a 1-bit bitmap by integer factor f (for shrinking 3x icons)."""
     if not rows or f <= 1:
         return rows

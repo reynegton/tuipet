@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import tuipet.ui.screens.adventurescreen as adventurescreen
 import tuipet.ui.screens.backgroundscreen as backgroundscreen
@@ -16,18 +17,18 @@ from tuipet.i18n.translator import t
 from tuipet.core.pet import Pet
 import tuipet.ui.screens.lobbyscreen as lobbyscreen
 class NavActionsMixin:
-    def action_inventory(self):
-            self._open_mode(shopscreen.ShopPanel(self.pet, start_mode="bag"), self._after_shop)
+    def action_inventory(self) -> None:
+            self._open_mode(shopscreen.ShopPanel(self.pet, start_mode="bag"), self._after_shop)  # type: ignore
 
-    def action_eggguide(self):
+    def action_eggguide(self) -> None:
             import tuipet.ui.screens.eggguidescreen as eggguidescreen
-            self._open_mode(eggguidescreen.EggGuidePanel(self.pet), lambda _=None: self.repaint())
+            self._open_mode(eggguidescreen.EggGuidePanel(self.pet), lambda _=None: self.repaint())  # type: ignore
 
-    def action_datacore(self):
+    def action_datacore(self) -> None:
             import tuipet.ui.screens.datacorescreen as datacorescreen
-            self._open_mode(datacorescreen.datacorePanel(self.pet), self._after_datacore)
+            self._open_mode(datacorescreen.datacorePanel(self.pet), self._after_datacore)  # type: ignore
 
-    def _after_datacore(self, msg):
+    def _after_datacore(self, msg: str) -> None:
             import tuipet.ui.screens.datacorescreen as datacorescreen
             import tuipet.ui.screens.albumscreen as albumscreen
             if isinstance(msg, tuple) and msg and msg[0] == "hall":
@@ -36,14 +37,14 @@ class NavActionsMixin:
                                     datacorescreen.datacorePanel(self.pet, start="TROPHIES"),
                                     self._after_datacore))
 
-    def _after_title(self, _=None):
+    def _after_title(self, _: Optional[Any]=None) -> None:
             # The account wall used to stand HERE: name + password demanded on
             # first launch, before the player had seen a single pet (sweep
             # 2026-07-14).  The account only matters online -- the lobby asks for
             # one when it's first opened, and sync starts on the next autosave.
-            self._post_title()
+            self._post_title()  # type: ignore
 
-    def action_battle(self):
+    def action_battle(self) -> None:
             # DM20's battle icon as a first-class action (Joel 2026-07-23
             # "should we add battles action... like dm20 does it?" -> "yeah
             # lets do it"): a REAL recorded bout -- wins/exp/KO6/log/+2
@@ -53,84 +54,84 @@ class NavActionsMixin:
             # (entry gates >= 10, each bout bills -5, ~3 per full tank).
             # can_battle is the ONE gate: dead / too young / asleep-wake /
             # starved / drained / sick / filth + the soft refusal roll.
-            err = self.pet.can_battle()
+            err = self.pet.can_battle()  # type: ignore
             if err:
-                self._do(err); return
+                self._do(err); return  # type: ignore
             import tuipet.ui.screens.battlescreen as battlescreen
             # THE NAMED RIVAL answers every 3rd bout (Joel 2026-07-26): its
             # card rides the ordinary Battle engine — same bracket, ideal
             # condition, no purse — only the NAME changes.  A rival bout wears
             # the arena backdrop (enemy != None flips it; presentation only).
             import tuipet.core.rival as rival
-            foe = rival.maybe_challenge(self.pet)
+            foe = rival.maybe_challenge(self.pet)  # type: ignore
             if foe is not None:
-                self.flash(f"[b]{foe['tamer']}[/] te desafia — "
+                self.flash(f"[b]{foe['tamer']}[/] te desafia — "  # type: ignore
                            f"{foe['name']} steps up!")
-            self._open_mode(battlescreen.BattlePanel(self.pet, enemy=foe),
+            self._open_mode(battlescreen.BattlePanel(self.pet, enemy=foe),  # type: ignore
                             self._after_battle)
 
-    def _after_battle(self, b):
+    def _after_battle(self, b: Any) -> None:
             # the post-bout emotional beat rides the HOUSE screen, the cup's
             # grammar (_after_cup): cheer a win home, sulk a loss.  b is None
             # when the pet walked away before the bell -- nothing happened.
             if (b is not None and getattr(b, "over", False)
-                    and self.screen_w.fx is None and not self.pet.dead):
+                    and self.screen_w.fx is None and not self.pet.dead):  # type: ignore
                 if (getattr(b, "enemy", None) or {}).get("rival"):
                     # the feud's running score lands with the verdict
-                    self.flash(f"[b]{rival.record_line(self.pet)}[/] no total")
-                self.screen_w.start_fx("cheer" if b.won else "losing")
-            self.repaint()
+                    self.flash(f"[b]{rival.record_line(self.pet)}[/] no total")  # type: ignore
+                self.screen_w.start_fx("cheer" if b.won else "losing")  # type: ignore
+            self.repaint()  # type: ignore
 
 
-    def _after_cup(self, msg):
+    def _after_cup(self, msg: str) -> None:
         verdict = None
         if isinstance(msg, tuple):           # (last, champion) from a played bracket
             msg, verdict = msg
         if msg:
-            self.flash(msg)
+            self.flash(msg)  # type: ignore
         # the post-cup emotional beat rides the HOUSE screen (anim hardening
         # 2026-07-14: every reference celebrates a win / sulks a loss back
         # home for a few seconds; tuipet's losing() fx sat built but unwired)
         if verdict is not None and self.screen_w.fx is None and not self.pet.dead:
             self.screen_w.start_fx("cheer" if verdict else "losing")
-        self.repaint()
+        self.repaint()  # type: ignore
 
-    def action_tournament(self):
-            err = tournament.can_enter(self.pet)   # single source of entry gating (young/asleep/no-cup)
+    def action_tournament(self) -> None:
+            err = tournament.can_enter(self.pet)   # type: ignore
             if err:
-                self._do(err); return
-            self.pet.tourney_alert = False         # answering the call silences it
-            self._open_mode(tournamentscreen.TournamentPanel(self.pet), self._after_cup)
+                self._do(err); return  # type: ignore
+            self.pet.tourney_alert = False         # type: ignore
+            self._open_mode(tournamentscreen.TournamentPanel(self.pet), self._after_cup)  # type: ignore
 
-    def action_dna(self):
-            reason = self.pet.can_charge_dna()
+    def action_dna(self) -> None:
+            reason = self.pet.can_charge_dna()  # type: ignore
             if reason:
-                self._do(reason); return
-            self._open_mode(dnascreen.DNAPanel(self.pet), self._after_dna)
+                self._do(reason); return  # type: ignore
+            self._open_mode(dnascreen.DNAPanel(self.pet), self._after_dna)  # type: ignore
 
-    def _after_dna(self, result=None):
-            self.autosave()
+    def _after_dna(self, result: Optional[Any]=None) -> None:
+            self.autosave()  # type: ignore
             if isinstance(result, tuple) and result and result[0] == "charged":
                 _, field, amount = result          # DVPet applyDNA -> DNA_Feeding -> main view
-                self.screen_w.start_fx("dna_charge", icon=field, pet=self.pet)
-                self.beep("compatible", bell=False)   # the DNA charge/absorb beep (no dedicated dna rip)
-                self.flash("%s absorveu %d DNA de %s" % (self.pet.name, amount, data.pretty_field(field)))
+                self.screen_w.start_fx("dna_charge", icon=field, pet=self.pet)  # type: ignore
+                self.beep("compatible", bell=False)   # type: ignore
+                self.flash("%s absorveu %d DNA de %s" % (self.pet.name, amount, data.pretty_field(field)))  # type: ignore
             else:
-                self.repaint()
+                self.repaint()  # type: ignore
 
-    def action_scenes(self):
+    def action_scenes(self) -> None:
             """The E scene picker (restored 2026-07-17): egg default, pick overrides."""
-            self._open_mode(backgroundscreen.BackgroundPanel(self.pet), self._after_scenes)
+            self._open_mode(backgroundscreen.BackgroundPanel(self.pet), self._after_scenes)  # type: ignore
 
-    def _after_scenes(self, msg):
+    def _after_scenes(self, msg: str) -> None:
             if msg:
-                self.flash(msg)
-            self.repaint()
+                self.flash(msg)  # type: ignore
+            self.repaint()  # type: ignore
 
-    def action_shop(self):
-            self._open_mode(shopscreen.ShopPanel(self.pet), self._after_shop)
+    def action_shop(self) -> None:
+            self._open_mode(shopscreen.ShopPanel(self.pet), self._after_shop)  # type: ignore
 
-    def _after_shop(self, msg):
+    def _after_shop(self, msg: str) -> None:
             if isinstance(msg, tuple) and msg and msg[0] == "eat":
                 if len(msg) > 2 and msg[2]:
                     self.flash(msg[2])               # the meal's verdict text
@@ -158,73 +159,73 @@ class NavActionsMixin:
                 self.screen_w.start_fx("inherit", pet=self.pet)
                 self.screen_w.fx["ancestor"] = mem.get("num", -1)
             elif msg:
-                self.flash(msg)
-            self.repaint()
+                self.flash(msg)  # type: ignore
+            self.repaint()  # type: ignore
 
-    def action_adventure(self):
+    def action_adventure(self) -> None:
             import tuipet.ui.screens.adventurescreen as adventurescreen
-            reason = self.pet.can_adventure()   # single-source gate, like raid/train/cup
+            reason = self.pet.can_adventure()   # type: ignore
             if reason:
-                self._do(reason); return
+                self._do(reason); return  # type: ignore
             # the zone picker first: choose an UNLOCKED zone, then embark
-            self._open_mode(adventurescreen.ZonePickPanel(self.pet), self._after_zone_pick)
+            self._open_mode(adventurescreen.ZonePickPanel(self.pet), self._after_zone_pick)  # type: ignore
 
-    def _after_adventure(self, msg):
+    def _after_adventure(self, msg: str) -> None:
             # safety net: however the mode closed, the pet is HOME now -- the
             # away flag (assistant billing / filth / gift-call gates + the
             # status card's @ line) must never survive the room
-            self.pet.away = False
-            self.pet.away_where = ""
+            self.pet.away = False  # type: ignore
+            self.pet.away_where = ""  # type: ignore
             if msg:
-                self.flash(msg)
-            self.autosave()
-            self.repaint()
+                self.flash(msg)  # type: ignore
+            self.autosave()  # type: ignore
+            self.repaint()  # type: ignore
 
 
-    def action_raid(self):
+    def action_raid(self) -> None:
         import tuipet.ui.screens.raidscreen as raidscreen
-        reason = self.pet.can_adventure()
+        reason = self.pet.can_adventure()  # type: ignore
         if reason:
-            self._do(reason); return
-        self._open_mode(raidscreen.RaidPanel(self.pet, self._sync), self._after_raid)
+            self._do(reason); return  # type: ignore
+        self._open_mode(raidscreen.RaidPanel(self.pet, self._sync), self._after_raid)  # type: ignore
 
-    def _after_raid(self, msg):
-        if self.pet:
-            self.pet.away = False
-            self.pet.away_where = ""
-        if self._lobby_worker:
-            self._lobby_worker.cancel()
+    def _after_raid(self, msg: str) -> None:
+        if self.pet:  # type: ignore
+            self.pet.away = False  # type: ignore
+            self.pet.away_where = ""  # type: ignore
+        if self._lobby_worker:  # type: ignore
+            self._lobby_worker.cancel()  # type: ignore
             self._lobby_worker = None
         if getattr(self, "_sync", None):
-            self._sync.lobby_disconnect()
-        self.autosave()
+            self._sync.lobby_disconnect()  # type: ignore
+        self.autosave()  # type: ignore
 
-    def action_lobby(self):
+    def action_lobby(self) -> None:
         import tuipet.ui.screens.lobbyscreen as lobbyscreen
         from tuipet.network.net import LobbyClient
-        if not self._sync:
-            self.flash("Lobby indisponível")
+        if not self._sync:  # type: ignore
+            self.flash("Lobby indisponível")  # type: ignore
             return
-        reason = self.pet.can_adventure()
+        reason = self.pet.can_adventure()  # type: ignore
         if reason and "jovem" not in reason.lower() and "ovo" not in reason.lower():
-            self._do(reason); return
-        self.pet.away = True
-        self.pet.away_where = "no lobby"
-        host = lobbyscreen.LobbyPanel(self.pet, LobbyClient)
-        self._open_mode(host, self._after_lobby)
+            self._do(reason); return  # type: ignore
+        self.pet.away = True  # type: ignore
+        self.pet.away_where = "no lobby"  # type: ignore
+        host = lobbyscreen.LobbyPanel(self.pet, LobbyClient)  # type: ignore
+        self._open_mode(host, self._after_lobby)  # type: ignore
 
-    def _after_lobby(self, msg):
-        if self.pet:
-            self.pet.away = False
-            self.pet.away_where = ""
+    def _after_lobby(self, msg: str) -> None:
+        if self.pet:  # type: ignore
+            self.pet.away = False  # type: ignore
+            self.pet.away_where = ""  # type: ignore
         if self._lobby_worker:
             self._lobby_worker.cancel()
             self._lobby_worker = None
         if getattr(self, "_sync", None):
-            self._sync.lobby_disconnect()
-        self.autosave()
+            self._sync.lobby_disconnect()  # type: ignore
+        self.autosave()  # type: ignore
 
-    def _after_zone_pick(self, zone):
+    def _after_zone_pick(self, zone: Any) -> None:
         if zone:
             import tuipet.ui.screens.adventurescreen as adventurescreen
-            self._open_mode(adventurescreen.AdventurePanel(self.pet, zone), self._after_adventure)
+            self._open_mode(adventurescreen.AdventurePanel(self.pet, zone), self._after_adventure)  # type: ignore

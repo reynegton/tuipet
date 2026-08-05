@@ -5,12 +5,13 @@ they can never disagree (and so sound.py needn't import app.py, which imports
 sound.py).  iOS support 2026-07-13.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import os
 import platform
 
 
-def is_ios():
+def is_ios() -> Any:
     """a-Shell on iPhone/iPad -- our official iOS target.
 
     iOS reports itself as 'Darwin', exactly like a Mac, so this has to look
@@ -27,17 +28,17 @@ def is_ios():
     return "/Containers/" in home or "/Application/" in home
 
 
-def is_termux():
+def is_termux() -> Any:
     return os.environ.get("PREFIX", "").endswith("com.termux/files/usr")
 
 
-def is_ssh():
+def is_ssh() -> Any:
     return bool(os.environ.get("SSH_CONNECTION")
                 or os.environ.get("SSH_TTY")
                 or os.environ.get("SSH_CLIENT"))
 
 
-def host_platform():
+def host_platform() -> Any:
     """The platform name for bug reports -- iOS players reported as 'Darwin'
     were indistinguishable from Macs, so they were invisible in the feed."""
     if is_ios():

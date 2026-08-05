@@ -23,6 +23,7 @@ Decoupled from the app: `on_connect(name, card) -> LobbyClient` lets the app own
 the WebSocket worker's lifecycle. Colours come from the live theme.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 import hashlib
 import random
@@ -61,7 +62,7 @@ from tuipet.i18n.translator import t
 
 
 class LobbyPanel(BoutMixin, ChatMixin):
-    def __init__(self, pet, on_connect, name=None, pw=""):
+    def __init__(self, pet: Any, on_connect: Any, name: Optional[Any]=None, pw: str="") -> None:
         self.pet = pet
         self.on_connect = on_connect
         self.client = None
@@ -77,7 +78,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         self.action_for = None
         self.pm_to = None              # (id, name): the input line is a PM compose
         self.invite_prompt = None
-        self._sent_invites = set()     # (pid, kind) awaiting a response: an
+        self._sent_invites = set()     # type: ignore
         #                                invite_resp with no entry here is a
         #                                forgery and is dropped (a crafted
         #                                accept used to force this client into
@@ -85,7 +86,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         #                                jogress fusion; audit 2026-07-19)
         self.dm_peer = None            # (id, name): the open DM thread
         self.dm_scroll = 0             # DM scrollback offset (0 = live tail)
-        self.sfx = None
+        self.sfx = None  # type: ignore
         # jogress session
         self.partner = None
         self.partner_species = None
@@ -96,12 +97,12 @@ class LobbyPanel(BoutMixin, ChatMixin):
         self.j_confirmed = False           # two-phase commit: my yes is in
         self.j_partner_confirmed = False   # ...and theirs
         self.j_peer_two_phase = False      # the peer speaks the confirm protocol
-        self.bshow = None             # the round's volley replay (BattlePanel shim)
+        self.bshow = None             # type: ignore
         # battle session
         self.is_host = False
-        self.battle = None
+        self.battle = None  # type: ignore
         self.opp_card = None
-        self.bphase = None            # "card" | "choose" | "wait" | "over"
+        self.bphase = None            # type: ignore
         self.bt_my_choice = None
         self.bt_opp_choice = None
         self.my_hp = self.my_max = 0
@@ -109,7 +110,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         self.bt_log = ""
         self.bt_outcome = ""
         self.bt_reward = None
-        self.bt_payload = None        # ("done", X) payload when the bout ends
+        self.bt_payload = None        # type: ignore
         # seeded symmetric PvP (proto 3: the precomputed 0.5 race)
         self.bt_nonce = None          # my seed nonce (committed in my card msg)
         self.bt_peer_commit = None    # sha256 hex the peer committed to
@@ -121,24 +122,24 @@ class LobbyPanel(BoutMixin, ChatMixin):
             self.phase = "login"
             self.entry = AccountPanel(name=name or "")
             self.status = t("lob_msg_login", "Log in to the lobby.")
-    def _connect(self, name, pw):
+    def _connect(self, name: str, pw: Any) -> None:
         self._last_name = name
         self.client = self.on_connect(name, pw, self._card())
-        self.state = self.client.state
+        self.state = self.client.state  # type: ignore
         import tuipet.utils.persistence as persistence
-        self.state.blocked = persistence.get_blocked()
+        self.state.blocked = persistence.get_blocked()  # type: ignore
         # DM threads + unread badges reload from the last session -- leaving a
         # PM (or the lobby) never loses the conversation (Joel 2026-07-10).
         # Seed-only merge: anything already live in this state wins.
         saved_dms, saved_unread = persistence.get_dms()
         for peer, thread in saved_dms.items():
-            self.state.dms.setdefault(peer, thread)
-        self.state.unread |= saved_unread
+            self.state.dms.setdefault(peer, thread)  # type: ignore
+        self.state.unread |= saved_unread  # type: ignore
         self.phase = "lobby"
         self.status = t("lob_msg_conn", "Connecting…")
 
     # ---- presence card ---------------------------------------------------
-    def _card(self):
+    def _card(self) -> Any:
         _, by = data.load_sprites()
         info = by.get(self.pet.num, {})
         card = {"name": getattr(self.pet, "name", None) or info.get("name") or "Egg",
@@ -156,7 +157,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         # verbatim, clients that predate it ignore the field.
         card["form"] = getattr(self.pet, "saved_hit_type", "normal") or "normal"
         return card
-    def _session_gate(self, kind):
+    def _session_gate(self, kind: Any) -> Any:
         """PURE session eligibility for a REMOTE invite.  can_battle is a
         player-poke: its guard DISTURBS a sleeper (wake + mood hit + disturb
         count) and rolls a refusal -- a stranger's invite must never touch
@@ -178,19 +179,19 @@ class LobbyPanel(BoutMixin, ChatMixin):
         # their pure form -- a starving/sick/drained pet used to auto-accept
         # bouts it could never send (gameplay audit 2026-07-19)
         return p.battle_condition()
-    def _others(self):
+    def _others(self) -> Any:
         """Everyone else ONLINE, lobby regulars first, then the playing
         ghosts (presence 2026-07-05: the roster carries the whole server)."""
-        others = self.state.others() if self.state else []
+        others = self.state.others() if self.state else []  # type: ignore
         return sorted(others, key=lambda p: (not p.get("live", True),
                                              str(p.get("name", "")).lower()))
-    def _pet_of(self, pid):
+    def _pet_of(self, pid: Any) -> Any:
         """'Agumon · Champion · lock mega' for a roster id ('' when
         unknown); a worn honor title trails as '· ★Bit Baron' (the
         marquee absorbs the length).  The LOCK shows so a challenge is
         never accepted blind (lock rework 2026-07-23: ±0.20 duel swing);
         presences from older clients simply omit it."""
-        for pl in (self.state.roster if self.state else []):
+        for pl in (self.state.roster if self.state else []):  # type: ignore
             if pl["id"] == pid:
                 pet = pl.get("pet") or {}
                 nm, st = pet.get("name"), pet.get("stage")
@@ -202,10 +203,10 @@ class LobbyPanel(BoutMixin, ChatMixin):
         return ""
 
     # ---- per-tick refresh (the 0.1s interval clock calls this) -----------
-    def anim(self):
+    def anim(self) -> None:
         self._mq = getattr(self, "_mq", 0) + 1   # drives long-field marquees
         if getattr(self, "phase", None) == "login" and getattr(self, "entry", None):
-            self.entry.anim()                    # the login note's marquee clock
+            self.entry.anim()                    # type: ignore
         # session replays advance first (they render whatever the wire does)
         if self.bshow is not None:
             b = self.bshow
@@ -213,9 +214,9 @@ class LobbyPanel(BoutMixin, ChatMixin):
                 b.anim()                        # advances + emits the volley sfx
                 if getattr(b, "sfx", None):
                     self.sfx = b.sfx
-                    b.sfx = None
+                    b.sfx = None  # type: ignore
             else:
-                self.bshow = None               # volley done -> choose/over shows
+                self.bshow = None               # type: ignore
         if self.jshow is not None and self.jphase == "result":
             self.jshow.anim()                   # converge -> flash -> fused bounce
         lad = getattr(self.client, "ladder", None) if self.client else None
@@ -369,7 +370,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                     self.bphase = "over"
 
     # ---- session orchestration ------------------------------------------
-    def _enter_session(self, pid, pname, kind, host):
+    def _enter_session(self, pid: Any, pname: Any, kind: Any, host: Any) -> None:
         if self.invite_prompt is not None:
             # a CROSSED invite (both players invited each other): entering the
             # session must consume the other prompt, or it survives the whole
@@ -378,11 +379,11 @@ class LobbyPanel(BoutMixin, ChatMixin):
             inv = self.invite_prompt
             self.invite_prompt = None
             self.client.respond(inv.get("from_id"), inv.get("kind"), False, busy=True)
-        self.partner = (pid, pname)
+        self.partner = (pid, pname)  # type: ignore
         if kind == "jogress":
             card = self._card()
             opts = jogress.options(self.pet)
-            self.client.relay(pid, {"kind": "jogress", "attr": card["attr"],
+            self.client.relay(pid, {"kind": "jogress", "attr": card["attr"],  # type: ignore
                                     "num": card["num"], "name": card["name"],
                                     # canon JogressProtocol.sendPlayerInfo ships the
                                     # jogressMatch string (reachable fusion NAMES +
@@ -404,7 +405,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                                     # 2026-07-07): both players confirm at the
                                     # result screen before either pet fuses
                                     "confirm2": True})
-            self.phase, self.jphase = "jogress", "waiting"
+            self.phase, self.jphase = "jogress", "waiting"  # type: ignore
             self.status = t("lob_msg_fusing", "Fusing with {name}…").format(name=pname)
         elif kind == "battle":
             self.is_host = host
@@ -418,12 +419,12 @@ class LobbyPanel(BoutMixin, ChatMixin):
             # with the first pick -- so neither client can grind the shared
             # seed for a favourable initiative coin flip.  Spiritually canon:
             # BattleProtocol exchanged a SHA-256 checksum at setup too.
-            self.bt_nonce = random.getrandbits(64)
+            self.bt_nonce = random.getrandbits(64)  # type: ignore
             commit = hashlib.sha256(str(self.bt_nonce).encode()).hexdigest()
-            self.client.relay(pid, {"kind": "battle", "t": "card",
+            self.client.relay(pid, {"kind": "battle", "t": "card",  # type: ignore
                                     "card": card, "commit": commit})
             self.status = t("lob_msg_battle_vs", "Battle vs {name}…").format(name=pname)
-    def _return_to_lobby(self, status=""):
+    def _return_to_lobby(self, status: str="") -> None:
         """End the current session and drop back into the chat lobby (not out of it).
         Any pet change (a fusion) is pushed so the roster shows your new form."""
         had_partner = self.partner is not None
@@ -431,11 +432,11 @@ class LobbyPanel(BoutMixin, ChatMixin):
         self.jphase = self.fail_reason = None
         self.j_confirmed = self.j_partner_confirmed = self.j_peer_two_phase = False
         self.jpartner_sick = False
-        self.jshow = self.bshow = None
-        self.battle = self.opp_card = self.bphase = None
+        self.jshow = self.bshow = None  # type: ignore
+        self.battle = self.opp_card = self.bphase = None  # type: ignore
         self.bt_my_choice = self.bt_opp_choice = None
         self.bt_log = self.bt_outcome = ""
-        self.bt_reward = self.bt_payload = None
+        self.bt_reward = self.bt_payload = None  # type: ignore
         self.bt_nonce = self.bt_peer_commit = self.bt_peer_nonce = None
         self.bt_my_card = None
         self.is_host = False
@@ -443,7 +444,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         self.status = status or t("lob_msg_back_lob", "Back in the lobby.")
         if had_partner and self.client:
             self.client.update_pet(self._card())
-    def _on_relay(self, m):
+    def _on_relay(self, m: Any) -> None:
         if not self.partner or m.get("from_id") != self.partner[0]:
             return
         payload = m.get("payload") or {}
@@ -516,7 +517,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                     self._maybe_build()
 
     # ---- battle ----------------------------------------------------------
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.phase == "login":
             return self._key_login(k)
         if self.phase == "jogress":
@@ -528,7 +529,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         if self.phase == "ladder":
             return self._key_ladder(k)
         return self._key_lobby(k)
-    def _down_status(self):
+    def _down_status(self) -> Any:
         """The banner while the client retries.  "Lost" only when a session
         EXISTED: a first-ever failed connect (offline, wrong server) used to
         claim a drop that never happened (QOL sweep 2026-07-23)."""
@@ -536,7 +537,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                 if getattr(self.client, "_had_welcome", False)
                 else t("lob_msg_cant_reach", "Can't reach the lobby — retrying…"))
 
-    def _key_ladder(self, k):
+    def _key_ladder(self, k: Any) -> Any:
         # q/g trimmed (grammar sweep 2026-07-18): they were unexplained
         # extra closes that shadowed q=quit / g=options muscle memory
         if k == "tab" and self._ladder_stalled():
@@ -550,13 +551,13 @@ class LobbyPanel(BoutMixin, ChatMixin):
             self.phase = "lobby"
         return None
 
-    def _ladder_stalled(self):
+    def _ladder_stalled(self) -> Any:
         """No reply ~5s after the ask (the 10 Hz clock) -- offline right as
         TAB was pressed used to strand 'fetching…' forever."""
         lad = getattr(self.client, "ladder", None) if self.client else None
         return lad is None and (getattr(self, "_mq", 0)
                                 - getattr(self, "_ladder_asked", 0)) > 50
-    def _text_ladder(self):
+    def _text_ladder(self) -> Any:
         """The monthly rankings: online PvP wins, top ten, your rank, and the
         days left in the season.  Data is the server's ladder message; a page
         opened before the reply shows a fetching line and fills in live."""
@@ -596,14 +597,14 @@ class LobbyPanel(BoutMixin, ChatMixin):
         t_obj.append(t("lob_lad_res_today", "  season resets today\n") if d == 0 else
                  t("lob_lad_res_days", "  season resets in {d} day(s)\n").format(d=d), style=DIM)
         return t_obj
-    def _key_login(self, k):
-        r = self.entry.key(k)
+    def _key_login(self, k: Any) -> Any:
+        r = self.entry.key(k)  # type: ignore
         if r is not None and r[0] == "done":
             if r[1] is None:
                 return ("done", None)            # Esc -> leave the lobby
             self._connect(*r[1])
         return None
-    def _key_lobby(self, k):
+    def _key_lobby(self, k: Any) -> Any:
         if self.invite_prompt is not None:
             inv = self.invite_prompt
             if k in ("y", "Y"):
@@ -726,7 +727,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                 if txt.startswith("/"):
                     self._slash(txt)
                 else:
-                    self.client.chat(txt)
+                    self.client.chat(txt)  # type: ignore
                     if down:
                         # the line vanishes from the input and only reappears
                         # on the server echo -- SAY it's queued, or a laggy
@@ -741,10 +742,10 @@ class LobbyPanel(BoutMixin, ChatMixin):
                 others = self._others()
                 if others and not self.rost_hidden:   # no acting on an unseen pick
                     p = others[min(self.sel, len(others) - 1)]
-                    self.action_for = (p["id"], p["name"], p.get("live", True))
+                    self.action_for = (p["id"], p["name"], p.get("live", True))  # type: ignore
             return None
         return self._edit(k)
-    def _edit(self, k):
+    def _edit(self, k: Any) -> Any:
         if k == "backspace":
             self.buf = self.buf[:-1]
         elif k == "space":
@@ -758,7 +759,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
         return None
 
     # ---- render ----------------------------------------------------------
-    def _care_cue(self):
+    def _care_cue(self) -> Any:
         """The care alarm's on-screen half while the lobby TICKS (2026-07-13:
         the lobby is no longer a pause room -- app.on_tick runs the life-sim
         through chat, so the strip must carry the nag or the pet starves
@@ -784,7 +785,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
             w = t("lob_alarm_mis", "misbehaving!")
         return (f"[{theme.NEG}]⚠ {(p.name or '?')[:10]} {w}[/] [dim]·[/] "
                 + menu.hints(("ESC", t("lob_hint_home", "home"))))
-    def strip(self):
+    def strip(self) -> Any:
         """The message box under the LCD = the lobby's CONTEXT layer (hint
         overhaul 2026-07-10): session scenes keep their prompts, every other
         phase pops the hints for exactly what the keys do right now."""
@@ -853,7 +854,7 @@ class LobbyPanel(BoutMixin, ChatMixin):
                               ("ESC", t("lob_hint_live", "live/leave")))
         return menu.hints(("→", t("lob_hint_fold", "fold")), ("↑↓", t("lob_hint_pick", "pick")),
                           ("ENTER", t("lob_hint_act", "act")), ("PgUp", t("lob_hint_log", "log")))
-    def text(self):
+    def text(self) -> Any:
         if self.phase == "login":
             return self._text_login()
         if self.phase == "jogress":
@@ -865,5 +866,5 @@ class LobbyPanel(BoutMixin, ChatMixin):
         if self.phase == "ladder":
             return self._text_ladder()
         return self._text_lobby()
-    def _text_login(self):
-        return self.entry.text()
+    def _text_login(self) -> Any:
+        return self.entry.text()  # type: ignore

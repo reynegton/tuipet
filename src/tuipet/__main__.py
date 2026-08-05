@@ -5,7 +5,7 @@ on every host (a-Shell on iOS installs scripts where PATH does not look).
 Module execution has no such dependency, so this is the launch we document for
 iOS (iOS support 2026-07-13).
 """
-from tuipet.app import main
+from tuipet.appboot import main
 
 if __name__ == "__main__":
     main()

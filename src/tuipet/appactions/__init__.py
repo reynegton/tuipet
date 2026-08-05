@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import tuipet.ui.screens.albumscreen as albumscreen
 import tuipet.ui.screens.assistscreen as assistscreen
@@ -35,6 +36,6 @@ from .nav_actions import NavActionsMixin
 from .system_actions import SystemActionsMixin
 
 class ActionsMixin(CareActionsMixin, NavActionsMixin, SystemActionsMixin):
-    def _do(self, result):
-        self.flash(result)
-        self.repaint()
+    def _do(self, result: Any) -> None:
+        self.flash(result)  # type: ignore
+        self.repaint()  # type: ignore

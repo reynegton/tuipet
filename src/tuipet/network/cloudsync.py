@@ -12,6 +12,7 @@ Everything here is fail-soft: offline / bad password / timeout simply returns
 without syncing, so the game always runs.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import time
 
@@ -25,13 +26,13 @@ _TIMEOUT = 3.0
 BOOT = time.time()
 
 
-def _connect(uri, timeout):
+def _connect(uri: Any, timeout: Any) -> Any:
     # imported lazily so a missing optional dep never blocks startup
     from websockets.sync.client import connect
     return connect(uri, open_timeout=timeout, close_timeout=1)
 
 
-def pull_save(uri, name, pw, timeout=_TIMEOUT):
+def pull_save(uri: Any, name: str, pw: Any, timeout: Any=_TIMEOUT) -> Any:
     """Return the account's stored cloud save dict, or None. Never raises."""
     try:
         with _connect(uri, timeout) as ws:
@@ -48,7 +49,7 @@ def pull_save(uri, name, pw, timeout=_TIMEOUT):
     return None
 
 
-def probe(uri, name, pw, timeout=_TIMEOUT):
+def probe(uri: Any, name: str, pw: Any, timeout: Any=_TIMEOUT) -> Any:
     """Login check for the account switcher: ('ok', save_or_None) on a welcome
     (an unknown name is CREATED by the server, like the first-launch flow),
     ('badpw', None) when the server rejects the login — pull_save can't tell
@@ -70,7 +71,7 @@ def probe(uri, name, pw, timeout=_TIMEOUT):
     return ("offline", None)
 
 
-def push_save(uri, name, pw, save, timeout=_TIMEOUT):
+def push_save(uri: Any, name: str, pw: Any, save: Any, timeout: Any=_TIMEOUT) -> Any:
     """Upload one save dict, blocking. Returns True on a clean send. Never raises.
     Compares timestamps first: a device that missed its startup pull (offline
     at launch) must not stomp a newer cloud save on quit."""
@@ -102,7 +103,7 @@ def push_save(uri, name, pw, save, timeout=_TIMEOUT):
         return False
 
 
-def sync_down_at_startup(uri, name, pw, timeout=_TIMEOUT):
+def sync_down_at_startup(uri: Any, name: str, pw: Any, timeout: Any=_TIMEOUT) -> Any:
     """Pull the cloud save and, if it's newer than the local one, write it to the
     local save file so the app loads the synced pet. Returns a short status string
     for logging/tests ('' when nothing changed)."""

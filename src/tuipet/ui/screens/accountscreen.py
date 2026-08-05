@@ -3,6 +3,7 @@
 MAX_PVP_* clamp constants (_clamp_card in lobbybout owns the real bounds) --
 was cut; the cell-width law finally reached the name field.)"""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 from rich.cells import cell_len
 from rich.text import Text
@@ -18,7 +19,7 @@ _PW_MAX = 64
 _FIELD_W = 26                   # input cells shown (38 - the 12-col label)
 
 
-def _tail(s, w):
+def _tail(s: Any, w: Any) -> Any:
     """The LAST w CELLS of s -- an emoji/CJK glyph is two cells, and the old
     character slice let a wide name overrun the 40-col box (the CELL-WIDTH
     LAW, finally applied here -- round 35)."""
@@ -32,7 +33,7 @@ class AccountPanel:
     confirms when both are filled. Returns ("done", (name, password)), or
     ("done", None) on Esc. Used at first launch and to recover a failed login."""
 
-    def __init__(self, name="", note=None):
+    def __init__(self, name: str="", note: Optional[Any]=None) -> None:
         self.name_buf = name[:_NAME_MAX]
         self.pw_buf = ""
         self.field = "pw" if name else "name"
@@ -41,15 +42,15 @@ class AccountPanel:
         self.frame_i = 0                # the note's marquee clock
         self.captures_text = True       # typing a name/password — never treat q as quit
 
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
 
-    def strip(self):
+    def strip(self) -> Any:
         # "field", the grammar sweep's verb -- the lobby's login strip and
         # this one said different words for the same key (round 35)
         return menu.hints(("TAB", t("acc_hint_field", "field")), ("ENTER", t("acc_hint_go", "go")), ("ESC", t("acc_hint_back", "back")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if k == "escape":
             return ("done", None)
         if k in ("tab", "up", "down"):
@@ -64,7 +65,7 @@ class AccountPanel:
                 return ("done", (name, self.pw_buf))
             # a missing field used to fail SILENTLY (round 35)
             self.note = t("acc_msg_both_please", "Name and password both, please.")
-            self.sfx = "error"
+            self.sfx = "error"  # type: ignore
             return None
         attr = "name_buf" if self.field == "name" else "pw_buf"
         cur = getattr(self, attr)
@@ -77,7 +78,7 @@ class AccountPanel:
         setattr(self, attr, cur[:_NAME_MAX if attr == "name_buf" else _PW_MAX])
         return None
 
-    def text(self):
+    def text(self) -> Any:
         t_out = Text()
         t_out.append(t("acc_hdr_account", "  TUIPET ACCOUNT\n\n"), style=INK_B)
         # tail-window long input BY CELLS so a line never overruns the 40-col

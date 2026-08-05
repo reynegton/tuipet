@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import time
+from typing import Any, Dict, List, Optional
 
 import websockets
 
@@ -16,7 +17,7 @@ from raid import _raid_hit, _raid_view, _raid_claim
 
 LOG = logging.getLogger("tuipet.lobby")
 
-def _admin_key():
+def _admin_key() -> Optional[str]:
     k = os.environ.get("TUIPET_ADMIN_KEY", "")
     if k:
         return k.strip()
@@ -25,13 +26,13 @@ def _admin_key():
     except OSError:
         return ""
 
-def _clean(s, limit):
+def _clean(s: Any, limit: int) -> str:
     return str(s or "").replace("\n", " ").replace("\r", " ").strip()[:limit]
 
-def _clamp_pet(p):
+def _clamp_pet(p: Any) -> Dict[str, Any]:
     if not isinstance(p, dict):
         return {}
-    out = {}
+    out: Dict[str, Any] = {}
     for k in ("name", "stage", "attr", "title"):
         v = p.get(k)
         if isinstance(v, (str, int, float)) and not isinstance(v, bool):
@@ -44,30 +45,30 @@ def _clamp_pet(p):
         out["num"] = 0
     return out
 
-async def _send(client, obj):
+async def _send(client: Any, obj: Any) -> None:
     try:
         await client.ws.send(json.dumps(obj))
     except Exception:
         pass
 
-async def _close_quiet(ws):
+async def _close_quiet(ws: Any) -> None:
     try:
         await ws.close()
     except Exception:
         pass
 
-async def _broadcast(obj, exclude=None):
+async def _broadcast(obj: Any, exclude: Optional[int] = None) -> None:
     if state.CLIENTS:
         msg = json.dumps(obj)
         await asyncio.gather(*(
             c.ws.send(msg) for c in state.CLIENTS.values() if c.id != exclude
         ), return_exceptions=True)
 
-def _room_code(raw):
+def _room_code(raw: Any) -> Optional[str]:
     code = " ".join(str(raw or "").split()).lower()[:state.MAX_ROOM]
     return code or None
 
-async def _broadcast_room(room, obj, exclude=None):
+async def _broadcast_room(room: Optional[str], obj: Any, exclude: Optional[int] = None) -> None:
     targets = [c for c in state.CLIENTS.values()
                if c.id != exclude and c.room == room]
     if targets:
@@ -75,8 +76,8 @@ async def _broadcast_room(room, obj, exclude=None):
         await asyncio.gather(*(c.ws.send(msg) for c in targets),
                              return_exceptions=True)
 
-def _roster(room=None):
-    by_key = {}
+def _roster(room: Optional[str] = None) -> Dict[str, Any]:
+    by_key: Dict[str, Any] = {}
     for c in state.CLIENTS.values():
         if not c.logged or c.room != room:
             continue
@@ -88,29 +89,29 @@ def _roster(room=None):
         {"id": c.id, "name": c.name, "pet": c.pet, "live": c.live}
         for c in by_key.values()]}
 
-def _account_conns(name):
+def _account_conns(name: str) -> List[Any]:
     key = name.lower()
     return [c for c in state.CLIENTS.values() if c.logged and c.name.lower() == key]
 
-async def _push_roster():
+async def _push_roster() -> None:
     for room in {c.room for c in state.CLIENTS.values()}:
         await _broadcast_room(room, _roster(room))
 
-async def _handle_bug(client, m):
+async def _handle_bug(client: Any, m: Dict[str, Any]) -> None:
     client.bugs_sent += 1
     text = (str(m.get("text") or "")).strip()[:state.MAX_BUG_TEXT]
     if not text or client.bugs_sent > state.MAX_BUGS_PER_CONN:
         await _send(client, {"t": "bug_ok", "ok": False})
         return
-    pet = m.get("pet") if isinstance(m.get("pet"), dict) else {}
-    pet = {k: (pet[k] if isinstance(pet[k], int) else str(pet[k])[:24])
-           for k in ("num", "name", "stage", "gen") if k in pet}
+    pet_data: Any = m.get("pet") if isinstance(m.get("pet"), dict) else {}
+    pet_data = {k: (pet_data[k] if isinstance(pet_data[k], int) else str(pet_data[k])[:24])
+           for k in ("num", "name", "stage", "gen") if k in pet_data}
     rec = {
         "ts": time.strftime("%Y-%m-%d %H:%M:%SZ", time.gmtime()),
         "from": (str(m.get("name") or "").strip() or "anon")[:state.MAX_NAME],
         "version": str(m.get("version") or "")[:24],
         "platform": str(m.get("platform") or "")[:60],
-        "pet": pet,
+        "pet": pet_data,
         "text": text,
     }
     ok = True
@@ -125,7 +126,7 @@ async def _handle_bug(client, m):
     LOG.info("bug from %s (%d chars) ok=%s", rec["from"], len(text), ok)
     await _send(client, {"t": "bug_ok", "ok": ok})
 
-def _feed(kind, **kw):
+def _feed(kind: str, **kw: Any) -> None:
     rec = {"ts": time.strftime("%Y-%m-%d %H:%M:%SZ", time.gmtime()), "kind": kind}
     rec.update(kw)
     try:
@@ -136,7 +137,7 @@ def _feed(kind, **kw):
     except OSError:
         pass
 
-async def _handle_admin(client, m):
+async def _handle_admin(client: Any, m: Dict[str, Any]) -> None:
     key = _admin_key()
     if not key or not hmac.compare_digest(str(m.get("key") or ""), key):
         LOG.info("admin REFUSED conn=%s cmd=%r", client.id, m.get("cmd"))
@@ -165,7 +166,7 @@ async def _handle_admin(client, m):
     else:
         await _send(client, {"t": "error", "code": "err_admin_unknown", "msg": "Unknown admin cmd."})
 
-def _consume_token(client):
+def _consume_token(client: Any) -> bool:
     now = time.time()
     elapsed = now - client._msg_refill_t
     client._msg_tokens = min(50.0, client._msg_tokens + elapsed * 10.0)
@@ -175,7 +176,7 @@ def _consume_token(client):
         return True
     return False
 
-async def handler(ws):
+async def handler(ws: Any) -> None:
     if len(state.CLIENTS) >= state.MAX_CLIENTS:
         await ws.send(json.dumps({"t": "error", "code": "err_lobby_full", "msg": "Lobby is full."}))
         return
@@ -380,13 +381,13 @@ async def handler(ws):
             _feed("leave", name=client.name, ghost=not client.live)
         LOG.info("gone  id=%s (%d online)", client.id, len(state.CLIENTS))
 
-async def main():
+async def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
     LOG.info("tuipet lobby on ws://%s:%d (%d accounts)", state.HOST, state.PORT, len(state.ACCOUNTS))
     async with websockets.serve(handler, state.HOST, state.PORT, max_size=state.MAX_MSG_BYTES):
         await asyncio.Future()
 
-def run():
+def run() -> None:
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

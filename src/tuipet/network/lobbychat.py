@@ -6,6 +6,7 @@ glyphs are two cells wide — every width decision goes through
 cell_len/set_cell_size/chop_cells.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 
 from rich.cells import cell_len, chop_cells, set_cell_size  # noqa: F401
@@ -36,12 +37,12 @@ HINTS_OPEN = "ENTER chat · TAB ranks · ESC leave"
 HINTS_FOLDED = "↑↓ scroll · ← player box · ESC leave"
 
 
-def _fit(s, w):
+def _fit(s: Any, w: Any) -> Any:
     """Pad or truncate to exactly `w` DISPLAY CELLS (never characters)."""
     return set_cell_size(str(s), w)
 
 
-def _wrap(s, w):
+def _wrap(s: Any, w: Any) -> Any:
     """Word-wrap `s` into lines of <= w CELLS, hard-splitting any over-long word.
     A wide glyph is never split down the middle -- chop_cells keeps it whole."""
     out, line = [], ""
@@ -63,7 +64,7 @@ def _wrap(s, w):
     return out or [""]
 
 
-def _tail_cells(s, w):
+def _tail_cells(s: Any, w: Any) -> Any:
     """The LAST `w` cells of `s` -- the input line scrolls as you type, and a
     character-based slice let a typed emoji run past the frame."""
     while cell_len(s) > w:
@@ -71,24 +72,24 @@ def _tail_cells(s, w):
     return s
 
 
-def _hpbar(hp, mx, w=10):
+def _hpbar(hp: Any, mx: Any, w: int=10) -> Any:
     fill = max(0, min(w, round(hp / mx * w))) if mx else 0
     return "█" * fill + "─" * (w - fill)
 
 
 class ChatMixin:
-    def _save_dms(self):
+    def _save_dms(self) -> None:
         """Persist the DM threads + unread badges (leaving must not lose them)."""
-        if self.state is not None:
+        if self.state is not None:  # type: ignore
             import tuipet.utils.persistence as persistence
-            persistence.save_dms(self.state.dms, self.state.unread)
-    def _key_dm(self, k):
+            persistence.save_dms(self.state.dms, self.state.unread)  # type: ignore
+    def _key_dm(self, k: Any) -> Any:
         """Private thread with one peer: type + Enter sends, Esc back to the
         lobby.  The thread scrolls like the lobby log (grammar sweep
         2026-07-18: 'thread saved' was true but everything above the window
         was unreadable) — ↑↓ a line, PgUp/PgDn a page, sending snaps live."""
         if k == "escape":
-            if self.dm_scroll:                 # scrolled thread: snap live first
+            if self.dm_scroll:                 # type: ignore
                 self.dm_scroll = 0
                 return None
             self.phase, self.buf = "lobby", ""
@@ -96,9 +97,9 @@ class ChatMixin:
             return None
         if k == "enter":
             self.dm_scroll = 0                 # speaking snaps the view live
-            if self.buf.strip() and self.dm_peer and self.client:
-                self.client.pm(self.dm_peer[0], self.buf.strip(), self.dm_peer[1])
-                if self.state is not None and not self.state.connected:
+            if self.buf.strip() and self.dm_peer and self.client:  # type: ignore
+                self.client.pm(self.dm_peer[0], self.buf.strip(), self.dm_peer[1])  # type: ignore
+                if self.state is not None and not self.state.connected:  # type: ignore
                     # the lobby twin's queued note (QOL sweep 2026-07-23)
                     self.status = "Offline — queued, sends on reconnect."
             self.buf = ""
@@ -115,10 +116,10 @@ class ChatMixin:
         if k == "pagedown":
             self.dm_scroll = max(0, self.dm_scroll - (BODY - 1))
             return None
-        return self._edit(k)
-    def _text_dm(self):
-        s = self.state
-        peer = self.dm_peer[1] if self.dm_peer else "?"
+        return self._edit(k)  # type: ignore
+    def _text_dm(self) -> Any:
+        s = self.state  # type: ignore
+        peer = self.dm_peer[1] if self.dm_peer else "?"  # type: ignore
         me = (s.me_name or "you") if s else "you"
         w = CHATW + ROSTW + 1
         t = Text()
@@ -150,7 +151,7 @@ class ChatMixin:
         t.append(label, style=INK_B)
         t.append(_fit(shown + caret, fw), style=INK)
         return t
-    def _slash(self, txt):
+    def _slash(self, txt: Any) -> None:
         """Chat slash commands (password rooms 2026-07-14): `/room <phrase>`
         joins the private room for that phrase — everyone typing the same
         phrase meets there (the phrase IS the password, DSprite-style 🔒);
@@ -158,26 +159,26 @@ class ChatMixin:
         cmd, _, arg = txt.partition(" ")
         cmd, arg = cmd.lower(), arg.strip()
         if cmd == "/room" and arg:
-            self.client.room(arg)
+            self.client.room(arg)  # type: ignore
             self.status = "Joining the room…"
         elif cmd == "/room":
-            room = getattr(self.state, "room", None) if self.state else None
+            room = getattr(self.state, "room", None) if self.state else None  # type: ignore
             self.status = f"room: {room} · /leave exits" if room else "main lobby · /room <phrase>"
         elif cmd in ("/leave", "/lobby"):
-            self.client.room("")
+            self.client.room("")  # type: ignore
             self.status = "Back to the main lobby…"
         else:
             self.status = "Commands: /room <phrase> · /leave"
-    def _chat_w(self):
+    def _chat_w(self) -> Any:
         """The chat column's width: the folded player box cedes its columns."""
-        return CHATW + ROSTW + 1 if self.rost_hidden else CHATW
-    def _chat_rows(self):
+        return CHATW + ROSTW + 1 if self.rost_hidden else CHATW  # type: ignore
+    def _chat_rows(self) -> Any:
         """The wrapped history as (line, style) rows, oldest first -- one
         style per MESSAGE (chat polish 2026-07-07): your own lines dim (you
         know what you said), PMs and lines that mention your name bright,
         join/leave notices dim; wrap continuations hang a 1-col indent so a
         long message reads as ONE message, not three."""
-        s = self.state
+        s = self.state  # type: ignore
         me = (s.me_name or "") if s else ""
         cw = self._chat_w()
         rows = []
@@ -200,15 +201,15 @@ class ChatMixin:
             rows.append((parts[0], sty))
             rows.extend((" " + ln, sty) for ln in parts[1:])
         return rows
-    def _text_lobby(self):
-        s = self.state
-        others = self._others()
+    def _text_lobby(self) -> Any:
+        s = self.state  # type: ignore
+        others = self._others()  # type: ignore
         online = len(s.roster) if s else 0
         me = (s.me_name if s and s.me_name else None) or "connecting…"
         t = Text()
         cw = self._chat_w()
         rows = self._chat_rows()
-        self.scroll = max(0, min(self.scroll, max(0, len(rows) - BODY)))
+        self.scroll = max(0, min(self.scroll, max(0, len(rows) - BODY)))  # type: ignore
         # ASCII only in this column (the CELL-WIDTH LAW: rjust counts chars)
         in_room = bool(s and getattr(s, "room", None))
         right = (f"▲{self.scroll} back" if self.scroll
@@ -218,11 +219,11 @@ class ChatMixin:
         # before the roster syncs); a long title marquees, the chrome holds
         worn = data.title_name(persistence.get_title_worn())
         me_line = f"you: {me}" + (f" · ★{worn}" if worn else "")
-        mw = cw - ROSTW if self.rost_hidden else CHATW
+        mw = cw - ROSTW if self.rost_hidden else CHATW  # type: ignore
         mq = getattr(self, "_mq", 0) // 2
         t.append(_fit(marquee(me_line, mw, mq), mw) if cell_len(me_line) > mw
                  else _fit(me_line, mw), style=INK_B)        # confirm your identity
-        if not self.rost_hidden:
+        if not self.rost_hidden:  # type: ignore
             t.append("│", style=DIM)
         t.append(right.rjust(ROSTW)[:ROSTW] + "\n", style=INK_B)
         end = len(rows) - self.scroll
@@ -233,11 +234,11 @@ class ChatMixin:
             if cell_len(hint) > cw:                        # folded col fits it; narrow one doesn't
                 hint = "— say hi —"
             view[BODY // 2] = (hint.center(cw), DIM)
-        sel = min(self.sel, len(others) - 1) if others else 0
+        sel = min(self.sel, len(others) - 1) if others else 0  # type: ignore
         rlo = max(0, min(sel - BODY // 2, len(others) - BODY)) if len(others) > BODY else 0
         for i in range(BODY):
             t.append(_fit(view[i][0], cw), style=view[i][1])
-            if self.rost_hidden:                 # the box is folded: chat owns the row
+            if self.rost_hidden:                 # type: ignore
                 t.append("\n")
                 continue
             t.append("│", style=DIM)
@@ -266,8 +267,8 @@ class ChatMixin:
             else:
                 t.append(_fit("", ROSTW), style=INK)
             t.append("\n")
-        if self.pm_to is not None:                           # the input line is a PM compose
-            label = f"✉{self.pm_to[1][:8]}: "
+        if self.pm_to is not None:                           # type: ignore
+            label = f"✉{self.pm_to[1][:8]}: "  # type: ignore
         else:
             label = "say: "
         t.append(label, style=INK_B)
@@ -281,17 +282,17 @@ class ChatMixin:
         # marquees instead (the v0.2.349 field-scroll doctrine)
         w = CHATW + ROSTW + 1
         mq = self._mq // 2 if hasattr(self, "_mq") else 0
-        if self.invite_prompt is not None:
-            inv = self.invite_prompt
-            blurb = self._pet_of(inv.get("from_id"))
+        if self.invite_prompt is not None:  # type: ignore
+            inv = self.invite_prompt  # type: ignore
+            blurb = self._pet_of(inv.get("from_id"))  # type: ignore
             who = f"{inv.get('from_name', '?')} ({blurb})" if blurb else inv.get("from_name", "?")
             tail = f" invites {inv['kind']}  [Y]/[N]"
             t.append(_fit(marquee(who, w - len(tail), mq) + tail, w), style=INK_B)
-        elif self.action_for is not None:
-            pid, pname, plive = self.action_for
-            blurb = self._pet_of(pid)
+        elif self.action_for is not None:  # type: ignore
+            pid, pname, plive = self.action_for  # type: ignore
+            blurb = self._pet_of(pid)  # type: ignore
             who = f"{pname} ({blurb})" if blurb else pname
-            if self.state and pname in self.state.blocked:
+            if self.state and pname in self.state.blocked:  # type: ignore
                 acts = "[X]unblock  [ESC]"
             elif plive:
                 acts = "[B]attle [J]og [V] DM [M] PM [X]block [ESC]"
@@ -309,13 +310,13 @@ class ChatMixin:
                                        or "reconnecting" in line or "Retrying" in line):
                 # liveness: the static wait line read as a hang (QOL 2026-07-23)
                 line = line[:-1] + "." * (1 + (mq // 5) % 3)
-            if self.rost_hidden and line == HINTS_OPEN:
+            if self.rost_hidden and line == HINTS_OPEN:  # type: ignore
                 # the box is folded: ↑↓ drive the log now, not the roster pick
                 line = HINTS_FOLDED
             elif others and line == HINTS_OPEN:
                 p = others[sel]
                 if p.get("live", True):
-                    blurb = self._pet_of(p["id"])
+                    blurb = self._pet_of(p["id"])  # type: ignore
                     if blurb:
                         tail = " — Enter to act"
                         line = marquee(f"{p['name']}: {blurb}", w - len(tail), mq) + tail

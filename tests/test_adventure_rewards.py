@@ -24,9 +24,9 @@ class _Win:
 
 
 def _panel_at_boss(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     pan = AdventurePanel(_pet(), zone=_boss_zone())
     for _ in range(TELE_LEAVE_T + TELE_ARRIVE_T + pan.adv.total * TRAVEL_TICKS + 20):
         pan.anim()
@@ -76,8 +76,8 @@ def test_felling_the_boss_pays_out_and_the_verdict_shows_it(monkeypatch):
 
 
 def test_a_wild_win_pays_its_bounty_too(monkeypatch):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 1.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 1.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     p = _pet()
     p.bits = 0
     pan = AdventurePanel(p, zone=_boss_zone())

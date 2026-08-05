@@ -1,6 +1,7 @@
 """The progression metadata (tier-1 split, 2026-07-17): egg unlock
 rules, care effects, datacore config, honors titles."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import csv  # noqa: F401
 import gzip  # noqa: F401
 import json  # noqa: F401
@@ -21,7 +22,7 @@ from tuipet.data.loaders.data_core import (    # noqa: F401  (shared plumbing)
 # corpus data.)
 
 @lru_cache(maxsize=1)
-def load_datacore_config():
+def load_datacore_config() -> Any:
     """DVPet datacoreMenuConfig.csv -> {num: {label, icon, icon_x}}.
     Icon/IconX name the SPECIAL core badge png (setupDatacore info[1]/info[2]);
     a literal "null" HIDES the badge for that Monster; unlisted Monster get the
@@ -30,7 +31,7 @@ def load_datacore_config():
              "twoCore.png": "Two", "darkcore.png": "Dark"}
     key = {"burstCore.png": "core_burst", "twelveCore.png": "core_twelve",
            "twoCore.png": "core_two", "darkcore.png": "core_dark"}
-    out = {}
+    out = {}  # type: ignore
     path = os.path.join(_DATA, "datacoreMenuConfig.csv")
     if not os.path.exists(path):
         return out
@@ -47,25 +48,25 @@ def load_datacore_config():
     return out
 
 @lru_cache(maxsize=1)
-def load_datacore_icons():
+def load_datacore_icons() -> Any:
     """Back-compat: {num: core_label} for the Data Book PERSON page."""
     return {n: c["label"] for n, c in load_datacore_config().items() if c["label"]}
 
 @lru_cache(maxsize=1)
-def load_egg_unlock():
+def load_egg_unlock() -> Any:
     """DVPet eggUnlock.csv -> {egg_index: rule}. Joined to tuipet egg indices by the
     egg's hatch name. Each rule is the parsed set of conditions that gate the egg;
     egg.evaluate() tests them against persistence.get_progress()."""
     import tuipet.core.egg as egg_mod
-    name_to_idx = {}
+    name_to_idx = {}  # type: ignore
     for i in range(egg_mod.count()):
         name_to_idx.setdefault(egg_mod.hatch_name(i), i)
 
-    def _int(v):
+    def _int(v: Any) -> Any:
         v = (v or "").strip()
         return int(v) if v.lstrip("-").isdigit() else None
 
-    def _opt(v):
+    def _opt(v: Any) -> Any:
         v = (v or "").strip()
         return None if v in ("", "-1", "None", "FALSE") else v
 
@@ -139,7 +140,7 @@ def load_egg_unlock():
     return rules
 
 
-def map_goal(n):
+def map_goal(n: Any) -> Any:
     """The map-row gate's one sentence -- the SINGLE source for every
     surface that tells it (the guide's Unlock desc here, the live Goal
     line in egg.unlock_progress)."""
@@ -147,7 +148,7 @@ def map_goal(n):
     return f"clear adventure map {n + 1} (or fell {n + 1} raid boss{s})"
 
 @lru_cache(maxsize=1)
-def load_titles():
+def load_titles() -> Any:
     """titles.csv: the HONORS ladder -- purely cosmetic tamer titles, priced
     as the late-game prestige sink (bit-sink design 2026-07-14).  A title is
     profile-level (it survives generations) and rides the STATUS panel plus
@@ -163,7 +164,7 @@ def load_titles():
             continue
     return out
 
-def title_name(tid):
+def title_name(tid: Any) -> Any:
     """The honor's display name ('' for -1/unknown -- nothing worn)."""
     for t in load_titles():
         if t["id"] == tid:

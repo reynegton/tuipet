@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 import time
@@ -20,20 +21,20 @@ import tuipet.utils.persistio as _persistio
 from .progress_io import album_add
 from .serializer import to_save_dict, pet_from_save
 
-def save(pet, path=None):
+def save(pet: Any, path: Optional[Any]=None) -> None:
     # the .bak generation matters: a corrupt main save used to mean a silent
     # new egg -- and the next autosave then DESTROYED the old pet
     _atomic_write_json(path or SAVE_PATH, to_save_dict(pet), keep_bak=True)
     if getattr(pet, "num", -1) >= 0 and pet.stage != "Egg":
         album_add(pet.num)            # grow the cross-pet album (gates egg unlocks)
 
-def write_save_dict(data, path=None):
+def write_save_dict(data: Any, path: Optional[Any]=None) -> None:
     """Atomically write a raw save dict (e.g. one pulled from the cloud) to disk.
     keep_bak: a cloud pull is the ONE writer that replaces the save with bytes
     this device never played -- it must not also burn the local backup."""
     _atomic_write_json(path or SAVE_PATH, data, keep_bak=True)
 
-def local_saved_at(path=None):
+def local_saved_at(path: Optional[Any]=None) -> Any:
     """The _saved_at of the on-disk save, or 0.0 if there's no readable save."""
     path = path or SAVE_PATH
     try:
@@ -41,7 +42,7 @@ def local_saved_at(path=None):
     except (ValueError, OSError, TypeError):
         return 0.0
 
-def quarantine_save(path):
+def quarantine_save(path: str) -> Any:
     """Copy an unreadable save aside (save.corrupt.<ts>.json) before a new game
     rotates over it, so the pet stays recoverable by hand.  Returns the
     quarantine path, or None when the disk refused."""
@@ -54,7 +55,7 @@ def quarantine_save(path):
     except OSError:
         return None
 
-def load(path=None):
+def load(path: Optional[Any]=None) -> Any:
     """Return (pet, message); pet is None if no valid save exists.  A corrupt
     main save falls back to the .bak rotated by save() -- at most one autosave
     (~10s) behind, instead of a silent new egg.  When BOTH generations are
@@ -93,7 +94,7 @@ def load(path=None):
                       f"{os.path.basename(kept)}. Starting fresh.")
     return None, "Your old save couldn't be read. Starting fresh."
 
-def delete(path=None):
+def delete(path: Optional[Any]=None) -> None:
     """Remove the save AND its .bak -- a deliberate delete must not come back
     from the backup on the next launch."""
     path = path or SAVE_PATH
@@ -103,6 +104,6 @@ def delete(path=None):
         except OSError:
             pass
 
-def exists(path=None):
+def exists(path: Optional[Any]=None) -> Any:
     return os.path.exists(path or SAVE_PATH)
 

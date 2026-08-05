@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -8,7 +9,7 @@ import tuipet.core.lines as lines_mod
 from tuipet.i18n.translator import t
 from tuipet.core.petbase import *
 
-def save_from_death(pet):
+def save_from_death(pet: Any) -> Any:
     """PhysicalState.saveFromDeath: yanked back from the brink -- starving,
     a bonus point poorer, RevivalLifeInc of life restored -- and the DEATH
     EVOLUTION fires if a Death-special form will take the body (Devimon /
@@ -42,7 +43,7 @@ def save_from_death(pet):
     return old if targets else None
 
 
-def final_care_grade(pet):
+def final_care_grade(pet: Any) -> Any:
     """careBonusOnReset: grade the ending life.  Runs at death AFTER the
     Memory etch (which spends the bonus); the result seeds the next
     generation's evol_bonus."""
@@ -80,7 +81,7 @@ def final_care_grade(pet):
     return max(0, b)
 
 
-def make_memory(pet):
+def make_memory(pet: Any) -> Any:
     """setNewMemory, the dying pet's side: with a care bonus in hand, etch
     Va/D/Vi = floor(power * bonus * 0.01) into the Memory payload; the
     bonus is spent.  Returns None with no bonus (DVPet onDie only enters

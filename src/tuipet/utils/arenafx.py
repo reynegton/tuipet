@@ -11,6 +11,7 @@ resetScreen() blackout.  Classify any NEW fx against the decompile before
 wiring it.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 
 
 import tuipet.data.loaders.data as data
@@ -49,7 +50,7 @@ POOP_W = 8
 POOP_PAD = 0
 
 
-def _evol_strobe(c):
+def _evol_strobe(c: Any) -> None:
     """DVPet's 50% 'evol' dither tiled over the whole LCD in ink -- the evolve
     burst and the inherit collide strobe carried two copies (refactor 2026-07-05)."""
     ev = (data.load_effects().get("evol") or [None])[0]
@@ -60,7 +61,7 @@ def _evol_strobe(c):
                   if ev[y % mh][x % mw] == "1"]
 
 
-def _filth_right(count):
+def _filth_right(count: int) -> Any:
     """Right edge x of the filth block: fixed POOP_W columns like DVPet's 30px slots."""
     n = min(count or 0, POOP_MAX_PILES)
     if n <= 0:
@@ -68,7 +69,7 @@ def _filth_right(count):
     return grid.X0 + ((n + 1) // 2 - 1) * (POOP_W + POOP_PAD) + POOP_W
 
 
-def _filth_pts(pet, tick, count=None, sizes=None, push=0, px_h=None):
+def _filth_pts(pet: Any, tick: Any, count: Optional[Any]=None, sizes: Optional[Any]=None, push: int=0, px_h: Optional[Any]=None) -> Any:
     """DVPet drawFilthLevel + animFilth: per-pile SIZED sprites (the real filth.png
     sizes 1-4, two anim frames each, from pet.poop_sizes) laid in fixed 2-high
     columns stepping right from the grid's left edge; the frame swaps every
@@ -154,13 +155,13 @@ SICK_ZONE = COND_W + 1                             # skull slot + 1px gap off th
 _WINDOW = grid.WINDOW                              # the locked 32x16 play window (LAW 2026-07-11:
 
 
-def _clip_win(pts):
+def _clip_win(pts: Any) -> Any:
     """Canon overlay ink stays inside the 32x16 window (the matrix edge)."""
     x0, x1, y0, y1 = _WINDOW
     return [(x, y) for x, y in pts if x0 <= x < x1 and y0 <= y < y1]
 
 
-def _sick_mark_up(pet):
+def _sick_mark_up(pet: Any) -> Any:
     """The skull stands in the scene: sick, visible (lights on), and only when
     the piles leave the pet a 16px corridor beside it (poop always wins).
     advance()'s roamer wall and paint()'s clamp both key off this ONE
@@ -201,7 +202,7 @@ HOLIDAY_DECOR = {
 }
 
 
-def _holiday_decor(today=None):
+def _holiday_decor(today: Optional[Any]=None) -> Any:
     """TODAY's festival decoration sprite (cropped rows), or None.
 
     Food icons are stored at 3x (24px cells over an 8px native sprite -- a
@@ -224,11 +225,11 @@ def _holiday_decor(today=None):
     return grid._crop(sprite)
 
 
-def _effect_overlay(pet, frame_i, cols, px_h, tick=0):
+def _effect_overlay(pet: Any, frame_i: Any, cols: Any, px_h: Any, tick: int=0) -> Any:
     """The scene's overlay actors: filth piles, the sleep Zzz, the sick skull.
     Nothing else -- badges belong to the HUD, not the play field."""
     E = data.load_effects()
-    pts = []
+    pts = []  # type: ignore
     if pet.dead:
         return pts
     # a festival prop in the TOP-LEFT corner (2026-07-24): ambient, shown for
@@ -292,7 +293,7 @@ class FxMixin:
     self.roamer, self.frame_i -- arena.Screen composes this in)."""
 
     # ---- care-action animations (DVPet SpriteAnim eat/clean/cheer) -----------
-    def start_fx(self, kind, icon=None, poop=0, old_num=None, pet=None, starving=False, good=True, script=None):
+    def start_fx(self, kind: Any, icon: Optional[Any]=None, poop: int=0, old_num: Optional[Any]=None, pet: Optional[Any]=None, starving: bool=False, good: bool=True, script: Optional[Any]=None) -> None:
         steps = {"eat": 35, "cheer": 31, "jeer": 31, "clean": 22, "spit": 25, "evolve": 41, "dying": 50, "dna_charge": 44, "play": 48, "poop": 25, "poopdance": 21, "yawn": 22, "losing": 50,
                  "gift": GIFT_OUT + GIFT_BACK + GIFT_HOLD, "assist": 28, "inherit": 50}.get(kind, 12)
         self.fx = {"kind": kind, "step": 0, "steps": steps, "icon": icon, "poop": poop,
@@ -300,7 +301,7 @@ class FxMixin:
         if kind == "item":
             # a scripted item-use (itemfx: the per-AnimationType canon tables)
             import tuipet.utils.itemfx as itemfx
-            sc = itemfx.SCRIPTS[script]
+            sc = itemfx.SCRIPTS[script]  # type: ignore
             self.fx["script"] = script
             self.fx["steps"] = sc["steps"]
             self.fx["snds"] = dict(sc["snds"])
@@ -394,10 +395,10 @@ class FxMixin:
             # dnaCharge(): _dnaWash as the sweep enters (t21).
             self.fx["snds"] = {21: "wash"}
 
-    def advance_fx(self):
+    def advance_fx(self) -> Any:
         if not self.fx:
             return False
-        self.frame_i += 1        # filth keeps animating through an fx (audit 2026-07)
+        self.frame_i += 1        # type: ignore
         self.fx["step"] += 1
         if self.fx["step"] < self.fx["steps"]:
             return True
@@ -406,7 +407,7 @@ class FxMixin:
         chain_eat = self.fx.get("chain_eat")
         pet_ref = self.fx.get("pet_ref")
         item_end = self.fx.get("end")
-        self.fx = None
+        self.fx = None  # type: ignore
         if kind == "item" and item_end:
             # canon: playing()/interact/study/... resolve into Cheering;
             # angrySurprise resolves into Jeering (itemfx script tables)
@@ -431,7 +432,7 @@ class FxMixin:
             self.fx["step"] = 6
         return self.fx is not None
 
-    def _pose_rows(self, pet, role, phase):
+    def _pose_rows(self, pet: Any, role: Any, phase: Any) -> Any:
         if pet.num == -1:
             rec = egg_mod.record(pet.egg_type)
             roles = egg_mod.ROLES
@@ -448,7 +449,7 @@ class FxMixin:
         idx = frames[phase % len(frames)]
         return (fr[idx] if idx < len(fr) else None) or first
 
-    def _pose_rows_idx(self, pet, i):
+    def _pose_rows_idx(self, pet: Any, i: Any) -> Any:
         """A single creature frame by raw sprite index (for beat-scripted fx poses)."""
         if pet.num == -1:
             rec = egg_mod.record(pet.egg_type)
@@ -459,7 +460,7 @@ class FxMixin:
         first = next((f for f in fr if f), fr[0])
         return (fr[i] if i < len(fr) and fr[i] else None) or first
 
-    def _food_frames(self, key, px=8):
+    def _food_frames(self, key: str, px: int=8) -> Any:
         if key and key.startswith("sym:"):
             # 8px LCD symbols eat through their OWN glyph, no DVPet food sheet
             # and no downsample (DSprite: the pill eats PILL -> HALF_PILL ->
@@ -473,7 +474,7 @@ class FxMixin:
         f = max(1, 24 // px)
         return [downsample(fr, f) for fr in raw]           # 24px source -> ~px tall on the LCD
 
-    def _fx_filth(self, pet, tick, count=None):
+    def _fx_filth(self, pet: Any, tick: Any, count: Optional[Any]=None) -> Any:
         """DVPet checkFilth: the care anims (eat/cheer/jeer/refuse/poop) keep the
         filth piles on screen and stand the pet clear of them
         (adjustCharacterForFilth).  Returns (overlay_pts, clear_xshift)."""
@@ -485,14 +486,14 @@ class FxMixin:
         cap = max(0, grid.X1 - SPRITE_W - base)             # stay inside the grid's right edge
         return pts, min(max(0, _filth_right(n) - base), cap)
 
-    def _paint_fx(self, pet):
+    def _paint_fx(self, pet: Any) -> None:
         """The care-fx painter, decomposed (audit 2026-07): a shared context is
         pre-loaded (default pose, the cross-kind FILTH prelude),
         then the kind's own painter (_fxk_<kind>) mutates it.  Bodies verbatim
         from the old 210-line chain; behavior pinned by the fx golden."""
         fx = self.fx
         on, bg = LCD_ON, LCD_BG
-        bgimg = self._background(pet)
+        bgimg = self._background(pet)  # type: ignore
         if bgimg:
             on = SIL_SCENE   # dark silhouette day OR night, same rule as paint() --
             #                the pet is never white (the old SIL_LIGHTSOFF branch washed
@@ -513,42 +514,42 @@ class FxMixin:
             # happens just before update() once the kind painter has run
             bgimg, bg, on = None, VOID, SIL_LIGHTSOFF
         c = _FxCtx()
-        c.px_h = SCREEN_ROWS * 2
-        c.bg, c.bgimg = bg, bgimg
+        c.px_h = SCREEN_ROWS * 2  # type: ignore
+        c.bg, c.bgimg = bg, bgimg  # type: ignore
         # only clean/dying rely on this default pose; the kind painters override
         # `rows` unconditionally otherwise
         pose = {"clean": "idle", "dying": "exhausted"}.get(fx["kind"], "idle")
-        c.rows = self._pose_rows(pet, pose, step // 2)
-        c.overlay = []
-        c.free = []          # (the weather plane left with the weather system)
-        c.xshift = 0
-        c.yshift = 0
-        c.mirror = False
+        c.rows = self._pose_rows(pet, pose, step // 2)  # type: ignore
+        c.overlay = []  # type: ignore
+        c.free = []          # type: ignore
+        c.xshift = 0  # type: ignore
+        c.yshift = 0  # type: ignore
+        c.mirror = False  # type: ignore
         if fx["kind"] in ("eat", "cheer", "jeer", "spit"):
             # DVPet checkFilth runs inside these anims: piles stay visible and the
             # pet (and its food) stands clear of them.
-            filth_pts, filth_clear = self._fx_filth(pet, self.frame_i)
-            c.overlay += filth_pts
-            c.xshift = filth_clear
+            filth_pts, filth_clear = self._fx_filth(pet, self.frame_i)  # type: ignore
+            c.overlay += filth_pts  # type: ignore
+            c.xshift = filth_clear  # type: ignore
         elif fx["kind"] == "poop":
             # DVPet poop(): squat (+4, MIRRORED) clear of the old piles, net-zero
             # sway every 3 ticks; the new pile lands at t18 with the size-keyed
             # sound (fx snds) and the relieved pose (+5); ends 24.
             new = fx["step"] >= 18
-            filth_pts, filth_clear = self._fx_filth(pet, self.frame_i,
+            filth_pts, filth_clear = self._fx_filth(pet, self.frame_i,  # type: ignore
                                                     count=fx.get("poop", 0) + (1 if new else 0))
-            c.overlay += filth_pts
+            c.overlay += filth_pts  # type: ignore
             sway = -1 if (3 <= step < 18 and (step // 3) % 2 == 1) else 0
-            c.xshift = filth_clear + sway
-            c.rows = self._pose_rows_idx(pet, 5 if new else 4)
+            c.xshift = filth_clear + sway  # type: ignore
+            c.rows = self._pose_rows_idx(pet, 5 if new else 4)  # type: ignore
         elif fx["kind"] in ("yawn", "poopdance"):
             # canon idle(): the tells are IDLE-family specials -- yawning()/
             # poopDance() move RELATIVE to the pet's LocX with its current
             # facing; only care anims resetScreen() to the anchor.  Seed the
             # roamer so the pose plays where the pet stands (walk-pose audit
             # 2026-07-08: it teleported to centre for every tell).
-            c.xshift = self.roamer.xshift
-            c.mirror = self.roamer.mirror
+            c.xshift = self.roamer.xshift  # type: ignore
+            c.mirror = self.roamer.mirror  # type: ignore
         painter = getattr(self, "_fxk_" + fx["kind"], None)
         if painter is not None:
             painter(pet, fx, step, c)
@@ -563,30 +564,30 @@ class FxMixin:
             lo = (_filth_right(pet.poop) if pet.poop else grid.X0) - PET_BASE_X
             cap = ((grid.X1 - SICK_ZONE if _sick_mark_up(pet) else grid.X1)
                    - SPRITE_W) - PET_BASE_X
-            c.xshift = min(max(c.xshift, lo), max(cap, lo))
-            c.overlay += _effect_overlay(pet, self.frame_i // 4, SCREEN_COLS, c.px_h,
-                                         tick=self.frame_i)
+            c.xshift = min(max(c.xshift, lo), max(cap, lo))  # type: ignore
+            c.overlay += _effect_overlay(pet, self.frame_i // 4, SCREEN_COLS, c.px_h,  # type: ignore
+                                         tick=self.frame_i)  # type: ignore
         if dark:                     # the opaque cover: black over everything
-            c.rows, c.overlay, c.free, c.xshift, c.yshift = [], [], [], 0, 0
-        mirror = (c.mirror or fx["kind"] in ("dying", "poop")
+            c.rows, c.overlay, c.free, c.xshift, c.yshift = [], [], [], 0, 0  # type: ignore
+        mirror = (c.mirror or fx["kind"] in ("dying", "poop")  # type: ignore
                   or (fx["kind"] == "gift" and GIFT_OUT <= step < GIFT_OUT + GIFT_BACK)  # facing right, ambling back
                   or (fx["kind"] == "spit" and (step // 6) % 2 == 0))   # refuse(): head-shake flips
-        if c.yshift and c.rows:
+        if c.yshift and c.rows:  # type: ignore
             # a hop may lift the sprite only as far as ITS clearance under the
             # band top -- nothing exits the window upward (LAW: off-screen is
             # left/right only).  A full-16px mon has no headroom, exactly like
             # the real 16px matrix: its excitement is the pose, not the air.
-            ink = grid._crop(c.rows)
-            c.yshift = max(0, min(c.yshift, grid.BAND - len(ink)))
+            ink = grid._crop(c.rows)  # type: ignore
+            c.yshift = max(0, min(c.yshift, grid.BAND - len(ink)))  # type: ignore
         import tuipet.core.arena as _arena
         # render_screen resolves in ARENA's namespace: tuipet.arena.render_screen
         # is the documented spy/patch point, and it must catch fx frames too
-        self.update(_arena.render_screen(c.rows, SCREEN_COLS, SCREEN_ROWS, on, c.bg,
-                                  xshift=c.xshift, yshift=c.yshift,
-                                  overlay=_clip_win(c.overlay),
-                                  bgimg=c.bgimg, mirror=mirror, clip=_WINDOW))
+        self.update(_arena.render_screen(c.rows, SCREEN_COLS, SCREEN_ROWS, on, c.bg,  # type: ignore
+                                  xshift=c.xshift, yshift=c.yshift,  # type: ignore
+                                  overlay=_clip_win(c.overlay),  # type: ignore
+                                  bgimg=c.bgimg, mirror=mirror, clip=_WINDOW))  # type: ignore
 
-    def _fxk_eat(self, pet, fx, step, c):
+    def _fxk_eat(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet eat(): 24px food descends in 4 stages (beats 0/2/4/6) toward the
         # mouth, then a chew triad alternates open-mouth(+8)/chew(+7) at beats
         # 10/14/18/22/26/30 while the food is consumed frame-by-frame; ends ~34.
@@ -646,7 +647,7 @@ class FxMixin:
             fi = 0 if step < fb[0] else 1 if step < fb[1] else 2 if step < fb[2] else 3
             c.overlay += _blit(food[min(fi, len(food) - 1)], fx_x, fy)
 
-    def _fxk_clean(self, pet, fx, step, c):
+    def _fxk_clean(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet clean(): the wash enters from the right and, once it reaches the pet,
         # shoves the pet AND the filth left together until they slide off-screen (pet
         # in its clean pose, frame 4); the chained cheer then brings the pet back.
@@ -660,13 +661,13 @@ class FxMixin:
         if push > 0:                                       # slide left in lockstep (gap preserved, no mash)
             c.rows = self._pose_rows_idx(pet, 4)           # DVPet drawNum(4) while being washed
         if fx.get("poop"):                                 # the sized piles slide off with the pet
-            c.overlay += _filth_pts(pet, self.frame_i, count=fx["poop"],
+            c.overlay += _filth_pts(pet, self.frame_i, count=fx["poop"],  # type: ignore
                                     sizes=fx.get("sizes"), push=push, px_h=c.px_h)
         if wash:
             wash = grid.fit_band(wash)                     # the 21px shower fits the 16px band
             c.overlay += _blit(wash, wx, grid.TOP + (grid.BAND - len(wash)) // 2)
 
-    def _fxk_assist(self, pet, fx, step, c):
+    def _fxk_assist(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet assistantClean/assistantFeed/assistantLights: the hired helper
         # descends from the top on the LEFT (locX 6, icon flipped to face the
         # pet), does its round, and rises away (moveUp beats 18/19).  Mapped to
@@ -686,7 +687,7 @@ class FxMixin:
             # -- the poop-overlap glitch (audit 2026-07-08).
             push = -step * 3                                   # filth marches right
             c.xshift = _filth_right(fx["poop"]) - push - PET_BASE_X   # stay clear of its right edge
-            c.overlay += _filth_pts(pet, self.frame_i, count=fx["poop"],
+            c.overlay += _filth_pts(pet, self.frame_i, count=fx["poop"],  # type: ignore
                                     sizes=fx.get("sizes"), push=push, px_h=c.px_h)
         elif not feed:
             # assistantLights: the pet gives ground as the helper arrives (DVPet
@@ -742,7 +743,7 @@ class FxMixin:
             if hy > -hh:
                 c.overlay += _blit(hf, hx, hy)
 
-    def _fxk_cheer(self, pet, fx, step, c):
+    def _fxk_cheer(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet cheer(): pose alternates up(+5)/down(+7) every 6 intervals with a
         # "happy" emote bubble pulsing on the up-beats; ends ~beat 30.  A
         # spoiling Bad_Praise (cheer(false)) bounces on 6/4 instead of 5/7.
@@ -784,7 +785,7 @@ class FxMixin:
                 # bezel spot and the clip beheaded the sun (2026-07-12).
                 c.overlay += _blit(hf, PET_BASE_X + c.xshift + SPRITE_W, grid.TOP)
 
-    def _fxk_gift(self, pet, fx, step, c):
+    def _fxk_gift(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet gifting(): walk-toggle poses (spriteNum/spriteNum+1) per beat;
         # facing follows the leg (drawNumMirror false left / true right).  The
         # present is only revealed on arrival, beside the pet (locX gap 4/104
@@ -811,7 +812,7 @@ class FxMixin:
             if gx > -gw:
                 c.overlay += _blit(g0, gx, grid.TOP + max(0, (grid.BAND - gh) // 2))
 
-    def _fxk_play(self, pet, fx, step, c):
+    def _fxk_play(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet jumping() (SpriteAnim 17308): the pet bounces with joy -- hops UP on
         # the excited pose (5) and lands on the neutral pose (1), a happy chirp at the
         # top of each hop.  Distinct from cheer (which bounces in place on 5/7 with an
@@ -853,7 +854,7 @@ class FxMixin:
                     tx = max(0, PET_BASE_X + c.xshift - tw - 1)
                     c.overlay += _blit(toy, tx, c.px_h - 2 - th)
 
-    def _fxk_item(self, pet, fx, step, c):
+    def _fxk_item(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # a scripted item-use (item-anim audit 2026-07-07): the item's OWN
         # icon frames animate on the canon stage -- item left/beside/feet,
         # pet right -- per the itemfx table for its AnimationType
@@ -876,7 +877,7 @@ class FxMixin:
     # the beamed pair of eighth notes in the special-orb bank -- Gekomon's
     # own shot (its attack_index, monster.csv col 55).  A REAL rip: the note
     # is picked out of the bank, never drawn (Joel's standing art law).
-    def _fxk_jeer(self, pet, fx, step, c):
+    def _fxk_jeer(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet jeer(goodScold): the SCOLD reaction -- pose alternates down(+4)/up(+6)
         # every 6 intervals, leading DOWN, with the frustration emote riding the
         # pet; ends ~beat 30.  (Poses 9/10 belong to badHealthJeer, the dying variant.)
@@ -898,14 +899,14 @@ class FxMixin:
             # head height in the window (y=1 predated the law's clip).
             c.overlay += _blit(sf, PET_BASE_X + c.xshift + SPRITE_W, grid.TOP)
 
-    def _fxk_spit(self, pet, fx, step, c):
+    def _fxk_spit(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet refuse(): pose 4 held the whole beat while the head SHAKES via
         # mirror flips T/F/T/F at 0/6/12/18 (_refuse on each flip, wired in
         # start_fx); ends at 24.  No food drops -- the meal never appears.
         # (the Depressed pose-9 variant left with the mood system)
         c.rows = self._pose_rows_idx(pet, 4)
 
-    def _fxk_evolve(self, pet, fx, step, c):
+    def _fxk_evolve(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet evolveAnim(): the room plunges DARK (lightsOff, fully opaque -- the
         # pet vanishes) and the bright "evol" burst strobes over it at beats
         # 5/12/19/25/29/34 (each icon holds until the next beat); changeSprite()
@@ -956,7 +957,7 @@ class FxMixin:
         else:                                              # lightsOff beats: the void, pet hidden
             c.rows, c.bgimg, c.bg = [], None, VOID
 
-    def _fxk_inherit(self, pet, fx, step, c):
+    def _fxk_inherit(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet inheriting(): the pet stands RIGHT (locX width-3-size); the chip
         # descends on its left (t1-10), shrinks to a point (t11, chipShrink), the
         # DEPARTED ancestor rises from it (t17, parentGrow) and greets on poses
@@ -991,7 +992,7 @@ class FxMixin:
             if step % 2 == 0:
                 _evol_strobe(c)
 
-    def _fxk_dna_charge(self, pet, fx, step, c):
+    def _fxk_dna_charge(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet dnaCharge() (SpriteAnim 12860): the FIELD badge drops in beside the
         # pet (t1-7), wobbles (9/11/13), inserts (t16), then the full-screen dnaWash
         # wave sweeps DOWN over everything (t21+, ~9px/tick of 120) while the pet
@@ -1032,7 +1033,7 @@ class FxMixin:
     # the pill was this painter's only rider.  It also drew the medicine strip
     # at y0-4, above the window top (y6) -- a clipped sliver either way.)
 
-    def _fxk_losing(self, pet, fx, step, c):
+    def _fxk_losing(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet losing() (the home-battle defeat): the sore loser jeers for 30
         # beats -- disposition-shaded pose pair (sour 4/6, mild slumps 10/9)
         # with the "dying" emote strobing on the jeer cadence -- then the WASH
@@ -1072,7 +1073,7 @@ class FxMixin:
     # (_fxk_toilet -- DVPet poopToilet -- left with the staple props:
     # strict-DSprite items, 2026-07-17)
 
-    def _fxk_yawn(self, pet, fx, step, c):
+    def _fxk_yawn(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet yawning() (SpriteAnim 15742): idle -> the yawn (+8 at beat 4)
         # -> a side-sway (x-3/+3 pairs, beats 10..28) -> the stretch tail
         # (+3/+1 alternating, 33..53).  The special-idle tell that bedtime
@@ -1087,7 +1088,7 @@ class FxMixin:
         else:
             c.rows = self._pose_rows_idx(pet, 3 if ((step - 15) // 2) % 2 == 0 else 1)
 
-    def _fxk_poopdance(self, pet, fx, step, c):
+    def _fxk_poopdance(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet poopDance (a special-idle roll while the gauge is full): a
         # nervous wiggle (+-1 every other beat, 2..10) then pose 4 flipping its
         # mirror every 2 beats (12..18) -- the tell that a poop is coming.
@@ -1103,7 +1104,7 @@ class FxMixin:
             if ((step - 12) // 2) % 2 == 1:
                 c.mirror = not c.mirror
 
-    def _fxk_dying(self, pet, fx, step, c):
+    def _fxk_dying(self, pet: Any, fx: Any, step: Any, c: Any) -> None:
         # DVPet dying() (SpriteAnim 13179): the collapsed pet (pose 10, mirrored)
         # sways +/-1 as the 'dying' emote (dying/dying2) swaps at its right edge,
         # BOTH on a 10-tick beat (frame % (10*interval)), just before the memorial.

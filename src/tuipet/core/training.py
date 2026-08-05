@@ -22,6 +22,7 @@ wrong prop, Joel 2026-07-17).  Wall_1 stands through the whole volley;
 only a MEGA break crumbles it to Wall_2.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import json
 import os
 
@@ -56,13 +57,13 @@ from tuipet.ui.screens.battlescreen import mega_window    # noqa: E402
 
 
 class TrainingPanel:
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.frame_i = 0
         self.phase = "bar"            # bar -> shoot -> done
         self.bar = 0
         self.bar_dir = 1
-        self._bar_hist = []           # trailing marker steps (the lock's latency grace)
+        self._bar_hist = []           # type: ignore
         self.mega_lo, self.mega_hi = mega_window(pet)
         self.grade = None             # mega / normal / miss
         self.success = False
@@ -74,7 +75,7 @@ class TrainingPanel:
         #                               the main LCD (Joel 2026-07-17)
 
     # ---- driving ----
-    def anim(self):
+    def anim(self) -> None:
         self.frame_i += 1
         if self.phase == "bar":
             self._bar_hist = (self._bar_hist + [self.bar])[-strikefx.LOCK_GRACE:]
@@ -86,17 +87,17 @@ class TrainingPanel:
             self.i += 1
             fr = self.timeline[min(self.i, len(self.timeline) - 1)]
             m = fr.get("m")
-            if m != self._last_m:
+            if m != self._last_m:  # type: ignore
                 self.sfx = strikefx.beat_sfx(m, fr.get("double"))
                 self._last_m = m
             if self.i >= len(self.timeline) - 1:
-                self._verdict += 1
-                if self._verdict >= VERDICT_T:
+                self._verdict += 1  # type: ignore
+                if self._verdict >= VERDICT_T:  # type: ignore
                     # straight home: the aftermath tableau WAS the verdict --
                     # the app closes us and the happy/mad fx plays on the LCD
-                    self.auto_close = ("done", self.result)
+                    self.auto_close = ("done", self.result)  # type: ignore
 
-    def _lock(self):
+    def _lock(self) -> None:
         # ONE grading source with the bout (strikefx.grade_lock: the
         # latency grace, the 2px marker, and the verbatim v0.4.12
         # battles >= 999 never-whiff rule, which lives there now)
@@ -110,7 +111,7 @@ class TrainingPanel:
         self.result = {"mega": t("train_result_mega", "A PERFECT strike!"),
                        "normal": t("train_result_normal", "Acerto sólido!"),
                        "miss": t("train_result_miss", "Whiffed it...")}[g]
-        self.sfx = "confirm" if self.success else "refuse"
+        self.sfx = "confirm" if self.success else "refuse"  # type: ignore
         # the strike is the battle's own volley: windup -> fire -> the
         # TARGET breaks (hit) or stands (miss)
         self.timeline = strikefx.build_volley(self.success, g == "mega")
@@ -119,7 +120,7 @@ class TrainingPanel:
         self.phase = "shoot"
         self.i = 0
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.phase == "bar":
             if k in ("space", "enter"):
                 self._lock()
@@ -127,28 +128,28 @@ class TrainingPanel:
                 return ("done", None)
         return None                    # the strike plays through; anim() closes us
 
-    def strip(self):
+    def strip(self) -> Any:
         if self.phase == "bar":
             return menu.hints(("SPACE", t("hint_strike", "strike")), ("ESC", t("hint_out", "out")))
         return ""
 
     # ---- rendering ----
-    def _rows(self, pose):
+    def _rows(self, pose: Any) -> Any:
         rec = data.record_for(self.pet.num)
         fr = rec["frames"]
         return (fr[pose] if pose < len(fr) else None) or fr[0]
 
-    def _bar_overlay(self):
+    def _bar_overlay(self) -> Any:
         """The canon timing bar (Joel 2026-07-15: 'do it canon style') --
         the pixel-set moved VERBATIM to strikefx.timing_bar so the battle/
         raid ready screen sweeps the same sprite (Joel 2026-07-19)."""
         return strikefx.timing_bar(self.bar, self.mega_lo, self.mega_hi)
 
-    def _bar_text(self):
+    def _bar_text(self) -> Any:
         return menu.paint([], self.pet.background(), rows=ROWS, cols=COLS,
                           overlay=self._bar_overlay(), clip=grid.WINDOW)
 
-    def _wall_overlay(self, m):
+    def _wall_overlay(self, m: Any) -> Any:
         """The standing target wall (the clone's rule, verbatim): Wall_1
         stands through the whole volley; only a MEGA break crumbles it to
         Wall_2."""
@@ -157,7 +158,7 @@ class TrainingPanel:
         rows = _WALL.get(which) or []
         return render.blit(rows, grid.X0, grid.FLOOR - len(rows))
 
-    def _shoot_text(self):
+    def _shoot_text(self) -> Any:
         """The pet fires LEFT at the target wall on battle's ALTERNATING
         views -- no room for pet + flight + wall in the 32px window:
         windup/fire_out -> the pet's view, orb exits the window;
@@ -206,7 +207,7 @@ class TrainingPanel:
         return menu.paint(place, self.pet.background(), rows=ROWS, cols=COLS,
                           overlay=overlay, clip=grid.WINDOW)
 
-    def text(self):
+    def text(self) -> Any:
         if self.phase == "bar":
             return self._bar_text()
         return self._shoot_text()      # (the done page left: the verdict is

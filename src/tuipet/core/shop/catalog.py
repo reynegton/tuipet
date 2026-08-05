@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 from typing import NamedTuple
 import tuipet.data.loaders.data as data
 from functools import lru_cache
@@ -201,7 +202,7 @@ _AUTHORED = {
 }
 
 
-def tier_for_price(price):
+def tier_for_price(price: Any) -> Any:
     """The band a price falls in, or None for a grant-only item."""
     if price is None:
         return None
@@ -211,7 +212,7 @@ def tier_for_price(price):
     return TIER_TOP
 
 
-def tier_weight(key):
+def tier_weight(key: str) -> Any:
     """Roll weight for `key` -- the find pools and any weighted shelf pick."""
     if key in _WEIGHT_OVERRIDE:
         return _WEIGHT_OVERRIDE[key]
@@ -219,12 +220,12 @@ def tier_weight(key):
     return TIER_WEIGHT.get((v.tier if v else None) or "common", 1)
 
 
-def tier_stock(key):
+def tier_stock(key: str) -> Any:
     v = CATALOG.get(key)
     return TIER_STOCK.get((v.tier if v else None) or "common", 1)
 
 
-def adventure_open(key, prog=None):
+def adventure_open(key: str, prog: Optional[Any]=None) -> Any:
     """Is this road-shelf item unlocked (enough maps cleared)?  Non-gated keys
     are always open."""
     need = ADVENTURE_GATES.get(key)
@@ -236,7 +237,7 @@ def adventure_open(key, prog=None):
     return len(prog.get("maps", ()) or ()) >= need
 
 
-def key_for_icon(icon):
+def key_for_icon(icon: Any) -> Any:
     """The CATALOG key whose sprite is `icon`, or None (unmapped loot).
     A RETIRED key's icon resolves to its heir -- authored loot rows, cup
     prizes and town stock lines written against a cut item keep paying."""
@@ -247,7 +248,7 @@ def key_for_icon(icon):
     return RETIRED.get(old) if old else None
 
 
-def icon_art(key):
+def icon_art(key: str) -> Any:
     """A still-cell's substitute sprite for `key` (catalog key or raw icon
     key), or None to use the sheet frame.  Falls back to None if the orb
     bank is missing so the frame path always still renders something."""
@@ -260,13 +261,13 @@ def icon_art(key):
     return (data_world.load_orbs().get(group) or {}).get(idx)
 
 
-def icon_frame(key):
+def icon_frame(key: str) -> Any:
     """The display frame for a CATALOG key or a raw icon key ('i:9')."""
     k = key if key in CATALOG else (key_for_icon(key) or "")
     return _ICON_FRAME.get(k, 0)
 
 
-def item_is_eaten(key):
+def item_is_eaten(key: str) -> Any:
     """True when USING this item should play the EAT show.
 
     The canon rule is the SHEET (item-show audit 2026-07-23, Joel "do
@@ -281,7 +282,7 @@ def item_is_eaten(key):
     return ICON_KEYS.get(key, "").startswith("f:")
 
 
-def item_script(key):
+def item_script(key: str) -> Any:
     """The canon SHOW for a catalog item, or None.
 
     ONE SOURCE (item-show audit 2026-07-23, Joel: "is all of that
@@ -305,7 +306,7 @@ def item_script(key):
     return act if act in itemfx.SCRIPTS else None
 
 
-def relic_open(key, prog=None):
+def relic_open(key: str, prog: Optional[Any]=None) -> Any:
     """Is this Relic's wave reached?  (Non-relic keys are open.)"""
     gate = RELIC_GATES.get(key)
     if gate is None:
@@ -317,11 +318,11 @@ def relic_open(key, prog=None):
     return int(prog.get(sig, 0)) >= need
 
 
-def _price(v):
+def _price(v: Any) -> Any:
     return int(v.get("price") or DEFAULT_PRICE)
 
 
-def _usable(key, category):
+def _usable(key: str, category: Any) -> Any:
     """Only goods Pet.use_item can actually APPLY are sold.  Since the
     TUIPET catalog (2026-07-18) the consumables are authored in CATALOG;
     vitems contributes only the Relics (its theme_* skins,
@@ -329,7 +330,7 @@ def _usable(key, category):
     return category == ARMOR_CATEGORY or key in CATALOG
 
 
-def catalog():
+def catalog() -> Any:
     """Every buyable entry: [{key, name, price, category}], price order.
     The consumable shelf is the authored CATALOG (price None = unsold);
     the 11 Relics still come from vitems.json.  A Relic whose
@@ -353,7 +354,7 @@ def catalog():
     return out
 
 
-def entry(key):
+def entry(key: str) -> Any:
     """Resolve any key: the authored CATALOG first (an unsold treat still
     renders in the bag at a nominal resale), then vitems (Relics)."""
     c = CATALOG.get(key)
@@ -369,17 +370,17 @@ def entry(key):
             "category": v.get("category", "Item")}
 
 
-def categories():
+def categories() -> Any:
     have = {e["category"] for e in catalog()}
     out = [c for c in CATEGORY_ORDER if c in have]
     return out + sorted(have - set(out))
 
 
-def shelf(cat):
+def shelf(cat: Any) -> Any:
     return [e for e in catalog() if e["category"] == cat]
 
 
-def crest_answer(pet, key):
+def crest_answer(pet: Any, key: str) -> Any:
     """The forms THIS pet's armor jump would land right now -- the same
     evolution.check gate the crest egg runs on use (display only, no
     roll).  [] when nothing answers (not a crest key, egg/dead, gates
@@ -397,7 +398,7 @@ def crest_answer(pet, key):
                    and evolution.check(pet, t, item=item_id)})
 
 
-def wave_status(prog=None):
+def wave_status(prog: Optional[Any]=None) -> Any:
     """(sealed_count, closest-wave tease) from live RELIC_GATES
     progress -- (0, '') once every relic is on the shelf."""
     if prog is None:
@@ -408,7 +409,7 @@ def wave_status(prog=None):
     if not sealed:
         return 0, ""
 
-    def ratio(g):
+    def ratio(g: Any) -> Any:
         sig, need = g
         return min(1.0, int(prog.get(sig, 0)) / need)
     # DETERMINISTIC TIE-BREAK (shops audit 2026-07-25).  `max(set(...))`
@@ -428,7 +429,7 @@ def wave_status(prog=None):
     return len(sealed), tease.format(have=have, need=need)
 
 
-def effect_line(e):
+def effect_line(e: Any) -> Any:
     if e.get("category") == ARMOR_CATEGORY:
         return "an armor evolution (the right Child)"
     k = e["key"]
@@ -593,7 +594,7 @@ TIER_TOP = "legendary"
 TIER_ORDER = ("common", "uncommon", "rare", "legendary")
 
 
-def tier_for_price(price):
+def tier_for_price(price: Any) -> Any:  # type: ignore
     """The band a price falls in, or None for a grant-only item."""
     if price is None:
         return None
@@ -625,7 +626,7 @@ _WEIGHT_OVERRIDE = {k: TIER_WEIGHT["legendary"] for k in (
     "beast_dark_spirit")}
 
 
-def tier_weight(key):
+def tier_weight(key: str) -> Any:  # type: ignore
     """Roll weight for `key` -- the find pools and any weighted shelf pick."""
     if key in _WEIGHT_OVERRIDE:
         return _WEIGHT_OVERRIDE[key]
@@ -633,7 +634,7 @@ def tier_weight(key):
     return TIER_WEIGHT.get((v.tier if v else None) or "common", 1)
 
 
-def tier_stock(key):
+def tier_stock(key: str) -> Any:  # type: ignore
     v = CATALOG.get(key)
     return TIER_STOCK.get((v.tier if v else None) or "common", 1)
 
@@ -665,7 +666,7 @@ ADVENTURE_GATES = {
 }
 
 
-def adventure_open(key, prog=None):
+def adventure_open(key: str, prog: Optional[Any]=None) -> Any:  # type: ignore
     """Is this road-shelf item unlocked (enough maps cleared)?  Non-gated keys
     are always open."""
     need = ADVENTURE_GATES.get(key)
@@ -686,7 +687,7 @@ for _k, _v in CATALOG.items():
     _BY_ICON.setdefault(_v.icon, _k)
 
 
-def key_for_icon(icon):
+def key_for_icon(icon: Any) -> Any:  # type: ignore
     """The CATALOG key whose sprite is `icon`, or None (unmapped loot).
     A RETIRED key's icon resolves to its heir -- authored loot rows, cup
     prizes and town stock lines written against a cut item keep paying."""
@@ -715,7 +716,7 @@ _ICON_FRAME = {"music_player": 1}
 _ICON_ART = {"music_player": ("special", "42")}
 
 
-def icon_art(key):
+def icon_art(key: str) -> Any:  # type: ignore
     """A still-cell's substitute sprite for `key` (catalog key or raw icon
     key), or None to use the sheet frame.  Falls back to None if the orb
     bank is missing so the frame path always still renders something."""
@@ -728,7 +729,7 @@ def icon_art(key):
     return (data_world.load_orbs().get(group) or {}).get(idx)
 
 
-def icon_frame(key):
+def icon_frame(key: str) -> Any:  # type: ignore
     """The display frame for a CATALOG key or a raw icon key ('i:9')."""
     k = key if key in CATALOG else (key_for_icon(key) or "")
     return _ICON_FRAME.get(k, 0)
@@ -773,7 +774,7 @@ _OWN_FLOW = frozenset({"memory", "town_transport", "disaster_transport",
                        "beast_metal_spirit", "beast_dark_spirit"})
 
 
-def item_is_eaten(key):
+def item_is_eaten(key: str) -> Any:  # type: ignore
     """True when USING this item should play the EAT show.
 
     The canon rule is the SHEET (item-show audit 2026-07-23, Joel "do
@@ -788,7 +789,7 @@ def item_is_eaten(key):
     return ICON_KEYS.get(key, "").startswith("f:")
 
 
-def item_script(key):
+def item_script(key: str) -> Any:  # type: ignore
     """The canon SHOW for a catalog item, or None.
 
     ONE SOURCE (item-show audit 2026-07-23, Joel: "is all of that
@@ -892,7 +893,7 @@ RELIC_GATES = {
 }
 
 
-def relic_open(key, prog=None):
+def relic_open(key: str, prog: Optional[Any]=None) -> Any:  # type: ignore
     """Is this Relic's wave reached?  (Non-relic keys are open.)"""
     gate = RELIC_GATES.get(key)
     if gate is None:
@@ -912,7 +913,7 @@ def relic_open(key, prog=None):
 EGG_STOCK_PER_TOWN = 6
 
 
-def _sellable_eggs():
+def _sellable_eggs() -> Any:
     """The egg a town may stock: every egg that ISN'T a free starter
     (the five START babies you already own) and CAN be owned.  A can_perm
     FALSE row is a lineage egg -- hatchable only the generation its
@@ -928,7 +929,7 @@ def _sellable_eggs():
             and (rules.get(i) or {}).get("can_perm", True)]
 
 
-def town_egg_stock(town_id, count=EGG_STOCK_PER_TOWN):
+def town_egg_stock(town_id: Any, count: Any=EGG_STOCK_PER_TOWN) -> Any:
     """The DISTINCT set of eggs THIS town sells -- a stable band over the
     earnable egg, rotated by town so no two town shops feel the same."""
     pool = _sellable_eggs()
@@ -940,13 +941,13 @@ def town_egg_stock(town_id, count=EGG_STOCK_PER_TOWN):
     # the moment the width divided the pool (egg audit 2026-07-25: cutting
     # the 5 lineage eggs left a 36-egg pool, and 26 towns fell into 6 bands)
     stride = count
-    while len(pool) > 1 and _gcd(stride, len(pool)) != 1:
+    while len(pool) > 1 and _gcd(stride, len(pool)) != 1:  # type: ignore
         stride += 1
     start = (int(town_id) * stride) % len(pool)
     return [pool[(start + i) % len(pool)] for i in range(count)]
 
 
-def egg_price(idx):
+def egg_price(idx: int) -> Any:
     """A town egg's bit price -- earned eggs are a treat, so the buy-outright
     shortcut costs real bits.  Starters (never stocked) are free."""
     import tuipet.data.loaders.data as data
@@ -963,11 +964,11 @@ def egg_price(idx):
 # never reach the shelf.  Faithful to the source default, not invented.
 DEFAULT_PRICE = 1000
 
-def _price(v):
+def _price(v: Any) -> Any:  # type: ignore
     return int(v.get("price") or DEFAULT_PRICE)
 
 
-def _usable(key, category):
+def _usable(key: str, category: Any) -> Any:  # type: ignore
     """Only goods Pet.use_item can actually APPLY are sold.  Since the
     TUIPET catalog (2026-07-18) the consumables are authored in CATALOG;
     vitems contributes only the Relics (its theme_* skins,
@@ -975,7 +976,7 @@ def _usable(key, category):
     return category == ARMOR_CATEGORY or key in CATALOG
 
 
-def catalog():
+def catalog() -> Any:  # type: ignore
     """Every buyable entry: [{key, name, price, category}], price order.
     The consumable shelf is the authored CATALOG (price None = unsold);
     the 11 Relics still come from vitems.json.  A Relic whose
@@ -999,7 +1000,7 @@ def catalog():
     return out
 
 
-def entry(key):
+def entry(key: str) -> Any:  # type: ignore
     """Resolve any key: the authored CATALOG first (an unsold treat still
     renders in the bag at a nominal resale), then vitems (Relics)."""
     c = CATALOG.get(key)
@@ -1015,13 +1016,13 @@ def entry(key):
             "category": v.get("category", "Item")}
 
 
-def categories():
+def categories() -> Any:  # type: ignore
     have = {e["category"] for e in catalog()}
     out = [c for c in CATEGORY_ORDER if c in have]
     return out + sorted(have - set(out))
 
 
-def shelf(cat):
+def shelf(cat: Any) -> Any:  # type: ignore
     return [e for e in catalog() if e["category"] == cat]
 
 
@@ -1035,7 +1036,7 @@ CATEGORY_ORDER = ("Feed", "Rest", "Cure", "Drill", "Modos", "Power",
                   "Tesouro", "Evoluir", "Road", ARMOR_CATEGORY)
 
 
-def crest_answer(pet, key):
+def crest_answer(pet: Any, key: str) -> Any:  # type: ignore
     """The forms THIS pet's armor jump would land right now -- the same
     evolution.check gate the crest egg runs on use (display only, no
     roll).  [] when nothing answers (not a crest key, egg/dead, gates
@@ -1064,7 +1065,7 @@ _WAVE_TEASE = {
 }
 
 
-def wave_status(prog=None):
+def wave_status(prog: Optional[Any]=None) -> Any:  # type: ignore
     """(sealed_count, closest-wave tease) from live RELIC_GATES
     progress -- (0, '') once every relic is on the shelf."""
     if prog is None:
@@ -1075,7 +1076,7 @@ def wave_status(prog=None):
     if not sealed:
         return 0, ""
 
-    def ratio(g):
+    def ratio(g: Any) -> Any:
         sig, need = g
         return min(1.0, int(prog.get(sig, 0)) / need)
     # DETERMINISTIC TIE-BREAK (shops audit 2026-07-25).  `max(set(...))`
@@ -1095,7 +1096,7 @@ def wave_status(prog=None):
     return len(sealed), tease.format(have=have, need=need)
 
 
-def effect_line(e):
+def effect_line(e: Any) -> Any:  # type: ignore
     if e.get("category") == ARMOR_CATEGORY:
         return "an armor evolution (the right Child)"
     k = e["key"]
@@ -1112,7 +1113,7 @@ def effect_line(e):
     return eff
 
 
-def buy(pet, e):
+def buy(pet: Any, e: Any) -> Any:
     """-> (message, sfx)."""
     if pet.bits < e["price"]:
         return (f"Precisa de {e['price']}b — você tem {pet.bits}b.", "error")
@@ -1121,7 +1122,7 @@ def buy(pet, e):
     return (f"Comprou {e['name']}!", "confirm")
 
 
-def resell_price(e):
+def resell_price(e: Any) -> Any:
     # a town-priced bag row carries its LOCAL sell price (buy-low/sell-high,
     # shops arc 2026-07-21); home keeps the flat half
     if "sell_price" in e:
@@ -1129,7 +1130,7 @@ def resell_price(e):
     return max(1, e.get("price", 0) // 2)
 
 
-def sell(pet, e):
+def sell(pet: Any, e: Any) -> Any:
     if pet.inventory.get(e["key"], 0) <= 0:
         return ("Você não tem isso.", "error")
     pet.take_item(e["key"])                    # classic take_item returns None
@@ -1168,14 +1169,14 @@ TOWN_DAILY_CAP = 3        # tuipet's own per-(town,item,day) purchase bound.
 # DEALS the only trade window -- by design.
 
 
-def _today_ordinal(today=None):
+def _today_ordinal(today: Optional[Any]=None) -> Any:
     import tuipet.core.tournament as tournament
     d = today if today is not None else tournament._today()
     return d.toordinal()
 
 
 @lru_cache(maxsize=1)
-def _town_maps():
+def _town_maps() -> Any:
     """town_id -> the MAP whose zone hosts the town (the road's own
     geography; item diversity audit 2026-07-23)."""
     import tuipet.data.loaders.data as data
@@ -1199,7 +1200,7 @@ _MAP_SPECIALTY = {1: "chocolate_egg", 2: "futon", 3: "board_game",
                   4: "datatron", 5: "gold_pill"}
 
 
-def _econ_stub(key):
+def _econ_stub(key: str) -> Any:
     """A synthetic econ row for non-authored shelf rows (guest/regional):
     catalog price, standard factors, capped stock -- no money printer."""
     v = CATALOG[key]
@@ -1208,7 +1209,7 @@ def _econ_stub(key):
             "consumable_id": -1}
 
 
-def _base_rows(town_id):
+def _base_rows(town_id: Any) -> Any:
     """The town's authored shelf + its map's regional specialty:
     [(sid, catalog_key, econ_row, local_price)] in list order (items shelf
     first, then the food family).  local_price is the PRICE-LAW ratio (see
@@ -1222,7 +1223,7 @@ def _base_rows(town_id):
     ov = data.load_shop_overrides()
     import tuipet.data.loaders.data_shop as data_shop
     foods, items = data_shop._load_consumables()
-    rows = []
+    rows = []  # type: ignore
     for sid in t["items_override"] + t["foods_override"]:
         o = ov.get(sid)
         if not o or o["price"] <= 0:
@@ -1254,7 +1255,7 @@ def _base_rows(town_id):
 
 
 @lru_cache(maxsize=1)
-def _guest_deal():
+def _guest_deal() -> Any:
     """town_id -> its standing guest good, dealt WITHOUT replacement
     across ALL towns (item diversity audit 2026-07-23: the old per-town
     crc32 pick birthday-collided -- 8 items served 2-3 towns each, and
@@ -1279,7 +1280,7 @@ def _guest_deal():
     pool = [k for k, v in CATALOG.items()
             if v.price is not None and v.category != "Road"
             and k != "poison_mushroom"]
-    base_anywhere = set()
+    base_anywhere = set()  # type: ignore
     for tid in _town_maps():
         base_anywhere.update(k for _sid, k, _o, _p in _base_rows(tid))
     pool.sort(key=lambda k: (k in base_anywhere,
@@ -1296,7 +1297,7 @@ def _guest_deal():
     return out
 
 
-def _town_rows(town_id):
+def _town_rows(town_id: Any) -> Any:
     """The full town shelf: authored base + regional specialty + the
     standing guest good (gameplay polish #24; re-dealt collision-free in
     the item diversity audit 2026-07-23) + THE ROAD SHELF.
@@ -1324,7 +1325,7 @@ def _town_rows(town_id):
     return rows
 
 
-def _open_rows(town_id, prog=None):
+def _open_rows(town_id: Any, prog: Optional[Any]=None) -> Any:
     """The town shelf a tamer can actually SHOP today: `_town_rows` minus
     anything whose earned-access gate is still shut.
 
@@ -1343,7 +1344,7 @@ def _open_rows(town_id, prog=None):
     return [r for r in _town_rows(town_id) if adventure_open(r[1], prog)]
 
 
-def _deal_index(seed, count, today=None):
+def _deal_index(seed: Any, count: int, today: Optional[Any]=None) -> Any:
     """A daily rotating index in [0, count), crc32-seeded on (seed, day):
     stable all day, different tomorrow.  DEDUPED (2026-07-24, Joel: "dedup
     the town deal") -- it never repeats YESTERDAY's pick, so no shelf shows
@@ -1360,7 +1361,7 @@ def _deal_index(seed, count, today=None):
     if count == 1:
         return 0
     import zlib
-    def raw(day):
+    def raw(day: Any) -> Any:
         return zlib.crc32(f"{seed}:{day}".encode()) % count
     day = _today_ordinal(today)
     final = raw(day - _DEAL_LOOKBACK)
@@ -1375,7 +1376,7 @@ def _deal_index(seed, count, today=None):
 _DEAL_LOOKBACK = 32          # days walked to stabilise the dedup chain
 
 
-def town_deal_sid(town_id, today=None, prog=None):
+def town_deal_sid(town_id: Any, today: Optional[Any]=None, prog: Optional[Any]=None) -> Any:
     """The town's ONE rotating daily deal: seeded on (town, day) -- stable
     all day, different tomorrow, different next town, and never the same as
     yesterday (dedup 2026-07-24).
@@ -1397,12 +1398,12 @@ HOME_DEAL_FACTOR = 2
 
 
 @lru_cache(maxsize=1)
-def _home_deal_pool():
+def _home_deal_pool() -> Any:
     return sorted(k for k, v in CATALOG.items()
                   if v.price is not None and v.category != "Road")
 
 
-def home_deal_key(today=None):
+def home_deal_key(today: Optional[Any]=None) -> Any:
     """The home shelf's ONE rotating daily deal key (2026-07-24, Joel: "add
     the home daily deal") -- seeded on the day, deduped vs yesterday."""
     pool = _home_deal_pool()

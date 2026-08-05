@@ -24,6 +24,7 @@ the town and rests, a danger warp (Garuda) dashes toward the boss and gets
 ambushed.
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import math
 import random
 from functools import lru_cache
@@ -133,7 +134,7 @@ HABITAT_SCENE = {
 DEFAULT_SCENE = "greenhills"
 
 
-def _boss_biome_hid(zone):
+def _boss_biome_hid(zone: Any) -> Any:
     """The zone's ONE biome habitat id: the terrain its gate boss STANDS in --
     the bgs span holding the boss's Location (bosses gate the zone's end).  No
     boss -> the terrain the pet spends the most steps in (dominant span)."""
@@ -157,7 +158,7 @@ def _boss_biome_hid(zone):
     return max(cover, key=lambda h: (cover[h], -h))
 
 
-def _town_legs(z):
+def _town_legs(z: Any) -> Any:
     """The zone's town step-spans mapped onto the ~40 interactive legs:
     [(leg_lo, leg_hi, town_id)] -- a mid-zone rest waypoint / visitable hub."""
     ts = max(1, z.get("total_steps", 1))
@@ -228,7 +229,7 @@ _FESTIVAL_CAPSULES = ("capsule_a", "capsule_b", "capsule_c", "capsule_d",
                       "prank_capsule_a", "prank_capsule_b")
 
 
-def _find_keys(scene, is_final):
+def _find_keys(scene: Any, is_final: bool) -> Any:
     """The zone's discoverable loot as CATALOG keys: its biome's pool (or
     the rare tier for a map's final zone), with the road items riding
     along.  (The per-slot authored tables retired 2026-07-23 -- see
@@ -239,7 +240,7 @@ def _find_keys(scene, is_final):
 
 
 @lru_cache(maxsize=1)
-def _real_zones():
+def _real_zones() -> Any:
     """The 26 zones as run-zones: name (its biome + the gate boss that guards
     it), the one biome scene, a uniform ~40-leg crossing, the zone's OWN wild
     pool (its randoms), its town waypoints (leg-ranges that rest + suppress
@@ -275,14 +276,14 @@ _FALLBACK_ZONE = {"name": "Green Hills", "scene": DEFAULT_SCENE,
 ZONES = tuple(_real_zones()) or (_FALLBACK_ZONE,)
 
 
-def active_holiday(today=None):
+def active_holiday(today: Optional[Any]=None) -> Any:
     """Today's festival name (double bits + more finds on the road), or None.
     Reuses the cup's date/holiday cadence -- ONE source for 'what day is it'."""
     import tuipet.core.tournament as tournament
     return tournament.holiday(today)
 
 
-def pick_zone(pet):
+def pick_zone(pet: Any) -> Any:
     """A zone when none is chosen (tests, or a default embark): the pet's
     frontier zone -- the newest one it has unlocked.  The zone-pick UI lets the
     player choose any UNLOCKED zone instead (progression phase)."""
@@ -302,7 +303,7 @@ def pick_zone(pet):
 # field all stay keyed as before; only the ORDER you meet them changed.
 
 
-def _difficulty(z):
+def _difficulty(z: Any) -> Any:
     """The zone's deterministic difficulty key: mean wild stage rank + gate
     boss rank (the measured win-rate driver)."""
     from tuipet.core.battle import _RANK
@@ -345,7 +346,7 @@ _ORDER_POS = {zi: pos for pos, zi in enumerate(PROGRESSION)}
 _SIG_BANDS = (("common", 8), ("uncommon", 8), ("rare", 5), ("legendary", 5))
 
 
-def _assign_signatures():
+def _assign_signatures() -> Any:
     """Give every zone its own exclusive find.  Returns {zone_index: key}."""
     import zlib
     import tuipet.core.shop as shop
@@ -413,7 +414,7 @@ _HUMAN_SPIRITS = ("human_fire_spirit", "human_light_spirit",
 for _pos, _zi in enumerate(PROGRESSION[-len(_HUMAN_SPIRITS):]):
     if _HUMAN_SPIRITS[_pos] not in ZONES[_zi]["find_keys"]:
         ZONES[_zi]["find_keys"].append(_HUMAN_SPIRITS[_pos])
-def zone_index(zone):
+def zone_index(zone: Any) -> Any:
     """The index of a zone dict in the ordered ZONES, or None (a test zone)."""
     try:
         return ZONES.index(zone)
@@ -421,7 +422,7 @@ def zone_index(zone):
         return None
 
 
-def frontier(pet):
+def frontier(pet: Any) -> Any:
     """The ZONES index of the pet's current frontier zone: the next stop on
     the difficulty road (clamped to the last stop)."""
     prog = max(0, min(int(getattr(pet, "adv_progress", 0) or 0),
@@ -429,7 +430,7 @@ def frontier(pet):
     return PROGRESSION[prog]
 
 
-def unlocked_indices(pet):
+def unlocked_indices(pet: Any) -> Any:
     """The zone indices the pet may embark on, in ROAD order: everything up
     to and including the frontier."""
     prog = max(0, min(int(getattr(pet, "adv_progress", 0) or 0),
@@ -437,14 +438,14 @@ def unlocked_indices(pet):
     return PROGRESSION[:prog + 1]
 
 
-def is_conquered(pet, zi):
+def is_conquered(pet: Any, zi: Any) -> Any:
     """Has the pet already felled this zone's boss (its road position sits
     below the conquered count)?"""
     pos = _ORDER_POS.get(zi)
     return pos is not None and pos < int(getattr(pet, "adv_progress", 0) or 0)
 
 
-def _veteran(enemy):
+def _veteran(enemy: Any) -> Any:
     """A conquered zone's foe, replayed: the SAME species carrying a
     trained veteran's Side -- the real hit-formula terms (trainings, a
     winning record), which Battle consumes via enemy['side'].  Returns a
@@ -459,7 +460,7 @@ def _veteran(enemy):
     return e
 
 
-def is_map_cleared(pet, map_num):
+def is_map_cleared(pet: Any, map_num: Any) -> Any:
     """Are ALL of a map's zones conquered (every one below the frontier)?  This
     is the profile `maps` signal that unlocks the road shop shelf + eggs."""
     idxs = [i for i, z in enumerate(ZONES) if z["map"] == map_num]
@@ -468,7 +469,7 @@ def is_map_cleared(pet, map_num):
     return bool(idxs) and all(is_conquered(pet, i) for i in idxs)
 
 
-def record_win(pet, zone):
+def record_win(pet: Any, zone: Any) -> Any:
     """A boss felled: if it was the FRONTIER, the next stop on the road
     unlocks.  Replaying an already-conquered zone advances nothing.
     Returns True if a zone unlocked."""
@@ -486,7 +487,7 @@ class Adventure:
     step toward the goal; `done` flips on arrival.  The view reads `name`,
     `scene`, `pct`, `ribbon()` and `last`."""
 
-    def __init__(self, pet, zone=None):
+    def __init__(self, pet: Any, zone: Optional[Any]=None) -> None:
         self.pet = pet
         self.zone = zone if zone is not None else pick_zone(pet)
         self.loc = 0                     # travel actions taken, 0..steps
@@ -511,23 +512,23 @@ class Adventure:
         self.last = f"Setting out for {self.name}."
 
     @property
-    def name(self):
+    def name(self) -> Any:
         return self.zone["name"]
 
     @property
-    def scene(self):
+    def scene(self) -> Any:
         return self.zone["scene"]        # the run's ONE backdrop (own-game law)
 
     @property
-    def total(self):
+    def total(self) -> Any:
         return max(1, self.zone["steps"])
 
     @property
-    def pct(self):
+    def pct(self) -> Any:
         return min(100, int(self.loc / self.total * 100))
 
     @property
-    def boss(self):
+    def boss(self) -> Any:
         bs = self.zone.get("bosses") or []
         b = bs[0] if bs else None          # one gate boss per run (the first listed)
         if b is not None and self.replay:
@@ -537,18 +538,18 @@ class Adventure:
         return b
 
     @property
-    def boss_name(self):
+    def boss_name(self) -> Any:
         b = self.boss
         return b["name"] if b else self.name
 
     @property
-    def boss_felled(self):
+    def boss_felled(self) -> Any:
         """True when this run ended by defeating the gate boss (done=True and
         the zone has a boss).  Bossless zones end via 'arrived' instead, so
         the two victory paths stay distinct in the UI."""
         return self.done and self.boss is not None
 
-    def ribbon(self, width=14):
+    def ribbon(self, width: int=14) -> Any:
         """The journey at a glance -- progress lives HERE, not on the pet, so
         the pet is free to just walk (the old engine's doctrine).  '◆' is you,
         '⚑' the goal, '·' the untrod road."""
@@ -560,7 +561,7 @@ class Adventure:
         return "".join(cells)
 
     # -- wild encounters ------------------------------------------------------
-    def _wild_pool(self):
+    def _wild_pool(self) -> Any:
         """The road's wild mons: THIS zone's own random-encounter table
         (enemies.csv, filtered to its map/zone by data.load_maps).  Falls back
         to stage-matched roster enemies only if a zone ships no randoms."""
@@ -569,18 +570,18 @@ class Adventure:
             return pool
         return [e for e in data.enemies_for_stage(self.pet.stage) if not e.get("boss")]
 
-    def _in_town(self, loc):
+    def _in_town(self, loc: Any) -> Any:
         """Is this leg inside a town waypoint span (rest + no encounters)?"""
         return any(a <= loc <= b for a, b, _t in self.zone.get("town_legs", ()))
 
-    def town_at(self, loc):
+    def town_at(self, loc: Any) -> Any:
         """The town id whose span holds this leg, or None (for the town hub)."""
         for a, b, tid in self.zone.get("town_legs", ()):
             if a <= loc <= b:
                 return tid
         return None
 
-    def _roll_encounter(self):
+    def _roll_encounter(self) -> Any:
         """A wild enemy this leg, or None.  A town is safe ground (no roll);
         immunity after a fight is spent first; then a per-leg roll, the pick
         weighted by AppearanceChance."""
@@ -607,7 +608,7 @@ class Adventure:
         return _veteran(e) if self.replay else e
 
     # -- transport (in-run warp items) ----------------------------------------
-    def _transport_kind(self, key):
+    def _transport_kind(self, key: str) -> Any:
         """'town' (Birdra), 'danger' (Garuda), 'life' (Life Recovery),
         'skip' (Zone Transport: a safe lift up the road) or 'camp'
         (Continent Transport: the Whamon rest) -- the CATALOG road items
@@ -619,7 +620,7 @@ class Adventure:
                 "life_recovery": "life", "zone_transport": "skip",
                 "continent_transport": "camp"}.get(key)
 
-    def held_transports(self):
+    def held_transports(self) -> Any:
         """The run-usable road-item keys the pet is carrying, in bag order.
         Each row lists only when it BUYS something (the dead-menu-row rule,
         audit 2026-07-25): Life Recovery hides at full hearts, the Town
@@ -653,7 +654,7 @@ class Adventure:
                 and not (self._transport_kind(k) == "camp"
                          and self.pet.energy >= self.pet.max_energy // 2)]
 
-    def use_transport(self, key):
+    def use_transport(self, key: str) -> Any:
         """Spend a road item.  Town warp -> jump to the town and rest
         (lives + energy; the PANEL then offers the hub doors like any
         walked-in arrival).  Danger warp -> dash toward the boss and get
@@ -734,7 +735,7 @@ class Adventure:
         self.last = "Warped ahead."
         return "danger-warp"
 
-    def _roll_find(self):
+    def _roll_find(self) -> Any:
         """A loot key spotted on the road this step, or None (no finds in a
         town -- the pet is resting, not scavenging)."""
         pool = self.zone.get("find_keys") or ()
@@ -759,7 +760,7 @@ class Adventure:
         weights = [shop.tier_weight(k) for k in pool]
         return (random.choices(list(pool), weights=weights, k=1)[0], False)
 
-    def _roll_hazard(self):
+    def _roll_hazard(self) -> Any:
         """An ambush pounce this leg, or None: town ground is safe, and the
         pouncer is one of THIS zone's own wilds (real roster art -- the
         hazard never invents a creature)."""
@@ -775,7 +776,7 @@ class Adventure:
         weights = [max(1, e.get("chance", 100)) for e in pool]
         return random.choices(pool, weights=weights, k=1)[0]
 
-    def score(self):
+    def score(self) -> Any:
         """The run's arcade score, from the tallies the card already shows."""
         return (self.bits_earned
                 + SCORE_WIN * self.wins
@@ -784,7 +785,7 @@ class Adventure:
                 + SCORE_STREAK * max(0, self.best_streak - 1)
                 + (SCORE_CONQUEST if self.done else 0))
 
-    def _rest_up(self):
+    def _rest_up(self) -> None:
         """A town rest, wherever it comes from (waypoint or warp): lives back,
         energy rested to at least HALF the tank (topped by TOWN_REST_ENERGY
         when already above it) -- and the WIN STREAK breaks.  One rest, one
@@ -809,7 +810,7 @@ class Adventure:
         self.pet.inj_length = 0.0
         self.streak = 0
 
-    def chain(self, won):
+    def chain(self, won: Any) -> None:
         """Advance the WIN STREAK: a chained win grows it (and the run's
         best); a loss or a flee breaks it."""
         if won:
@@ -818,12 +819,12 @@ class Adventure:
         else:
             self.streak = 0
 
-    def streak_mult(self):
+    def streak_mult(self) -> Any:
         """The chained-win bounty multiplier: +STREAK_STEP per win past the
         first, capped at STREAK_CAP."""
         return min(STREAK_CAP, 1 + STREAK_STEP * max(0, self.streak - 1))
 
-    def hazard_hit(self):
+    def hazard_hit(self) -> None:
         """Eat the pounce: the small energy toll.  Single source -- the panel
         reports the missed dodge, the ENGINE applies the cost.  UNFLOORED by
         the energy floor law (a KNOCK, not a spend): this is the one road
@@ -831,7 +832,7 @@ class Adventure:
         self.pet._set_energy(self.pet.energy - HAZARD_ENERGY)
         self.last = "Ambushed on the road!"
 
-    def award_bits(self, enemy):
+    def award_bits(self, enemy: Any) -> Any:
         """Pay out a beaten enemy's bounty (enemies.csv BitsWon range): a wild
         pays a little, a gate boss pays a lot.  Adds to the pet's purse and the
         run tally, returns the amount."""
@@ -870,7 +871,7 @@ class Adventure:
             self.bits_earned += amt
         return amt
 
-    def award_drop(self, enemy):
+    def award_drop(self, enemy: Any) -> Any:
         """THE BATTLE DROP (item expansion 2026-07-26, Joel: "i even want
         battle drops in adventure") -- and it was AUTHORED all along:
         every enemies.csv row carries a LootTableID into dropRate.csv.
@@ -904,7 +905,7 @@ class Adventure:
                 return key
         return None
 
-    def resolve(self, won, fled=False):
+    def resolve(self, won: Any, fled: bool=False) -> Any:
         """Settle a wild fight.  Every fight grants a grace leg so the next
         step is clear.  won -> march on; fled -> got away, no penalty, no
         progress; lost -> a life, and at 0 lives the run FAILS (retreat home).
@@ -927,7 +928,7 @@ class Adventure:
         return "lost"
 
     # -- travel drain ---------------------------------------------------------
-    def _march_drain(self):
+    def _march_drain(self) -> None:
         """One marched leg's toll: it tires (energy), burns the calorie buffer
         (weight trims toward the species base when it bottoms out), and tops the
         effort gauge -- travel is light training.  Applied on a leg cadence."""
@@ -946,7 +947,7 @@ class Adventure:
             p.strength += 1
 
     # -- the march ------------------------------------------------------------
-    def travel(self):
+    def travel(self) -> Any:
         """Advance one step down the road -- unless a wild blocks it.  Returns
         ('encounter', enemy) when one fires (no progress that leg), 'arrived'
         on the step that reaches the goal (the run is `done`), 'step'
@@ -998,7 +999,7 @@ class Adventure:
         self.last = f"{self.name} — {self.pct}%"
         return "step"
 
-    def resolve_boss(self, won, fled=False):
+    def resolve_boss(self, won: Any, fled: bool=False) -> Any:
         """Settle the gate boss.  won -> the zone is CONQUERED (done); fled ->
         turned back at the gate, no victory (not a failure); lost -> a life, and
         at 0 lives the run FAILS; 'retry' keeps the pet at the gate to try

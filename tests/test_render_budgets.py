@@ -28,9 +28,9 @@ def _pet():
 
 
 def _road(monkeypatch, zone=None):
-    monkeypatch.setattr(adventure, "ENCOUNTER_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "HAZARD_CHANCE", 0.0)
-    monkeypatch.setattr(adventure, "FIND_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "ENCOUNTER_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "HAZARD_CHANCE", 0.0)
+    monkeypatch.setattr(adventure.run, "FIND_CHANCE", 0.0)
     monkeypatch.setattr(tournament, "_today", lambda: D)
     pan = AdventurePanel(_pet(), zone=zone or adventure.ZONES[0])
     pan._trans = None

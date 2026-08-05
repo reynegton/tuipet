@@ -14,13 +14,14 @@ import json
 import os
 import sys
 import time
+from typing import Any, Dict, List
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 URI = os.environ.get("TUIPET_LOBBY_URL", "ws://127.0.0.1:8765")
 FEED = os.environ.get("TUIPET_FEED", os.path.join(_HERE, "lobby_feed.jsonl"))
 
 
-def _key():
+def _key() -> str:
     k = os.environ.get("TUIPET_ADMIN_KEY", "").strip()
     if k:
         return k
@@ -30,7 +31,7 @@ def _key():
         sys.exit("no admin key (create admin.key beside server.py)")
 
 
-async def _rpc(payload, timeout=8.0):
+async def _rpc(payload: Dict[str, Any], timeout: float = 8.0) -> Dict[str, Any]:
     import websockets
     async with websockets.connect(URI, open_timeout=timeout) as ws:
         await ws.send(json.dumps(dict(payload, t="admin", key=_key())))
@@ -43,7 +44,7 @@ async def _rpc(payload, timeout=8.0):
                 return r
 
 
-def _fmt(rec):
+def _fmt(rec: Dict[str, Any]) -> str:
     ts, kind = rec.get("ts", "?"), rec.get("kind", "?")
     if kind == "chat":
         return f"{ts}  <{rec.get('name')}> {rec.get('text')}"
@@ -55,7 +56,7 @@ def _fmt(rec):
     return f"{ts}  {json.dumps(rec)}"
 
 
-def cmd_who():
+def cmd_who() -> None:
     r = asyncio.run(_rpc({"cmd": "who"}))
     if r.get("t") != "admin_ok":
         sys.exit(f"refused: {r}")
@@ -66,21 +67,21 @@ def cmd_who():
         print(f"  [{where}] {p['name']}{pet}")
 
 
-def cmd_announce(text):
+def cmd_announce(text: str) -> None:
     r = asyncio.run(_rpc({"cmd": "announce", "text": text}))
     if r.get("t") != "admin_ok":
         sys.exit(f"refused: {r}")
     print(f"announced to {r['sent']} online player(s)")
 
 
-def _feed_lines():
+def _feed_lines() -> List[str]:
     try:
         return open(FEED, encoding="utf-8").readlines()
     except OSError:
         return []
 
 
-def cmd_tail(n=20):
+def cmd_tail(n: int = 20) -> None:
     for ln in _feed_lines()[-n:]:
         try:
             print(_fmt(json.loads(ln)))
@@ -88,7 +89,7 @@ def cmd_tail(n=20):
             pass
 
 
-def cmd_watch():
+def cmd_watch() -> None:
     pos = os.path.getsize(FEED) if os.path.exists(FEED) else 0
     print(f"watching {FEED} (Ctrl-C to stop)")
     while True:

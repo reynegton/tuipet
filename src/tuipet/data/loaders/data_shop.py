@@ -1,6 +1,7 @@
 """The economy data (tier-1 split, 2026-07-17): foods, the vitems
 catalog, the DVPet consumable tables, shop overrides/econ, loot tables."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import csv  # noqa: F401
 import gzip  # noqa: F401
 import json  # noqa: F401
@@ -16,7 +17,7 @@ from tuipet.data.loaders.data_core import (    # noqa: F401  (shared plumbing)
 
 
 @lru_cache(maxsize=1)
-def load_vitems():
+def load_vitems() -> Any:
     """The DSprite item catalog (vitems.json, cloned from the v0.4.x rebuild;
     BASIC VPET 2026-07-16) -- the shop/bag speak THIS now; the DVPet
     foods/items.csv consumable machine is retired."""
@@ -24,7 +25,7 @@ def load_vitems():
         return json.load(fh)
 
 @lru_cache(maxsize=1)
-def load_foods():
+def load_foods() -> Any:
     path = os.path.join(_RAW, "foods.csv")
     foods = []
     with open(path) as fh:
@@ -90,13 +91,13 @@ FOOD_CATEGORIES = ("Meat", "Fish", "Veg", "Fruit", "Med", "Junk", "Grain", "Dair
 # Shop & consumables (foods.csv / items.csv sold via shopConsumable.csv).
 # Each consumable carries care effects applied to the pet when used.
 # ---------------------------------------------------------------------------
-def _consumable(row, id_field):
-    def num(k):
+def _consumable(row: Any, id_field: Any) -> Any:
+    def num(k: Any) -> Any:
         try:
             return float(row.get(k) or 0)
         except ValueError:
             return 0.0
-    def flag(k):
+    def flag(k: Any) -> Any:
         return (row.get(k) or "FALSE").strip().upper() == "TRUE"
     from tuipet.i18n.translator import t_col
     return {
@@ -187,7 +188,7 @@ def _consumable(row, id_field):
         "show_in_inventory": (row.get("ShowInInventory") or "TRUE").strip().upper() != "FALSE",
     }
 
-def _idlist(s):
+def _idlist(s: Any) -> Any:
     out = []
     for x in (s or "").split(";"):
         x = x.strip()
@@ -197,7 +198,7 @@ def _idlist(s):
 
 @lru_cache(maxsize=1)
 @lru_cache(maxsize=1)
-def load_loot_tables():
+def load_loot_tables() -> Any:
     """The AUTHORED battle-drop economy (item expansion 2026-07-26):
     enemies.csv LootTableID -> [(icon_key, rate)] rows, resolved through
     lootTable.csv (table -> dropRate ids) and dropRate.csv (id -> item).
@@ -244,7 +245,7 @@ def load_loot_tables():
     return tables
 
 
-def _load_consumables():
+def _load_consumables() -> Any:
     foods, items = {}, {}
     for r in csv.DictReader(_open_data(os.path.join(_DATA, "foods.csv"))):
         try:
@@ -271,7 +272,7 @@ _FUNC_STATS = ("hunger", "weight", "energy",
 
 _FUNC_FLAGS = ("cured", "healed", "unfatigue", "vitamin")
 
-def item_is_functional(e):
+def item_is_functional(e: Any) -> Any:
     if not e:
         return False
     if any(e.get(k) for k in _FUNC_STATS) or any(e.get(k) for k in _FUNC_FLAGS):
@@ -295,7 +296,7 @@ def item_is_functional(e):
 _SPECIAL_ANIMS = {"ItemEvol", "X_Program", "Inherit", "PhoenixTransport",
                   "BirdraTransport", "GarudaTransport", "WhaTransport", "PortToilet"}
 
-def shop_category(e):
+def shop_category(e: Any) -> Any:
     """Bucket a consumable into food / medicine / toy / chip / special."""
     act = (e.get("action") or "").strip()
     if act in _SPECIAL_ANIMS or e.get("special") == "xantibody":
@@ -307,7 +308,7 @@ def shop_category(e):
         return "medicine"
     return "food" if str(e.get("key", "")).startswith("f:") else "toy"
 
-def _shop_season4(val, default=0):
+def _shop_season4(val: Any, default: int=0) -> Any:
     """Parse a ';'-separated per-season list (Spring;Summer;Fall;Winter) of ints."""
     parts = [x.strip() for x in (val or "").split(";")]
     out = []
@@ -318,7 +319,7 @@ def _shop_season4(val, default=0):
             out.append(default)
     return out
 
-def _shop_time4(val):
+def _shop_time4(val: Any) -> Any:
     """Parse DefaultTimeAvailable 'AtB;AtB;AtB;AtB' -> 4 per-season [start,end] hour windows."""
     out = []
     for seg in (val or "").split(";"):
@@ -334,12 +335,12 @@ def _shop_time4(val):
         out.append(out[-1] if out else [0, 23])
     return out[:4]
 
-def _default_econ(r):
+def _default_econ(r: Any) -> Any:
     """DVPet home-shop economy: each consumable's OWN Default* columns
     (FoodType/Item build their _homeShop ShopConsumable from these).
     shopConsumable.csv is only the per-TOWN override table -- tuipet has the
     single home shop, so the Default* columns are the whole economy."""
-    def i(k, d):
+    def i(k: Any, d: Any) -> Any:
         try:
             return int(r.get(k) or d)
         except ValueError:
@@ -360,10 +361,10 @@ def _default_econ(r):
 # shops, deals"): towns.csv override lists -> these rows' authored econ.
 
 @lru_cache(maxsize=1)
-def load_shop_overrides():
+def load_shop_overrides() -> Any:
     """shopConsumable.csv: the per-TOWN override table -- towns.csv references
     these rows by ShopConsumableID to reprice/restock consumables locally."""
-    out = {}
+    out = {}  # type: ignore
     path = os.path.join(_DATA, "shopConsumable.csv")
     if not os.path.exists(path):
         return out
@@ -372,7 +373,7 @@ def load_shop_overrides():
             sid = int(r["ShopConsumableID"])
         except (KeyError, ValueError):
             continue
-        def i(k, d):
+        def i(k: Any, d: Any) -> Any:
             try:
                 return int(r.get(k) or d)
             except ValueError:
@@ -392,7 +393,7 @@ def load_shop_overrides():
 
 
 @lru_cache(maxsize=1)
-def load_towns():
+def load_towns() -> Any:
     """towns.csv: the full town records -- local shop overrides + inventory
     sizes, sell permissions, and the town tournament (slots 0-23 are hourly
     cups; slots past 23 -- where ForceTrophies pin -- are ALWAYS open)."""
@@ -402,12 +403,12 @@ def load_towns():
             tid = int(r["TownID"])
         except (KeyError, ValueError):
             continue
-        def ids(k):
+        def ids(k: Any) -> Any:
             return [int(x) for x in (r.get(k) or "").split(":") if x.strip().isdigit()]
         forced = [int(x) for x in (r.get("ForceTrophies") or "").split(";")
                   if x.strip().lstrip("-").isdigit() and int(x) >= 0]
 
-        def hours(k):
+        def hours(k: Any) -> Any:
             """'6t23;6t23;24t17;6t23' -> per-season (start, end) opening spans,
             keyed Spring/Summer/Fall/Winter.  Canon Utility.isOpen(h, span) is a
             plain h >= start and h <= end -- so a '24t17' span (start past any
@@ -440,7 +441,7 @@ def load_towns():
         }
     return out
 
-def _shop_econ_default():
+def _shop_econ_default() -> Any:
     """Always-stocked, no-sale defaults for specialty items not in shopConsumable.csv."""
     # NOT must_stock: these specialty extras (X-Antibody etc.) are not in DVPet's
     # shopConsumable.csv -- keep them buyable but as an occasional rare find, not a
@@ -450,7 +451,7 @@ def _shop_econ_default():
             "sale_chance": [0] * 4, "sale_factor": 1, "resell_factor": 10}
 
 @lru_cache(maxsize=1)
-def home_shop_pool():
+def home_shop_pool() -> Any:
     """Every consumable + its own Default* shop economy.  randomizeShop pools
     the ones with ShopUnlocked && price > 0 (shop.py applies that filter); the
     rest are here so bag/loot lookups get data-driven resell factors too."""
@@ -474,7 +475,7 @@ def home_shop_pool():
     # Vitamin and the crafters ship with price 0 / ShopUnlocked false in the data,
     # but their mechanics must stay reachable -- stocked as occasional 20% finds
     for key, price in (("i:79", 2000), ("i:14", 4000), ("f:5", 300), ("f:58", 800), ("i:66", 1200)):
-        e = out.get(key)
+        e = out.get(key)  # type: ignore
         if e and not (e.get("shop_unlocked") and e.get("price", 0) > 0):
             e["price"] = price
             e.update(_shop_econ_default())
@@ -483,13 +484,13 @@ def home_shop_pool():
                 e["special"] = "xantibody"
     return list(out.values())
 
-def consumable_by_key(key):
+def consumable_by_key(key: str) -> Any:
     for e in home_shop_pool():
         if e["key"] == key:
             return e
     # fall back to the full tables -- crafted/loot consumables need not have a shop slot
     try:
-        kind, cid = key.split(":"); cid = int(cid)
+        kind, cid = key.split(":"); cid = int(cid)  # type: ignore
     except (ValueError, AttributeError):
         return None
     foods, items = _load_consumables()

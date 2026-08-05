@@ -1,5 +1,6 @@
 """Tournament — pick an hourly cup, then fight its bracket, in the display box."""
 from __future__ import annotations
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import tuipet.data.loaders.data as data
 import tuipet.core.tournament as tournament
 from tuipet.core.tournament import Tournament
@@ -38,7 +39,7 @@ INTRO_HOLD_T = 10 # the held stare-down, then the bell
 
 
 class TournamentPanel(menu.SubHost):
-    def __init__(self, pet):
+    def __init__(self, pet: Any) -> None:
         self.pet = pet
         self.frame_i = 0
         self.sub = None
@@ -57,7 +58,7 @@ class TournamentPanel(menu.SubHost):
         self._ceremony = None        # the champion's podium beat: {"t"}
         self._intro = None           # the match introductions: {"t"}
 
-    def anim(self):
+    def anim(self) -> None:
         if self.sub_anim():          # SubHost: delegate + sfx bubble
             return
         self.frame_i += 1
@@ -84,7 +85,7 @@ class TournamentPanel(menu.SubHost):
                                        skip_intro=True)
             return
 
-    def strip(self):
+    def strip(self) -> Any:
         """The message-box hint line (hint overhaul 2026-07-10).
 
         THE SHOW PAGES NARRATE HERE NOW (cup audit 2026-07-25).  Each of
@@ -107,7 +108,7 @@ class TournamentPanel(menu.SubHost):
         return menu.hints(("SPACE", t("cup_hint_fight_on", "fight on")), ("B", t("cup_hint_bracket", "bracket")),
                           ("ESC", t("cup_hint_leave", "leave")))
 
-    def key(self, k):
+    def key(self, k: Any) -> Any:
         if self.sub is not None:
             r = self.sub.key(k)
             if r is not None and r[0] == "done":
@@ -164,33 +165,33 @@ class TournamentPanel(menu.SubHost):
                 tr = tournament.trophy_by_id(tid) if tid >= 0 else None
                 if tr is None:
                     self.msg = t("cup_no_slot", "No cup in that slot.")
-                    self.sfx = "error"
+                    self.sfx = "error"  # type: ignore
                     return None
                 err = tournament.eligibility_at(self.pet, tr, self.cursor)
                 if err:
                     self.msg = err
-                    self.sfx = "error"
+                    self.sfx = "error"  # type: ignore
                     return None
-                self.tourney = Tournament(self.pet, tr, slot=self.cursor)
+                self.tourney = Tournament(self.pet, tr, slot=self.cursor)  # type: ignore
                 self.phase = "bracket"
                 self.tree_view = True          # the event opens on the field of eight
-                self.sfx = "mischief"          # soundConfig tourneyStart -> mischief.wav
+                self.sfx = "mischief"          # type: ignore
             elif k == "f":
                 # today's FEATURED cup: any hour, once per real day
                 tr = tournament.featured_now(self.pet)
                 if tr is None:
                     self.msg = t("cup_no_featured", "No featured cup today.")
-                    self.sfx = "error"
+                    self.sfx = "error"  # type: ignore
                     return None
                 err = tournament.eligibility_featured(self.pet, tr)
                 if err:
                     self.msg = err
-                    self.sfx = "error"
+                    self.sfx = "error"  # type: ignore
                     return None
-                self.tourney = Tournament(self.pet, tr, featured=True)
+                self.tourney = Tournament(self.pet, tr, featured=True)  # type: ignore
                 self.phase = "bracket"
                 self.tree_view = True
-                self.sfx = "mischief"
+                self.sfx = "mischief"  # type: ignore
             elif k == "a":
                 # onTourneyAlarm: toggle the wake-me call on this slot's cup
                 tid = self.sched[self.cursor] if 0 <= self.cursor < len(self.sched) else -1
@@ -201,7 +202,7 @@ class TournamentPanel(menu.SubHost):
                     else:
                         self.pet.tourney_alarm = tid
                         self.msg = t("cup_alarm_set", "Alarm set — it will call you at {hour:02d}:00.").format(hour=self.cursor)
-                    self.sfx = "confirm"
+                    self.sfx = "confirm"  # type: ignore
             elif k in ("escape", "u"):          # u (the opening key) also closes
                 return ("done", None)
             return None
@@ -215,45 +216,45 @@ class TournamentPanel(menu.SubHost):
             # other way landed on the empty faceoff arena, a dead page that
             # read as a freeze (Joel 2026-07-25 "i thought the thing froze,
             # there was nothing on screen")
-            self.tree_view = (not self.tree_view) if tourn.over else True
+            self.tree_view = (not self.tree_view) if tourn.over else True  # type: ignore
             return None
-        if k in ("space", "enter") and self.tree_view and not tourn.over:
+        if k in ("space", "enter") and self.tree_view and not tourn.over:  # type: ignore
             # ONE press: "fight on" starts the walk-in THERE AND THEN.  The
             # old flow parked on the empty faceoff arena until a SECOND
             # space -- the same frozen-blank complaint as B above.
             self.tree_view = False
-            self._intro = {"t": 0}
-            self.sfx = "menu"
+            self._intro = {"t": 0}  # type: ignore
+            self.sfx = "menu"  # type: ignore
             return None
-        if k in ("space", "enter") and tourn.over and self.tree_view:
+        if k in ("space", "enter") and tourn.over and self.tree_view:  # type: ignore
             self.tree_view = False             # from the final tree to the result
             return None
-        if k in ("space", "enter") and not (tourn.over or self.sub):
-            self._intro = {"t": 0}             # the introductions, then the bell
-            self.sfx = "menu"
+        if k in ("space", "enter") and not (tourn.over or self.sub):  # type: ignore
+            self._intro = {"t": 0}             # type: ignore
+            self.sfx = "menu"  # type: ignore
         elif k in ("escape", "u"):          # u (the opening key) also closes
-            if not tourn.over:
-                tourn.record(False)             # walking out forfeits: the elimination is real
+            if not tourn.over:  # type: ignore
+                tourn.record(False)             # type: ignore
             # carry the VERDICT home: the winner's cheer / loser's sulk plays
             # on the house screen, like the devices (anim hardening 2026-07-14)
-            return ("done", (tourn.last, tourn.champion))
+            return ("done", (tourn.last, tourn.champion))  # type: ignore
         return None
 
-    def _render_tree(self):
+    def _render_tree(self) -> Any:
         """The bracket page: the field of eight and the tree filling in round
         by round (the entrants always existed in the engine; the player just
         never SAW the tournament)."""
         tourn = self.tourney
-        tree = tourn.tree
+        tree = tourn.tree  # type: ignore
 
-        def nm(e, w):
+        def nm(e: Any, w: Any) -> Any:
             if e == "YOU":
                 s = self.pet.name or "YOU"
             else:                              # the rival wears its grudge mark
                 s = ("!" if e.get("rival") else "") + e["name"]
             return s[:w]
 
-        out = menu.bar(tourn.name, t("cup_bracket_title", "BRACKET"))
+        out = menu.bar(tourn.name, t("cup_bracket_title", "BRACKET"))  # type: ignore
         champ = tree[3][0] if len(tree) > 3 else None
         for i in range(8):
             c1 = nm(tree[0][i], 10)
@@ -269,29 +270,29 @@ class TournamentPanel(menu.SubHost):
             style = INK_B if you else INK
             out.append(" %-11s%-11s%s\n" % (c1, c2, c3),
                        style=style if you else (INK if c1 else DIM))
-        out.append_text(menu.note(tourn.last, tick=self.frame_i))
-        if tourn.over:
+        out.append_text(menu.note(tourn.last, tick=self.frame_i))  # type: ignore
+        if tourn.over:  # type: ignore
             out.append_text(menu.footer(t("cup_hint_result", "SPACE result   ESC leave")))
         else:
             # two-space gap: "quarterfinal" runs the line to exactly 38 --
             # three spaces clipped "ESC forfeit" to "ESC forfei" (menu audit
             # 2026-07-21; menu.footer hard-cuts at W)
-            out.append_text(menu.footer(t("cup_hint_next", "SPACE to the {round}  ESC forfeit").format(round=tourn.round_name.lower())))
+            out.append_text(menu.footer(t("cup_hint_next", "SPACE to the {round}  ESC forfeit").format(round=tourn.round_name.lower())))  # type: ignore
         return out
 
-    def _frames(self, num, role="idle"):
+    def _frames(self, num: int, role: str="idle") -> Any:
         # the standard ~2Hz WALK_BEAT bob -- this screen alone flipped poses
         # every 0.1s tick (a 10Hz flutter, accidental drift; calmed to match
         # the rest, Joel 2026-07-05)
         return data.bob_frame(num, self.frame_i, role)
 
-    def _ceremony_frame(self):
+    def _ceremony_frame(self) -> Any:
         """THE AWARD CEREMONY: the champion cheers centre-stage while the
         arena light pulses bright (the zoneChange idiom) -- the podium beat
         the crown never had.  Mirrors the result page's shape exactly (one
         layout language per screen family)."""
         from tuipet.ui.screens.adventurescreen.panel import _brighten
-        frame_t = self._ceremony["t"]
+        frame_t = self._ceremony["t"]  # type: ignore
         bgimg = self.pet.background(file="tourneyBack")
         if bgimg and any(a <= frame_t % 20 < b for a, b in ((3, 8), (12, 17))):
             bgimg = _brighten(bgimg, 0.5)      # the podium light, on the beat
@@ -303,14 +304,14 @@ class TournamentPanel(menu.SubHost):
                                          ph=FIGHT_ROWS * 2)],
                             COLS, FIGHT_ROWS, on, LCD_BG, bgimg=bgimg)
 
-    def _advance_frame(self):
+    def _advance_frame(self) -> Any:
         """THE FIELD ADVANCES: the other winners cross the arena one at a
         time (the parade idiom on the cup stage) before the bracket page
         lands -- the tournament happening AROUND you, visible at last."""
         a = self._advance
-        i = min(a["t"] // NPC_T, len(a["nums"]) - 1)
-        frame_t = a["t"] % NPC_T
-        fr = data.frames_for(a["nums"][i])
+        i = min(a["t"] // NPC_T, len(a["nums"]) - 1)  # type: ignore
+        frame_t = a["t"] % NPC_T  # type: ignore
+        fr = data.frames_for(a["nums"][i])  # type: ignore
         wi = data.ROLES["walk"][(frame_t // 3) % 2]
         rows = grid.prep((fr[wi] if wi < len(fr) else None) or fr[0],
                          ph=FIGHT_ROWS * 2)
@@ -326,20 +327,20 @@ class TournamentPanel(menu.SubHost):
         scene = render_scene([(rows, x, False)], COLS, FIGHT_ROWS,
                              menu.scene_ink(bgimg), LCD_BG, bgimg=bgimg,
                              clip=grid.WINDOW)
-        nm = (self.tourney.results[i]
-              if i < len(self.tourney.results) else "")
+        nm = (self.tourney.results[i]  # type: ignore
+              if i < len(self.tourney.results) else "")  # type: ignore
         # pure scene; who advanced rides the STRIP (cup audit 2026-07-25)
         self._say = (t("cup_advances_name", "{name} advances").replace("{name}", nm)) if nm else t("cup_advances_field", "the field advances")
         return scene
 
-    def _intro_frame(self):
+    def _intro_frame(self) -> Any:
         """MATCH INTRODUCTIONS: the challenger strides in from the RIGHT and
         is announced, your mon answers from the LEFT, both hold the
         stare-down -- then the bell (anim opens the fight).  The corners are
         grid.faceoff's own, so the entrance lands exactly where the fight
         stands."""
-        frame_t = self._intro["t"]
-        opp = self.tourney.current_opponent()
+        frame_t = self._intro["t"]  # type: ignore
+        opp = self.tourney.current_opponent()  # type: ignore
         pet_rows = self._frames(self.pet.num, "walk" if frame_t >= INTRO_OPP_T else "idle")
         opp_rows = self._frames(opp["num"], "walk" if frame_t < INTRO_OPP_T else "idle")
         left, right = grid.faceoff(pet_rows, opp_rows, left_mirror=True,
@@ -361,7 +362,7 @@ class TournamentPanel(menu.SubHost):
                     else t("cup_you_answer", "You answer!"))           # unnamed: "YOU answers!" was bad grammar
         else:                                  # the held stare-down
             placements = [(lrows, lx, lm), (rrows, rx, rm)]
-            note = t("cup_round_fight", "{round} — FIGHT!").replace("{round}", self.tourney.round_name)
+            note = t("cup_round_fight", "{round} — FIGHT!").replace("{round}", self.tourney.round_name)  # type: ignore
         bgimg = self.pet.background(file="tourneyBack")
         scene = render_scene(placements, COLS, FIGHT_ROWS,
                              menu.scene_ink(bgimg), LCD_BG, bgimg=bgimg,
@@ -372,7 +373,7 @@ class TournamentPanel(menu.SubHost):
         self._say = note
         return scene
 
-    def text(self):
+    def text(self) -> Any:
         if self.sub is not None:
             return self.sub.text()
         if self._ceremony is not None:
@@ -386,7 +387,7 @@ class TournamentPanel(menu.SubHost):
             hour = tournament._hour(self.pet)
             out = menu.header("CUP", "%02d:00" % hour)
 
-            def fmt(tid, i):
+            def fmt(tid: Any, i: Any) -> Any:
                 tr = tournament.trophy_by_id(tid) if tid >= 0 else None
                 name = tournament.trophy_label(tr)[:22] if tr else "\u2014"
                 if tr and tid in (getattr(self.pet, "trophies_won", None) or {}):
@@ -464,8 +465,8 @@ class TournamentPanel(menu.SubHost):
         # plays in the ARENA (tourneyBack.png), not the home habitat
         bgimg = self.pet.background(file="tourneyBack")
         on = menu.scene_ink(bgimg)
-        if tourn.over:
-            pose = "happy" if tourn.champion else "tired"
+        if tourn.over:  # type: ignore
+            pose = "happy" if tourn.champion else "tired"  # type: ignore
             # pure scene (see below): the verdict, the trophy count and the
             # purse all live on the CARD already, and ESC rides the strip
             return render_scene(

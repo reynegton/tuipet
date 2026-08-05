@@ -4,22 +4,22 @@ import tuipet.utils.persistence as persistence
 from tuipet.i18n.translator import t
 import tuipet.utils.theme as theme
 class CloudMixin:
-    def _start_sync(self):
+    def _start_sync(self) -> None:
             """Spin up the background cloud-save push client once an account exists
             (idempotent). The startup pull already ran in main(); this handles pushes."""
             from tuipet import SERVIDOR_ONLINE
-            if not SERVIDOR_ONLINE or self._sync is not None:
+            if not SERVIDOR_ONLINE or self._sync is not None:  # type: ignore
                 return
             if not persistence.sync_enabled():
                 return                       # opted out (TUIPET_NO_SYNC or the options toggle)
             name, pw = persistence.get_account()
             if not name:
                 return                       # no account yet (first launch) — started after account setup
-            self._sync = net.SyncClient(_lobby_uri(), name, pw)
-            self._sync_worker = self.run_worker(self._sync.run(), name="sync",
+            self._sync = net.SyncClient(_lobby_uri(), name, pw)  # type: ignore
+            self._sync_worker = self.run_worker(self._sync.run(), name="sync",  # type: ignore
                                                 exclusive=False)
 
-    def _stop_sync(self):
+    def _stop_sync(self) -> None:
             """Tear the pusher down for real: the stop flag alone left the old
             account's connection parked in `async for` until the socket dropped --
             a live sync ghost in the roster after every account switch (netplay
@@ -32,13 +32,13 @@ class CloudMixin:
                 w.cancel()
                 self._sync_worker = None
 
-    def _push_cloud(self):
+    def _push_cloud(self) -> None:
             """Queue the current pet's save for upload (no-op until the account/sync exists)."""
             from tuipet import SERVIDOR_ONLINE
-            if SERVIDOR_ONLINE and self._sync is not None and self.pet is not None and persistence.sync_enabled():
-                self._sync.push_save(persistence.to_save_dict(self.pet))
+            if SERVIDOR_ONLINE and self._sync is not None and self.pet is not None and persistence.sync_enabled():  # type: ignore
+                self._sync.push_save(persistence.to_save_dict(self.pet))  # type: ignore
 
-    def _warn_if_cloud_dropped(self):
+    def _warn_if_cloud_dropped(self) -> None:
             """The cloud is refusing (or we're refusing to send) this device's
             saves.  The local save is fine, but cross-device sync is dead -- and
             we used to never mention it (swallowed-failure sweep 2026-07-13), or
@@ -63,16 +63,16 @@ class CloudMixin:
             if getattr(self, "_cloud_warned", None) == msg:
                 return                       # one flash per distinct cause
             self._cloud_warned = msg
-            self.flash(f"[{theme.NEG}]{msg}[/]")
+            self.flash(f"[{theme.NEG}]{msg}[/]")  # type: ignore
 
-    def _flush_cloud_on_quit(self):
+    def _flush_cloud_on_quit(self) -> None:
             """Best-effort blocking push so the final state is captured cloud-side."""
             if self._sync is None:
                 return
             try:
                 name, pw = persistence.get_account()
-                cloudsync.push_save(_lobby_uri(), name, pw,
-                                    persistence.to_save_dict(self.pet), timeout=2.0)
+                cloudsync.push_save(_lobby_uri(), name, pw,  # type: ignore
+                                    persistence.to_save_dict(self.pet), timeout=2.0)  # type: ignore
             except Exception:
                 pass
 

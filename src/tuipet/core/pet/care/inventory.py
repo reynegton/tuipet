@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Callable, Union
 import random
 import time
 import math
@@ -9,12 +10,12 @@ import tuipet.core.datacore as datacore
 import tuipet.core.evolution as evolution
 import tuipet.core.lines as lines_mod
 
-def add_item(pet, key, n=1):
+def add_item(pet: Any, key: str, n: int=1) -> None:
     """Drop loot / grants straight into the bag."""
     pet.inventory[key] = pet.inventory.get(key, 0) + n
 
 
-def take_item(pet, key, n=1):
+def take_item(pet: Any, key: str, n: int=1) -> None:
     """Spend n from the bag, dropping the key at zero -- add_item's mirror
     (this decrement lived in four hand-rolled copies; refactor 2026-07-05)."""
     left = pet.inventory.get(key, 0) - n
@@ -24,7 +25,7 @@ def take_item(pet, key, n=1):
         pet.inventory[key] = left
 
 
-def spend_bits(pet, price):
+def spend_bits(pet: Any, price: Any) -> Any:
     """The affordability gate + deduction in ONE place (the 'Not enough
     bits.' guard lived in four copies).  True when paid."""
     if pet.bits < price:
@@ -33,13 +34,13 @@ def spend_bits(pet, price):
     return True
 
 
-def _compensate_attrs(pet):
+def _compensate_attrs(pet: Any) -> Any:
     """compensateAttributes x3 rotations: each negative power borrows from
     the next two in canon's order.  (Canon's zero-all escape only fires
     when all THREE are negative -- with both banks empty its loop would
     spin forever; unreachable with the shipped symmetric trades, and the
     port floors the deficit at 0 instead of freezing.)"""
-    def comp(main, weak, normal):
+    def comp(main: Any, weak: Any, normal: Any) -> Any:
         while main < 0:
             if weak > 0:
                 weak -= 1
@@ -57,7 +58,7 @@ def _compensate_attrs(pet):
     pet.vaccine, pet.data_power, pet.virus = v, d, vi
 
 
-def use_item(pet, key):
+def use_item(pet: Any, key: str) -> Any:
     """Consume one inventory item -> a short result message ('' = the
     item does nothing here, None-equivalent = don't have it).  The
     DSprite item table, cloned from v0.4.x (BASIC VPET 2026-07-16): the
@@ -181,7 +182,7 @@ def use_item(pet, key):
     return out
 
 
-def _crest_egg(pet, key):
+def _crest_egg(pet: Any, key: str) -> Any:
     """A crest egg -> the classic Relic item-evolution flow."""
     if pet.dead or pet.stage == "Egg" or pet.num < 0:
         return Refused("")
@@ -202,7 +203,7 @@ def _crest_egg(pet, key):
     return f"{pet.name} armor-evolved!"
 
 
-def _energy_drink(pet):
+def _energy_drink(pet: Any) -> Any:
     """The label says "energy to FULL": SET the signed meter to max (the
     old += max_energy left a drained pet short of full), and refuse at
     full like every care sibling instead of vanishing for nothing."""
@@ -212,8 +213,8 @@ def _energy_drink(pet):
     return "Energia restaurada!"
 
 
-def _snack(pet, hunger=0, energy=0, weight=0, obedience=0, powers=None,
-           strength=0):
+def _snack(pet: Any, hunger: int=0, energy: int=0, weight: int=0, obedience: int=0, powers: Optional[Any]=None,
+           strength: int=0) -> Any:
     """The TUIPET food family (2018-07-18 -> grown 2026-07-26): plain
     live-meter meals.  Positive-hunger food is refused at a full belly,
     like every meal.  The expansion legs (obedience / VDV powers /
@@ -239,7 +240,7 @@ def _snack(pet, hunger=0, energy=0, weight=0, obedience=0, powers=None,
     return "Nham nham."
 
 
-def _giga_meal(pet):
+def _giga_meal(pet: Any) -> Any:
     if pet.hunger >= FULL_HUNGER:
         return Refused("Refused - belly's full.")
     pet.hunger = FULL_HUNGER
@@ -248,7 +249,7 @@ def _giga_meal(pet):
     return "UM BANQUETE."
 
 
-def _vitamin(pet):
+def _vitamin(pet: Any) -> Any:
     # the canon second job (restoration 2026-07-23): a live vitamin
     # guards against battle injuries (the decompile's good_v/bad_v
     # column) for a game-day -- so a full-effort pet still has a
@@ -262,7 +263,7 @@ def _vitamin(pet):
     return "Cheio de energia — e ele protege!"
 
 
-def _bandage(pet):
+def _bandage(pet: Any) -> Any:
     """The SECOND med, restored (canon restoration 2026-07-23, Joel:
     "it was wrongfully stripped").  Cures the injury, one dose --
     the pill's own grammar; the pill stays sick-only.  Two ailments,
@@ -275,7 +276,7 @@ def _bandage(pet):
     return "Totalmente curado!"
 
 
-def _caffeine(pet):
+def _caffeine(pet: Any) -> Any:
     """Tonight's bedtime pushed later: a quarter of the night off the
     clock the pet ACTUALLY sleeps by.  Line pets (every hatch) read the
     wall-clock window, not sleep_lapse -- the old pressure-only nudge
@@ -304,7 +305,7 @@ def _caffeine(pet):
     return "Bem acordado por um tempo ainda."
 
 
-def _miracle_drink(pet):
+def _miracle_drink(pet: Any) -> Any:
     """THE ERASER, rehoused and nerfed (Joel 2026-07-23: "one at a
     time, own item").  foods.csv row 18 is DVPet's own answer -- the
     ONLY consumable in either sheet carrying `Mistake = -1` -- so the
@@ -329,7 +330,7 @@ def _miracle_drink(pet):
             else f"One slip forgiven — {left} still on the slate.")
 
 
-def _cold_compress(pet):
+def _cold_compress(pet: Any) -> Any:
     """THE CHEAP ERASER (2026-07-27, Joel: "fill the cure hole").
 
     care_mistakes is the game's death clock -- 20 kills outright, an
@@ -349,7 +350,7 @@ def _cold_compress(pet):
             else f"One slip scrubbed off — {left} still on the slate.")
 
 
-def _textbook(pet):
+def _textbook(pet: Any) -> Any:
     """THE TEXTBOOK, back to canon (Joel 2026-07-23: R4).  items.csv
     row 0 is `+Obedience -Mood +Stress`; mood and stress are stripped
     systems, so only the obedience leg lands -- and it is the FIRST
@@ -364,7 +365,7 @@ def _textbook(pet):
     return f"Studied hard. (+{pet.obedience - before} obedience)"
 
 
-def heal_bandage(pet):
+def heal_bandage(pet: Any) -> Any:
     """THE H KEY's verb: patch the battle injury, free (the bandage's
     FINAL door -- Joel 2026-07-26: "remove bandage as an item
     alltogether and just add an h heal hotkey".  It spent one day as a
@@ -384,7 +385,7 @@ def heal_bandage(pet):
     return pet._bandage()
 
 
-def _attr_chip(pet, field, amount):
+def _attr_chip(pet: Any, field: Any, amount: Any) -> Any:
     """THE ATTRIBUTE CHIPS (P6, 2026-07-23) -- foods.csv rows 10/11/12
     (+15) and 20/21/22 (+30), plus 33 (Omni, all three).
 
@@ -409,7 +410,7 @@ def _attr_chip(pet, field, amount):
     return f"{pet._ATTR_WORD[field]} power +{amount}!"
 
 
-def _dna_crystal(pet):
+def _dna_crystal(pet: Any) -> Any:
     """+10 banked DNA in the pet's own Field (the live DNA bank; skips
     one mash session)."""
     field = getattr(pet, "field", "") or ""
@@ -422,7 +423,7 @@ def _dna_crystal(pet):
     return f"+{pet.dna_owned[field] - have} {field} DNA banked!"
 
 
-def _toy(pet, weight=0, energy=0, msg="Fun!", obedience=0, strength=0):
+def _toy(pet: Any, weight: int=0, energy: int=0, msg: str="Fun!", obedience: int=0, strength: int=0) -> Any:
     """The toy dial: exercise sheds weight, couch time buys energy at a
     weight price.  The SHOW (itemfx script) is fired by the bag panel.
     The expansion legs: a spoiling toy dents obedience (authored), the
@@ -438,7 +439,7 @@ def _toy(pet, weight=0, energy=0, msg="Fun!", obedience=0, strength=0):
     return msg
 
 
-def _deadly(pet):
+def _deadly(pet: Any) -> Any:
     # through _die like every other death: it clears asleep/hatching and
     # sets the pose -- the hand-rolled dead=True skipped both, and the
     # tick-edge detector never saw a between-ticks death at all
@@ -447,7 +448,7 @@ def _deadly(pet):
     return "...estava DELICIOSO. E foi fatal."
 
 
-def _junk(pet):
+def _junk(pet: Any) -> Any:
     pet.hunger = FULL_HUNGER
     pet._set_weight(pet.weight + 4)
     # the real mistake pipeline: the bare counter bumped care_mistakes
@@ -457,7 +458,7 @@ def _junk(pet):
     return "Delicioso. Lamentável."
 
 
-def _premium_meat(pet):
+def _premium_meat(pet: Any) -> Any:
     pet.hunger = FULL_HUNGER
     # 12 REAL hours (Joel 2026-07-19, "tune them up to match the words"):
     # the old 12*60 ticks delivered 12 real MINUTES while the text and
@@ -466,13 +467,13 @@ def _premium_meat(pet):
     return "Satisfeito por 12 horas."
 
 
-def _smart_potty(pet):
+def _smart_potty(pet: Any) -> Any:
     pet.clean()
     pet.auto_clean_until = pet.world_seconds + 24 * 3600.0  # 24 REAL hours (same ruling)
     return "Limpeza automática por 24 horas."
 
 
-def _sleep_pill(pet):
+def _sleep_pill(pet: Any) -> Any:
     """Sleep NOW, no argument.  A line pet's real sleep outside its
     window used to be woken by the very next tick's 7:00-sharp check --
     one second of sleep for 300b (gameplay audit 2026-07-19): out of
@@ -504,7 +505,7 @@ def _sleep_pill(pet):
     return "Zzz..."
 
 
-def _alarm(pet):
+def _alarm(pet: Any) -> Any:
     """Wake Up Without Mistake: a clean wake, no disturb penalty.  In a
     line pet's sleep window the wake must HOLD like a rude one does --
     with no grace the pet re-slept on the very next tick, leaving the
@@ -524,7 +525,7 @@ def _alarm(pet):
     return "Hora de acordar!"
 
 
-def _time_gear(pet):
+def _time_gear(pet: Any) -> Any:
     """The Grow Capsule: a QUARTER of this stage off the growth clock
     (Joel 2026-07-24: "make the grow capsule worth 500b").
 
@@ -560,12 +561,12 @@ def _time_gear(pet):
     return f"Time lurches forward. (+{int(moved)}min)"
 
 
-def _anti_evo(pet):
+def _anti_evo(pet: Any) -> Any:
     pet.evo_blocked = not getattr(pet, "evo_blocked", False)
     return "Evolução " + ("BLOQUEADA." if pet.evo_blocked else "desbloqueada.")
 
 
-def _x_item(pet):
+def _x_item(pet: Any) -> Any:
     """The X-Antibody chip: raises the X state (the classic X system).
     Canon xEvolve() charges calcXAntibodyLifeDec() the instant X is gained
     from None (PhysicalState L3361) -- the X-Program's price in LIFE.  That
@@ -584,21 +585,21 @@ def _x_item(pet):
     return "O Anticorpo-X faz efeito!"
 
 
-def _training_pack(pet):
+def _training_pack(pet: Any) -> Any:
     """The Dumbbell: +10 stage trainings, capped 999 (the source's canon
     value -- the +5 was unexplained drift; TUIPET catalog 2026-07-18)."""
     pet.stage_trainings = min(999, pet.stage_trainings + 10)
     return "Treino +10."
 
 
-def _revive_item(pet):
+def _revive_item(pet: Any) -> Any:
     if not pet.dead:
         return Refused("Ninguém precisa ser revivido.")
     pet.save_from_death()
     return "VIVO."
 
 
-def stash_wild_memory(pet):
+def stash_wild_memory(pet: Any) -> Any:
     """A FOUND memory carries a random payload (2026-07-24, Joel:
     "make wild chips carry a random payload").  Where an INHERITED chip
     holds a maxed ancestor's etched Va/D/Vi (tens to hundreds), a wild
@@ -614,7 +615,7 @@ def stash_wild_memory(pet):
     return mem
 
 
-def peek_memory(pet):
+def peek_memory(pet: Any) -> Any:
     """The payload the NEXT chip use will apply -- inherited first, then
     the oldest wild trace.  The inherit fx needs the numbers BEFORE
     use_item consumes them (shopscreen._use)."""
@@ -623,7 +624,7 @@ def peek_memory(pet):
     return pet.wild_memories[0] if pet.wild_memories else {}
 
 
-def _inherit_memory(pet):
+def _inherit_memory(pet: Any) -> Any:
     """The Memory chip (DVPet item 32, anim Inherit): a payload's
     Va/D/Vi joins this pet's powers (petbase MEMORY_* law).  An
     INHERITED chip's etched ancestor data takes priority; failing that,
@@ -646,14 +647,14 @@ def _inherit_memory(pet):
     return f"{mem.get('name', 'The ancestor')}'s power lives on!"
 
 
-def _super_carrot(pet):
+def _super_carrot(pet: Any) -> Any:
     if pet.weight <= 1:
         return Refused("Nada mais para aparar.")
     pet._set_weight(max(1, pet.weight - 10))
     return "Leve como uma pena!"
 
 
-def _csv_snack(pet, key):
+def _csv_snack(pet: Any, key: str) -> Any:
     """A generic authored meal -- and the FOOD EVOLUTION door: one
     corpus form (Citramon) gates on `evol_food` and the source's
     processFoodEvol (evolution.food_select) sat with zero callers.
@@ -674,7 +675,7 @@ def _csv_snack(pet, key):
     return out
 
 
-def _med_item(pet):
+def _med_item(pet: Any) -> Any:
     """The field pill (foods.csv 4, grant-only): cures sickness, the
     free pill's one job in pocket form -- never sold, so the free-cure
     law holds."""
@@ -685,7 +686,7 @@ def _med_item(pet):
     return "A doença passa."
 
 
-def _elixir(pet):
+def _elixir(pet: Any) -> Any:
     """The premium combo (2000b): cures sickness AND fills the tank.
     The free pill stays the cure -- this sells convenience."""
     if not pet.sick and pet.energy >= pet.max_energy:
@@ -696,7 +697,7 @@ def _elixir(pet):
     return "Doença curada — cheio de vida!"
 
 
-def _vitamin_g(pet):
+def _vitamin_g(pet: Any) -> Any:
     """The golden mend (2000b): heals the injury AND the vitamin's
     whole job (effort full + a game-day's injury guard).  H stays the
     free cure -- this is the vitamin's big sibling."""
@@ -711,7 +712,7 @@ def _vitamin_g(pet):
     return "Dourado! Curado, protegido, cheio de energia."
 
 
-def _gold_pill(pet):
+def _gold_pill(pet: Any) -> Any:
     """Canon Energy +12 (the miracle drink's dose, no eraser)."""
     if pet.energy >= pet.max_energy:
         return Refused("Energia já está cheia.")  # noqa: F405
@@ -719,7 +720,7 @@ def _gold_pill(pet):
     return "Vitalidade dourada!"
 
 
-def _supplement(pet):
+def _supplement(pet: Any) -> Any:
     """Effort to FULL + the obedience leg (authored +5) + its weight."""
     if pet.strength >= 4 and pet.obedience >= MAX_OBEDIENCE:  # noqa: F405
         return Refused("Nada mais para fortalecer.")  # noqa: F405
@@ -729,7 +730,7 @@ def _supplement(pet):
     return "Transbordando esforço!"
 
 
-def _board_game(pet):
+def _board_game(pet: Any) -> Any:
     """The attribute RESHAPER (items.csv 5): Vaccine -15 -> Data +15,
     plus the authored obedience.  Refused when there is no Vaccine to
     convert -- a converter with an empty tank is a dud."""
@@ -741,7 +742,7 @@ def _board_game(pet):
     return "Um jogo longo — a ordem cede à lógica. (Va-15 → D+15)"
 
 
-def _computer_game(pet):
+def _computer_game(pet: Any) -> Any:
     """Virus -15 -> Data +15 (items.csv 8)."""
     if pet.virus < 15:
         return Refused("Poder Vírus insuficiente para troca.")  # noqa: F405
@@ -750,7 +751,7 @@ def _computer_game(pet):
     return "Recorde — o caos compila. (Vi-15 → D+15)"
 
 
-def _toy_oven(pet):
+def _toy_oven(pet: Any) -> Any:
     """'+Appetite': makes room for a meal (hunger -1)."""
     if pet.hunger <= 0:
         return Refused("A barriga já está vazia.")  # noqa: F405
@@ -758,7 +759,7 @@ def _toy_oven(pet):
     return "Um cheiro maravilhoso — de repente com fome."
 
 
-def _futon(pet):
+def _futon(pet: Any) -> Any:
     """The deep daytime bed: lie down NOW (the sleeping pill's flow)
     and the doze HOLDS until the tank is FULL, not half (petbody's
     recovery-doze threshold reads futon_doze; cleared on wake)."""
@@ -778,7 +779,7 @@ def _futon(pet):
     return "Bem agasalhado. Zzz..."
 
 
-def _x_program(pet):
+def _x_program(pet: Any) -> Any:
     """The RISKY X (items.csv 14, a 100%-authored elite drop): the
     authored drains ARE the price -- belly emptied, effort zeroed,
     80% of the tank torn away -- then the X takes hold.  No invented
@@ -795,7 +796,7 @@ def _x_program(pet):
     return "Ele convulsiona... e TRANSCENDE. O X faz efeito!"
 
 
-def _textbook_lite(pet):
+def _textbook_lite(pet: Any) -> Any:
     """The Book (items.csv 2): the textbook's little brother -- the
     authored +5, same full-gauge refusal."""
     if pet.obedience >= MAX_OBEDIENCE:                   # noqa: F405
@@ -805,7 +806,7 @@ def _textbook_lite(pet):
     return f"A quiet chapter. (+{pet.obedience - before} obedience)"
 
 
-def _hedonism(pet):
+def _hedonism(pet: Any) -> Any:
     """Hedonism 101 (items.csv 1): obedience -80, exactly as authored.
     A trap with a warning label -- the poison mushroom's precedent:
     a trap always goes down, never refuses."""
@@ -813,7 +814,7 @@ def _hedonism(pet):
     return "Ele lê a coisa TODA. Modos: obliterados."
 
 
-def _evo_key(pet, key):
+def _evo_key(pet: Any, key: str) -> Any:
     """A dormant door opens: the spirits and the Datatron ride the same
     item_select flow the crest eggs do; the direct items name their form
     outright.  Refused (item kept) when nothing answers."""
@@ -842,7 +843,7 @@ def _evo_key(pet, key):
     return f"{pet.name} evolves!"
 
 
-def _capsule(pet, key):
+def _capsule(pet: Any, key: str) -> Any:
     """Open the box: a tier-weighted surprise from the gift pool -- and
     on a HOLIDAY the roll reaches one tier higher (the festival-present
     grammar; 'christmas presents are holiday versions of these').  A
@@ -865,7 +866,7 @@ def _capsule(pet, key):
     return f"Inside: {name}!"
 
 
-def _chocolate_egg(pet):
+def _chocolate_egg(pet: Any) -> Any:
     """A snack with a TOY INSIDE (authored: 'Toy Inside +Mood'): the
     meal, then a common-tier surprise."""
     out = pet._snack(hunger=1, weight=1)
